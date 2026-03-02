@@ -1,7 +1,0 @@
-{
-  networking = {
-    firewall = {
-      enable = true;
-    };
-  };
-}

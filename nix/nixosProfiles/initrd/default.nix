@@ -1,7 +1,0 @@
-{
-  boot = {
-    initrd = {
-      verbose = false;
-    };
-  };
-}

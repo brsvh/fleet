@@ -1,7 +1,0 @@
-{
-  services = {
-    fprintd = {
-      enable = true;
-    };
-  };
-}

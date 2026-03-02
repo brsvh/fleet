@@ -1,4 +1,0 @@
-alias la        ls              --all   --color=auto
-alias lal       ls      -l      --all   --color=auto
-alias ls        ls                      --color=auto
-alias ll        ls      -l              --color=auto --human-readable

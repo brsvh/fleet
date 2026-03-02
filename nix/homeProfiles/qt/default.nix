@@ -1,5 +1,0 @@
-{
-  qt = {
-    enable = true;
-  };
-}
