@@ -1,0 +1,193 @@
+{
+  "nodes": {
+    "devshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768818222,
+        "narHash": "sha256-460jc0+CZfyaO8+w8JNtlClB2n4ui1RbHfPTLkpwhU8=",
+        "ref": "main",
+        "rev": "255a2b1725a20d060f566e4755dbf571bbbb5f76",
+        "revCount": 361,
+        "type": "git",
+        "url": "https://github.com/numtide/devshell.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/devshell.git"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772408722,
+        "narHash": "sha256-rHuJtdcOjK7rAHpHphUb1iCvgkU3GpfvicLMwwnfMT0=",
+        "ref": "main",
+        "rev": "f20dc5d9b8027381c474144ecabc9034d6a839a3",
+        "revCount": 445,
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "ref": "main",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "infix": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772415845,
+        "narHash": "sha256-4zPBVt9h8DORtOjhdWJI7g3aiwNCATvrg3dFMxKEXvI=",
+        "ref": "main",
+        "rev": "b50cd8e7fe3d71396036ae03429049e8b3a1dd72",
+        "revCount": 6,
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/infix.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/infix.git"
+      }
+    },
+    "nixago": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixago-exts": [
+          "nixago-extensions"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1746801636,
+        "narHash": "sha256-dlcKfIXp/eqFHzFm+DzseXAWWlpVwyk9cTvCKGtVKkw=",
+        "ref": "master",
+        "rev": "8cc33f973ab3a891d8a41391e73ef451a783960b",
+        "revCount": 106,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixago.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/nixago.git"
+      }
+    },
+    "nixago-extensions": {
+      "inputs": {
+        "flake-utils": [
+          "nixago",
+          "flake-utils"
+        ],
+        "nixago": [
+          "nixago"
+        ],
+        "nixpkgs": [
+          "nixago",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1676070308,
+        "narHash": "sha256-QaJ65oc2l8iwQIGWUJ0EKjCeSuuCM/LqR8RauxZUUkc=",
+        "ref": "master",
+        "rev": "e5380cb0456f4ea3c86cf94e3039eb856bf07d0b",
+        "revCount": 7,
+        "type": "git",
+        "url": "https://github.com/nix-community/nixago-extensions.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/nixago-extensions.git"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1772082373,
+        "narHash": "sha256-wySf8a6hvuqgFdwvvzPPTARBCMLDz7WFAufGkllD1M4=",
+        "ref": "nixpkgs-unstable",
+        "rev": "26eaeac4e409d7b5a6bf6f90a2a2dc223c78d915",
+        "revCount": 954674,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      },
+      "original": {
+        "ref": "nixpkgs-unstable",
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs.git"
+      }
+    },
+    "root": {
+      "inputs": {
+        "devshell": "devshell",
+        "flake-parts": "flake-parts",
+        "flake-utils": "flake-utils",
+        "infix": "infix",
+        "nixago": "nixago",
+        "nixago-extensions": "nixago-extensions",
+        "nixpkgs": "nixpkgs",
+        "systems": "systems"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1680978846,
+        "narHash": "sha256-Gtqg8b/v49BFDpDetjclCYXm8mAnTrUzR0JnE2nv5aw=",
+        "ref": "main",
+        "rev": "2ecfcac5e15790ba6ce360ceccddb15ad16d08a8",
+        "revCount": 3,
+        "type": "git",
+        "url": "https://github.com/nix-systems/x86_64-linux.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/nix-systems/x86_64-linux.git"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
