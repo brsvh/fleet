@@ -66,27 +66,34 @@
         toCamelCase
         ;
 
-      parts = pipe (dirToAttrs ./.) [
-        (filterAttrsRecursive (
-          name: value:
-          if (isAttrs value) || (name == "__path") then
-            true
-          else
-            hasSuffix ".nix" (toString value)
-        ))
-        (mapAttrsRecursive' (
-          path: value:
-          let
-            basename = last path;
-          in
-          nameValuePair (
-            if basename == "__path" then
-              "__path"
-            else
-              (toCamelCase (stemOf basename))
-          ) value
-        ))
-      ];
+      dirToAttrs' =
+        dir: fns:
+        pipe (dirToAttrs dir) (
+          fns
+          ++ [
+            (filterAttrsRecursive (
+              name: value:
+              if (isAttrs value) || (name == "__path") then
+                true
+              else
+                hasSuffix ".nix" (toString value)
+            ))
+            (mapAttrsRecursive' (
+              path: value:
+              let
+                basename = last path;
+              in
+              nameValuePair (
+                if basename == "__path" then
+                  "__path"
+                else
+                  (toCamelCase (stemOf basename))
+              ) value
+            ))
+          ]
+        );
+
+      dev = dirToAttrs' ./src/dev [ ];
     in
     mkFlake
       {
@@ -106,12 +113,12 @@
 
         partitions = {
           dev = {
-            extraInputsFlake = parts.dev.__path;
+            extraInputsFlake = dev.__path;
 
             module = {
               imports = [
                 infix.flakeModules.devshell
-                parts.dev.flakeModule
+                dev.flakeModule
               ];
             };
           };
