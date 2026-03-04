@@ -51,6 +51,12 @@ in
                   tab_width = 8;
                 };
 
+                "*.el" = {
+                  indent_style = "space";
+                  indent_size = "unset";
+                  tab_width = 2;
+                };
+
                 "*.nix" = {
                   indent_style = "space";
                   tab_width = 2;
