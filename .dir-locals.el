@@ -8,9 +8,10 @@
    ;; Treat project-specific terminology as first-class vocabulary so
    ;; spell checking focuses on genuine mistakes rather than
    ;; repeatedly flagging domain terms.
-   (jinx-dir-local-words . "config dev devShells devshells dirToAttrs
- direnv editorconfig emacs gitignore infix lefthook lf mkdir nixfmt
-nixpkgs pipefail rebase toml treefmt untracked utf yaml yml")))
+   (jinx-dir-local-words . "config dev devShells devshell devshells
+ dirToAttrs direnv editorconfig emacs gitignore infix lefthook lf
+ mkdir nixfmt nixpkgs pipefail rebase toml treefmt untracked utf yaml
+ yml")))
 
  (nix-mode
   .

@@ -110,6 +110,7 @@
 
             module = {
               imports = [
+                infix.flakeModules.devshell
                 parts.dev.flakeModule
               ];
             };

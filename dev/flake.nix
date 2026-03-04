@@ -10,16 +10,6 @@
       url = "git+https://github.com/numtide/devshell.git?ref=main";
     };
 
-    flake-parts = {
-      inputs = {
-        nixpkgs-lib = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
-    };
-
     flake-utils = {
       inputs = {
         systems = {
@@ -28,20 +18,6 @@
       };
 
       url = "github:numtide/flake-utils/main";
-    };
-
-    infix = {
-      inputs = {
-        flake-parts = {
-          follows = "flake-parts";
-        };
-
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://codeberg.org/bingshan/infix.git?ref=main";
     };
 
     nixago = {

@@ -9,7 +9,6 @@ let
     ;
 
   inherit (inputs)
-    infix
     systems
     ;
 
@@ -28,10 +27,6 @@ let
     ;
 in
 {
-  imports = [
-    infix.flakeModules.devshell
-  ];
-
   perSystem =
     {
       config,
