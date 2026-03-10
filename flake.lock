@@ -1,5 +1,42 @@
 {
   "nodes": {
+    "disko": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773025010,
+        "narHash": "sha256-khlHllTsovXgT2GZ0WxT4+RvuMjNeR5OW0UYeEHPYQo=",
+        "ref": "master",
+        "rev": "7b9f7f88ab3b339f8142dc246445abb3c370d3d3",
+        "revCount": 1340,
+        "type": "git",
+        "url": "https://github.com/nix-community/disko.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/disko.git"
+      }
+    },
+    "facter": {
+      "locked": {
+        "lastModified": 1766558141,
+        "narHash": "sha256-Ud9v49ZPsoDBFuyJSQ2Mpw1ZgAH/aMwUwwzrVoetNus=",
+        "ref": "main",
+        "rev": "e796d536e3d83de74267069e179dc620a608ed7d",
+        "revCount": 202,
+        "type": "git",
+        "url": "https://github.com/numtide/nixos-facter-modules.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/nixos-facter-modules.git"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -21,6 +58,27 @@
         "url": "https://github.com/hercules-ci/flake-parts.git"
       }
     },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773093840,
+        "narHash": "sha256-u/96NoAyN8BSRuM3ZimGf7vyYgXa3pLx4MYWjokuoH4=",
+        "ref": "master",
+        "rev": "bb014746edb2a98d975abde4dd40fa240de4cf86",
+        "revCount": 6337,
+        "type": "git",
+        "url": "https://github.com/nix-community/home-manager.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/home-manager.git"
+      }
+    },
     "infix": {
       "inputs": {
         "flake-parts": [
@@ -31,11 +89,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772589299,
-        "narHash": "sha256-eLnfERsBGiXvA0IJqpLbIeflOm8Rj70LFWd++vxymDI=",
+        "lastModified": 1773107231,
+        "narHash": "sha256-qNdp0OD3UnedJ2mAY1lxAxq/3ZIjwnin/2c/KBqCj80=",
         "ref": "main",
-        "rev": "e83bb54d25996f93cf550c834a287ee87fc56c81",
-        "revCount": 10,
+        "rev": "d0b2f80fd1618c2b09e63877e12ce9f225bab083",
+        "revCount": 11,
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
       },
@@ -45,27 +103,33 @@
         "url": "https://codeberg.org/bingshan/infix.git"
       }
     },
-    "nixpkgs": {
+    "nixos": {
       "locked": {
-        "lastModified": 1772525000,
-        "narHash": "sha256-M7kpjimt0jdEQzmin6ptszf8ev7TVzibyZNSLaLquMM=",
-        "ref": "nixpkgs-unstable",
-        "rev": "72b1d820cb0149b40a35aa077b4b6d60cd1b23c3",
-        "revCount": 957475,
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
+        "ref": "nixos-unstable",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
+        "revCount": 960399,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
       "original": {
-        "ref": "nixpkgs-unstable",
+        "ref": "nixos-unstable",
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       }
     },
     "root": {
       "inputs": {
+        "disko": "disko",
+        "facter": "facter",
         "flake-parts": "flake-parts",
+        "home-manager": "home-manager",
         "infix": "infix",
-        "nixpkgs": "nixpkgs"
+        "nixos": "nixos",
+        "nixpkgs": [
+          "nixos"
+        ]
       }
     }
   },

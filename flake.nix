@@ -2,6 +2,20 @@
   description = "A personal fleet of workstation and server configurations";
 
   inputs = {
+    disko = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/disko.git?ref=master";
+    };
+
+    facter = {
+      url = "git+https://github.com/numtide/nixos-facter-modules.git?ref=main";
+    };
+
     flake-parts = {
       inputs = {
         nixpkgs-lib = {
@@ -10,6 +24,16 @@
       };
 
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
+    };
+
+    home-manager = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/home-manager.git?ref=master";
     };
 
     infix = {
@@ -27,7 +51,11 @@
     };
 
     nixpkgs = {
-      url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixpkgs-unstable";
+      follows = "nixos";
+    };
+
+    nixos = {
+      url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
     };
   };
 
@@ -53,10 +81,13 @@
       inherit (infix.lib)
         dirToAttrs
         mapAttrsRecursive'
+        mapAttrsRecursiveCond'
         stemOf
         ;
 
       inherit (nixpkgs.lib)
+        elem
+        filterAttrs
         filterAttrsRecursive
         hasSuffix
         isAttrs
@@ -66,34 +97,73 @@
         toCamelCase
         ;
 
-      dirToAttrs' =
-        dir: fns:
-        pipe (dirToAttrs dir) (
-          fns
-          ++ [
-            (filterAttrsRecursive (
-              name: value:
-              if (isAttrs value) || (name == "__path") then
-                true
-              else
-                hasSuffix ".nix" (toString value)
-            ))
-            (mapAttrsRecursive' (
-              path: value:
-              let
-                basename = last path;
-              in
-              nameValuePair (
-                if basename == "__path" then
-                  "__path"
-                else
-                  (toCamelCase (stemOf basename))
-              ) value
-            ))
-          ]
-        );
+      camelifyAttrs = mapAttrsRecursive' (
+        path: value:
+        let
+          basename = last path;
+        in
+        nameValuePair (
+          if basename == "__path" then
+            "__path"
+          else
+            (toCamelCase (stemOf basename))
+        ) value
+      );
 
-      dev = dirToAttrs' ./src/dev [ ];
+      liftDefaultAttrs =
+        mapAttrsRecursiveCond'
+          (v: !(isAttrs v && v ? default))
+          (
+            path: v:
+            nameValuePair (stemOf (last path)) (
+              if isAttrs v && v ? default then v.default else v
+            )
+          );
+
+      removePathAttrs = filterAttrsRecursive (
+        name: _: name != "__path"
+      );
+
+      excludeTopLevelDirs =
+        dirs:
+        filterAttrsRecursive (name: _: !(elem name dirs));
+
+      keepOnlyNixAttrs = filterAttrsRecursive (
+        name: value:
+        if (isAttrs value) || (name == "__path") then
+          true
+        else
+          hasSuffix ".nix" (toString value)
+      );
+
+      collect = dir: fns: pipe (dirToAttrs dir) fns;
+
+      dev = collect ./src/dev [
+        keepOnlyNixAttrs
+        camelifyAttrs
+      ];
+
+      fleet = collect ./src [
+        (excludeTopLevelDirs [
+          "dev"
+          "home"
+          "system"
+        ])
+        keepOnlyNixAttrs
+        camelifyAttrs
+      ];
+
+      home = collect ./src/home [
+        removePathAttrs
+        keepOnlyNixAttrs
+        camelifyAttrs
+      ];
+
+      system = collect ./src/system [
+        removePathAttrs
+        keepOnlyNixAttrs
+        camelifyAttrs
+      ];
     in
     mkFlake
       {
@@ -104,7 +174,22 @@
       {
         imports = [
           flake-parts.flakeModules.partitions
+          infix.flakeModules.nixosConfigurations
         ];
+
+        nixosConfigurations = {
+          azaleoid = {
+            directory = fleet.azaleoid.__path;
+
+            specialArgs = {
+              inherit
+                home
+                infix
+                system
+                ;
+            };
+          };
+        };
 
         partitionedAttrs = {
           devShells = "dev";
