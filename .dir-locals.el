@@ -11,7 +11,7 @@
    (jinx-dir-local-words . "apm autocd azaleoid bg bluetooth btrfs
 cdspell checkwinsize cmdhist cond config ctrl dev devShells devshell
 devshells dirToAttrs direnv dirname dirspell disko editorconfig efi
-emacs erasedups esac facter fg filesystem gitignore globstar gpt
+emacs erasedups esac facter fg filesystem gitignore globstar gpt guix
 histappend histfile hstr hstrnotiocsti ignoreboth ignorespace infix
 json lba lefthook lf linux mkDefault mkdir nftables nixfmt nixos
 nixosConfigurations nixpkgs noatime noclobber pipefail pnp posix
