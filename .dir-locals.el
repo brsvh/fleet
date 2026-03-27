@@ -8,16 +8,16 @@
    ;; Treat project-specific terminology as first-class vocabulary so
    ;; spell checking focuses on genuine mistakes rather than
    ;; repeatedly flagging domain terms.
-   (jinx-dir-local-words . "apm autocd azaleoid bg bluetooth btrfs
-cdspell cgroups checkwinsize cmdhist cond config ctrl dev devShells
-devshell devshells dirToAttrs direnv dirname dirspell disko
-editorconfig efi emacs erasedups esac facter fg filesystem gitignore
-globstar gpt guix histappend histfile hstr hstrnotiocsti ignoreboth
-ignorespace infix json lba lefthook lf linux mkDefault mkdir nftables
-nixfmt nixos nixosConfigurations nixpkgs noatime noclobber pipefail
-pnp posix rebase shopt smbios src ssd stdout subvols symlinked
-symlinks sysfs toml treefmt tty uefi uids untracked usb utf vbe vfat
-virtualisation yaml yml zstd")))
+   (jinx-dir-local-words . "allowUnfree apm autocd azaleoid bg
+bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond config ctrl
+dev devShells devshell devshells dirToAttrs direnv dirname dirspell
+disko editorconfig efi emacs erasedups esac facter fg filesystem
+gitignore globstar gpt guix histappend histfile hstr hstrnotiocsti
+ignoreboth ignorespace infix json lba lefthook lf linux mkDefault
+mkdir nftables nixfmt nixos nixosConfigurations nixpkgs noatime
+noclobber pipefail pnp posix rebase shopt smbios src ssd stdout
+subvols symlinked symlinks sysfs toml treefmt tty uefi uids untracked
+usb utf vbe vfat virtualisation yaml yml zstd")))
 
  (nix-mode
   .
