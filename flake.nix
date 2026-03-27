@@ -125,8 +125,7 @@
       );
 
       excludeTopLevelDirs =
-        dirs:
-        filterAttrsRecursive (name: _: !(elem name dirs));
+        dirs: filterAttrs (name: _: !(elem name dirs));
 
       keepOnlyNixAttrs = filterAttrsRecursive (
         name: value:
