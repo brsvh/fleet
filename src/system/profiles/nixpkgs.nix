@@ -1,15 +1,10 @@
 {
   inputs,
-  lib,
   ...
 }:
 let
   inherit (inputs)
     nixpkgs
-    ;
-
-  inherit (lib)
-    mkDefault
     ;
 in
 {
@@ -18,12 +13,6 @@ in
       nixpkgs = {
         flake = nixpkgs;
       };
-    };
-  };
-
-  nixpkgs = {
-    config = {
-      allowUnfree = mkDefault true;
     };
   };
 }
