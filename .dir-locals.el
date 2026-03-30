@@ -15,9 +15,9 @@ disko editorconfig efi emacs erasedups esac facter fg filesystem
 gitignore globstar gpt guix histappend histfile hstr hstrnotiocsti
 ignoreboth ignorespace infix json lba lefthook lf linux mkDefault
 mkdir nftables nixfmt nixos nixosConfigurations nixpkgs noatime
-noclobber pipefail pnp posix rebase shopt smbios src ssd stdout
-subvols symlinked symlinks sysfs toml treefmt tty uefi uids untracked
-usb utf vbe vfat virtualisation yaml yml zstd")))
+noclobber openssh pipefail pnp posix rebase shopt smbios src ssd
+stdout subvols symlinked symlinks sysfs toml treefmt tty uefi uids
+untracked usb utf vbe vfat virtualisation yaml yml zstd")))
 
  (nix-mode
   .
