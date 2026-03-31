@@ -120,6 +120,19 @@
             )
           );
 
+      removeExtension = mapAttrsRecursive' (
+        path: value:
+        let
+          basename = last path;
+        in
+        nameValuePair (
+          if basename == "__path" then
+            "__path"
+          else
+            (stemOf basename)
+        ) value
+      );
+
       removePathAttrs = filterAttrsRecursive (
         name: _: name != "__path"
       );
@@ -153,11 +166,13 @@
       ];
 
       home = collect ./src/home [
+        removeExtension
         removePathAttrs
         keepOnlyNixAttrs
       ];
 
       system = collect ./src/system [
+        removeExtension
         removePathAttrs
         keepOnlyNixAttrs
       ];
