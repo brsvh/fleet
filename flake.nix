@@ -155,13 +155,11 @@
       home = collect ./src/home [
         removePathAttrs
         keepOnlyNixAttrs
-        camelifyAttrs
       ];
 
       system = collect ./src/system [
         removePathAttrs
         keepOnlyNixAttrs
-        camelifyAttrs
       ];
     in
     mkFlake
