@@ -11,14 +11,14 @@
    (jinx-dir-local-words . "allowUnfree apm autocd azaleoid bg bgrt
 bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond config ctrl
 dev devShells devshell devshells dirToAttrs direnv dirname dirspell
-disko editorconfig efi emacs erasedups esac facter fg filesystem
-gitignore globstar gpt guix histappend histfile hstr hstrnotiocsti
-ignoreboth ignorespace infix json lba lefthook lf linux loglevel
-mkDefault mkdir nftables nixfmt nixos nixosConfigurations nixpkgs
-noatime noclobber openssh pipefail plymouth pnp posix rebase shopt
-smbios src ssd stdout subvols symlinked symlinks sysfs systemd toml
-treefmt tty udev uefi uids untracked usb utf vbe vfat virtualisation
-wayland xdg yaml yml zh zstd")))
+disko editorconfig efi emacs erasedups esac facter fg filesystem gdm
+gitignore globstar gnome gpt guix histappend histfile hstr
+hstrnotiocsti ignoreboth ignorespace infix json lba lefthook lf linux
+loglevel mkDefault mkdir nftables nixfmt nixos nixosConfigurations
+nixpkgs noatime noclobber openssh pipefail plymouth pnp posix rebase
+shopt smbios src ssd stdout subvols symlinked symlinks sysfs systemd
+toml treefmt tty udev uefi uids untracked usb utf vbe vfat
+virtualisation wayland xdg yaml yml zh zstd")))
 
  (nix-mode
   .
