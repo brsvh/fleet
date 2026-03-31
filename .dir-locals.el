@@ -18,7 +18,7 @@ mkDefault mkdir nftables nixfmt nixos nixosConfigurations nixpkgs
 noatime noclobber openssh pipefail plymouth pnp posix rebase shopt
 smbios src ssd stdout subvols symlinked symlinks sysfs systemd toml
 treefmt tty udev uefi uids untracked usb utf vbe vfat virtualisation
-wayland yaml yml zstd")))
+wayland yaml yml zh zstd")))
 
  (nix-mode
   .
