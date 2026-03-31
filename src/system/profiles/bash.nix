@@ -60,7 +60,7 @@ in
 
         _hf_dir="''${XDG_STATE_HOME:-''$HOME/.local/state}/''${_hf_prefix}"
         export HISTFILE="''${_hf_dir}/history"
-        mkdir -p "$(dirname -- "${HISTFILE}")"
+        mkdir -p "$(dirname -- "''${HISTFILE}")"
 
         # Huge history. Doesn't appear to slow things down, so why not?
         HISTSIZE=500000
