@@ -200,6 +200,12 @@
                 system
                 ;
             };
+
+            users = {
+              root = {
+                directory = fleet.root.__path;
+              };
+            };
           };
         };
 
