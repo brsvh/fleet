@@ -8,9 +8,9 @@
    ;; Treat project-specific terminology as first-class vocabulary so
    ;; spell checking focuses on genuine mistakes rather than
    ;; repeatedly flagging domain terms.
-   (jinx-dir-local-words . "allowUnfree apm autocd azaleoid bg bgrt
-bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond config ctrl
-dconf dev devShells devshell devshells dirToAttrs direnv dirname
+   (jinx-dir-local-words . "adwaita allowUnfree apm autocd azaleoid bg
+bgrt bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond config
+ctrl dconf dev devShells devshell devshells dirToAttrs direnv dirname
 dirspell disko editorconfig efi emacs enablement erasedups esac facter
 fg filesystem gdm gitignore globstar gnome gpt guix histappend
 histfile hstr hstrnotiocsti ignoreboth ignorespace infix json lba
@@ -18,7 +18,8 @@ lefthook lf linux loglevel mkDefault mkdir nftables nixfmt nixos
 nixosConfigurations nixpkgs noatime noclobber openssh pipefail
 plymouth pnp posix rebase shopt smbios src ssd stdout subvols
 symlinked symlinks sysfs systemd toml treefmt tty udev uefi uids
-untracked usb utf vbe vfat virtualisation wayland xdg yaml yml zh zstd")))
+untracked usb utf vbe vfat virtualisation wayland xdg xwayland yaml
+yml zh zstd")))
 
  (nix-mode
   .
