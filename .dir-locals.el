@@ -13,12 +13,12 @@ bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond config ctrl
 dev devShells devshell devshells dirToAttrs direnv dirname dirspell
 disko editorconfig efi emacs erasedups esac facter fg filesystem
 gitignore globstar gpt guix histappend histfile hstr hstrnotiocsti
-ignoreboth ignorespace infix json lba lefthook lf linux mkDefault
-mkdir nftables nixfmt nixos nixosConfigurations nixpkgs noatime
-noclobber openssh pipefail plymouth pnp posix rebase shopt smbios src
-ssd stdout subvols symlinked symlinks sysfs systemd toml treefmt tty
-uefi uids untracked usb utf vbe vfat virtualisation wayland yaml yml
-zstd")))
+ignoreboth ignorespace infix json lba lefthook lf linux loglevel
+mkDefault mkdir nftables nixfmt nixos nixosConfigurations nixpkgs
+noatime noclobber openssh pipefail plymouth pnp posix rebase shopt
+smbios src ssd stdout subvols symlinked symlinks sysfs systemd toml
+treefmt tty udev uefi uids untracked usb utf vbe vfat virtualisation
+wayland yaml yml zstd")))
 
  (nix-mode
   .
