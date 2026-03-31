@@ -202,6 +202,10 @@
             };
 
             users = {
+              bingshan = {
+                directory = fleet.bingshan.__path;
+              };
+
               root = {
                 directory = fleet.root.__path;
               };
