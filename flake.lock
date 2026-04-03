@@ -89,11 +89,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775206556,
-        "narHash": "sha256-/acteeQaJcDO9/+4dSmPNc2wr5FzkwwEoPFeJJK3z14=",
+        "lastModified": 1775210863,
+        "narHash": "sha256-bv6xHENIDBvl/KouFCMMnWcGKTC2BrNQYaCy5z+dhxk=",
         "ref": "main",
-        "rev": "8e42510f92a9c8a23286dd60b6c4cac08df10ee2",
-        "revCount": 14,
+        "rev": "a6dc6641ca56365782e285768fe5a32fab9a93b2",
+        "revCount": 15,
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
       },
