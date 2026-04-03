@@ -14,4 +14,7 @@
 /result
 /result-*
 
+# sops
+/.sops.yaml
+
 # .gitignore ends here

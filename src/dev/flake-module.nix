@@ -168,6 +168,32 @@ in
               ];
             };
 
+            sops = {
+              data = {
+                creation_rules = [
+                  {
+                    key_groups = [
+                      {
+                        pgp = [
+                          "D6E9ED4504C41AD2DA16F39631E62A2FC33802BA"
+                        ];
+                      }
+                    ];
+
+                    path_regex = "^src/azaleoid/etc/sops\.yaml$";
+                  }
+                ];
+              };
+
+              format = "yaml";
+              output = ".sops.yaml";
+
+              packages = with pkgs; [
+                age
+                sops
+              ];
+            };
+
             treefmt = {
               data = {
                 formatter = {
