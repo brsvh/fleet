@@ -10,7 +10,7 @@ in
 {
   networking = {
     networkmanager = {
-      enable = true;
+      enable = mkDefault true;
     };
   };
 }
