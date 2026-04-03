@@ -57,6 +57,16 @@
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
     };
+
+    sops = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/Mic92/sops-nix.git?ref=master";
+    };
   };
 
   nixConfig = {

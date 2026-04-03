@@ -129,7 +129,29 @@
         "nixos": "nixos",
         "nixpkgs": [
           "nixos"
+        ],
+        "sops": "sops"
+      }
+    },
+    "sops": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
         ]
+      },
+      "locked": {
+        "lastModified": 1774910634,
+        "narHash": "sha256-B+rZDPyktGEjOMt8PcHKYmgmKoF+GaNAFJhguktXAo0=",
+        "ref": "master",
+        "rev": "19bf3d8678fbbfbc173beaa0b5b37d37938db301",
+        "revCount": 1189,
+        "type": "git",
+        "url": "https://github.com/Mic92/sops-nix.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/Mic92/sops-nix.git"
       }
     }
   },
