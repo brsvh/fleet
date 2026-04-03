@@ -21,8 +21,8 @@ PreloadInputMethod PrevCandidate PrevPage Romaja ShareInputState
 ShowFirstInputMethodInformation ShowInputMethodInformation
 ShowPassword ShowPreeditForPassword TogglePreedit TriggerKey
 TriggerKeys Zenkaku adwaita allowUnfree apm autocd azaleoid bg bgrt
-bingshan bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond
-config ctrl dae dconf dev devShells devshell devshells dialout
+bingshan bluetooth btrfs cachix cdspell cgroups checkwinsize cmdhist
+cond config ctrl dae dconf dev devShells devshell devshells dialout
 dirToAttrs direnv dirname dirspell disko editorconfig efi emacs
 enablement erasedups esac facter fg filesystem gdm gitattributes
 gitignore globstar gnome gnupg gpg gpt gtk gtkrc guix histappend
