@@ -10,7 +10,7 @@
    ;; repeatedly flagging domain terms.
    (jinx-dir-local-words . "adwaita allowUnfree apm autocd azaleoid bg
 bgrt bingshan bluetooth btrfs cdspell cgroups checkwinsize cmdhist
-cond config ctrl dconf dev devShells devshell devshells dialout
+cond config ctrl dae dconf dev devShells devshell devshells dialout
 dirToAttrs direnv dirname dirspell disko editorconfig efi emacs
 enablement erasedups esac facter fg filesystem gdm gitattributes
 gitignore globstar gnome gnupg gpg gpt gtk gtkrc guix histappend
