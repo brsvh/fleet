@@ -9,19 +9,19 @@ let
     username
     ;
 
-  account =
+  email =
     config.accounts.email.accounts.${username};
 in
 {
   imports = [
-    bingshan.profiles.account
+    bingshan.profiles.accounts
     home.profiles.git
   ];
 
   programs = {
     git = {
       signing = {
-        inherit (account.gpg)
+        inherit (email.gpg)
           key
           signByDefault
           ;
@@ -29,8 +29,8 @@ in
 
       settings = {
         user = {
-          email = account.address;
-          name = account.realName;
+          email = email.address;
+          name = email.realName;
         };
       };
     };
