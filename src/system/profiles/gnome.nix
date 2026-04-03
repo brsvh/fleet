@@ -46,7 +46,6 @@ in
                     "appindicatorsupport@rgcjonas.gmail.com"
                     "kimpanel@kde.org"
                     "user-theme@gnome-shell-extensions.gcampax.github.com"
-                    p
                   ];
                 };
               };
