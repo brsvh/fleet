@@ -8,20 +8,32 @@
    ;; Treat project-specific terminology as first-class vocabulary so
    ;; spell checking focuses on genuine mistakes rather than
    ;; repeatedly flagging domain terms.
-   (jinx-dir-local-words . "adwaita allowUnfree apm autocd azaleoid bg
-bgrt bingshan bluetooth btrfs cdspell cgroups checkwinsize cmdhist
-cond config ctrl dae dconf dev devShells devshell devshells dialout
+   (jinx-dir-local-words . "ActivateKeys ActiveByDefault
+AllowInputMethodForPassword AltTriggerKeys AutoSavePeriod
+ClearPasswordAfter CompactInputMethodInformation CustomXkbOption
+DeactivateKeys DefaultIM DefaultPageSize DisabledAddons EnabledAddons
+EnumerateBackwardKeys EnumerateForwardKeys EnumerateGroupBackwardKeys
+EnumerateGroupForwardKeys EnumerateSkipFirst EnumerateWithTriggerKeys
+FallbackSpellLanguage Hanja Hankaku HiddenNotifications
+IgnorePasswordFromPasswordManager ModifierOnlyKeyTimeout NextCandidate
+NextPage OverrideXkbOption PastePrimaryKey PreeditEnabledByDefault
+PreloadInputMethod PrevCandidate PrevPage Romaja ShareInputState
+ShowFirstInputMethodInformation ShowInputMethodInformation
+ShowPassword ShowPreeditForPassword TogglePreedit TriggerKey
+TriggerKeys Zenkaku adwaita allowUnfree apm autocd azaleoid bg bgrt
+bingshan bluetooth btrfs cdspell cgroups checkwinsize cmdhist cond
+config ctrl dae dconf dev devShells devshell devshells dialout
 dirToAttrs direnv dirname dirspell disko editorconfig efi emacs
 enablement erasedups esac facter fg filesystem gdm gitattributes
 gitignore globstar gnome gnupg gpg gpt gtk gtkrc guix histappend
-histfile hstr hstrnotiocsti ignoreboth ignorespace infix json
-jackaudio kvm lba lefthook lf libvirtd linux loglevel loopback lp
-mkDefault mkdir networkmanager nftables nixfmt nixos
-nixosConfigurations nixpkgs noatime noclobber openssh pinentry
-pipefail plymouth pnp posix rebase shopt smbios src ssd stdout subvols
-symlinked symlinks sysfs systemd toml treefmt tty txt udev uefi uids
-untracked usb utf vbe vfat virtualisation wayland xdg xwayland yaml
-yml zh zstd")))
+histfile hstr hstrnotiocsti ignoreboth ignorespace infix jackaudio
+json kvm lba lefthook lf libvirtd linux loglevel loopback lp mkDefault
+mkdir networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
+noatime noclobber openssh pinentry pipefail plymouth pnp posix rebase
+resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
+smbios src ssd stdout subvols symlinked symlinks sysfs systemd toml
+treefmt tty txt udev uefi uids untracked usb utf vbe vfat
+virtualisation wayland xdg xwayland yaml yml zh zstd")))
 
  (nix-mode
   .
