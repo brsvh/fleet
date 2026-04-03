@@ -13,14 +13,14 @@ bgrt bingshan bluetooth btrfs cdspell cgroups checkwinsize cmdhist
 cond config ctrl dconf dev devShells devshell devshells dialout
 dirToAttrs direnv dirname dirspell disko editorconfig efi emacs
 enablement erasedups esac facter fg filesystem gdm gitignore globstar
-gnome gpt gtk gtkrc guix histappend histfile hstr hstrnotiocsti
-ignoreboth ignorespace infix json jackaudio kvm lba lefthook lf
-libvirtd linux loglevel lp mkDefault mkdir networkmanager nftables
-nixfmt nixos nixosConfigurations nixpkgs noatime noclobber openssh
-pinentry pipefail plymouth pnp posix rebase shopt smbios src ssd
-stdout subvols symlinked symlinks sysfs systemd toml treefmt tty udev
-uefi uids untracked usb utf vbe vfat virtualisation wayland xdg
-xwayland yaml yml zh zstd")))
+gnome gnupg gpg gpt gtk gtkrc guix histappend histfile hstr
+hstrnotiocsti ignoreboth ignorespace infix json jackaudio kvm lba
+lefthook lf libvirtd linux loglevel loopback lp mkDefault mkdir
+networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
+noatime noclobber openssh pinentry pipefail plymouth pnp posix rebase
+shopt smbios src ssd stdout subvols symlinked symlinks sysfs systemd
+toml treefmt tty udev uefi uids untracked usb utf vbe vfat
+virtualisation wayland xdg xwayland yaml yml zh zstd")))
 
  (nix-mode
   .
