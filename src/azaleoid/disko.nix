@@ -2,7 +2,7 @@
   disko = {
     devices = {
       disk = {
-        nvme0n1 = {
+        azaleoid = {
           content = {
             partitions = {
               efi = {
