@@ -24,17 +24,18 @@ TriggerKeys Zenkaku adwaita allowUnfree apm autocd azaleoid bg bgrt
 bingshan bluetooth btrfs cachix cdspell cgroups checkwinsize cmdhist
 cond config consolefonts ctrl dae dconf dev devShells devshell
 devshells dialout dirToAttrs direnv dirname dirspell disko
-editorconfig efi emacs enablement erasedups esac eurlatgr facter fg
-filesystem gdm gitattributes gitignore globstar gnome gnupg gpg gpt
+editorconfig edP efi emacs enablement erasedups esac eurlatgr facter
+fg filesystem gdm gitattributes gitignore globstar gnome gnupg gpg gpt
 gtk gtkrc guix gz histappend histfile hstr hstrnotiocsti ignoreboth
-ignorespace infix jackaudio json kvm lanzaboote lba lefthook lf
-libvirtd linux loglevel loopback lp mkDefault mkdir networkmanager
-nftables nixfmt nixos nixosConfigurations nixpkgs noatime noclobber
-openssh partlabel pinentry pipefail plymouth pnp posix psfu rebase
-resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
-smbios src ssd stdout subvols swapfile symlinked symlinks sysfs
-systemd toml treefmt tty txt udev uefi uids untracked usb utf vbe vfat
-virtualisation wayland writeback xdg xwayland yaml yml zh zram zstd")))
+ignorespace infix jackaudio json kvm lanzaboote layoutmode lba
+lefthook lf libvirtd linux logicalmonitor loglevel loopback lp
+mkDefault mkdir monitorspec networkmanager nftables nixfmt nixos
+nixosConfigurations nixpkgs noatime noclobber openssh partlabel
+pinentry pipefail plymouth pnp posix psfu rebase resetStateWhenFocusIn
+shopt showInputMethodInformationWhenFocusIn smbios src ssd stdout
+subvols swapfile symlinked symlinks sysfs systemd toml treefmt tty txt
+udev uefi uids untracked usb utf vbe vfat virtualisation wayland
+writeback xdg xml xwayland yaml yml zh zram zstd")))
 
  (nix-mode
   .
