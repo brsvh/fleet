@@ -34,7 +34,7 @@ pipefail plymouth pnp posix psfu rebase resetStateWhenFocusIn shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout subvols
 swapfile symlinked symlinks sysfs systemd toml treefmt tty txt udev
 uefi uids untracked usb utf vbe vfat virtualisation wayland xdg
-xwayland yaml yml zh zstd")))
+xwayland yaml yml zh zram zstd")))
 
  (nix-mode
   .
