@@ -12,6 +12,8 @@
     dae = {
       configFile =
         config.sops.secrets."config.dae".path;
+
+      enable = true;
     };
   };
 
