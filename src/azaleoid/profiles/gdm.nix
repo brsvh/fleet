@@ -1,5 +1,6 @@
 {
   azaleoid,
+  config,
   system,
   ...
 }:
