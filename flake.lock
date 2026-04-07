@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "crane": {
+      "locked": {
+        "lastModified": 1625557891,
+        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
+        "ref": "master",
+        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -58,6 +74,22 @@
         "url": "https://github.com/hercules-ci/flake-parts.git"
       }
     },
+    "git-hooks": {
+      "locked": {
+        "lastModified": 1625557891,
+        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
+        "ref": "master",
+        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -103,6 +135,36 @@
         "url": "https://codeberg.org/bingshan/infix.git"
       }
     },
+    "lanzaboote": {
+      "inputs": {
+        "crane": [
+          "crane"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "pre-commit": [
+          "git-hooks"
+        ],
+        "rust-overlay": [
+          "rust-overlay"
+        ]
+      },
+      "locked": {
+        "lastModified": 1765382359,
+        "narHash": "sha256-RJmgVDzjRI18BWVogG6wpsl1UCuV6ui8qr4DJ1LfWZ8=",
+        "ref": "refs/tags/v1.0.0",
+        "rev": "e8c096ade12ec9130ff931b0f0e25d2f1bc63607",
+        "revCount": 907,
+        "type": "git",
+        "url": "https://github.com/nix-community/lanzaboote.git"
+      },
+      "original": {
+        "ref": "refs/tags/v1.0.0",
+        "type": "git",
+        "url": "https://github.com/nix-community/lanzaboote.git"
+      }
+    },
     "nixos": {
       "locked": {
         "lastModified": 1772963539,
@@ -121,16 +183,36 @@
     },
     "root": {
       "inputs": {
+        "crane": "crane",
         "disko": "disko",
         "facter": "facter",
         "flake-parts": "flake-parts",
+        "git-hooks": "git-hooks",
         "home-manager": "home-manager",
         "infix": "infix",
+        "lanzaboote": "lanzaboote",
         "nixos": "nixos",
         "nixpkgs": [
           "nixos"
         ],
+        "rust-overlay": "rust-overlay",
         "sops": "sops"
+      }
+    },
+    "rust-overlay": {
+      "locked": {
+        "lastModified": 1625557891,
+        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
+        "ref": "master",
+        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
       }
     },
     "sops": {

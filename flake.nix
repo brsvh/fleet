@@ -2,6 +2,10 @@
   description = "A personal fleet of workstation and server configurations";
 
   inputs = {
+    crane = {
+      url = "git+https://github.com/divnix/blank.git?ref=master";
+    };
+
     disko = {
       inputs = {
         nixpkgs = {
@@ -24,6 +28,10 @@
       };
 
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
+    };
+
+    git-hooks = {
+      url = "git+https://github.com/divnix/blank.git?ref=master";
     };
 
     home-manager = {
@@ -50,12 +58,38 @@
       url = "git+https://codeberg.org/bingshan/infix.git?ref=main";
     };
 
+    lanzaboote = {
+      inputs = {
+        crane = {
+          follows = "crane";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        pre-commit = {
+          follows = "git-hooks";
+        };
+
+        rust-overlay = {
+          follows = "rust-overlay";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.0.0";
+    };
+
     nixpkgs = {
       follows = "nixos";
     };
 
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
+    };
+
+    rust-overlay = {
+      url = "git+https://github.com/divnix/blank.git?ref=master";
     };
 
     sops = {
