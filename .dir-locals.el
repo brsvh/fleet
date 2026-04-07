@@ -31,8 +31,8 @@ json kvm lba lefthook lf libvirtd linux loglevel loopback lp mkDefault
 mkdir networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
 noatime noclobber openssh pinentry pipefail plymouth pnp posix rebase
 resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
-smbios src ssd stdout subvols symlinked symlinks sysfs systemd toml
-treefmt tty txt udev uefi uids untracked usb utf vbe vfat
+smbios src ssd stdout subvols swapfile symlinked symlinks sysfs
+systemd toml treefmt tty txt udev uefi uids untracked usb utf vbe vfat
 virtualisation wayland xdg xwayland yaml yml zh zstd")))
 
  (nix-mode
