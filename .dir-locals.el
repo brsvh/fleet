@@ -33,9 +33,10 @@ mkDefault mkdir monitorspec networkmanager nftables nixfmt nixos
 nixosConfigurations nixpkgs noatime noclobber openssh partlabel
 pinentry pipefail plymouth pnp posix psfu rebase resetStateWhenFocusIn
 shopt showInputMethodInformationWhenFocusIn smbios src ssd stdout
-subvols swapfile symlinked symlinks sysfs systemd toml treefmt tty txt
-udev uefi uids untracked usb utf vbe vfat virtualisation wayland
-writeback xdg xml xwayland yaml yml zh zram zstd")))
+subvols swapfile symlinked symlinks sysfs systemd tmpfiles toml
+treefmt tty txt udev uefi uids untracked usb utf vbe vfat
+virtualisation wayland writeback xdg xml xwayland yaml yml zh zram
+zstd")))
 
  (nix-mode
   .
