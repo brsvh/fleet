@@ -26,6 +26,7 @@ in
       enableSshSupport = mkDefault true;
 
       extraConfig = ''
+        allow-emacs-pinentry
         allow-loopback-pinentry
       '';
 
