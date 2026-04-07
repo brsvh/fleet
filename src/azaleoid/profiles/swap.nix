@@ -8,6 +8,6 @@
   ];
 
   zramSwap = {
-    writebackDevice = "/dev/nvme0n1p3";
+    writebackDevice = "/dev/disk/by-partlabel/disk-azaleoid-swap";
   };
 }
