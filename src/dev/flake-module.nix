@@ -169,21 +169,25 @@ in
             };
 
             sops = {
-              data = {
-                creation_rules = [
-                  {
-                    key_groups = [
-                      {
-                        pgp = [
-                          "D6E9ED4504C41AD2DA16F39631E62A2FC33802BA"
-                        ];
-                      }
-                    ];
+              data =
+                let
+                  azaleoid = "age1rwjg9yvg8nf27avrrz5c7lu0q8vwgch6y7987sdx3kwlqrd5hqxsccjmmw";
+                in
+                {
+                  creation_rules = [
+                    {
+                      key_groups = [
+                        {
+                          age = [
+                            azaleoid
+                          ];
+                        }
+                      ];
 
-                    path_regex = "^src/azaleoid/etc/sops\.yaml$";
-                  }
-                ];
-              };
+                      path_regex = "^src/azaleoid/etc/sops\.yaml$";
+                    }
+                  ];
+                };
 
               format = "yaml";
               output = ".sops.yaml";
