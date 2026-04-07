@@ -22,18 +22,19 @@ ShowFirstInputMethodInformation ShowInputMethodInformation
 ShowPassword ShowPreeditForPassword TogglePreedit TriggerKey
 TriggerKeys Zenkaku adwaita allowUnfree apm autocd azaleoid bg bgrt
 bingshan bluetooth btrfs cachix cdspell cgroups checkwinsize cmdhist
-cond config ctrl dae dconf dev devShells devshell devshells dialout
-dirToAttrs direnv dirname dirspell disko editorconfig efi emacs
-enablement erasedups esac facter fg filesystem gdm gitattributes
-gitignore globstar gnome gnupg gpg gpt gtk gtkrc guix histappend
-histfile hstr hstrnotiocsti ignoreboth ignorespace infix jackaudio
-json kvm lba lefthook lf libvirtd linux loglevel loopback lp mkDefault
-mkdir networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
-noatime noclobber openssh pinentry pipefail plymouth pnp posix rebase
-resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
-smbios src ssd stdout subvols swapfile symlinked symlinks sysfs
-systemd toml treefmt tty txt udev uefi uids untracked usb utf vbe vfat
-virtualisation wayland xdg xwayland yaml yml zh zstd")))
+cond config consolefonts ctrl dae dconf dev devShells devshell
+devshells dialout dirToAttrs direnv dirname dirspell disko
+editorconfig efi emacs enablement erasedups esac eurlatgr facter fg
+filesystem gdm gitattributes gitignore globstar gnome gnupg gpg gpt
+gtk gtkrc guix gz histappend histfile hstr hstrnotiocsti ignoreboth
+ignorespace infix jackaudio json kvm lba lefthook lf libvirtd linux
+loglevel loopback lp mkDefault mkdir networkmanager nftables nixfmt
+nixos nixosConfigurations nixpkgs noatime noclobber openssh pinentry
+pipefail plymouth pnp posix psfu rebase resetStateWhenFocusIn shopt
+showInputMethodInformationWhenFocusIn smbios src ssd stdout subvols
+swapfile symlinked symlinks sysfs systemd toml treefmt tty txt udev
+uefi uids untracked usb utf vbe vfat virtualisation wayland xdg
+xwayland yaml yml zh zstd")))
 
  (nix-mode
   .
