@@ -1,5 +1,6 @@
 {
   lib,
+  system,
   ...
 }:
 let
@@ -8,10 +9,16 @@ let
     ;
 in
 {
-  zramSwap = {
-    algorithm = mkDefault "zstd";
-    enable = mkDefault true;
-    memoryPercent = mkDefault 50;
-    priority = mkDefault 5;
+  imports = [
+    system.modules.zswap
+  ];
+
+  boot = {
+    zswap = {
+      acceptThresholdPercent = mkDefault 80;
+      compressor = mkDefault "zstd";
+      enable = mkDefault true;
+      shrinkerEnabled = mkDefault true;
+    };
   };
 }
