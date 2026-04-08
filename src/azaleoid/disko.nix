@@ -64,22 +64,22 @@
                       mountpoint = "/";
                       name = "nixos";
                     };
+
+                    "/swap" = {
+                      mountpoint = "/swap";
+
+                      swap = {
+                        swapfile = {
+                          size = "16G";
+                        };
+                      };
+                    };
                   };
 
                   type = "btrfs";
                 };
 
-                end = "-16G";
                 name = "system";
-              };
-
-              swap = {
-                content = {
-                  discardPolicy = "both";
-                  resumeDevice = true;
-                  type = "swap";
-                };
-
                 size = "100%";
               };
             };
