@@ -22,6 +22,7 @@ in
     overlays = [
       emacs-overlay.overlays.default
       infix.overlays.default
+      infix.overlays.emacs-packages
     ];
   };
 }
