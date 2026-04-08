@@ -9,34 +9,41 @@
    ;; spell checking focuses on genuine mistakes rather than
    ;; repeatedly flagging domain terms.
    (jinx-dir-local-words . "ActivateKeys ActiveByDefault
-AllowInputMethodForPassword AltTriggerKeys AutoSavePeriod
-ClearPasswordAfter CompactInputMethodInformation CustomXkbOption
-DeactivateKeys DefaultIM DefaultPageSize DisabledAddons EnabledAddons
-EnumerateBackwardKeys EnumerateForwardKeys EnumerateGroupBackwardKeys
+AllowInputMethodForPassword AltTriggerKeys Apheleia AutoSavePeriod
+Backtrace Citre ClearPasswordAfter CompactInputMethodInformation
+CustomXkbOption DeactivateKeys DefaultIM DefaultPageSize Dired
+DisabledAddons EasyPG Eglot Eldoc EnabledAddons EnumerateBackwardKeys
+EnumerateForwardKeys EnumerateGroupBackwardKeys
 EnumerateGroupForwardKeys EnumerateSkipFirst EnumerateWithTriggerKeys
-FallbackSpellLanguage Hanja Hankaku HiddenNotifications
-IgnorePasswordFromPasswordManager ModifierOnlyKeyTimeout NextCandidate
-NextPage OverrideXkbOption PastePrimaryKey PreeditEnabledByDefault
-PreloadInputMethod PrevCandidate PrevPage Romaja ShareInputState
-ShowFirstInputMethodInformation ShowInputMethodInformation
-ShowPassword ShowPreeditForPassword TogglePreedit TriggerKey
-TriggerKeys Zenkaku Zswap adwaita allowUnfree apm autocd azaleoid
-backend bg bgrt bingshan bluetooth btrfs cachix cdspell cgroups
-checkwinsize cmdhist cond config consolefonts ctrl dae dconf dev
-devShells devshell devshells dialout dirToAttrs direnv dirname
-dirspell disko editorconfig edP efi emacs enablement erasedups esac
-eurlatgr facter fg filesystem gdm gitattributes gitignore globstar
-gnome gnupg gpg gpt gtk gtkrc guix gz histappend histfile hstr
-hstrnotiocsti ignoreboth ignorespace infix jackaudio json kvm
-lanzaboote layoutmode lba lefthook lf libvirtd linux logicalmonitor
-loglevel loopback lp lzo mkDefault mkdir monitorspec networkmanager
-nftables nixfmt nixos nixosConfigurations nixpkgs noatime noclobber
-openssh partlabel pinentry pipefail plymouth pnp posix psfu rebase
-resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
-smbios src ssd stdout subvols swapfile symlinked symlinks sysfs
-systemd swapDevices tmpfiles toml treefmt treesit tty txt udev uefi
-uids untracked usb utf vbe vfat virtualisation wayland writeback xdg
-xml xwayland yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
+Eshell FallbackSpellLanguage Fixit Flymake Hanja Hankaku
+HiddenNotifications IgnorePasswordFromPasswordManager LaTeX
+Macroexpand Magit Magit's Minibuffer ModifierOnlyKeyTimeout Modus
+NextCandidate NextPage OverrideXkbOption PastePrimaryKey
+PreeditEnabledByDefault PreloadInputMethod PrevCandidate PrevPage
+Rmail Romaja ShareInputState ShowFirstInputMethodInformation
+ShowInputMethodInformation ShowPassword ShowPreeditForPassword
+TogglePreedit Treemacs TriggerKey TriggerKeys Vertico Zenkaku Zswap
+adwaita allowUnfree apm authinfo autocd autoload autoloads azaleoid
+backend baz bg bgrt bingshan bluetooth btrfs cachix cdspell cgroups
+charset checkwinsize citre cmdhist cond config consolefonts ctags ctrl
+dae dconf dev devShells devshell devshells dialout dirToAttrs direnv
+dirname dirspell disko editorconfig edP efi elisp eln elpa emacs
+emacsclient enablement epa erasedups esac eurlatgr facter fg
+filesystem flymake gdm geiser gitattributes gitignore globstar gnome
+gnupg gpg gpt gtk gtkrc guix gz histappend histfile hstr hstrnotiocsti
+ignoreboth ignorespace infix iw jackaudio json keymap kvm lanzaboote
+layoutmode lba lefthook lf libvirtd linux logicalmonitor loglevel
+loopback lp lzo minibuffer mkDefault mkdir modeline monitorspec mrepl
+mtimes networkmanager nftables nixfmt nixos nixosConfigurations
+nixpkgs noatime noclobber openssh partlabel pinentry pipefail plymouth
+pnp posframe posix pre psfu quux py pyi pyw rebase
+resetStateWhenFocusIn ripgrep sbcl shopt
+showInputMethodInformationWhenFocusIn smbios src ssd stdout substring
+subvols swapfile symlinked symlinks sysfs systemd swapDevices
+tabspaces tmpfiles toml treefmt treemacs treesit tty txt udev uefi
+uids unicode untabify untracked usb utf vbe vfat virtualisation
+wayland writeback xdg xml xwayland yaml yml zbud zh zpool zram
+zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
   .
