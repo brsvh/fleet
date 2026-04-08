@@ -1,5 +1,6 @@
 {
   config,
+  home,
   lib,
   pkgs,
   ...
@@ -54,6 +55,10 @@ let
       );
 in
 {
+  imports = [
+    home.modules.emacs
+  ];
+
   programs = {
     emacs = {
       enable = true;
