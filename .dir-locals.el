@@ -30,14 +30,14 @@ dae dconf dev devShells devshell devshells dialout dirToAttrs direnv
 dirname dirspell disko editorconfig edP efi elisp eln elpa emacs
 emacsclient enablement epa erasedups esac eurlatgr facter fg
 filesystem flymake gdm geiser gitattributes gitignore globstar gnome
-gnupg gpg gpt gtk gtkrc guix gz histappend histfile hstr hstrnotiocsti
-ignoreboth ignorespace infix iw jackaudio json keymap kvm lanzaboote
-layoutmode lba lefthook lf libvirtd linux logicalmonitor loglevel
-loopback lp lzo minibuffer mkDefault mkdir modeline monitorspec mrepl
-mtimes networkmanager nftables nixfmt nixos nixosConfigurations
-nixpkgs noatime noclobber openssh partlabel pinentry pipefail plymouth
-pnp posframe posix pre psfu quux py pyi pyw rebase
-resetStateWhenFocusIn ripgrep sbcl shopt
+gnupg gpg gpt gtags gtk gtkrc guix gz histappend histfile hstr
+hstrnotiocsti ignoreboth ignorespace infix iw jackaudio json keymap
+kvm lanzaboote layoutmode lba lefthook lf libvirtd linux
+logicalmonitor loglevel loopback lp lzo minibuffer mkDefault mkdir
+modeline monitorspec mrepl mtimes networkmanager nftables nixfmt nixos
+nixosConfigurations nixpkgs noatime noclobber openssh partlabel
+pinentry pipefail pkgs plymouth pnp posframe posix pre psfu py pyi pyw
+quux rebase resetStateWhenFocusIn ripgrep sbcl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout substring
 subvols swapfile symlinked symlinks sysfs systemd swapDevices
 tabspaces tmpfiles toml treefmt treemacs treesit tty txt udev uefi
