@@ -23,11 +23,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773025010,
-        "narHash": "sha256-khlHllTsovXgT2GZ0WxT4+RvuMjNeR5OW0UYeEHPYQo=",
+        "lastModified": 1773889306,
+        "narHash": "sha256-PAqwnsBSI9SVC2QugvQ3xeYCB0otOwCacB1ueQj2tgw=",
         "ref": "master",
-        "rev": "7b9f7f88ab3b339f8142dc246445abb3c370d3d3",
-        "revCount": 1340,
+        "rev": "5ad85c82cc52264f4beddc934ba57f3789f28347",
+        "revCount": 1352,
         "type": "git",
         "url": "https://github.com/nix-community/disko.git"
       },
@@ -37,13 +37,37 @@
         "url": "https://github.com/nix-community/disko.git"
       }
     },
+    "emacs-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nixpkgs-stable": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775615115,
+        "narHash": "sha256-zKvhIebrI2SZlmDizJKI6CbCaJjuaNft0eeHbxsc+Os=",
+        "ref": "master",
+        "rev": "3497e75abfca9a5ed7fa65f5e47f046e1f2a00f4",
+        "revCount": 18636,
+        "type": "git",
+        "url": "https://github.com/nix-community/emacs-overlay.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/emacs-overlay.git"
+      }
+    },
     "facter": {
       "locked": {
-        "lastModified": 1766558141,
-        "narHash": "sha256-Ud9v49ZPsoDBFuyJSQ2Mpw1ZgAH/aMwUwwzrVoetNus=",
+        "lastModified": 1773858690,
+        "narHash": "sha256-oW0/lC0oRG5H5LaK6Rmh9L1wmkn9TbenM4bXwnIEDKA=",
         "ref": "main",
-        "rev": "e796d536e3d83de74267069e179dc620a608ed7d",
-        "revCount": 202,
+        "rev": "139dcef4dfc97009629c445806f197883351ab4a",
+        "revCount": 205,
         "type": "git",
         "url": "https://github.com/numtide/nixos-facter-modules.git"
       },
@@ -60,11 +84,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772408722,
-        "narHash": "sha256-rHuJtdcOjK7rAHpHphUb1iCvgkU3GpfvicLMwwnfMT0=",
+        "lastModified": 1775087534,
+        "narHash": "sha256-91qqW8lhL7TLwgQWijoGBbiD4t7/q75KTi8NxjVmSmA=",
         "ref": "main",
-        "rev": "f20dc5d9b8027381c474144ecabc9034d6a839a3",
-        "revCount": 445,
+        "rev": "3107b77cd68437b9a76194f0f7f9c55f2329ca5b",
+        "revCount": 448,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -97,11 +121,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773093840,
-        "narHash": "sha256-u/96NoAyN8BSRuM3ZimGf7vyYgXa3pLx4MYWjokuoH4=",
+        "lastModified": 1775615548,
+        "narHash": "sha256-LI6N0JhdBmkayu0Ege3LQ/G1lBcZHhGq4DFJPIB96Jc=",
         "ref": "master",
-        "rev": "bb014746edb2a98d975abde4dd40fa240de4cf86",
-        "revCount": 6337,
+        "rev": "3d822c1dbae858138189262ed194d3bbb3007a77",
+        "revCount": 6470,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -167,11 +191,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1772963539,
-        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
+        "lastModified": 1775423009,
+        "narHash": "sha256-vPKLpjhIVWdDrfiUM8atW6YkIggCEKdSAlJPzzhkQlw=",
         "ref": "nixos-unstable",
-        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
-        "revCount": 960399,
+        "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+        "revCount": 975402,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -185,6 +209,7 @@
       "inputs": {
         "crane": "crane",
         "disko": "disko",
+        "emacs-overlay": "emacs-overlay",
         "facter": "facter",
         "flake-parts": "flake-parts",
         "git-hooks": "git-hooks",
@@ -222,11 +247,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774910634,
-        "narHash": "sha256-B+rZDPyktGEjOMt8PcHKYmgmKoF+GaNAFJhguktXAo0=",
+        "lastModified": 1775365543,
+        "narHash": "sha256-f50qrK0WwZ9z5EdaMGWOTtALgSF7yb7XwuE7LjCuDmw=",
         "ref": "master",
-        "rev": "19bf3d8678fbbfbc173beaa0b5b37d37938db301",
-        "revCount": 1189,
+        "rev": "a4ee2de76efb759fe8d4868c33dec9937897916f",
+        "revCount": 1194,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },

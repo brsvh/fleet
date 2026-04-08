@@ -16,6 +16,20 @@
       url = "git+https://github.com/nix-community/disko.git?ref=master";
     };
 
+    emacs-overlay = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        nixpkgs-stable = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/emacs-overlay.git?ref=master";
+    };
+
     facter = {
       url = "git+https://github.com/numtide/nixos-facter-modules.git?ref=main";
     };
