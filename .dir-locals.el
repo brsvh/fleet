@@ -34,9 +34,9 @@ nftables nixfmt nixos nixosConfigurations nixpkgs noatime noclobber
 openssh partlabel pinentry pipefail plymouth pnp posix psfu rebase
 resetStateWhenFocusIn shopt showInputMethodInformationWhenFocusIn
 smbios src ssd stdout subvols swapfile symlinked symlinks sysfs
-systemd swapDevices tmpfiles toml treefmt tty txt udev uefi uids
-untracked usb utf vbe vfat virtualisation wayland writeback xdg xml
-xwayland yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
+systemd swapDevices tmpfiles toml treefmt treesit tty txt udev uefi
+uids untracked usb utf vbe vfat virtualisation wayland writeback xdg
+xml xwayland yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
   .
