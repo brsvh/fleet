@@ -18,7 +18,8 @@ let
 in
 {
   imports = [
-    home.profiles.accounts
+    bingshan.profiles.accounts
+    bingshan.profiles.global
     home.profiles.emacs
   ];
 
