@@ -61,22 +61,6 @@
         "url": "https://github.com/nix-community/emacs-overlay.git"
       }
     },
-    "facter": {
-      "locked": {
-        "lastModified": 1773858690,
-        "narHash": "sha256-oW0/lC0oRG5H5LaK6Rmh9L1wmkn9TbenM4bXwnIEDKA=",
-        "ref": "main",
-        "rev": "139dcef4dfc97009629c445806f197883351ab4a",
-        "revCount": 205,
-        "type": "git",
-        "url": "https://github.com/numtide/nixos-facter-modules.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/numtide/nixos-facter-modules.git"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -145,11 +129,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775621595,
-        "narHash": "sha256-hZWA4pwaeExLZMyaS0BaHukNgV6aWfIt9eOcg0YI3Ws=",
+        "lastModified": 1775705433,
+        "narHash": "sha256-OMWwNxpsLH64fY/1kjGZIWckzG/v/JzvzDlYVl6EVlc=",
         "ref": "main",
-        "rev": "e04c7131326e459ca38668d1b8a37d4bf0b089d0",
-        "revCount": 24,
+        "rev": "3950194c7e53e2a5d68ea1ea5b0d3407b7f45642",
+        "revCount": 27,
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
       },
@@ -210,7 +194,6 @@
         "crane": "crane",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
-        "facter": "facter",
         "flake-parts": "flake-parts",
         "git-hooks": "git-hooks",
         "home-manager": "home-manager",

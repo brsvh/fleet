@@ -30,10 +30,6 @@
       url = "git+https://github.com/nix-community/emacs-overlay.git?ref=master";
     };
 
-    facter = {
-      url = "git+https://github.com/numtide/nixos-facter-modules.git?ref=main";
-    };
-
     flake-parts = {
       inputs = {
         nixpkgs-lib = {
