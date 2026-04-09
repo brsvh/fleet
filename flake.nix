@@ -122,6 +122,7 @@
 
   outputs =
     inputs@{
+      emacs-overlay,
       flake-parts,
       infix,
       nixpkgs,
@@ -250,7 +251,15 @@
 
         nixosConfigurations = {
           azaleoid = {
+            allowUnfree = true;
+
             directory = fleet.azaleoid.__path;
+
+            overlays = [
+              emacs-overlay.overlays.default
+              infix.overlays.default
+              infix.overlays.emacs-packages
+            ];
 
             specialArgs = {
               inherit
