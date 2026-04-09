@@ -33,6 +33,7 @@ in
       music = "${dataHome}/Music";
       pictures = "${dataHome}/Pictures";
       publicShare = "${dataHome}/Public";
+      setSessionVariables = mkDefault true;
       templates = "${dataHome}/Templates";
       videos = "${dataHome}/Videos";
     };
