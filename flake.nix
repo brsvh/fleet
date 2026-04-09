@@ -247,6 +247,11 @@
           infix.flakeModules.nixosConfigurations
         ];
 
+        flake = {
+          homeModules = home.modules;
+          nixosModules = system.modules;
+        };
+
         nixosConfigurations = {
           azaleoid = {
             directory = fleet.azaleoid.__path;
