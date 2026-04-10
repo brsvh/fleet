@@ -23,27 +23,27 @@ PreeditEnabledByDefault PreloadInputMethod PrevCandidate PrevPage
 Rmail Romaja ShareInputState ShowFirstInputMethodInformation
 ShowInputMethodInformation ShowPassword ShowPreeditForPassword
 TogglePreedit Treemacs TriggerKey TriggerKeys Vertico Zenkaku Zswap
-adwaita allowUnfree apm authinfo autocd autoload autoloads azaleoid
-backend baz bg bgrt bingshan bluetooth btrfs cachix cdspell cgroups
-charset checkwinsize citre cmdhist cond config consolefonts ctags ctrl
-dae dconf dev devShells devshell devshells dialout dirToAttrs direnv
-dirname dirspell disko editorconfig edP efi elisp eln elpa emacs
-emacsclient enablement epa erasedups esac eurlatgr facter fg
-filesystem flymake gdm geiser gitattributes gitignore globstar gnome
-gnupg gpg gpt gtags gtk gtkrc guix gz histappend histfile hstr
-hstrnotiocsti ignoreboth ignorespace infix iw jackaudio json keymap
-kvm lanzaboote layoutmode lba lefthook lf libvirtd linux
-logicalmonitor loglevel loopback lp lzo minibuffer mkDefault mkdir
-modeline monitorspec mrepl mtimes networkmanager nftables nixfmt nixos
-nixosConfigurations nixpkgs noatime noclobber openai openssh partlabel
-pinentry pipefail pkgs plymouth pnp posframe posix pre psfu py pyi pyw
-quux rebase resetStateWhenFocusIn ripgrep sbcl shopt
-showInputMethodInformationWhenFocusIn smbios src ssd stdout substring
-subvols swapfile symlinked symlinks sysfs systemd swapDevices
-tabspaces tmpfiles toml treefmt treemacs treesit tty txt udev uefi
-uids unicode untabify untracked usb utf vbe vfat virtualisation
-wayland writeback xdg xml xwayland yaml yml zbud zh zpool zram
-zramSwap zsmalloc zstd zswap")))
+adwaita allowUnfree antialiasing apm authinfo autocd autoload
+autoloads azaleoid backend baz bg bgrt bingshan bluetooth btrfs cachix
+cdspell cgroups charset checkwinsize citre cmdhist cond config
+consolefonts ctags ctrl dae dconf dev devShells devshell devshells
+dialout dirToAttrs direnv dirname dirspell disko editorconfig edP efi
+elisp eln elpa emacs emacsclient enablement epa erasedups esac
+eurlatgr facter fg filesystem flymake fontconfig gdm geiser
+gitattributes gitignore globstar gnome gnupg gpg gpt gtags gtk gtkrc
+guix gz histappend histfile hstr hstrnotiocsti ignoreboth ignorespace
+infix iw jackaudio json keymap kvm lanzaboote layoutmode lba lefthook
+lf libvirtd linux logicalmonitor loglevel loopback lp lzo minibuffer
+mkDefault mkdir modeline monitorspec mrepl mtimes networkmanager
+nftables nixfmt nixos nixosConfigurations nixpkgs noatime noclobber
+openai openssh partlabel pinentry pipefail pkgs plymouth pnp posframe
+posix pre psfu py pyi pyw quux rebase resetStateWhenFocusIn ripgrep
+sbcl shopt showInputMethodInformationWhenFocusIn smbios src ssd stdout
+subpixel substring subvols swapfile symlinked symlinks sysfs systemd
+swapDevices tabspaces tmpfiles toml treefmt treemacs treesit tty txt
+udev uefi uids unicode untabify untracked usb utf vbe vfat
+virtualisation wayland writeback xdg xml xwayland yaml yml zbud zh
+zpool zram zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
   .
