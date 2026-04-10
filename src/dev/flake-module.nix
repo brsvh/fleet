@@ -50,7 +50,6 @@ in
                 project_doc_max_bytes = 32768;
                 review_model = "gpt-5.4";
                 sandbox_mode = "workspace-write";
-                service_tier = "flex";
                 web_search = "cached";
 
                 agents = {
