@@ -18,7 +18,7 @@ EnumerateGroupForwardKeys EnumerateSkipFirst EnumerateWithTriggerKeys
 Eshell FallbackSpellLanguage Fixit Flymake Hanja Hankaku
 HiddenNotifications IgnorePasswordFromPasswordManager LaTeX
 Macroexpand Magit Magit's Minibuffer ModifierOnlyKeyTimeout Modus
-NextCandidate NextPage OverrideXkbOption PastePrimaryKey
+NextCandidate NextPage OverrideXkbOption PastePrimaryKey Plex
 PreeditEnabledByDefault PreloadInputMethod PrevCandidate PrevPage
 Rmail Romaja ShareInputState ShowFirstInputMethodInformation
 ShowInputMethodInformation ShowPassword ShowPreeditForPassword
