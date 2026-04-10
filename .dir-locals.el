@@ -35,7 +35,7 @@ hstrnotiocsti ignoreboth ignorespace infix iw jackaudio json keymap
 kvm lanzaboote layoutmode lba lefthook lf libvirtd linux
 logicalmonitor loglevel loopback lp lzo minibuffer mkDefault mkdir
 modeline monitorspec mrepl mtimes networkmanager nftables nixfmt nixos
-nixosConfigurations nixpkgs noatime noclobber openssh partlabel
+nixosConfigurations nixpkgs noatime noclobber openai openssh partlabel
 pinentry pipefail pkgs plymouth pnp posframe posix pre psfu py pyi pyw
 quux rebase resetStateWhenFocusIn ripgrep sbcl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout substring
