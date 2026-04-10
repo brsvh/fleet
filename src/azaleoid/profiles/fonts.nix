@@ -27,29 +27,31 @@ let
 in
 {
   imports = [
-    system.profile.fonts
+    system.profiles.fonts
   ];
 
   fonts = {
-    defaultFonts = {
-      emoji = [
-        "Twitter Color Emoji"
-      ];
-
-      monospace = [
-        "IBM Plex Mono"
-      ];
-
-      sansSerif = [
-        "IBM Plex Sans"
-      ];
-
-      serif = [
-        "IBM Plex Serif"
-      ];
-    };
-
     enableDefaultPackages = mkForce false;
+
+    fontconfig = {
+      defaultFonts = {
+        emoji = [
+          "Twitter Color Emoji"
+        ];
+
+        monospace = [
+          "IBM Plex Mono"
+        ];
+
+        sansSerif = [
+          "IBM Plex Sans"
+        ];
+
+        serif = [
+          "IBM Plex Serif"
+        ];
+      };
+    };
 
     packages = with pkgs; [
       ibm-plex-math
