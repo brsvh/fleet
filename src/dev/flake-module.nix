@@ -118,7 +118,15 @@ in
                   tab_width = 2;
                 };
 
+                "*.md" = {
+                  indent_size = 2;
+                  indent_style = "space";
+                  max_line_length = 80;
+                  trim_trailing_whitespace = false;
+                };
+
                 "*.nix" = {
+                  indent_size = 2;
                   indent_style = "space";
                   tab_width = 2;
                   max_line_length = 80;
