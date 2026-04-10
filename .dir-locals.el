@@ -33,18 +33,18 @@ eurlatgr facter fg filesystem flymake fontconfig gdm geiser
 gitattributes gitignore globstar gnome gnupg gpg gpt gtags gtk gtkrc
 guix gz histappend histfile hstr hstrnotiocsti ignoreboth ignorespace
 infix iw jackaudio json keymap kvm lanzaboote layoutmode lba lefthook
-lf libvirtd linux logicalmonitor loglevel loopback lp lzo mcp
+lf libvirtd linux logicalmonitor loglevel loopback lp lzo mcp md
 minibuffer mkDefault mkdir modeline monitorspec mrepl mtimes
 networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
 noatime noclobber openai openssh partlabel pinentry pipefail pkgs
-plymouth pnp posframe posix pre psfu py pyi pyw quux rebase
+plymouth pnp posframe posix pre psfu py pyi pyw quux rebase repo
 resetStateWhenFocusIn ripgrep sbcl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout subpixel
-substring subvols swapfile symlinked symlinks sysfs systemd
-swapDevices tabspaces tmpfiles toml treefmt treemacs treesit tty txt
-udev uefi uids unicode untabify untracked usb utf vbe vfat
-virtualisation wayland writeback xdg xml xwayland yaml yml zbud zh
-zpool zram zramSwap zsmalloc zstd zswap")))
+subscope subscopes substring subvols swapfile symlinked symlinks sysfs
+systemd swapDevices tabspaces tmpfiles toml treefmt treemacs treesit
+tty txt udev uefi uids unicode unstaged untabify untracked usb utf vbe
+vfat virtualisation wayland writeback xdg xml xwayland yaml yml zbud
+zh zpool zram zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
   .
