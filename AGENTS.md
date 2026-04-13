@@ -42,5 +42,3 @@
 - Write the body as `* path: change.` bullets with concise file-oriented
   sentences.
 - When asked to write a commit message, use the `commit-message` skill.
-- When asked to compare, review, or refine commit message candidates, use the
-  `commit-message-review` skill.
