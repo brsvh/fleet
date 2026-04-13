@@ -28,14 +28,14 @@ Rmail Romaja Segoe ShanHeiSun ShareInputState
 ShowFirstInputMethodInformation ShowInputMethodInformation
 ShowPassword ShowPreeditForPassword SimSun SungtiL Tahoma Thorndale
 TogglePreedit Treemacs TriggerKey TriggerKeys UnBatang UnDotum Verdana
-Vertico Webdings WenQuanYi YaHei Zenkaku Zswap adwaita allowUnfree
-antialias antialiasing apm authinfo autocd autohint autoload autoloads
-azaleoid backend baz bg bgrt bingshan bluetooth bool btrfs cachix
-cdspell cgroups charset checkwinsize citre cmdhist cn cond config
-consolefonts const ctags ctrl dae dconf dev devShells devshell
-devshells dialout dirToAttrs direnv dirname dirspell disko dtd edP
-editorconfig efi elisp eln elpa emacs emacsclient enablement epa
-erasedups esac eurlatgr facter fg filesystem flymake fontconfig
+VerticalTabs Vertico Webdings WenQuanYi YaHei Zenkaku Zswap adwaita
+allowUnfree antialias antialiasing apm authinfo autocd autohint
+autoload autoloads azaleoid backend baz bg bgrt bingshan bluetooth
+bool btrfs cachix cdspell cgroups charset checkwinsize citre cmdhist
+cn cond config consolefonts const ctags ctrl dae dconf dev devShells
+devshell devshells dialout dirToAttrs direnv dirname dirspell disko
+dtd edP editorconfig efi elisp eln elpa emacs emacsclient enablement
+epa erasedups esac eurlatgr facter fg filesystem flymake fontconfig
 frontend fwupd gdm geiser gitattributes gitignore globaladvance
 globstar gnome gnupg gpg gpt gtags gtk gtkrc guix gz hintslight
 hintstyle histappend histfile hk hstr hstrnotiocsti ignoreboth
