@@ -2,18 +2,18 @@
   "nodes": {
     "crane": {
       "locked": {
-        "lastModified": 1625557891,
-        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
-        "ref": "master",
-        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
-        "revCount": 1,
+        "lastModified": 1774313390,
+        "narHash": "sha256-BEp040fMklOW2+ttpNUKivlE0hzpv0AAP+0kG47uVCk=",
+        "ref": "refs/tags/v0.23.2",
+        "rev": "ca870b74b19e5433c4171e84ebf359aaef7b3e7e",
+        "revCount": 830,
         "type": "git",
-        "url": "https://github.com/divnix/blank.git"
+        "url": "https://github.com/ipetkov/crane.git"
       },
       "original": {
-        "ref": "master",
+        "ref": "refs/tags/v0.23.2",
         "type": "git",
-        "url": "https://github.com/divnix/blank.git"
+        "url": "https://github.com/ipetkov/crane.git"
       }
     },
     "disko": {
@@ -208,19 +208,24 @@
       }
     },
     "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1625557891,
-        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
+        "lastModified": 1775963625,
+        "narHash": "sha256-OmwF0Rd/HDbEGC0ZcBS2jPMvmCcn3HDqUypjXrR7KfM=",
         "ref": "master",
-        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
-        "revCount": 1,
+        "rev": "573a61faa8ec910a6b8576cc3c145844245574f3",
+        "revCount": 2140,
         "type": "git",
-        "url": "https://github.com/divnix/blank.git"
+        "url": "https://github.com/oxalica/rust-overlay.git"
       },
       "original": {
         "ref": "master",
         "type": "git",
-        "url": "https://github.com/divnix/blank.git"
+        "url": "https://github.com/oxalica/rust-overlay.git"
       }
     },
     "sops": {

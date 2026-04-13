@@ -3,7 +3,7 @@
 
   inputs = {
     crane = {
-      url = "git+https://github.com/divnix/blank.git?ref=master";
+      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.2";
     };
 
     disko = {
@@ -99,7 +99,13 @@
     };
 
     rust-overlay = {
-      url = "git+https://github.com/divnix/blank.git?ref=master";
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/oxalica/rust-overlay.git?ref=master";
     };
 
     sops = {
