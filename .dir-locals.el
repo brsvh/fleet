@@ -45,7 +45,7 @@ lp lzo mcp md minibuffer mkDefault mkdir modeline monitorspec mrepl
 mtimes networkmanager nftables nixfmt nixos nixosConfigurations
 nixpkgs noatime noclobber openai openssh partlabel pinentry pipefail
 pixelsize pkgs plymouth pnp posframe posix pre psfu py pyi pyw qual
-quux rebase repo resetStateWhenFocusIn rgb ripgrep sbcl shopt
+quux rebase repo resetStateWhenFocusIn rgb ripgrep sbcl sbctl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout subpixel
 subscope subscopes substring subvols swapDevices swapfile symlinked
 symlinks sysfs systemd tabspaces tmpfiles toml treefmt treemacs
