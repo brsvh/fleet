@@ -1,8 +1,14 @@
 {
   home,
+  lib,
   pkgs,
   ...
 }:
+let
+  inherit (lib)
+    mkForce
+    ;
+in
 {
   imports = [
     home.profiles.fonts
@@ -11,39 +17,7 @@
   fonts = {
     fontconfig = {
       configFile = {
-        embolden = {
-          enable = true;
-          priority = 10;
-
-          text = ''
-            <?xml version="1.0"?>
-            <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
-            <fontconfig>
-              <description>Synthetic emboldening for fonts that do not have bold face available</description>
-
-              <match target="font">
-                <test name="weight" compare="less_eq">
-                  <const>medium</const>
-                </test>
-
-                <test target="pattern" name="weight" compare="more">
-                  <const>medium</const>
-                </test>
-
-                <edit name="embolden" mode="assign">
-                  <bool>true</bool>
-                </edit>
-
-                <edit name="weight" mode="assign">
-                  <const>bold</const>
-                </edit>
-              </match>
-
-            </fontconfig>
-          '';
-        };
-
-        latin = {
+        chinese-families = {
           enable = true;
           priority = 60;
 
@@ -51,278 +25,78 @@
             <?xml version="1.0"?>
             <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
             <fontconfig>
-              <description>Set preferable fonts for Latin</description>
+              <description>Prefer Chinese families</description>
 
-              <match target="font">
+              <match target="pattern">
+                <test name="lang" compare="contains">
+                  <string>zh-cn</string>
+                </test>
                 <test name="family" compare="eq">
-                  <string>Andale Mono</string>
+                  <string>sans-serif</string>
                 </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
+                <edit name="family" mode="prepend" binding="strong">
+                  <string>Microsoft YaHei UI</string>
+                  <string>Microsoft YaHei</string>
+                  <string>Segoe UI Variable Text</string>
+                  <string>Segoe UI</string>
+                  <string>Segoe UI Emoji</string>
                 </edit>
               </match>
 
-              <match target="font">
+              <match target="pattern">
+                <test name="lang" compare="contains">
+                  <string>zh-tw</string>
+                </test>
                 <test name="family" compare="eq">
-                  <string>Arial</string>
+                  <string>sans-serif</string>
                 </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
+                <edit name="family" mode="prepend" binding="strong">
+                  <string>Microsoft JhengHei UI</string>
+                  <string>Microsoft JhengHei</string>
+                  <string>Segoe UI Variable Text</string>
+                  <string>Segoe UI</string>
+                  <string>Segoe UI Emoji</string>
                 </edit>
               </match>
 
-              <match target="font">
+              <match target="pattern">
+                <test name="lang" compare="contains">
+                  <string>zh-hk</string>
+                </test>
                 <test name="family" compare="eq">
-                  <string>Comic Sans MS</string>
+                  <string>sans-serif</string>
                 </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
+                <edit name="family" mode="prepend" binding="strong">
+                  <string>Microsoft JhengHei UI</string>
+                  <string>Microsoft JhengHei</string>
+                  <string>Segoe UI Variable Text</string>
+                  <string>Segoe UI</string>
+                  <string>Segoe UI Emoji</string>
+                </edit>
+              </match>
+            </fontconfig>
+          '';
+        };
+
+        cleartype = {
+          enable = true;
+          priority = 20;
+
+          text = ''
+            <?xml version="1.0"?>
+            <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+            <fontconfig>
+              <description>Approximate DirectWrite-like rendering</description>
+
+              <match target="font">
                 <edit name="autohint" mode="assign">
                   <bool>false</bool>
                 </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
+
+                <edit name="lcdfilter" mode="assign">
+                  <const>lcddefault</const>
                 </edit>
               </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Georgia</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Impact</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Trebuchet MS</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Verdana</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Courier New</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Times New Roman</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Tahoma</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Webdings</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Albany AMT</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Thorndale AMT</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Cumberland AMT</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Andale Sans</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Andy MT</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Bell MT</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq">
-                  <string>Monotype Sorts</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
             </fontconfig>
           '';
         };
@@ -359,552 +133,52 @@
             </fontconfig>
           '';
         };
-
-        nonlatin = {
-          enable = true;
-          priority = 65;
-
-          text = ''
-            <?xml version="1.0"?>
-            <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
-            <fontconfig>
-              <description>Set preferable fonts for Non-Latin</description>
-
-              <match target="font">
-                <test target="pattern" name="lang" compare="contains">
-                  <string>zh</string>
-                </test>
-                <edit name="spacing" mode="assign">
-                  <const>proportional</const>
-                </edit>
-                <edit name="globaladvance" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test target="pattern" name="lang" compare="contains">
-                  <string>ja</string>
-                </test>
-                <edit name="spacing" mode="assign">
-                  <const>proportional</const>
-                </edit>
-                <edit name="globaladvance" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test target="pattern" name="lang" compare="contains">
-                  <string>ko</string>
-                </test>
-                <edit name="spacing" mode="assign">
-                  <const>proportional</const>
-                </edit>
-                <edit name="globaladvance" mode="assign">
-                  <bool>false</bool>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>SimSun</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>SimSun-18030</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL ShanHeiSun Uni</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL New Sung</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>MingLiU</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="pattern">
-                <test name="family" compare="eq" qual="any">
-                  <string>PMingLiU</string>
-                </test>
-                <edit binding="strong" mode="prepend" name="family">
-                  <string>Tahoma</string>
-                  <string>Arial</string>
-                  <string>Verdana</string>
-                  <string>DejaVu Sans</string>
-                  <string>Bitstream Vera Sans</string>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL ShanHeiSun Uni</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL New Sung</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>SimSun</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>NSimSun</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>MingLiU</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>PMingLiU</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>12</double>
-                </test>
-                <edit name="pixelsize" mode="assign">
-                  <double>12</double>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>宋体</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>新宋体</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>SimSun</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>NSimSun</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>宋体-18030</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>新宋体-18030</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>SimSun-18030</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>NSimSun-18030</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL ShanHeiSun Uni</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>AR PL New Sung</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>MingLiU</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-              <match target="font">
-                <test name="family" compare="eq" qual="any">
-                  <string>PMingLiU</string>
-                </test>
-                <test name="pixelsize" compare="less_eq">
-                  <double>16</double>
-                </test>
-                <edit name="hinting" mode="assign">
-                  <bool>true</bool>
-                </edit>
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="antialias" mode="assign">
-                  <bool>false</bool>
-                </edit>
-                <edit name="hintstyle" mode="assign">
-                  <const>hintslight</const>
-                </edit>
-              </match>
-
-            </fontconfig>
-          '';
-        };
       };
 
       defaultFonts = {
         emoji = [
+          "Segoe UI Emoji"
           "Twitter Color Emoji"
         ];
 
         monospace = [
+          "Consolas"
+          "Cascadia Mono"
           "Courier New"
-          "Cumberland AMT"
-          "Nimbus Mono L"
-          "Andale Mono"
-          "DejaVu Sans Mono"
-          "Bitstream Vera Sans Mono"
-          "Luxi Mono"
-          "FreeMono"
           "NSimSun"
-          "NSimSun-18030"
-          "PMingLiU"
-          "WenQuanYi Bitmap Song"
-          "AR PL ShanHeiSun Uni"
-          "AR PL New Sung"
-          "FZSongTi"
-          "FZMingTiB"
-          "AR PL SungtiL GB"
-          "AR PL Mingti2L Big5"
-          "Kochi Gothic"
-          "UnDotum"
-          "Baekmuk Gulim"
-          "Baekmuk Dotum"
-          "HanyiSong"
-          "ZYSong18030"
+          "Segoe UI Emoji"
         ];
 
         sansSerif = [
-          "Arial"
-          "Albany AMT"
-          "Nimbus Sans L"
-          "Verdana"
-          "DejaVu Sans"
-          "Bitstream Vera Sans"
-          "Luxi Sans"
-          "FreeSans"
-          "Helvetica"
-          "SimSun"
-          "SimSun-18030"
-          "MingLiU"
-          "WenQuanYi Bitmap Song"
-          "AR PL ShanHeiSun Uni"
-          "AR PL New Sung"
-          "FZSongTi"
-          "FZMingTiB"
-          "AR PL SungtiL GB"
-          "AR PL Mingti2L Big5"
-          "Kochi Gothic"
-          "UnDotum"
-          "Baekmuk Gulim"
-          "Baekmuk Dotum"
+          "Segoe UI Variable Text"
+          "Segoe UI Variable"
+          "Segoe UI"
+          "Microsoft YaHei UI"
+          "Microsoft YaHei"
+          "Segoe UI Emoji"
         ];
 
         serif = [
+          "Georgia"
           "Times New Roman"
-          "Thorndale AMT"
-          "Nimbus Roman No9 L"
-          "DejaVu Serif"
-          "Bitstream Vera Serif"
-          "Luxi Serif"
-          "Likhan"
-          "FreeSerif"
-          "Times"
           "SimSun"
-          "SimSun-18030"
-          "MingLiU"
-          "WenQuanYi Bitmap Song"
-          "AR PL ShanHeiSun Uni"
-          "AR PL New Sung"
-          "FZSongTi"
-          "FZMingTiB"
-          "AR PL SungtiL GB"
-          "AR PL Mingti2L Big5"
-          "Kochi Mincho"
-          "UnBatang"
-          "Baekmuk Batang"
-          "HanyiSong"
-          "ZYSong18030"
+          "PMingLiU"
         ];
       };
+
+      subpixelRendering = mkForce "rgb";
     };
   };
 
   home = {
     packages = with pkgs; [
+      cascadia-code
       twitter-color-emoji
       windows-fonts
     ];
+
+    sessionVariables = {
+      FREETYPE_PROPERTIES = "truetype:interpreter-version=40";
+    };
   };
 }
