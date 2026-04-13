@@ -1,3 +1,33 @@
+# AGENTS.md
+
+## General response preferences
+
+- Prefer precise, verifiable claims over broad or vague phrasing.
+- Avoid emotional judgments, rhetorical framing, and unsupported confidence.
+- Make assumptions explicit when they affect the conclusion or implementation.
+- Separate evidence, inference, and recommendation in analysis-heavy answers.
+- Say when the available evidence is insufficient to support a conclusion.
+- When comparing options, state the decision criteria and apply them
+  consistently.
+- Do not present personal preference or conventional wisdom as a technical
+  conclusion.
+- Keep routine coding answers concise, but include enough reasoning for
+  non-obvious trade-offs to be checked.
+
+## Research and analysis tasks
+
+- Prefer primary or authoritative sources when external information is needed.
+- Cross-check important claims against multiple independent sources when
+  practical.
+- Cite the sources used for factual claims that are not derived from the local
+  repository.
+- If source quality or coverage is weak, state the limitation directly instead
+  of filling the gap with speculation.
+- Use tables for comparison-heavy results when they make the reasoning easier
+  to audit.
+- Do not force a table when the task is a small code change, simple command
+  result, rewrite, or direct explanation.
+
 ## Commit message rules
 
 - Follow `doc/commit-message-style.md`.
