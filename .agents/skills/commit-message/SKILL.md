@@ -2,8 +2,8 @@
 name: commit-message
 description: >
   Generate a final git commit message for this repository, or create the commit
-  after showing the message and getting explicit user confirmation. Use when
-  asked to write a commit message or commit the current staged changes.
+  when explicitly asked. Use when asked to write a commit message or commit the
+  current staged changes.
 ---
 
 # Commit Message
@@ -36,15 +36,19 @@ In commit mode:
 
 1. Complete the required workflow above.
 2. Draft the final commit message using the repository rules below.
-3. Show the exact commit message to the user.
-4. Ask for explicit confirmation before running `git commit`.
-5. Do not run `git commit` until the user confirms.
-6. After confirmation, write the message to a temporary file and run
+3. Check the final message text using the checklist below.
+4. Write the message to a temporary file and run
    `git commit -F <temporary-file>`.
-7. Report the commit result, including the new commit hash when available.
+5. Report the commit result, including the new commit hash when available.
 
-If the user changes the staged set before confirming, repeat the required
-workflow and regenerate the message before committing.
+Do not pause after the user's explicit commit request. Treat that request as
+authorization to create the commit. If the environment blocks access to `.git`,
+retry with the required sandbox escalation and continue after access is
+available.
+
+In commit mode, do not stop after drafting the message and do not ask the user
+to type another prompt. The message drafting step and `git commit -F` step are
+one uninterrupted workflow.
 
 ## Repository rules
 
@@ -62,7 +66,16 @@ Hard requirements:
 - write the body as `* path: change.` bullets;
 - sort bullets by path in ascending lexicographic order;
 - keep bullets concise and file-oriented;
-- wrap long lines in GNU style without indenting continuation lines.
+- wrap body lines to at most 70 columns in GNU style without indenting
+  continuation lines.
+
+Before producing or committing a message, check the final message text:
+
+- the subject must use one allowed scope form;
+- exactly one blank line must separate the subject from the body;
+- every body line must be 70 columns or shorter;
+- wrapped bullet continuations must start at column 0;
+- every bullet must end with a period.
 
 ## Output format
 
@@ -71,5 +84,5 @@ In message-only mode, produce exactly one final commit message.
 Output only the commit message text unless the user explicitly asks for
 explanation.
 
-In commit mode, show the exact proposed commit message and ask for confirmation
-before committing.
+In commit mode, do not output only a proposed message. Commit with the generated
+message first, then report the result.
