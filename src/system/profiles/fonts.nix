@@ -25,6 +25,7 @@ in
       includeUserConf = mkDefault true;
 
       subpixel = {
+        lcdfilter = mkDefault "none";
         rgba = mkDefault "none";
       };
 
