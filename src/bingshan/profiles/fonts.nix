@@ -78,29 +78,6 @@ in
           '';
         };
 
-        cleartype = {
-          enable = true;
-          priority = 20;
-
-          text = ''
-            <?xml version="1.0"?>
-            <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
-            <fontconfig>
-              <description>Approximate DirectWrite-like rendering</description>
-
-              <match target="font">
-                <edit name="autohint" mode="assign">
-                  <bool>false</bool>
-                </edit>
-
-                <edit name="lcdfilter" mode="assign">
-                  <const>lcddefault</const>
-                </edit>
-              </match>
-            </fontconfig>
-          '';
-        };
-
         metric-unaliases = {
           enable = true;
           priority = 30;
