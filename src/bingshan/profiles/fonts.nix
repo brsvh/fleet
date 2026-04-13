@@ -138,7 +138,6 @@ in
       defaultFonts = {
         emoji = [
           "Segoe UI Emoji"
-          "Twitter Color Emoji"
         ];
 
         monospace = [
@@ -173,7 +172,6 @@ in
   home = {
     packages = with pkgs; [
       cascadia-code
-      twitter-color-emoji
       windows-fonts
     ];
 
