@@ -31,22 +31,22 @@ TogglePreedit Treemacs TriggerKey TriggerKeys UnBatang UnDotum Verdana
 VerticalTabs Vertico Webdings WenQuanYi YaHei Zenkaku Zswap adwaita
 allowUnfree antialias antialiasing apm authinfo autocd autohint
 autoload autoloads azaleoid backend baz bg bgrt bingshan bluetooth
-bool btrfs cachix cdspell cgroups charset checkwinsize citre cmdhist
-cn cond config consolefonts const ctags ctrl dae dconf dev devShells
-devshell devshells dialout dirToAttrs direnv dirname dirspell disko
-dtd edP editorconfig efi elisp eln elpa emacs emacsclient enablement
-epa erasedups erythron esac eurlatgr facter fg filesystem flymake
-fontconfig frontend fwupd gdm geiser gitattributes gitignore
-globaladvance globstar gnome gnupg gpg gpt gtags gtk gtkrc guix gz
-hintslight hintstyle histappend histfile hk hstr hstrnotiocsti
-ignoreboth ignorespace infix iw jackaudio json keymap ko kvm
-lanzaboote layoutmode lba lcddefault lcdfilter lefthook lf libvirtd
-linux logicalmonitor loglevel loopback lp lzo mcp md minibuffer
-mkDefault mkdir modeline monitorspec mrepl mtimes networkmanager
-nftables nixfmt nixos nixosConfigurations nixpkgs noatime noclobber
-openai openssh partlabel pinentry pipefail pixelsize pkgs plymouth pnp
-posframe posix pre psfu py pyi pyw qual quux rebase repo
-resetStateWhenFocusIn rgb ripgrep sbcl sbctl shopt
+bool btrfs cachix cdspell cgroups charset checkwinsize citre cjk
+cmdhist cn cond config consolefonts const ctags ctrl dae dconf dev
+devShells devshell devshells dialout dirToAttrs direnv dirname
+dirspell disko dtd edP editorconfig efi elisp eln elpa emacs
+emacsclient enablement epa erasedups erythron esac eurlatgr facter fg
+filesystem flymake fontconfig fontset frontend fwupd gdm geiser
+gitattributes gitignore globaladvance globstar gnome gnupg gpg gpt
+gtags gtk gtkrc guix gz hintslight hintstyle histappend histfile hk
+hstr hstrnotiocsti ignoreboth ignorespace infix iw jackaudio json
+keymap ko kvm lanzaboote layoutmode lba lcddefault lcdfilter lefthook
+lf libvirtd linux logicalmonitor loglevel loopback lp lzo mcp md
+minibuffer mkDefault mkdir modeline monitorspec mrepl mtimes
+networkmanager nftables nixfmt nixos nixosConfigurations nixpkgs
+noatime noclobber openai openssh partlabel pinentry pipefail pixelsize
+pkgs plymouth pnp posframe posix pre psfu py pyi pyw qual quux rebase
+repo resetStateWhenFocusIn rgb ripgrep sbcl sbctl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd stdout subpixel
 subscope subscopes substring subvols swapDevices swapfile symlinked
 symlinks sysfs systemd tabspaces tmpfiles toml treefmt treemacs

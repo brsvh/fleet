@@ -19,6 +19,7 @@ in
 {
   imports = [
     bingshan.profiles.accounts
+    bingshan.profiles.fonts
     bingshan.profiles.global
     home.profiles.emacs
   ];
@@ -48,6 +49,15 @@ in
 
           :custom
           (user-full-name "${email.realName}"))
+
+        (use-package emacs
+          :demand t
+          :no-require t
+          :when (display-graphic-p)
+
+          :config
+          (set-fontset-font t 'cjk-misc (font-spec :family "Microsoft YaHei"))
+          (set-fontset-font t 'han (font-spec :family "Microsoft YaHei")))
 
         (use-package epa-hook
           :config
