@@ -33,7 +33,7 @@ in
       };
 
       "org/gnome/desktop/session" = {
-        idle-delay = 0;
+        idle-delay = false;
       };
 
       "org/gnome/settings-daemon/plugins/power" = {
