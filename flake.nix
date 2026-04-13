@@ -335,6 +335,36 @@
               };
             };
           };
+
+          erythron = {
+            allowUnfree = true;
+
+            directory = fleet.erythron.__path;
+
+            overlays = [
+              emacs-overlay.overlays.default
+              infix.overlays.default
+              infix.overlays.emacs-packages
+            ];
+
+            specialArgs = {
+              inherit
+                home
+                infix
+                system
+                ;
+            };
+
+            users = {
+              bingshan = {
+                directory = fleet.bingshan.__path;
+              };
+
+              root = {
+                directory = fleet.root.__path;
+              };
+            };
+          };
         };
 
         partitionedAttrs = {
