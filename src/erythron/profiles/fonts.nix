@@ -51,6 +51,11 @@ in
           "IBM Plex Serif"
         ];
       };
+
+      subpixel = {
+        lcdfilter = mkForce "default";
+        rgba = mkForce "rgb";
+      };
     };
 
     packages = with pkgs; [
