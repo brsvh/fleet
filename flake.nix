@@ -181,7 +181,9 @@
       emacs-overlay,
       flake-parts,
       infix,
+      openclaw,
       nixpkgs,
+      systems,
       ...
     }:
     let
@@ -315,6 +317,7 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
+              openclaw.overlays.default
             ];
 
             specialArgs = {
@@ -345,6 +348,7 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
+              openclaw.overlays.default
             ];
 
             specialArgs = {
@@ -385,6 +389,6 @@
           };
         };
 
-        systems = [ ];
+        systems = import systems;
       };
 }
