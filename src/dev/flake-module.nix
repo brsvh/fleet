@@ -240,6 +240,10 @@ in
               data =
                 let
                   azaleoid = "age16dqp5jglesqrl3g683dv7zkahuaq6h3e9w88je70cgd0rhj53edq2a00xm";
+
+                  bingshan = "age170frnnagdmfajd686ahxztn7suxn7890jsqeh4fgpugltrnm4cpqmkdd0h";
+
+                  erythron = "age1svqryg3zmt67c6229sfem69hhe8aqup7v82r9req0vmrhd4mk9ks6gh4an";
                 in
                 {
                   creation_rules = [
@@ -253,6 +257,17 @@ in
                       ];
 
                       path_regex = "^src/azaleoid/etc/sops\.yaml$";
+                    }
+                    {
+                      key_groups = [
+                        {
+                          age = [
+                            erythron
+                          ];
+                        }
+                      ];
+
+                      path_regex = "^src/erythron/etc/sops\.yaml$";
                     }
                   ];
                 };
