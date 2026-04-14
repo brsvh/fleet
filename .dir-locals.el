@@ -52,7 +52,7 @@ subpixel subscope subscopes substring subvols swapDevices swapfile
 symlinked symlinks sysfs systemd tabspaces tmpfiles toml treefmt
 treemacs treesit truetype tty tw txt udev uefi uids unicode unstaged
 untabify untracked usb utf utils vbe vfat virtualisation wayland
-waypipe writeback xdg xml xwayland yaml yml zbud zh zpool zram
+waypipe wemeet writeback xdg xml xwayland yaml yml zbud zh zpool zram
 zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
