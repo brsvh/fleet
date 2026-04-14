@@ -3,10 +3,15 @@
   bingshan,
   config,
   home,
+  inputs,
   lib,
   ...
 }:
 let
+  inherit (inputs.home-manager.lib.hm.gvariant)
+    mkUint32
+    ;
+
   inherit (lib)
     elemAt
     toString
@@ -33,7 +38,7 @@ in
       };
 
       "org/gnome/desktop/session" = {
-        idle-delay = false;
+        idle-delay = mkUint32 0;
       };
 
       "org/gnome/settings-daemon/plugins/power" = {
