@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -6,9 +7,12 @@
 let
   inherit (lib)
     mkEnableOption
+    mkIf
     mkPackageOption
     types
     ;
+
+  cfg = config.programs.wemeet;
 in
 {
   options = {
@@ -20,6 +24,14 @@ in
           default = "wemeet";
         };
       };
+    };
+  };
+
+  config = {
+    home = {
+      packages = mkIf (cfg.package != null) [
+        cfg.package
+      ];
     };
   };
 }
