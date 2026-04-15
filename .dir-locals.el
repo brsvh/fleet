@@ -31,7 +31,7 @@ TogglePreedit Treemacs TriggerKey TriggerKeys UnBatang UnDotum Verdana
 VerticalTabs Vertico Webdings WenQuanYi YaHei Zenkaku Zswap adwaita
 allowUnfree antialias antialiasing apm authinfo autocd autohint
 autoload autoloads azaleoid backend baz bg bgrt bingshan bluetooth
-bool btrfs cachix cdspell cgroups charset checkwinsize citre cjk
+bool bs btrfs cachix cdspell cgroups charset checkwinsize citre cjk
 cmdhist cn cond config consolefonts const ctags ctrl dae dconf dev
 devShells devshell devshells dialout dirToAttrs direnv dirname
 dirspell disko dtd edP editorconfig efi elisp eln elpa emacs

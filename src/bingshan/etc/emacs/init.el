@@ -1611,6 +1611,15 @@
 ;; Maintaining Large Programs (info "(emacs) Maintaining")
 ;;
 
+(use-package bs-project
+  :after (tabspaces)
+  :commands (bs-project-find-file)
+
+  :bind
+  ;; Allow to switch to a new project tab when find file in the new
+  ;; project.
+  ([remap project-find-file] . bs-project-find-file))
+
 (use-package eat
   :after (project)
   :bind
