@@ -310,6 +310,7 @@
         nixosConfigurations = {
           azaleoid = {
             allowUnfree = true;
+            allowUnsupportedSystem = true;
 
             directory = fleet.azaleoid.__path;
 
