@@ -41,19 +41,20 @@ gitattributes gitignore globaladvance globstar gnome gnupg gpg gpt
 gtags gtk gtkrc guix gz hintslight hintstyle histappend histfile hk
 hstr hstrnotiocsti html http https ignoreboth ignorespace infix iw
 jackaudio json keymap ko kvm lanzaboote layoutmode lba lcddefault
-lcdfilter lefthook lf libvirtd linux logicalmonitor loglevel loopback
-lp lzo mcp md minibuffer mkDefault mkdir modeline monitorspec mrepl
-mtimes networkmanager nftables nixfmt nixos nixosConfigurations
+lcdfilter lefthook lf libvirt libvirtd linux logicalmonitor loglevel
+loopback lp lzo mcp md minibuffer mkDefault mkdir modeline monitorspec
+mrepl mtimes networkmanager nftables nixfmt nixos nixosConfigurations
 nixpkgs noatime noclobber openai openclaw openssh partlabel pdf
 pinentry pipefail pixelsize pkgs plymouth pnp posframe posix pre psfu
-py pyi pyw qual quux rebase repo resetStateWhenFocusIn rgb ripgrep rss
-sbcl sbctl shopt showInputMethodInformationWhenFocusIn smbios src ssd
-stdout steipete subpixel subscope subscopes substring subvols svg
-swapDevices swapfile symlinked symlinks sysfs systemd tabspaces
-tmpfiles toml treefmt treemacs treesit truetype tty tw txt udev uefi
-uids unicode unstaged untabify untracked usb utf utils vbe vfat
-virtualisation wayland waypipe wemeet writeback xdg xhtml xml xwayland
-yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
+py pyi pyw qemu qual quux rebase repo resetStateWhenFocusIn rgb
+ripgrep rss sbcl sbctl shopt showInputMethodInformationWhenFocusIn
+smbios src ssd stdout steipete subpixel subscope subscopes substring
+subvols svg swapDevices swapfile symlink symlinked symlinks sysfs
+systemd tabspaces tmpfiles toml treefmt treemacs treesit truetype tty
+tw txt udev uefi uids unicode unstaged untabify untracked usb utf
+utils vbe vfat virtualisation wayland waypipe wemeet writeback xdg
+xhtml xml xwayland yaml yml zbud zh zpool zram zramSwap zsmalloc zstd
+zswap")))
 
  (nix-mode
   .
