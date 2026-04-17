@@ -49,12 +49,12 @@ partlabel pdf pinentry pipefail pixelsize pkgs plymouth pnp posframe
 posix pre psfu py pyi pyw qemu qual quux rebase repo
 resetStateWhenFocusIn rgb ripgrep rss sbcl sbctl shopt
 showInputMethodInformationWhenFocusIn smbios src ssd starship stdout
-steipete subpixel subscope subscopes substring subvols svg swapDevices
-swapfile symlink symlinked symlinks sysfs systemd tabspaces tmpfiles
-toml treefmt treemacs treesit truetype tty tw txt udev uefi uids
-unicode unstaged untabify untracked usb utf utils vbe vfat
-virtualisation wayland waypipe wemeet writeback xdg xhtml xml xwayland
-yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
+steipete subpixel subscope subscopes substituters substring subvols
+svg swapDevices swapfile symlink symlinked symlinks sysfs systemd
+tabspaces tmpfiles toml treefmt treemacs treesit truetype tty tw txt
+udev uefi uids unicode unstaged untabify untracked usb utf utils vbe
+vfat virtualisation wayland waypipe wemeet writeback xdg xhtml xml
+xwayland yaml yml zbud zh zpool zram zramSwap zsmalloc zstd zswap")))
 
  (nix-mode
   .

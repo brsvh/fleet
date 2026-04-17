@@ -124,6 +124,16 @@
       "ca-derivations"
       "flakes"
     ];
+
+    extra-substituters = [
+      "https://bingshan.cachix.org"
+      "https://nix-community.cachix.org"
+    ];
+
+    extra-trusted-public-keys = [
+      "bingshan.cachix.org-1:ynGuZwJQAfYuM0uq1d2UF8OMxf8uO8GN7V4XDSLYFv8="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
   outputs =
