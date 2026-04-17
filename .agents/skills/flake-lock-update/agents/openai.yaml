@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flake Lock Update"
+  short_description: "Update coordinated Nix flake locks"
+  default_prompt: "Use $flake-lock-update to update the root and src/dev flake locks together."
