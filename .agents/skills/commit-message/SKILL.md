@@ -52,7 +52,7 @@ one uninterrupted workflow.
 
 ## Repository rules
 
-Follow `doc/commit-message-style.md`.
+Follow `.agents/doc/commit-message-style.md`.
 
 Hard requirements:
 
