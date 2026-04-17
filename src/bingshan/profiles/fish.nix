@@ -5,6 +5,7 @@
 {
   imports = [
     home.profiles.fish
+    home.profiles.starship
   ];
 
   programs = {
@@ -12,6 +13,12 @@
       interactiveShellInit = ''
         set fish_greeting
       '';
+    };
+
+    starship = {
+      presets = [
+        "jetpack"
+      ];
     };
   };
 }
