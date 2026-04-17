@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775615115,
-        "narHash": "sha256-zKvhIebrI2SZlmDizJKI6CbCaJjuaNft0eeHbxsc+Os=",
+        "lastModified": 1776362623,
+        "narHash": "sha256-GT9GB1EWzAS9sVxeqL8zEdXpBJFFp/qoklaVeLzL76o=",
         "ref": "master",
-        "rev": "3497e75abfca9a5ed7fa65f5e47f046e1f2a00f4",
-        "revCount": 18636,
+        "rev": "1a0129b355cbc765ae868529997175a5af59959d",
+        "revCount": 18689,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -98,27 +98,6 @@
         "url": "https://github.com/hercules-ci/flake-parts.git"
       }
     },
-    "flake-utils": {
-      "inputs": {
-        "systems": [
-          "systems"
-        ]
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "ref": "main",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "revCount": 102,
-        "type": "git",
-        "url": "https://github.com/numtide/flake-utils.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/numtide/flake-utils.git"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -126,11 +105,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775615548,
-        "narHash": "sha256-LI6N0JhdBmkayu0Ege3LQ/G1lBcZHhGq4DFJPIB96Jc=",
+        "lastModified": 1776373306,
+        "narHash": "sha256-iAJIzHngGZeLIkjzuuWI6VBsYJ1n89a/Esq0m8R1vjs=",
         "ref": "master",
-        "rev": "3d822c1dbae858138189262ed194d3bbb3007a77",
-        "revCount": 6470,
+        "rev": "d401492e2acd4fea42f7705a3c266cea739c9c36",
+        "revCount": 6541,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -173,7 +152,7 @@
           "nixpkgs"
         ],
         "pre-commit": [
-          "git-hooks"
+          "blank"
         ],
         "rust-overlay": [
           "rust-overlay"
@@ -196,11 +175,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1775423009,
-        "narHash": "sha256-vPKLpjhIVWdDrfiUM8atW6YkIggCEKdSAlJPzzhkQlw=",
+        "lastModified": 1776169885,
+        "narHash": "sha256-l/iNYDZ4bGOAFQY2q8y5OAfBBtrDAaPuRQqWaFHVRXM=",
         "ref": "nixos-unstable",
-        "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
-        "revCount": 975402,
+        "rev": "4bd9165a9165d7b5e33ae57f3eecbcb28fb231c9",
+        "revCount": 980183,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -208,36 +187,6 @@
         "ref": "nixos-unstable",
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
-      }
-    },
-    "openclaw": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "home-manager": [
-          "home-manager"
-        ],
-        "nix-steipete-tools": [
-          "steipete-tools"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775955906,
-        "narHash": "sha256-q9mgAyN1df8j3gerC4xQJfBwQshGlRAwIrX46HBTODg=",
-        "ref": "main",
-        "rev": "13deaaf73ffb0ef567c83f7730320f6ee6b157b2",
-        "revCount": 1152,
-        "type": "git",
-        "url": "https://github.com/openclaw/nix-openclaw.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/openclaw/nix-openclaw.git"
       }
     },
     "root": {
@@ -247,10 +196,6 @@
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts",
-        "flake-utils": "flake-utils",
-        "git-hooks": [
-          "blank"
-        ],
         "home-manager": "home-manager",
         "infix": "infix",
         "lanzaboote": "lanzaboote",
@@ -258,10 +203,8 @@
         "nixpkgs": [
           "nixos"
         ],
-        "openclaw": "openclaw",
         "rust-overlay": "rust-overlay",
         "sops": "sops",
-        "steipete-tools": "steipete-tools",
         "systems": "systems"
       }
     },
@@ -272,11 +215,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775963625,
-        "narHash": "sha256-OmwF0Rd/HDbEGC0ZcBS2jPMvmCcn3HDqUypjXrR7KfM=",
+        "lastModified": 1776350315,
+        "narHash": "sha256-ijD4bgb5Iyap9F3MX73vLAZF/SYu+q7Gd7Ux4cbfCWw=",
         "ref": "master",
-        "rev": "573a61faa8ec910a6b8576cc3c145844245574f3",
-        "revCount": 2140,
+        "rev": "62e3b8aedabc240e5b0cc9fae003bc9edfebbc9b",
+        "revCount": 2145,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -293,11 +236,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775365543,
-        "narHash": "sha256-f50qrK0WwZ9z5EdaMGWOTtALgSF7yb7XwuE7LjCuDmw=",
+        "lastModified": 1776119890,
+        "narHash": "sha256-Zm6bxLNnEOYuS/SzrAGsYuXSwk3cbkRQZY0fJnk8a5M=",
         "ref": "master",
-        "rev": "a4ee2de76efb759fe8d4868c33dec9937897916f",
-        "revCount": 1194,
+        "rev": "d4971dd58c6627bfee52a1ad4237637c0a2fb0cd",
+        "revCount": 1205,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -305,43 +248,20 @@
         "ref": "master",
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
-      }
-    },
-    "steipete-tools": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775606539,
-        "narHash": "sha256-aYvej+QTr8g5/NZi8heCHlBHxIt5KArLrs3ULusaiU8=",
-        "ref": "main",
-        "rev": "d17f197c47f30afb82bbfaa3a98bc46a97654e09",
-        "revCount": 104,
-        "type": "git",
-        "url": "https://github.com/openclaw/nix-steipete-tools.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/openclaw/nix-steipete-tools.git"
       }
     },
     "systems": {
       "locked": {
-        "lastModified": 1689347949,
-        "narHash": "sha256-12tWmuL2zgBgZkdoB6qXZsgJEH9LR3oUgpaQq2RbI80=",
-        "ref": "main",
-        "rev": "31732fcf5e8fea42e59c2488ad31a0e651500f68",
-        "revCount": 5,
-        "type": "git",
-        "url": "https://github.com/nix-systems/default-linux.git"
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
       },
       "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/nix-systems/default-linux.git"
+        "id": "systems",
+        "type": "indirect"
       }
     }
   },

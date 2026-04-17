@@ -44,20 +44,6 @@
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
     };
 
-    flake-utils = {
-      inputs = {
-        systems = {
-          follows = "systems";
-        };
-      };
-
-      url = "git+https://github.com/numtide/flake-utils.git?ref=main";
-    };
-
-    git-hooks = {
-      follows = "blank";
-    };
-
     home-manager = {
       inputs = {
         nixpkgs = {
@@ -93,7 +79,7 @@
         };
 
         pre-commit = {
-          follows = "git-hooks";
+          follows = "blank";
         };
 
         rust-overlay = {
@@ -110,28 +96,6 @@
 
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
-    };
-
-    openclaw = {
-      inputs = {
-        flake-utils = {
-          follows = "flake-utils";
-        };
-
-        home-manager = {
-          follows = "home-manager";
-        };
-
-        nix-steipete-tools = {
-          follows = "steipete-tools";
-        };
-
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/openclaw/nix-openclaw.git?ref=main";
     };
 
     rust-overlay = {
@@ -153,20 +117,6 @@
 
       url = "git+https://github.com/Mic92/sops-nix.git?ref=master";
     };
-
-    steipete-tools = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/openclaw/nix-steipete-tools.git?ref=main";
-    };
-
-    systems = {
-      url = "git+https://github.com/nix-systems/default-linux.git?ref=main";
-    };
   };
 
   nixConfig = {
@@ -181,7 +131,6 @@
       emacs-overlay,
       flake-parts,
       infix,
-      openclaw,
       nixpkgs,
       systems,
       ...
@@ -318,7 +267,6 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
-              openclaw.overlays.default
             ];
 
             specialArgs = {
@@ -349,7 +297,6 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
-              openclaw.overlays.default
             ];
 
             specialArgs = {
