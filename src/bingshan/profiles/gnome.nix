@@ -47,12 +47,4 @@ in
       };
     };
   };
-
-  xdg = {
-    configFile = {
-      "monitors.xml" = {
-        source = azaleoid.etc.monitors;
-      };
-    };
-  };
 }
