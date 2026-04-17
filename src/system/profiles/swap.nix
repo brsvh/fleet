@@ -1,6 +1,5 @@
 {
   lib,
-  system,
   ...
 }:
 let
@@ -9,10 +8,6 @@ let
     ;
 in
 {
-  imports = [
-    system.modules.zswap
-  ];
-
   boot = {
     zswap = {
       acceptThresholdPercent = mkDefault 80;
