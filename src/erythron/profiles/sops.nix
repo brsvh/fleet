@@ -1,5 +1,5 @@
 {
-  azaleoid,
+  erythron,
   system,
   ...
 }:
@@ -9,6 +9,6 @@
   ];
 
   sops = {
-    defaultSopsFile = azaleoid.etc.sops;
+    defaultSopsFile = erythron.etc.sops;
   };
 }
