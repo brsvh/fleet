@@ -21,6 +21,7 @@ in
       gnugrep
       hex
       igrep
+      lsof
       multipath-tools
       nix-output-monitor
       nix-tree
