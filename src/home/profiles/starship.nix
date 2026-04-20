@@ -18,6 +18,10 @@ in
   programs = {
     starship = {
       enable = mkDefault true;
+
+      settings = {
+        add_newline = false;
+      };
     };
   };
 }
