@@ -17,7 +17,7 @@
 
     starship = {
       presets = [
-        "jetpack"
+        "plain-text-symbols"
       ];
     };
   };
