@@ -37,9 +37,9 @@ devShells devshell devshells dialout dirToAttrs direnv dirname
 dirspell disko dtd edP editorconfig efi elisp eln elpa emacs
 emacsclient enablement epa erasedups erythron esac eurlatgr facter fg
 filesystem flymake fontconfig fontset frontend fwupd gdm geiser
-gitattributes gitignore globaladvance globstar gnome gnupg gpg gpt
-gtags gtk gtkrc guix gz hintslight hintstyle histappend histfile hk
-hstr hstrnotiocsti html http https ignoreboth ignorespace infix iw
+gitattributes github gitignore globaladvance globstar gnome gnupg gpg
+gpt gtags gtk gtkrc guix gz hintslight hintstyle histappend histfile
+hk hstr hstrnotiocsti html http https ignoreboth ignorespace infix iw
 jackaudio jetpack json keymap ko kvm lanzaboote layoutmode lba
 lcddefault lcdfilter lefthook lf libvirt libvirtd linux logicalmonitor
 loglevel loopback lp lzo mcp md minibuffer mkDefault mkdir modeline

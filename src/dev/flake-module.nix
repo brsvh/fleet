@@ -59,6 +59,13 @@ in
                 };
 
                 mcp_servers = {
+                  github = {
+                    command = "github-mcp-server";
+                    required = false;
+                    startup_timeout_sec = 20;
+                    tool_timeout_sec = 120;
+                  };
+
                   nixos = {
                     command = "mcp-nixos";
                     required = false;
@@ -93,6 +100,7 @@ in
 
               packages = with pkgs; [
                 codex
+                github-mcp-server
                 mcp-nixos
               ];
             };
