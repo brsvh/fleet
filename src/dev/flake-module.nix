@@ -47,6 +47,11 @@ in
                 model_verbosity = "medium";
                 personality = "pragmatic";
                 plan_mode_reasoning_effort = "high";
+
+                project_doc_fallback_filenames = [
+                  ".agents/AGENTS.md"
+                ];
+
                 project_doc_max_bytes = 32768;
                 review_model = "gpt-5.4";
                 sandbox_mode = "workspace-write";

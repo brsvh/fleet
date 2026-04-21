@@ -23,8 +23,8 @@
   repository.
 - If source quality or coverage is weak, state the limitation directly instead
   of filling the gap with speculation.
-- Use tables for comparison-heavy results when they make the reasoning easier
-  to audit.
+- Use tables for comparison-heavy results when they make the reasoning easier to
+  audit.
 - Do not force a table when the task is a small code change, simple command
   result, rewrite, or direct explanation.
 
