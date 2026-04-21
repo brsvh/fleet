@@ -121,7 +121,7 @@ Rules:
 
 Common subscopes include:
 
-- `commit-message`
+- `commit`
 - `nixpkgs`
 - `gnome`
 - `emacs`
@@ -253,7 +253,7 @@ top-level structure changes when no narrower truthful scope exists.
 ## Recommended examples
 
 - `agents: Update commit message routing rules`
-- `agents: commit-message: Split generation workflow`
+- `agents: commit: Split generation workflow`
 - `home: fonts: Add default font profile`
 - `system: fish: Update shell abbreviations`
 - `azaleoid: nixpkgs: Remove redundant overlay wiring`

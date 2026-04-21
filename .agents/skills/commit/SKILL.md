@@ -1,15 +1,13 @@
 ---
-name: commit-message
+name: commit
 description: >
-  Generate a final git commit message for this repository, or create the commit
-  when explicitly asked. Use when asked to write a commit message or commit the
-  current staged changes.
+  Commit the staged changes in this repository using the repository's commit
+  message rules.
 ---
 
-# Commit Message
+# Commit
 
-Use this skill when the user wants a final commit message for this repository,
-or wants the staged changes committed.
+Use this skill when the user wants the staged changes committed.
 
 ## Required workflow
 
@@ -21,18 +19,7 @@ Run these commands in order from the repo root:
 
 Do not skip these checks.
 
-If nothing is staged, say so clearly and ask whether the user wants a message
-for unstaged changes instead.
-
-## Commit automation
-
-Default to message-only mode when the user asks for a commit message, runs
-`$commit-message`, or does not explicitly ask you to create a commit.
-
-Use commit mode only when the user explicitly asks you to commit the staged
-changes.
-
-In commit mode:
+If nothing is staged, say so clearly and stop.
 
 1. Complete the required workflow above.
 2. Draft the final commit message using the repository rules below.
@@ -45,10 +32,6 @@ Do not pause after the user's explicit commit request. Treat that request as
 authorization to create the commit. If the environment blocks access to `.git`,
 retry with the required sandbox escalation and continue after access is
 available.
-
-In commit mode, do not stop after drafting the message and do not ask the user
-to type another prompt. The message drafting step and `git commit -F` step are
-one uninterrupted workflow.
 
 ## Repository rules
 
@@ -79,10 +62,5 @@ Before producing or committing a message, check the final message text:
 
 ## Output format
 
-In message-only mode, produce exactly one final commit message.
-
-Output only the commit message text unless the user explicitly asks for
-explanation.
-
-In commit mode, do not output only a proposed message. Commit with the generated
-message first, then report the result.
+Do not output only a proposed message. Commit with the generated message first,
+then report the result.

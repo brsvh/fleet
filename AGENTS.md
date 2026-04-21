@@ -41,4 +41,4 @@
 - Always include a body after exactly one blank line.
 - Write the body as `* path: change.` bullets with concise file-oriented
   sentences.
-- When asked to write a commit message, use the `commit-message` skill.
+- When asked to commit staged changes, use the `commit` skill.

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Commit Message"
-  short_description: "Generate or commit staged changes"
-  default_prompt: "Use $commit-message to write a commit message for staged changes."
