@@ -293,6 +293,19 @@ in
             treefmt = {
               data = {
                 formatter = {
+                  markdown = {
+                    command = "mdformat";
+
+                    includes = [
+                      "*.md"
+                    ];
+
+                    options = [
+                      "--extensions=frontmatter"
+                      "--wrap=80"
+                    ];
+                  };
+
                   nix = {
                     command = "nixfmt";
 
@@ -310,10 +323,20 @@ in
               format = "toml";
               output = "treefmt.toml";
 
-              packages = with pkgs; [
-                nixfmt
-                treefmt
-              ];
+              packages =
+                let
+                  mdformatWithPlugins = pkgs.mdformat.withPlugins (
+                    ps: with ps; [
+                      mdformat-frontmatter
+                    ]
+                  );
+                in
+                with pkgs;
+                [
+                  mdformatWithPlugins
+                  nixfmt
+                  treefmt
+                ];
             };
           };
 
