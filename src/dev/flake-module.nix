@@ -42,11 +42,11 @@ in
                 approval_policy = "on-request";
                 model = "gpt-5.4";
                 model_provider = "openai";
-                model_reasoning_effort = "medium";
+                model_reasoning_effort = "xhigh";
                 model_reasoning_summary = "auto";
-                model_verbosity = "medium";
+                model_verbosity = "high";
                 personality = "pragmatic";
-                plan_mode_reasoning_effort = "high";
+                plan_mode_reasoning_effort = "xhigh";
 
                 project_doc_fallback_filenames = [
                   ".agents/AGENTS.md"
@@ -64,13 +64,6 @@ in
                 };
 
                 mcp_servers = {
-                  github = {
-                    command = "github-mcp-server";
-                    required = false;
-                    startup_timeout_sec = 20;
-                    tool_timeout_sec = 120;
-                  };
-
                   nixos = {
                     command = "mcp-nixos";
                     required = false;
@@ -105,7 +98,6 @@ in
 
               packages = with pkgs; [
                 codex
-                github-mcp-server
                 mcp-nixos
               ];
             };
