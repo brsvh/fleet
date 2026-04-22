@@ -44,6 +44,36 @@
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
     };
 
+    hermes-agent = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        npm-lockfile-fix = {
+          follows = "npm-lockfile-fix";
+        };
+
+        pyproject-nix = {
+          follows = "pyproject";
+        };
+
+        pyproject-build-systems = {
+          follows = "pyproject-overlay";
+        };
+
+        uv2nix = {
+          follows = "uv";
+        };
+      };
+
+      url = "git+https://github.com/NousResearch/hermes-agent.git?ref=refs/tags/v2026.4.16";
+    };
+
     home-manager = {
       inputs = {
         nixpkgs = {
@@ -98,6 +128,44 @@
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
     };
 
+    npm-lockfile-fix = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/jeslie0/npm-lockfile-fix.git?ref=main";
+    };
+
+    pyproject = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/pyproject-nix/pyproject.nix.git?ref=master";
+    };
+
+    pyproject-overlay = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        pyproject-nix = {
+          follows = "pyproject";
+        };
+
+        uv2nix = {
+          follows = "uv";
+        };
+      };
+
+      url = "git+https://github.com/pyproject-nix/build-system-pkgs.git?ref=master";
+    };
+
     rust-overlay = {
       inputs = {
         nixpkgs = {
@@ -116,6 +184,20 @@
       };
 
       url = "git+https://github.com/Mic92/sops-nix.git?ref=master";
+    };
+
+    uv = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        pyproject-nix = {
+          follows = "pyproject";
+        };
+      };
+
+      url = "git+https://github.com/pyproject-nix/uv2nix.git?ref=master";
     };
   };
 
