@@ -1,6 +1,6 @@
 ---
 name: commit
-description: >
+description: >-
   Commit the staged changes in this repository using the repository's commit
   message rules.
 ---
@@ -14,19 +14,19 @@ Use this skill when the user wants the staged changes committed.
 Run these commands in order from the repo root:
 
 1. `git status --short`
-2. `git diff --cached --stat`
-3. `git diff --cached`
+1. `git diff --cached --stat`
+1. `git diff --cached`
 
 Do not skip these checks.
 
 If nothing is staged, say so clearly and stop.
 
 1. Complete the required workflow above.
-2. Draft the final commit message using the repository rules below.
-3. Check the final message text using the checklist below.
-4. Write the message to a temporary file and run
+1. Draft the final commit message using the repository rules below.
+1. Check the final message text using the checklist below.
+1. Write the message to a temporary file and run
    `git commit -F <temporary-file>`.
-5. Report the commit result, including the new commit hash when available.
+1. Report the commit result, including the new commit hash when available.
 
 Do not pause after the user's explicit commit request. Treat that request as
 authorization to create the commit. If the environment blocks access to `.git`,

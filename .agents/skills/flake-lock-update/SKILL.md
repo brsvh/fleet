@@ -1,6 +1,6 @@
 ---
 name: flake-lock-update
-description: >
+description: >-
   Update and verify this repository's Nix flake lock files. Use when the user
   asks to update flake.lock, src/dev/flake.lock, shared flake inputs such as
   nixpkgs, nixos, systems, or all Nix flake inputs in this fleet repository.
@@ -20,8 +20,7 @@ explicitly limit the request to one flake.
 
 Treat these as the important top-level input relationships:
 
-- Root flake: `nixos` is the upstream Nixpkgs input; `nixpkgs` follows
-  `nixos`.
+- Root flake: `nixos` is the upstream Nixpkgs input; `nixpkgs` follows `nixos`.
 - Dev flake: `nixpkgs` is the upstream Nixpkgs input.
 - Dev flake: `systems` is shared by `flake-utils` through `follows`.
 
@@ -39,7 +38,7 @@ Run commands from the repository root.
    git status --short
    ```
 
-2. Choose the update command:
+1. Choose the update command:
 
    ```bash
    # Update every input in both lock files.
@@ -57,10 +56,10 @@ Run commands from the repository root.
 
    If an input exists in only one flake, update only that flake and say so.
 
-3. If Nix cannot fetch inputs because of network sandboxing, retry the same
+1. If Nix cannot fetch inputs because of network sandboxing, retry the same
    command with the required escalation rather than changing the update scope.
 
-4. Verify the result:
+1. Verify the result:
 
    ```bash
    git status --short
@@ -71,7 +70,7 @@ Run commands from the repository root.
    before the update, do not revert them; mention that they were already present
    if relevant.
 
-5. For broad updates or when the user asks for confidence checks, run the
+1. For broad updates or when the user asks for confidence checks, run the
    narrowest relevant Nix check available from local context. Prefer checking
    flake metadata before running expensive builds:
 
