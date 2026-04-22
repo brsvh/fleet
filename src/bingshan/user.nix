@@ -18,8 +18,6 @@
           "davfs2"
           "dialout"
           "jackaudio"
-          "kvm"
-          "libvirtd"
           "lp"
           "network"
           "networkmanager"
