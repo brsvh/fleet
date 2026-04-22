@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    system.modules.users-groups
     system.profiles.fish
   ];
 
@@ -14,16 +15,6 @@
         description = "Bingshan Chang";
 
         extraGroups = [
-          "audio"
-          "davfs2"
-          "dialout"
-          "jackaudio"
-          "lp"
-          "network"
-          "networkmanager"
-          "scanner"
-          "systemd-journal"
-          "video"
           "wheel"
         ];
 
