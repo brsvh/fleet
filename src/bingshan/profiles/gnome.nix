@@ -43,7 +43,7 @@ in
 
       "org/gnome/settings-daemon/plugins/power" = {
         idle-dim = false;
-        sleep-inactive-ac-type = "suspend";
+        sleep-inactive-ac-type = "nothing";
       };
     };
   };
