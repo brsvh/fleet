@@ -208,11 +208,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1776169885,
-        "narHash": "sha256-l/iNYDZ4bGOAFQY2q8y5OAfBBtrDAaPuRQqWaFHVRXM=",
+        "lastModified": 1776548001,
+        "narHash": "sha256-ZSK0NL4a1BwVbbTBoSnWgbJy9HeZFXLYQizjb2DPF24=",
         "ref": "nixos-unstable",
-        "rev": "4bd9165a9165d7b5e33ae57f3eecbcb28fb231c9",
-        "revCount": 980183,
+        "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+        "revCount": 982522,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -220,27 +220,6 @@
         "ref": "nixos-unstable",
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
-      }
-    },
-    "npm-lockfile-fix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775903712,
-        "narHash": "sha256-2GV79U6iVH4gKAPWYrxUReB0S41ty/Y3dBLquU8AlaA=",
-        "ref": "main",
-        "rev": "c6093acb0c0548e0f9b8b3d82918823721930fe8",
-        "revCount": 25,
-        "type": "git",
-        "url": "https://github.com/jeslie0/npm-lockfile-fix.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/jeslie0/npm-lockfile-fix.git"
       }
     },
     "pyproject": {
@@ -306,7 +285,6 @@
         "nixpkgs": [
           "nixos"
         ],
-        "npm-lockfile-fix": "npm-lockfile-fix",
         "pyproject": "pyproject",
         "pyproject-overlay": "pyproject-overlay",
         "rust-overlay": "rust-overlay",

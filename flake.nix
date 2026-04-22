@@ -54,10 +54,6 @@
           follows = "nixpkgs";
         };
 
-        npm-lockfile-fix = {
-          follows = "npm-lockfile-fix";
-        };
-
         pyproject-nix = {
           follows = "pyproject";
         };
@@ -126,16 +122,6 @@
 
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
-    };
-
-    npm-lockfile-fix = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/jeslie0/npm-lockfile-fix.git?ref=main";
     };
 
     pyproject = {
