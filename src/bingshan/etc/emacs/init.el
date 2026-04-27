@@ -372,6 +372,7 @@
                '((derived-mode . help-mode)
                  (display-buffer-in-side-window)
                  (side . bottom)
+                 (slot . 0)
                  (window-height . 0.4))))
 
 ;;
@@ -1611,6 +1612,24 @@
 ;; Maintaining Large Programs (info "(emacs) Maintaining")
 ;;
 
+(use-package bs-eat
+  :after (project)
+  :commands (bs/eat-project-dwim
+             bs/eat-project-switch)
+
+  :bind
+  ( :map global-map
+    ;; Use `eat' to create shell based on project root.
+    ([remap project-shell] . bs/eat-project-dwim)
+
+    :map ctl-c-p-map
+    ;; Switch to an Eat buffer associated with the current project.
+    ("C-s" . bs/eat-project-switch)
+
+    ;; Reuse an idle Eat session for the current project or create
+    ;; one.
+    ("s" . bs/eat-project-dwim)))
+
 (use-package bs-project
   :after (tabspaces)
   :commands (bs-project-find-file)
@@ -1619,13 +1638,6 @@
   ;; Allow to switch to a new project tab when find file in the new
   ;; project.
   ([remap project-find-file] . bs-project-find-file))
-
-(use-package eat
-  :after (project)
-  :bind
-  ( :map global-map
-    ;; Use `eat' to create shell based on project root.
-    ([remap project-shell] . eat-project)))
 
 (use-package diff-hl
   :hook
@@ -1954,6 +1966,19 @@
 ;; Running Shell Commands from Emacs (info "(emacs) Shell")
 ;;
 
+(use-package bs-eat
+  :commands (bs/eat-dwim
+             bs/eat-switch)
+
+  :bind
+  ( :map ctl-c-s-map
+    ;; Switch to an Eat buffer associated with the current directory.
+    ("C-s" . bs/eat-switch)
+
+    ;; Reuse an idle Eat session for the current directory or create
+    ;; one.
+    ("s" . bs/eat-dwim)))
+
 (use-package comint
   :after (cape)
 
@@ -1975,6 +2000,17 @@
 (use-package eat
   :functions (eat-self-input
               eat-term-send-string)
+
+  :config
+  ;; Add a display buffer rule to make Eat buffers shown in a side
+  ;; window at the bottom of the frame with its height set to 40% of
+  ;; the total frame height.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . eat-mode)
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.4)))
 
   :hook
   ;; Export environment variables so that programs launched from Eat
