@@ -7,7 +7,7 @@
     };
 
     crane = {
-      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.2";
+      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.3";
     };
 
     disko = {
