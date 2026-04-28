@@ -1701,6 +1701,19 @@
     ;; Press \\`C-c v g' to display Magit.
     ("g" . magit)))
 
+(use-package magit-status
+  :after (magit)
+
+  :config
+  ;; Show Magit Status in the shared bottom side window used for
+  ;; commit message editing.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . magit-status-mode)
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.4))))
+
 (use-package project
   :after (bs-lib)
 
