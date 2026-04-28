@@ -2410,13 +2410,6 @@
   ;; in the mini-buffer.
   (epg-pinentry-mode 'loopback))
 
-(use-package pinentry
-  :after (bs-hooks)
-
-  :hook
-  ;; Start the Emacs pinentry service shortly after startup.
-  (bs-after-startup-late-hook . pinentry-start))
-
 ;;
 ;; Org (info "(org) Top")
 ;;

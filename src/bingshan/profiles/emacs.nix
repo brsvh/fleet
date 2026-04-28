@@ -143,7 +143,6 @@ in
           org-modern-indent
           paredit
           pass
-          pinentry
           rainbow-delimiters
           sly
           sly-asdf
