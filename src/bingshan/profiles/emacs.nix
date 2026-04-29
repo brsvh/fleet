@@ -28,13 +28,16 @@ in
     packages = with pkgs; [
       black
       clang-tools
+      codesearch
       emacs-lsp-booster
       hunspell
       hunspellDicts.en_US-large
       nerd-fonts.symbols-only
-      pyright
       nixd
       nixfmt
+      pyright
+      ripgrep
+      silver-searcher
     ];
   };
 
@@ -86,10 +89,13 @@ in
           citar-embark
           citre
           consult
+          consult-ag
+          consult-codesearch
           consult-denote
           consult-eglot
           consult-eglot-embark
           consult-jinx
+          consult-project-extra
           corfu
           corfu-candidate-overlay
           denote

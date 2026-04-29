@@ -77,6 +77,14 @@
   ;; graphical interface is ready, rather than during early startup.
   (bs-first-ui-hook . doom-modeline-mode))
 
+(use-package doom-modeline
+  :when (display-graphic-p)
+
+  :custom
+  ;; Use the HUD-style position indicator in GUI frames instead of
+  ;; the default modeline bar.
+  (doom-modeline-hud t))
+
 (use-package menu-bar
   :after (bs-hooks)
   :commands (menu-bar-mode)
@@ -119,6 +127,11 @@
 ;;
 
 (use-package consult
+  :commands (consult-find
+             consult-grep
+             consult-line
+             consult-ripgrep)
+
   :bind
   ( :map goto-map
     ;; Go to matched file.
@@ -132,6 +145,15 @@
 
     ;; Go to matched ripgrep search result.
     ("r" . consult-ripgrep)))
+
+(use-package consult-ag
+  :after (consult)
+  :commands (consult-ag)
+
+  :bind
+  ( :map goto-map
+    ;; Go to matched ag search result.
+    ("a" . consult-ag)))
 
 (use-package mwim
   :bind
@@ -1639,6 +1661,16 @@
   ;; project.
   ([remap project-find-file] . bs-project-find-file))
 
+(use-package consult-project-extra
+  :after (consult project)
+  :commands (consult-project-extra-find
+             consult-project-extra-find-other-window)
+
+  :bind
+  ( :map ctl-c-p-map
+    ;; Find a file in the current project via `consult-project-extra'.
+    ("f" . consult-project-extra-find)))
+
 (use-package diff-hl
   :hook
   ;; Enable `diff-hl-mode' when visiting a file.
@@ -1984,7 +2016,7 @@
              bs/eat-switch)
 
   :bind
-  ( :map ctl-c-s-map
+  ( :map ctl-c-a-map
     ;; Switch to an Eat buffer associated with the current directory.
     ("C-s" . bs/eat-switch)
 
