@@ -160,6 +160,7 @@ in
           sly-named-readtables
           sly-stepper
           smartparens
+          spacious-padding
           switch-window
           tabspaces
           treemacs

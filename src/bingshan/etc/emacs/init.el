@@ -93,6 +93,40 @@
   ;; Disable the Menu Bar for all frames once the UI is initialized.
   (bs-first-ui-hook . (lambda () (menu-bar-mode -1))))
 
+(use-package spacious-padding
+  :after (bs-hooks)
+  :commands (spacious-padding-mode)
+
+  :custom
+  ;; Replace filled mode/header line backgrounds with thin
+  ;; overlines/underlines that use the dedicated Spacious Padding
+  ;; faces, while preserving the configured padding.
+  (spacious-padding-subtle-frame-lines
+   '( :mode-line-active spacious-padding-line-active
+      :mode-line-inactive spacious-padding-line-inactive
+      :header-line-active spacious-padding-line-active
+      :header-line-inactive spacious-padding-line-inactive))
+
+  ;; Set the pixel widths for frame borders, fringes, scroll bars, tab
+  ;; UI, and related elements in one place to keep the expanded
+  ;; spacing consistent across the interface.
+  (spacious-padding-widths '( :custom-button-width 4
+                              :fringe-width 12
+                              :header-line-width 4
+                              :internal-border-width 4
+                              :mode-line-width 4
+                              :right-divider-width 0
+                              :scroll-bar-width 24
+                              :tab-bar-width 16
+                              :tab-line-width 4
+                              :tab-width 4))
+
+  :hook
+  ;; Enable Spacious Padding once the graphical interface is ready, so
+  ;; the additional frame and window spacing is applied with the rest
+  ;; of the UI setup.
+  (bs-first-ui-hook . spacious-padding-mode))
+
 (use-package tool-bar
   :after (bs-hooks)
   :commands (tool-bar-mode)
