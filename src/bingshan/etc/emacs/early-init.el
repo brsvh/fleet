@@ -131,9 +131,11 @@
   ;; interface and more room for our buffers.
   (setq-default default-frame-alist
                 (seq-uniq (append default-frame-alist
-                                  '((menu-bar-lines . 0)
+                                  '((height . 40)
+                                    (menu-bar-lines . 0)
                                     (tool-bar-lines . 0)
-                                    (vertical-scroll-bars . 0))))))
+                                    (vertical-scroll-bars . 0)
+                                    (width . 80))))))
 
 (use-package package
   :custom
