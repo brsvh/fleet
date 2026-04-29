@@ -83,6 +83,7 @@ in
           blamer
           bs
           bufferlo
+          calfw
           cape
           citar
           citar-denote
@@ -145,8 +146,11 @@ in
           orderless
           org-appear
           org-contrib
+          org-gtd
           org-modern
           org-modern-indent
+          org-ql
+          org-super-agenda
           paredit
           pass
           rainbow-delimiters
