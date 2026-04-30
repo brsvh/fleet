@@ -9,6 +9,8 @@ let
     ;
 
   inherit (inputs)
+    infix
+    nixpkgs
     systems
     ;
 
@@ -31,9 +33,24 @@ in
     {
       config,
       pkgs,
+      system,
       ...
     }:
     {
+      _module = {
+        args = {
+          pkgs = import nixpkgs {
+            inherit
+              system
+              ;
+
+            overlays = [
+              infix.overlays.default
+            ];
+          };
+        };
+      };
+
       devshells = {
         default = {
           ago = {
@@ -290,6 +307,14 @@ in
             treefmt = {
               data = {
                 formatter = {
+                  emacs-lisp = {
+                    command = "emacs-lisp-formatter";
+
+                    includes = [
+                      "*.el"
+                    ];
+                  };
+
                   markdown = {
                     command = "mdformat";
 
@@ -330,6 +355,7 @@ in
                 in
                 with pkgs;
                 [
+                  emacs-lisp-formatter
                   mdformatWithPlugins
                   nixfmt
                   treefmt

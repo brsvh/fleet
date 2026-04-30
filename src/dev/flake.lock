@@ -21,6 +21,27 @@
         "url": "https://github.com/numtide/devshell.git"
       }
     },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775087534,
+        "narHash": "sha256-91qqW8lhL7TLwgQWijoGBbiD4t7/q75KTi8NxjVmSmA=",
+        "ref": "main",
+        "rev": "3107b77cd68437b9a76194f0f7f9c55f2329ca5b",
+        "revCount": 448,
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/hercules-ci/flake-parts.git"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": [
@@ -40,6 +61,30 @@
         "ref": "main",
         "repo": "flake-utils",
         "type": "github"
+      }
+    },
+    "infix": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1777520984,
+        "narHash": "sha256-R7m1Jtyfy3DnmiHvtPjbwqAy63UCc89Jx/hgNMMJA4k=",
+        "ref": "main",
+        "rev": "b733d6555801ef3851e794b25dca8cc2e33ef1a7",
+        "revCount": 44,
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/infix.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/infix.git"
       }
     },
     "nixago": {
@@ -117,7 +162,9 @@
     "root": {
       "inputs": {
         "devshell": "devshell",
+        "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
+        "infix": "infix",
         "nixago": "nixago",
         "nixago-extensions": "nixago-extensions",
         "nixpkgs": "nixpkgs",
