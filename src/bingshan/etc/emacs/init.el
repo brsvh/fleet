@@ -77,13 +77,14 @@
   ;; graphical interface is ready, rather than during early startup.
   (bs-first-ui-hook . doom-modeline-mode))
 
-(use-package doom-modeline
-  :when (display-graphic-p)
+(use-package doom-modeline-core
+  :after (doom-modeline)
+  :functions (doom-modeline-remove-segment)
 
-  :custom
-  ;; Use the HUD-style position indicator in GUI frames instead of
-  ;; the default modeline bar.
-  (doom-modeline-hud t))
+  :config
+  ;; Remove the left-edge status bar from every built-in modeline
+  ;; template so the layout stays text-focused and visually quieter.
+  (doom-modeline-remove-segment 'bar 'all))
 
 (use-package menu-bar
   :after (bs-hooks)
@@ -585,7 +586,11 @@
 
   ;; Cross-theme modifications.
   (modus-themes-common-palette-overrides
-   '(;; Remove mode line border.
+   '(;; Use the same background for the tab bar and inactive tabs so
+     ;; the strip recedes and individual tabs carry the separation.
+     (bg-tab-bar bg-tab-other)
+
+     ;; Remove mode line border.
      (border-mode-line-active unspecified)
      (border-mode-line-inactive unspecified)))
 
