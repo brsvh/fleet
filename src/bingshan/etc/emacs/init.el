@@ -2503,6 +2503,11 @@
   ;; Org fallback to the default three dots.
   (org-ellipsis nil)
 
+  ;; Enable direct TODO state selection for \\`C-c C-t' when shortcut
+  ;; keys are defined, and present the available states only in the
+  ;; prompt instead of opening the temporary selection window.
+  (org-use-fast-todo-selection 'expert)
+
   ;; Hide the surrounding markup characters for bold, italic,
   ;; verbatim, and similar constructs (e.g. *bold* → bold).  This
   ;; affects only the on-screen representation; the underlying Org
@@ -2522,7 +2527,16 @@
   ;; counts from the right edge of the window, let tags aligned 80
   ;; columns from the right border regardless of window width.
   (org-tags-column -80)
-  (org-auto-align-tags t))
+  (org-auto-align-tags t)
+
+  ;; Define a single sequential task workflow with active states
+  ;; before `|' and terminal states after it: `TODO' for newly
+  ;; captured work, `NEXT' for the next actionable item, `WAIT' for
+  ;; blocked work, `DONE' for completed work, `CNCL' for intentionally
+  ;; canceled work, and `FAIL' for work that ended unsuccessfully.
+  (org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)"
+                                 "|"
+                                 "DONE(d)" "CNCL(c)" "FAIL(f)"))))
 
 (use-package org-appear
   :after (org)
