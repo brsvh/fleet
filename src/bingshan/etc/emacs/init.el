@@ -260,6 +260,37 @@
   (use-short-answers t))
 
 (use-package embark
+  :custom
+  ;; Pop up embark buffers below the current buffer.
+  (embark-verbose-indicator-display-action
+   '(display-buffer-reuse-window display-buffer-below-selected))
+
+  :config
+  ;; Show the transient Embark action menu in a dedicated bottom side
+  ;; window so action discovery stays visible without replacing the
+  ;; current editing window.
+  (add-to-list 'display-buffer-alist
+               '("\\*Embark Actions\\*"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (no-other-window . t)))
+                 (window-height . fit-window-to-buffer)))
+
+  ;; Place Embark collect buffers in a persistent side window on the
+  ;; right so live candidate views remain inspectable while the main
+  ;; window keeps focus on the current task.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . embark-collect-mode)
+                 (display-buffer-reuse-mode-window
+                  display-buffer-in-side-window)
+                 (preserve-size . (t . t))
+                 (side . right)
+                 (window-width . 0.33)
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (no-other-window . t)))))
+
   :bind
   ( :map global-map
     ;; Quick action at point by press \\`C-.'
@@ -270,12 +301,7 @@
 
     :map help-map
     ;; Use `embark-bindings' to list keys.
-    ("B" . embark-bindings))
-
-  :custom
-  ;; Pop up embark buffers below the current buffer.
-  (embark-verbose-indicator-display-action
-   '(display-buffer-reuse-window display-buffer-below-selected)))
+    ("B" . embark-bindings)))
 
 (use-package marginalia
   :after (bs-hooks)
@@ -330,6 +356,15 @@
   :custom
   ;; Allow escape with the black-splash.
   (orderless-component-separator 'orderless-escapable-split-on-space))
+
+(use-package switch-window
+  :after (embark)
+
+  :config
+  ;; Exclude Embark collect helper windows from `switch-window' so
+  ;; window selection targets only primary work buffers.
+  (add-to-list 'switch-window-ignore-rules
+               '(:mode embark-collect-mode)))
 
 (use-package vertico
   :after (bs-hooks)
@@ -425,7 +460,7 @@
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.4))))
+                 (window-height . 0.33))))
 
 ;;
 ;; The Mark and the Region (info "(emacs) Mark")
@@ -581,7 +616,12 @@
 
   ;; Cross-theme modifications.
   (modus-themes-common-palette-overrides
-   '(;; Use the same background for the tab bar and inactive tabs so
+   '(;; Reuse the current-line highlight background for active line
+     ;; numbers so the line number column aligns visually with
+     ;; `hl-line'.
+     (bg-line-number-active bg-hl-line)
+
+     ;; Use the same background for the tab bar and inactive tabs so
      ;; the strip recedes and individual tabs carry the separation.
      (bg-tab-bar bg-tab-other)
 
@@ -794,8 +834,7 @@
                  (preserve-size . (t . t))
                  (side . left)
                  (slot . -1)
-                 (window-parameters . ((mode-line-format . none)
-                                       (no-delete-other-windows . t)
+                 (window-parameters . ((no-delete-other-windows . t)
                                        (no-other-window . t)))))
 
   :bind
@@ -2095,7 +2134,7 @@
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.3)))
+                 (window-height . 0.33)))
 
   :hook
   ;; Export environment variables so that programs launched from Eat
@@ -2552,11 +2591,10 @@
   (add-to-list 'display-buffer-alist
                '("\\*Agenda Commands\\*"
                  (display-buffer-in-side-window)
-                 (preserve-size . (t . t))
                  (side . bottom)
                  (slot . 0)
-                 (window-parameters . ((mode-line-format . none)
-                                       (no-delete-other-windows . t)
+                 (window-height . fit-window-to-buffer)
+                 (window-parameters . ((no-delete-other-windows . t)
                                        (no-other-window . t)))))
 
   ;; Present generated agenda buffers in a predictable bottom side
@@ -2567,7 +2605,7 @@
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.5))))
+                 (window-height . fit-window-to-buffer))))
 
 (use-package org-appear
   :after (org)
@@ -2606,6 +2644,7 @@
   (org-gtd-keyword-mapping '((todo . "TODO")
                              (next . "NEXT")
                              (wait . "WAIT")
+                             (done . "DONE")
                              (canceled . "CNCL")))
 
   :bind
