@@ -162,11 +162,6 @@
 ;;
 
 (use-package consult
-  :commands (consult-find
-             consult-grep
-             consult-line
-             consult-ripgrep)
-
   :bind
   ( :map goto-map
     ;; Go to matched file.
@@ -183,7 +178,6 @@
 
 (use-package consult-ag
   :after (consult)
-  :commands (consult-ag)
 
   :bind
   ( :map goto-map
@@ -236,6 +230,7 @@
   :after (vertico)
   :commands (corfu-mode)
   :defines (read-passwd-map)
+
   :hook
   (minibuffer-setup-hook
    .
@@ -796,12 +791,12 @@
                '((derived-mode . treemacs-mode)
                  (display-buffer-reuse-mode-window
                   display-buffer-in-side-window)
+                 (preserve-size . (t . t))
                  (side . left)
                  (slot . -1)
                  (window-parameters . ((mode-line-format . none)
-                                       (no-delete-other-window . t)
-                                       (no-other-window . t)
-                                       (window-preserve-size . (t . t))))))
+                                       (no-delete-other-windows . t)
+                                       (no-other-window . t)))))
 
   :bind
   ( :map ctl-c-f-map
@@ -1392,9 +1387,24 @@
   (prog-mode-hook . hs-minor-mode))
 
 (use-package hl-todo
-  :after (prog-mode)
+  :after (modus-themes prog-mode)
 
   :hook
+  ;; Reapply local keyword face overrides after each Modus theme load,
+  ;; because the theme repopulates `hl-todo-keyword-faces' with its
+  ;; own defaults.
+  (modus-themes-after-load-theme-hook
+   .
+   (lambda ()
+     (dolist (entry '(("CNCL" . warning)
+                      ("WAIT" . warning)))
+       (setf (alist-get (car entry)
+                        hl-todo-keyword-faces
+                        nil
+                        nil
+                        #'string=)
+             (cdr entry)))))
+
   ;; Treat TODO markers as active signals during development, not
   ;; passive comments to be rediscovered later.
   (prog-mode-hook . hl-todo-mode))
@@ -1675,8 +1685,6 @@
 
 (use-package bs-eat
   :after (project)
-  :commands (bs/eat-project-dwim
-             bs/eat-project-switch)
 
   :bind
   ( :map global-map
@@ -1693,7 +1701,6 @@
 
 (use-package bs-project
   :after (tabspaces)
-  :commands (bs-project-find-file)
 
   :bind
   ;; Allow to switch to a new project tab when find file in the new
@@ -1702,8 +1709,6 @@
 
 (use-package consult-project-extra
   :after (consult project)
-  :commands (consult-project-extra-find
-             consult-project-extra-find-other-window)
 
   :bind
   ( :map ctl-c-p-map
@@ -1782,8 +1787,7 @@
                '((derived-mode . magit-status-mode)
                  (display-buffer-in-side-window)
                  (side . bottom)
-                 (slot . 0)
-                 (window-height . 0.4))))
+                 (slot . 0))))
 
 (use-package project
   :after (bs-lib)
@@ -2051,9 +2055,6 @@
 ;;
 
 (use-package bs-eat
-  :commands (bs/eat-dwim
-             bs/eat-switch)
-
   :bind
   ( :map ctl-c-a-map
     ;; Switch to an Eat buffer associated with the current directory.
@@ -2094,7 +2095,7 @@
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.4)))
+                 (window-height . 0.3)))
 
   :hook
   ;; Export environment variables so that programs launched from Eat
@@ -2498,6 +2499,11 @@
   ;; Directory beneath org files.
   (org-directory (bs-path* "~/org"))
 
+  ;; Restrict agenda discovery to the GTD subtree so agenda commands
+  ;; operate on the curated task set instead of every Org file under
+  ;; `org-directory'.
+  (org-agenda-files (list (bs-path* org-directory "gtd/")))
+
   ;; Set the string displayed at folded outline boundaries.  Setting
   ;; this to nil disables the display of a custom ellipsis and lets
   ;; Org fallback to the default three dots.
@@ -2538,14 +2544,83 @@
                                  "|"
                                  "DONE(d)" "CNCL(c)" "FAIL(f)"))))
 
+(use-package org-agenda
+  :config
+  ;; Show the agenda dispatcher in a dedicated bottom side window and
+  ;; keep it out of normal window cycling, so command selection does
+  ;; not disturb the main editing layout.
+  (add-to-list 'display-buffer-alist
+               '("\\*Agenda Commands\\*"
+                 (display-buffer-in-side-window)
+                 (preserve-size . (t . t))
+                 (side . bottom)
+                 (slot . 0)
+                 (window-parameters . ((mode-line-format . none)
+                                       (no-delete-other-windows . t)
+                                       (no-other-window . t)))))
+
+  ;; Present generated agenda buffers in a predictable bottom side
+  ;; window, reusing a fixed slot and limiting height to half the
+  ;; frame so surrounding context remains visible.
+  (add-to-list 'display-buffer-alist
+               '("\\*Org Agenda\\*"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.5))))
+
 (use-package org-appear
   :after (org)
+
   :hook
   ;; Enable `org-appear-mode' whenever entering Org mode.  This mode
   ;; reveals hidden formatting markers (such as emphasis markers,
   ;; subscript/superscript markers, and link brackets) only when the
   ;; cursor moves onto them.
   (org-mode-hook . org-appear-mode))
+
+(use-package org-edna
+  :after (org)
+  :commands (org-edna-mode)
+
+  :hook
+  ;; Enable Org Edna in Org buffers so TODO-state dependencies and
+  ;; trigger properties are enforced when tasks change state.
+  (org-mode-hook . (lambda ()
+                     (org-edna-mode +1))))
+
+(use-package org-gtd
+  :preface
+  ;; Acknowledge the required Org GTD 4.x upgrade steps up front so
+  ;; the package does not emit its one-time migration warning on load.
+  (setq org-gtd-update-ack "4.0.0")
+
+  :custom
+  ;; Store Org GTD's inbox, archive, and supporting files inside the
+  ;; GTD subtree already included in `org-agenda-files'.
+  (org-gtd-directory (bs-path* org-directory "gtd/"))
+
+  ;; Bind Org GTD's semantic states to the workflow keywords defined
+  ;; above so capture and processing commands follow the same naming,
+  ;; including the local `CNCL' spelling for canceled tasks.
+  (org-gtd-keyword-mapping '((todo . "TODO")
+                             (next . "NEXT")
+                             (wait . "WAIT")
+                             (canceled . "CNCL")))
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open the org-gtd agenda view focused on actionable work and
+    ;; other GTD-specific reviews.
+    ("a" . org-gtd-engage)
+
+    ;; Capture a new item directly into the GTD inbox, ensuring the
+    ;; inbox file exists before delegating to `org-capture'.
+    ("c" . org-gtd-capture)
+
+    ;; Process inbox items sequentially through Org GTD's clarify
+    ;; workflow until the configured inbox files are exhausted.
+    ("i" . org-gtd-process-inbox)))
 
 (use-package org-modern
   :after (org)
