@@ -1435,6 +1435,7 @@
   (modus-themes-after-load-theme-hook
    .
    (lambda ()
+     (require 'hl-todo)
      (dolist (entry '(("CNCL" . warning)
                       ("WAIT" . warning)))
        (setf (alist-get (car entry)
