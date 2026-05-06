@@ -10,6 +10,7 @@ let
 
   inherit (inputs)
     infix
+    llm-agents
     nixpkgs
     systems
     ;
@@ -46,6 +47,7 @@ in
 
             overlays = [
               infix.overlays.default
+              llm-agents.overlays.default
             ];
           };
         };
@@ -57,7 +59,7 @@ in
             codex = {
               data = {
                 approval_policy = "on-request";
-                model = "gpt-5.4";
+                model = "gpt-5.5";
                 model_provider = "openai";
                 model_reasoning_effort = "xhigh";
                 model_reasoning_summary = "auto";

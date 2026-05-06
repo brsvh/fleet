@@ -1,5 +1,78 @@
 {
   "nodes": {
+    "blank": {
+      "locked": {
+        "lastModified": 1625557891,
+        "narHash": "sha256-O8/MWsPBGhhyPoPLHZAuoZiiHo9q6FLlEeIDEXuj6T4=",
+        "ref": "master",
+        "rev": "5a5d2684073d9f563072ed07c871d577a6c614a8",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/divnix/blank.git"
+      }
+    },
+    "blueprint": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1776249299,
+        "narHash": "sha256-Dt9t1TGRmJFc0xVYhttNBD6QsAgHOHCArqGa0AyjrJY=",
+        "ref": "main",
+        "rev": "56131e8628f173d24a27f6d27c0215eff57e40dd",
+        "revCount": 158,
+        "type": "git",
+        "url": "https://github.com/numtide/blueprint.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/blueprint.git"
+      }
+    },
+    "bun": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "import-tree": [
+          "import-tree"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ],
+        "treefmt-nix": [
+          "blank"
+        ]
+      },
+      "locked": {
+        "lastModified": 1770895533,
+        "narHash": "sha256-v3QaK9ugy9bN9RXDnjw0i2OifKmz2NnKM82agtqm/UY=",
+        "ref": "master",
+        "rev": "c843f477b15f51151f8c6bcc886954699440a6e1",
+        "revCount": 476,
+        "type": "git",
+        "url": "https://github.com/nix-community/bun2nix.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/nix-community/bun2nix.git"
+      }
+    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -63,6 +136,22 @@
         "type": "github"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1773693634,
+        "narHash": "sha256-BtZ2dtkBdSUnFPPFc+n0kcMbgaTxzFNPv2iaO326Ffg=",
+        "ref": "main",
+        "rev": "c41e7d58045f9057880b0d85e1152d6a4430dbf1",
+        "revCount": 95,
+        "type": "git",
+        "url": "https://github.com/denful/import-tree.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/denful/import-tree.git"
+      }
+    },
     "infix": {
       "inputs": {
         "flake-parts": [
@@ -85,6 +174,42 @@
         "ref": "main",
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
+      }
+    },
+    "llm-agents": {
+      "inputs": {
+        "blueprint": [
+          "blueprint"
+        ],
+        "bun2nix": [
+          "bun"
+        ],
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ],
+        "treefmt-nix": [
+          "blank"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778028867,
+        "narHash": "sha256-va9MJxaxLO79TeUsJy4tQlwhmVHdRozMNKWi0Mwkuvo=",
+        "ref": "main",
+        "rev": "f82be9f20dbaacd2452f301b9c23ad3104cb9b36",
+        "revCount": 8507,
+        "type": "git",
+        "url": "https://github.com/numtide/llm-agents.nix"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/llm-agents.nix"
       }
     },
     "nixago": {
@@ -161,10 +286,15 @@
     },
     "root": {
       "inputs": {
+        "blank": "blank",
+        "blueprint": "blueprint",
+        "bun": "bun",
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
+        "import-tree": "import-tree",
         "infix": "infix",
+        "llm-agents": "llm-agents",
         "nixago": "nixago",
         "nixago-extensions": "nixago-extensions",
         "nixpkgs": "nixpkgs",

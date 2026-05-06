@@ -1,5 +1,49 @@
 {
   inputs = {
+    blank = {
+      url = "git+https://github.com/divnix/blank.git?ref=master";
+    };
+
+    blueprint = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+      };
+
+      url = "git+https://github.com/numtide/blueprint.git?ref=main";
+    };
+
+    bun = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        import-tree = {
+          follows = "import-tree";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+
+        treefmt-nix = {
+          follows = "blank";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/bun2nix.git?ref=master";
+    };
+
     devshell = {
       inputs = {
         nixpkgs = {
@@ -30,6 +74,10 @@
       url = "github:numtide/flake-utils/main";
     };
 
+    import-tree = {
+      url = "git+https://github.com/denful/import-tree.git?ref=main";
+    };
+
     infix = {
       inputs = {
         flake-parts = {
@@ -42,6 +90,36 @@
       };
 
       url = "git+https://codeberg.org/bingshan/infix.git?ref=main";
+    };
+
+    llm-agents = {
+      inputs = {
+        blueprint = {
+          follows = "blueprint";
+        };
+
+        bun2nix = {
+          follows = "bun";
+        };
+
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+
+        treefmt-nix = {
+          follows = "blank";
+        };
+      };
+
+      url = "git+https://github.com/numtide/llm-agents.nix?ref=main";
     };
 
     nixago = {
