@@ -6,6 +6,46 @@
       url = "git+https://github.com/divnix/blank.git?ref=master";
     };
 
+    blueprint = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+      };
+
+      url = "git+https://github.com/numtide/blueprint.git?ref=main";
+    };
+
+    bun = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        import-tree = {
+          follows = "import-tree";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+
+        treefmt-nix = {
+          follows = "blank";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/bun2nix.git?ref=master";
+    };
+
     crane = {
       url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.3";
     };
@@ -80,6 +120,10 @@
       url = "git+https://github.com/nix-community/home-manager.git?ref=master";
     };
 
+    import-tree = {
+      url = "git+https://github.com/denful/import-tree.git?ref=main";
+    };
+
     infix = {
       inputs = {
         flake-parts = {
@@ -114,6 +158,36 @@
       };
 
       url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.0.0";
+    };
+
+    llm-agents = {
+      inputs = {
+        blueprint = {
+          follows = "blueprint";
+        };
+
+        bun2nix = {
+          follows = "bun";
+        };
+
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+
+        treefmt-nix = {
+          follows = "blank";
+        };
+      };
+
+      url = "git+https://github.com/numtide/llm-agents.nix?ref=main";
     };
 
     nixpkgs = {
@@ -211,6 +285,7 @@
       emacs-overlay,
       flake-parts,
       infix,
+      llm-agents,
       nixpkgs,
       systems,
       ...
@@ -346,6 +421,7 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
+              llm-agents.overlays.default
             ];
 
             specialArgs = {
@@ -376,6 +452,7 @@
               emacs-overlay.overlays.default
               infix.overlays.default
               infix.overlays.emacs-packages
+              llm-agents.overlays.default
             ];
 
             specialArgs = {
