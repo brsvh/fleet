@@ -108,9 +108,37 @@
       :header-line-active spacious-padding-line-active
       :header-line-inactive spacious-padding-line-inactive))
 
-  ;; Set the pixel widths for frame borders, fringes, scroll bars, tab
-  ;; UI, and related elements in one place to keep the expanded
-  ;; spacing consistent across the interface.
+  :hook
+  ;; Enable Spacious Padding once the graphical interface is ready, so
+  ;; the additional frame and window spacing is applied with the rest
+  ;; of the UI setup.
+  (bs-first-ui-hook . spacious-padding-mode))
+
+(use-package spacious-padding
+  :when (eq window-system 'pgtk)
+
+  :custom
+  ;; Keep PGTK frame chrome compact by using narrower border, fringe,
+  ;; scroll-bar, and tab-bar widths while preserving the shared
+  ;; mode/header/tab-line padding.
+  (spacious-padding-widths '( :custom-button-width 4
+                              :fringe-width 8
+                              :header-line-width 4
+                              :internal-border-width 2
+                              :mode-line-width 4
+                              :right-divider-width 0
+                              :scroll-bar-width 12
+                              :tab-bar-width 8
+                              :tab-line-width 4
+                              :tab-width 4)))
+
+(use-package spacious-padding
+  :when (eq window-system 'x)
+
+  :custom
+  ;; Use wider X frame chrome widths than the PGTK configuration while
+  ;; keeping the text-adjacent mode/header/tab-line padding aligned
+  ;; with the shared layout.
   (spacious-padding-widths '( :custom-button-width 4
                               :fringe-width 12
                               :header-line-width 4
@@ -120,13 +148,7 @@
                               :scroll-bar-width 24
                               :tab-bar-width 16
                               :tab-line-width 4
-                              :tab-width 4))
-
-  :hook
-  ;; Enable Spacious Padding once the graphical interface is ready, so
-  ;; the additional frame and window spacing is applied with the rest
-  ;; of the UI setup.
-  (bs-first-ui-hook . spacious-padding-mode))
+                              :tab-width 4)))
 
 (use-package tool-bar
   :after (bs-hooks)
