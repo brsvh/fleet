@@ -176,9 +176,7 @@ in
 
       initFile = bingshan.etc.emacs.init;
 
-      package = pkgs.emacs-git.override {
-        withGTK3 = true;
-      };
+      package = pkgs.emacs-igc-pgtk;
     };
   };
 }
