@@ -1,7 +1,7 @@
 # .gitignore --- Git untracked files -*- mode: gitignore; -*-
 
 # codex
-/.codex/config.toml
+/.codex
 
 # devshells
 /.editorconfig

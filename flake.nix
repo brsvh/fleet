@@ -2,6 +2,25 @@
   description = "A personal fleet of workstation and server configurations";
 
   inputs = {
+    agent-skills = {
+      inputs = {
+        home-manager = {
+          follows = "home-manager";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/Kyure-A/agent-skills-nix.git?ref=master";
+    };
+
+    bingshan-skills = {
+      flake = false;
+      url = "git+https://codeberg.org/bingshan/skills.git?ref=main";
+    };
+
     blank = {
       url = "git+https://github.com/divnix/blank.git?ref=master";
     };
@@ -26,10 +45,6 @@
           follows = "flake-parts";
         };
 
-        import-tree = {
-          follows = "import-tree";
-        };
-
         nixpkgs = {
           follows = "nixpkgs";
         };
@@ -48,6 +63,16 @@
 
     crane = {
       url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.3";
+    };
+
+    devshell = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/numtide/devshell.git?ref=main";
     };
 
     disko = {
@@ -126,10 +151,6 @@
 
     infix = {
       inputs = {
-        flake-parts = {
-          follows = "flake-parts";
-        };
-
         nixpkgs = {
           follows = "nixpkgs";
         };
@@ -190,12 +211,35 @@
       url = "git+https://github.com/numtide/llm-agents.nix?ref=main";
     };
 
+    nix-unit = {
+      inputs = {
+        nix-github-actions = {
+          follows = "blank";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        treefmt-nix = {
+          follows = "blank";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/nix-unit.git?ref=main";
+    };
+
     nixpkgs = {
       follows = "nixos";
     };
 
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
+    };
+
+    openai-skills = {
+      flake = false;
+      url = "git+https://github.com/openai/skills.git?ref=main";
     };
 
     pyproject = {
@@ -246,6 +290,10 @@
       url = "git+https://github.com/Mic92/sops-nix.git?ref=master";
     };
 
+    systems = {
+      url = "git+https://github.com/nix-systems/x86_64-linux.git?ref=main";
+    };
+
     uv = {
       inputs = {
         nixpkgs = {
@@ -282,12 +330,9 @@
 
   outputs =
     inputs@{
-      emacs-overlay,
       flake-parts,
       infix,
-      llm-agents,
       nixpkgs,
-      systems,
       ...
     }:
     let
@@ -296,203 +341,45 @@
         ;
 
       inherit (infix.lib)
-        dirToAttrs
-        mapAttrsRecursive'
-        mapAttrsRecursiveCond'
-        stemOf
+        readDir
         ;
 
       inherit (nixpkgs.lib)
-        elem
-        filterAttrs
-        filterAttrsRecursive
-        hasSuffix
-        isAttrs
-        last
-        nameValuePair
-        pipe
-        toCamelCase
+        attrNames
+        filter
+        map
+        pathExists
         ;
 
-      camelifyAttrs = mapAttrsRecursive' (
-        path: value:
+      flakeModules =
         let
-          basename = last path;
+          root = ./.;
+
+          tree = readDir root;
+
+          getFlakeModule =
+            subdir: root + "/${subdir}/flake-module.nix";
+
+          hasFlakeModule =
+            subdir:
+            tree.${subdir} == "directory"
+            && pathExists (getFlakeModule subdir);
         in
-        nameValuePair (
-          if basename == "__path" then
-            "__path"
-          else
-            (toCamelCase (stemOf basename))
-        ) value
-      );
-
-      liftDefaultAttrs =
-        mapAttrsRecursiveCond'
-          (v: !(isAttrs v && v ? default))
-          (
-            path: v:
-            nameValuePair (stemOf (last path)) (
-              if isAttrs v && v ? default then v.default else v
-            )
-          );
-
-      removeExtension = mapAttrsRecursive' (
-        path: value:
-        let
-          basename = last path;
-        in
-        nameValuePair (
-          if basename == "__path" then
-            "__path"
-          else
-            (stemOf basename)
-        ) value
-      );
-
-      removePathAttrs = filterAttrsRecursive (
-        name: _: name != "__path"
-      );
-
-      excludeTopLevelDirs =
-        dirs: filterAttrs (name: _: !(elem name dirs));
-
-      keepOnlyNixAttrs = filterAttrsRecursive (
-        name: value:
-        if (isAttrs value) || (name == "__path") then
-          true
-        else
-          hasSuffix ".nix" (toString value)
-      );
-
-      collect = dir: fns: pipe (dirToAttrs dir) fns;
-
-      dev = collect ./src/dev [
-        keepOnlyNixAttrs
-        camelifyAttrs
-      ];
-
-      fleet = collect ./src [
-        (excludeTopLevelDirs [
-          "dev"
-          "home"
-          "system"
-        ])
-        keepOnlyNixAttrs
-        camelifyAttrs
-      ];
-
-      home = collect ./src/home [
-        removeExtension
-        removePathAttrs
-        keepOnlyNixAttrs
-      ];
-
-      system = collect ./src/system [
-        removeExtension
-        removePathAttrs
-        keepOnlyNixAttrs
-      ];
+        map getFlakeModule (
+          filter hasFlakeModule (attrNames tree)
+        );
     in
     mkFlake
       {
         inherit
           inputs
           ;
+
+        specialArgs = {
+          infix-lib = infix.lib;
+        };
       }
       {
-        imports = [
-          flake-parts.flakeModules.partitions
-          infix.flakeModules.nixosConfigurations
-        ];
-
-        flake = {
-          homeModules = home.modules;
-          nixosModules = system.modules;
-        };
-
-        nixosConfigurations = {
-          azaleoid = {
-            allowUnfree = true;
-
-            directory = fleet.azaleoid.__path;
-
-            overlays = [
-              emacs-overlay.overlays.default
-              infix.overlays.default
-              infix.overlays.emacs-packages
-              llm-agents.overlays.default
-            ];
-
-            specialArgs = {
-              inherit
-                home
-                infix
-                system
-                ;
-            };
-
-            users = {
-              bingshan = {
-                directory = fleet.bingshan.__path;
-              };
-
-              root = {
-                directory = fleet.root.__path;
-              };
-            };
-          };
-
-          erythron = {
-            allowUnfree = true;
-
-            directory = fleet.erythron.__path;
-
-            overlays = [
-              emacs-overlay.overlays.default
-              infix.overlays.default
-              infix.overlays.emacs-packages
-              llm-agents.overlays.default
-            ];
-
-            specialArgs = {
-              inherit
-                home
-                infix
-                system
-                ;
-            };
-
-            users = {
-              bingshan = {
-                directory = fleet.bingshan.__path;
-              };
-
-              root = {
-                directory = fleet.root.__path;
-              };
-            };
-          };
-        };
-
-        partitionedAttrs = {
-          devShells = "dev";
-          formatter = "dev";
-        };
-
-        partitions = {
-          dev = {
-            extraInputsFlake = dev.__path;
-
-            module = {
-              imports = [
-                infix.flakeModules.devshell
-                dev.flakeModule
-              ];
-            };
-          };
-        };
-
-        systems = import systems;
+        imports = flakeModules;
       };
 }

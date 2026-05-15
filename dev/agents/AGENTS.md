@@ -28,9 +28,14 @@
 - Do not force a table when the task is a small code change, simple command
   result, rewrite, or direct explanation.
 
+## Coding rules
+
+- When writing, changing, generating, or restyling Nix code, use
+  `$nix-code-refactor` to refactor the code into the repository style.
+
 ## Commit message rules
 
-- Follow `.agents/doc/commit-message-style.md`.
+- Follow the shared `$gnu-style-commit` workflow for commit message style.
 - Describe staged changes only.
 - Use only `scope: Verb summary` or `scope: subscope: Verb summary`.
 - Derive scope from staged paths and staged diff.

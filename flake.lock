@@ -1,5 +1,46 @@
 {
   "nodes": {
+    "agent-skills": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1777875835,
+        "narHash": "sha256-+ghBYIh477YxDPd0sKeD4AwnKJSOXKT0nHuAAGHL1cQ=",
+        "ref": "master",
+        "rev": "c6cb03f84cda0dc3f5daa05bf4d49f56c182f690",
+        "revCount": 75,
+        "type": "git",
+        "url": "https://github.com/Kyure-A/agent-skills-nix.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/Kyure-A/agent-skills-nix.git"
+      }
+    },
+    "bingshan-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778722480,
+        "narHash": "sha256-sl3Ml1+L+y5Q+7ygEIdRFnLETe9Ny7/HEy98Uh7jPqY=",
+        "ref": "main",
+        "rev": "0816797a2203dcea130208d7b89c4819057201dc",
+        "revCount": 3,
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/skills.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/skills.git"
+      }
+    },
     "blank": {
       "locked": {
         "lastModified": 1625557891,
@@ -45,9 +86,6 @@
         "flake-parts": [
           "flake-parts"
         ],
-        "import-tree": [
-          "import-tree"
-        ],
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -59,11 +97,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770895533,
-        "narHash": "sha256-v3QaK9ugy9bN9RXDnjw0i2OifKmz2NnKM82agtqm/UY=",
+        "lastModified": 1778446047,
+        "narHash": "sha256-oQvcadh2BCkrog+SGrG6YffKJrveYpjj3TdQJWaKhaM=",
         "ref": "master",
-        "rev": "c843f477b15f51151f8c6bcc886954699440a6e1",
-        "revCount": 476,
+        "rev": "f2bc12af1a6369648aac41041ceeaa0b866599c6",
+        "revCount": 503,
         "type": "git",
         "url": "https://github.com/nix-community/bun2nix.git"
       },
@@ -89,6 +127,27 @@
         "url": "https://github.com/ipetkov/crane.git"
       }
     },
+    "devshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768818222,
+        "narHash": "sha256-460jc0+CZfyaO8+w8JNtlClB2n4ui1RbHfPTLkpwhU8=",
+        "ref": "main",
+        "rev": "255a2b1725a20d060f566e4755dbf571bbbb5f76",
+        "revCount": 361,
+        "type": "git",
+        "url": "https://github.com/numtide/devshell.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/devshell.git"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -96,11 +155,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776613567,
-        "narHash": "sha256-gC9Cp5ibBmGD5awCA9z7xy6MW6iJufhazTYJOiGlCUI=",
+        "lastModified": 1777713215,
+        "narHash": "sha256-8GzXDOXckDWwST8TY5DbwYFjdvQLlP7K9CLSVx6iTTo=",
         "ref": "master",
-        "rev": "32f4236bfc141ae930b5ba2fb604f561fed5219d",
-        "revCount": 1359,
+        "rev": "63b4e7e6cf75307c1d26ac3762b886b5b0247267",
+        "revCount": 1361,
         "type": "git",
         "url": "https://github.com/nix-community/disko.git"
       },
@@ -120,11 +179,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777344615,
-        "narHash": "sha256-pg93DT6h9qGnchIAcJp6Tpt45sJ+8CZXmro2+Xhi/Gc=",
+        "lastModified": 1778840631,
+        "narHash": "sha256-G9tsocbQIY5lCM+/09Gx3e6+h9bjHTl+YSpYZMFsMvk=",
         "ref": "master",
-        "rev": "b1f0d6617ca484adaf0c3ea410f9681f1532b460",
-        "revCount": 18772,
+        "rev": "edf8c260d6f10a51d61f7498fde57dd91e9ba4fd",
+        "revCount": 18866,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -195,11 +254,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777349711,
-        "narHash": "sha256-PGKgo2dO6fK603QGI+DWXdKmS09pbJjjTxwRHdhkGZA=",
+        "lastModified": 1778728372,
+        "narHash": "sha256-8pArLaovyMHR9VHa6eVk4e5vgvDS+Dg9J8pxPBjAE18=",
         "ref": "master",
-        "rev": "c1140540536d483e2730320100f6835d62c94fdf",
-        "revCount": 6629,
+        "rev": "f04b141d1a0d6d7d62aa9678aef602dfb61e8bb1",
+        "revCount": 6728,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -211,11 +270,11 @@
     },
     "import-tree": {
       "locked": {
-        "lastModified": 1773693634,
-        "narHash": "sha256-BtZ2dtkBdSUnFPPFc+n0kcMbgaTxzFNPv2iaO326Ffg=",
+        "lastModified": 1778781969,
+        "narHash": "sha256-Jjuz5CmSkur8KvLDoGa+vylEp+RkQtv4mt/qcMznpH0=",
         "ref": "main",
-        "rev": "c41e7d58045f9057880b0d85e1152d6a4430dbf1",
-        "revCount": 95,
+        "rev": "d321337efd0f23a9eb14a42adb7b2c29313ab274",
+        "revCount": 99,
         "type": "git",
         "url": "https://github.com/denful/import-tree.git"
       },
@@ -227,19 +286,16 @@
     },
     "infix": {
       "inputs": {
-        "flake-parts": [
-          "flake-parts"
-        ],
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1777520984,
-        "narHash": "sha256-R7m1Jtyfy3DnmiHvtPjbwqAy63UCc89Jx/hgNMMJA4k=",
+        "lastModified": 1778847159,
+        "narHash": "sha256-wTKPKbvKOkJ6Dqq2hwrbk5GKpjNSaIvR+/1ctamPxdE=",
         "ref": "main",
-        "rev": "b733d6555801ef3851e794b25dca8cc2e33ef1a7",
-        "revCount": 44,
+        "rev": "505f67f53811baefd8d1d99f3a7b79f2e6d50db8",
+        "revCount": 54,
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
       },
@@ -301,11 +357,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778044692,
-        "narHash": "sha256-feJrvdnT9SGuhSG7tYWqPf77L3TxmPtk2Xza6HyEIMc=",
+        "lastModified": 1778736441,
+        "narHash": "sha256-+JIJZstA++SpZerJMeFnUCPAluxh7pB+R+FHgdpqC+M=",
         "ref": "main",
-        "rev": "6159b9a1a78a736cea2977543e74787c5c382dfa",
-        "revCount": 8524,
+        "rev": "17d632682c765eaddddcf57b309567fbc69ae5ae",
+        "revCount": 8998,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -313,6 +369,33 @@
         "ref": "main",
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
+      }
+    },
+    "nix-unit": {
+      "inputs": {
+        "nix-github-actions": [
+          "blank"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treefmt-nix": [
+          "blank"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778306706,
+        "narHash": "sha256-68bQGOfejrJ6lqCk7IR4yfIFchSlAtN3diPc1imV+3k=",
+        "ref": "main",
+        "rev": "9317bef0ef5af9381902543e219a3c12d45cf5f6",
+        "revCount": 658,
+        "type": "git",
+        "url": "https://github.com/nix-community/nix-unit.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/nix-community/nix-unit.git"
       }
     },
     "nixos": {
@@ -331,6 +414,23 @@
         "url": "https://github.com/NixOS/nixpkgs.git"
       }
     },
+    "openai-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778624662,
+        "narHash": "sha256-YIQJxgvws5XZ9CfLlAf4/fv/sPmq94+iXIgLxaPyhqU=",
+        "ref": "main",
+        "rev": "c25113bf4c64c8dba6bfe61acf06051d79aa43f6",
+        "revCount": 108,
+        "type": "git",
+        "url": "https://github.com/openai/skills.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/openai/skills.git"
+      }
+    },
     "pyproject": {
       "inputs": {
         "nixpkgs": [
@@ -338,11 +438,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776715674,
-        "narHash": "sha256-Gs1VnEkCkkRZxJQAC/Dhz0Jbfi22mFXChbtNg9w/Ybg=",
+        "lastModified": 1778824905,
+        "narHash": "sha256-nzpb7npmpVQGDihItjtu5aVhmnGbh+X2qThRfZ+yknA=",
         "ref": "master",
-        "rev": "69f57f27e52a87c54e28138a75ec741cd46663c9",
-        "revCount": 545,
+        "rev": "e0de53826b89b6cee1930abb544dcf4c4d753050",
+        "revCount": 546,
         "type": "git",
         "url": "https://github.com/pyproject-nix/pyproject.nix.git"
       },
@@ -381,10 +481,13 @@
     },
     "root": {
       "inputs": {
+        "agent-skills": "agent-skills",
+        "bingshan-skills": "bingshan-skills",
         "blank": "blank",
         "blueprint": "blueprint",
         "bun": "bun",
         "crane": "crane",
+        "devshell": "devshell",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
         "flake-parts": "flake-parts",
@@ -394,10 +497,12 @@
         "infix": "infix",
         "lanzaboote": "lanzaboote",
         "llm-agents": "llm-agents",
+        "nix-unit": "nix-unit",
         "nixos": "nixos",
         "nixpkgs": [
           "nixos"
         ],
+        "openai-skills": "openai-skills",
         "pyproject": "pyproject",
         "pyproject-overlay": "pyproject-overlay",
         "rust-overlay": "rust-overlay",
@@ -413,11 +518,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777346187,
-        "narHash": "sha256-oVxyGjpiIsrXhWTJVUOs38fZQkLjd0nZGOY9K7Kfot8=",
+        "lastModified": 1778815121,
+        "narHash": "sha256-xlhD+1NVJbhrUUM2usRHW6iKWTXP2uw2Fo6sWJmLg8g=",
         "ref": "master",
-        "rev": "146e7bf7569b8288f24d41d806b9f584f7cfd5b5",
-        "revCount": 2157,
+        "rev": "017351829a9356423afd2cca0dde9b63346c8ab3",
+        "revCount": 2174,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -434,11 +539,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777338324,
-        "narHash": "sha256-bc+ZZCmOTNq86/svGnw0tVpH7vJaLYvGLLKFYP08Q8E=",
+        "lastModified": 1777944972,
+        "narHash": "sha256-VfGRo1qTBKOe3s2gOv8LSoA6Fk19PvBlwQ1ECN0Evn8=",
         "ref": "master",
-        "rev": "8eaee5c45428b28b8c47a83e4c09dccec5f279b5",
-        "revCount": 1211,
+        "rev": "c591bf665727040c6cc5cb409079acb22dcce33c",
+        "revCount": 1214,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -450,16 +555,18 @@
     },
     "systems": {
       "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
+        "lastModified": 1680978846,
+        "narHash": "sha256-Gtqg8b/v49BFDpDetjclCYXm8mAnTrUzR0JnE2nv5aw=",
+        "ref": "main",
+        "rev": "2ecfcac5e15790ba6ce360ceccddb15ad16d08a8",
+        "revCount": 3,
+        "type": "git",
+        "url": "https://github.com/nix-systems/x86_64-linux.git"
       },
       "original": {
-        "id": "systems",
-        "type": "indirect"
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/nix-systems/x86_64-linux.git"
       }
     },
     "uv": {
@@ -472,11 +579,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776718528,
-        "narHash": "sha256-XeGmo/BhkFXd8vVyendr3X4mQmw7CEkeQcpy7AHbVcg=",
+        "lastModified": 1778664018,
+        "narHash": "sha256-ogNyNANNLo0SMFevIeUpbTMOL9uUDu/hXvp7JlOYbwQ=",
         "ref": "master",
-        "rev": "60982c30e16db3e0cba6c0ed13f0894b06ab2bf1",
-        "revCount": 460,
+        "rev": "b48abe99ef639cd100c224898529370e5d935294",
+        "revCount": 464,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },
