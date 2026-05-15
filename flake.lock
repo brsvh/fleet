@@ -200,11 +200,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775087534,
-        "narHash": "sha256-91qqW8lhL7TLwgQWijoGBbiD4t7/q75KTi8NxjVmSmA=",
+        "lastModified": 1778716662,
+        "narHash": "sha256-m1Yf0wZ8j1OHjTc2UwHwyQRSnNeSgLJOd7q5Y45hzi4=",
         "ref": "main",
-        "rev": "3107b77cd68437b9a76194f0f7f9c55f2329ca5b",
-        "revCount": 448,
+        "rev": "f7c1a2d347e4c52d5fb8d10cb4d94b5884e546fb",
+        "revCount": 475,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -254,11 +254,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778728372,
-        "narHash": "sha256-8pArLaovyMHR9VHa6eVk4e5vgvDS+Dg9J8pxPBjAE18=",
+        "lastModified": 1778839998,
+        "narHash": "sha256-RDgpRW/09hQMy2w+IAyS4M5lHJ24hvVQ9J4TY4m+7zc=",
         "ref": "master",
-        "rev": "f04b141d1a0d6d7d62aa9678aef602dfb61e8bb1",
-        "revCount": 6728,
+        "rev": "3e707f5f93d7be40fd3e4182ed977446bdf2e2c3",
+        "revCount": 6735,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -357,11 +357,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778736441,
-        "narHash": "sha256-+JIJZstA++SpZerJMeFnUCPAluxh7pB+R+FHgdpqC+M=",
+        "lastModified": 1778841236,
+        "narHash": "sha256-4JSYSwDVeB8Xp8tdgJI61eL03nbT+ZfBdphcyrVw7aE=",
         "ref": "main",
-        "rev": "17d632682c765eaddddcf57b309567fbc69ae5ae",
-        "revCount": 8998,
+        "rev": "5797fab2e0191dcee23a1fe81ff0d97769ad9e74",
+        "revCount": 9057,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -400,11 +400,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1777954456,
-        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
+        "lastModified": 1778443072,
+        "narHash": "sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA=",
         "ref": "nixos-unstable",
-        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
-        "revCount": 992384,
+        "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+        "revCount": 995699,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
