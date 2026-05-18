@@ -2625,7 +2625,20 @@
   ;; canceled work, and `FAIL' for work that ended unsuccessfully.
   (org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)"
                                  "|"
-                                 "DONE(d)" "CNCL(c)" "FAIL(f)"))))
+                                 "DONE(d)" "CNCL(c)" "FAIL(f)")))
+
+  :config
+  ;; Show the Block Structure dispatcher in a dedicated bottom side
+  ;; window and keep it out of normal window cycling, so command
+  ;; selection does not disturb the main editing layout.
+  (add-to-list 'display-buffer-alist
+               '("\\*Org Select\\*"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . fit-window-to-buffer)
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (no-other-window . t))))))
 
 (use-package org-agenda
   :config
