@@ -2380,6 +2380,27 @@
   (format "%s <%s>" user-full-name user-mail-address))
 
 ;;
+;; Codex
+;;
+
+(use-package codex-ide
+  :config
+  ;; Display Codex session buffers in a bottom side window, keeping
+  ;; conversations visible without replacing the current editing
+  ;; window.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . codex-ide-session-mode)
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.5)))
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open the Codex IDE command menu from the custom AI prefix map.
+    ("c" . codex-ide-menu)))
+
+;;
 ;; Denote (info "(denote) Top")
 ;;
 
