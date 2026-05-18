@@ -62,7 +62,7 @@
     };
 
     crane = {
-      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.3";
+      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.4";
     };
 
     devshell = {
@@ -132,7 +132,7 @@
         };
       };
 
-      url = "git+https://github.com/NousResearch/hermes-agent.git?ref=refs/tags/v2026.4.16";
+      url = "git+https://github.com/NousResearch/hermes-agent.git?ref=refs/tags/v2026.5.16";
     };
 
     home-manager = {
