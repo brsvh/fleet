@@ -99,6 +99,11 @@
       url = "git+https://github.com/nix-community/emacs-overlay.git?ref=master";
     };
 
+    flake-compat = {
+      flake = false;
+      url = "git+https://github.com/NixOS/flake-compat.git?ref=master";
+    };
+
     flake-parts = {
       inputs = {
         nixpkgs-lib = {
@@ -209,6 +214,33 @@
       };
 
       url = "git+https://github.com/numtide/llm-agents.nix?ref=main";
+    };
+
+    mailserver = {
+      inputs = {
+        blobs = {
+          follows = "mailserver-blobs";
+        };
+
+        flake-compat = {
+          follows = "flake-compat";
+        };
+
+        git-hooks = {
+          follows = "blank";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git?ref=main";
+    };
+
+    mailserver-blobs = {
+      flake = false;
+      url = "git+https://gitlab.com/simple-nixos-mailserver/blobs.git?ref=master";
     };
 
     nix-unit = {

@@ -193,6 +193,23 @@
         "url": "https://github.com/nix-community/emacs-overlay.git"
       }
     },
+    "flake-compat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
+        "ref": "master",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "revCount": 91,
+        "type": "git",
+        "url": "https://github.com/NixOS/flake-compat.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/NixOS/flake-compat.git"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -372,6 +389,53 @@
         "url": "https://github.com/numtide/llm-agents.nix"
       }
     },
+    "mailserver": {
+      "inputs": {
+        "blobs": [
+          "mailserver-blobs"
+        ],
+        "flake-compat": [
+          "flake-compat"
+        ],
+        "git-hooks": [
+          "blank"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1777287493,
+        "narHash": "sha256-Fj7S91TuZm6+DG/v6SFme/p+sWrYMQICGX6yQ5KD43Q=",
+        "ref": "main",
+        "rev": "e33fbde199eaad513ef5d0746db19d5878150232",
+        "revCount": 996,
+        "type": "git",
+        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
+      }
+    },
+    "mailserver-blobs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1604995301,
+        "narHash": "sha256-wcLzgLec6SGJA8fx1OEN1yV/Py5b+U5iyYpksUY/yLw=",
+        "ref": "master",
+        "rev": "2cccdf1ca48316f2cfd1c9a0017e8de5a7156265",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://gitlab.com/simple-nixos-mailserver/blobs.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://gitlab.com/simple-nixos-mailserver/blobs.git"
+      }
+    },
     "nix-unit": {
       "inputs": {
         "nix-github-actions": [
@@ -512,6 +576,7 @@
         "devshell": "devshell",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
+        "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
@@ -519,6 +584,8 @@
         "infix": "infix",
         "lanzaboote": "lanzaboote",
         "llm-agents": "llm-agents",
+        "mailserver": "mailserver",
+        "mailserver-blobs": "mailserver-blobs",
         "nix-unit": "nix-unit",
         "nixos": "nixos",
         "nixpkgs": [
