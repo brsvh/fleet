@@ -15,6 +15,8 @@ let
 
   libext =
     pkgs.stdenv.targetPlatform.extensions.sharedLibrary;
+
+  maildir = "${config.accounts.email.maildirBasePath}/${username}";
 in
 {
   imports = [
@@ -65,6 +67,62 @@ in
         (use-package epa-hook
           :config
           (add-to-list 'epa-file-encrypt-to "${email.gpg.key}"))
+
+        (use-package mail-source
+          :custom
+          (mail-source-directory "${maildir}"))
+
+        (use-package message
+          :custom
+          (message-directory "${maildir}")
+          (message-signature "${email.signature.text}"))
+
+        (use-package mu4e
+          :custom
+          (mu4e-sent-folder "/${username}/Sent")
+          (mu4e-drafts-folder "/${username}/Drafts")
+          (mu4e-trash-folder "/${username}/Trash"))
+
+        (use-package mu4e-bookmarks
+          :custom
+          (mu4e-bookmarks
+           '(( :name "${email.realName}'s inbox"
+               :query "maildir:/${username}/INBOX"
+               :key ?i)
+             ( :name "${email.realName}'s drafts"
+               :query "maildir:/${username}/Drafts"
+               :key ?d)
+             ( :name "Unread messages"
+               :query "flag:unread AND NOT flag:trashed"
+               :key ?u)
+             ( :name "Today's messages"
+               :query "date:today..now"
+               :key ?t)
+             ( :name "Last 3 days"
+               :query "date:3d..now"
+               :key ?3)
+             ( :name "Last 7 days"
+               :query "date:7d..now"
+               :key ?7)
+             ( :name "${email.realName}'s sent messages"
+               :query "maildir:/${username}/Sent"
+               :key ?s)
+             ( :name "${email.realName}'s junk messages"
+               :query "maildir:/${username}/Junk"
+               :key ?j))))
+
+        (use-package mu4e-update
+          :custom
+          (mu4e-get-mail-command "offlineimap -u basic -o || true"))
+
+        (use-package sendmail
+          :custom
+          (send-mail-function 'sendmail-send-it)
+          (sendmail-program "msmtp"))
+
+        (use-package smime
+          :custom
+          (smime-certificate-directory "${maildir}/certs/"))
 
         (use-package startup
           :demand t
@@ -138,6 +196,9 @@ in
           magit-section
           marginalia
           modus-themes
+          mu4e
+          mu4e-alert
+          mu4e-marker-icons
           mwim
           nerd-icons
           nerd-icons-corfu

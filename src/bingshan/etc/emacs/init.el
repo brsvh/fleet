@@ -2566,6 +2566,83 @@
   (epg-pinentry-mode 'loopback))
 
 ;;
+;; mu4e
+;;
+
+(use-package mu4e
+  :when (eq system-type 'gnu/linux)
+
+  :config
+  ;; Load alert integration after mu4e is available so message
+  ;; notifications can derive their state from the mu4e index.
+  (require 'mu4e-alert))
+
+(use-package mu4e-alert
+  :commands (mu4e-alert-enable-notifications)
+  :when (eq system-type 'gnu/linux)
+
+  :config
+  ;; Use the desktop notification backend for new-message alerts, then
+  ;; enable notification delivery once the backend is selected.
+  (mu4e-alert-set-default-style 'notifications)
+  (mu4e-alert-enable-notifications))
+
+(use-package mu4e-headers
+  :custom
+  ;; Change default header date format, prefered to use locales' date
+  ;; and time format.
+  (mu4e-headers-date-format "%x %X")
+
+  ;; Show less fields.
+  (mu4e-headers-fields '(( :human-date . 25)
+                         ( :flags . 8)
+                         ( :from . 22)
+                         ( :subject))))
+
+(use-package mu4e-main
+  :config
+  (add-to-list 'display-buffer-alist
+               '("\\*mu4e-main\\*"
+                 (display-buffer-same-window))))
+
+(use-package mu4e-marker-icons
+  :after (mu4e)
+  :commands (mu4e-marker-icons-mode)
+
+  :init
+  ;; Replace textual mu4e markers with icon glyphs for faster scanning in
+  ;; header and view buffers.
+  (mu4e-marker-icons-mode +1))
+
+(use-package mu4e-thread
+  :bind
+  ( :map mu4e-thread-mode-map
+    ;; Leave `C-<tab>' available outside mu4e-thread by removing this
+    ;; mode-specific binding.
+    ("C-<tab>" . nil)))
+
+(use-package mu4e-update
+  :custom
+  ;; Hide annoying "mu4e Retrieving mail..." msg in mini buffer:
+  (mu4e-hide-index-messages nil)
+
+  ;; Retrieving and indexing messages every 5 minutes.
+  (mu4e-update-interval 300)
+
+  :config
+  ;; Keep background mail indexing from opening a visible update buffer.
+  (add-to-list 'display-buffer-alist
+               '("\\*mu4e-update\\*"
+                 (display-buffer-no-window)
+                 (allow-no-window . t))))
+
+(use-package simple
+  :custom
+  ;; Route generic Emacs mail entry points, such as `compose-mail', to
+  ;; mu4e's compose interface.
+  (mail-user-agent 'mu4e-user-agent))
+
+;;
 ;; Org (info "(org) Top")
 ;;
 
