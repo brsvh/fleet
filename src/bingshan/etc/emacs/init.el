@@ -2398,7 +2398,7 @@
   :bind
   ( :map ctl-c-a-map
     ;; Open the Codex IDE command menu from the custom AI prefix map.
-    ("c" . codex-ide-menu)))
+    ("x" . codex-ide-menu)))
 
 ;;
 ;; Denote (info "(denote) Top")
@@ -2741,6 +2741,12 @@
   ;; elements with the structural indentation defined by Org.  This
   ;; improves readability without altering underlying Org syntax.
   (org-mode-hook . org-modern-indent-mode))
+
+(use-package org-id
+  :custom
+  ;; Keep `org-id' location cache next to the configured Org files
+  ;; instead of using the default file in the user Emacs directory.
+  (org-id-locations-file (bs-path org-directory ".id-locations")))
 
 ;;
 ;; Transparent Remote (file) Access (info "(tramp) Top")
