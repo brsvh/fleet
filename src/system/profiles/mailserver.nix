@@ -25,6 +25,10 @@ in
   mailserver = {
     enable = mkDefault true;
     stateVersion = mkDefault 4;
+
+    x509 = {
+      useACMEHost = cfg.fqdn;
+    };
   };
 
   services = {
@@ -35,9 +39,5 @@ in
         };
       };
     };
-  };
-
-  x509 = {
-    useACMEHost = config.mailserver.fqdn;
   };
 }

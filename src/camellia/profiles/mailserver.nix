@@ -1,12 +1,13 @@
 {
+  camellia,
   config,
   system,
   ...
 }:
 {
   imports = [
+    camellia.profiles.networking
     system.profiles.mailserver
-    system.profiles.networking
   ];
 
   mailserver = {
