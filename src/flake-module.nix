@@ -81,6 +81,20 @@ in
         };
       };
 
+      ops = {
+        inherit (fleet.ops)
+          home
+          ;
+
+        profiles = profilesToList fleet.ops.profiles;
+
+        specialArgs = {
+          inherit (fleet)
+            ops
+            ;
+        };
+      };
+
       root = {
         inherit (fleet.root)
           home
@@ -121,6 +135,7 @@ in
           inherit (fleet)
             azaleoid
             bingshan
+            ops
             root
             ;
         };
@@ -192,6 +207,14 @@ in
         profiles = profilesToList fleet.camellia.profiles;
 
         users = {
+          ops = {
+            home = config.configurations.home.ops;
+
+            inherit (fleet.ops)
+              user
+              ;
+          };
+
           root = {
             inherit (fleet.root)
               user
@@ -229,6 +252,7 @@ in
             camellia
             erythron
             bingshan
+            ops
             root
             ;
         };
