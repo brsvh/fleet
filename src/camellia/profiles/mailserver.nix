@@ -21,6 +21,6 @@
       config.networking.domain
     ];
 
-    fqdn = config.networking.fqdn;
+    fqdn = "mail.bingshan.org";
   };
 }
