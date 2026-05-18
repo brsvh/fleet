@@ -184,6 +184,24 @@ in
         };
       };
 
+      camellia = {
+        inherit (fleet.camellia)
+          system
+          ;
+
+        profiles = profilesToList fleet.camellia.profiles;
+
+        users = {
+          root = {
+            inherit (fleet.root)
+              user
+              ;
+
+            home = config.configurations.home.root;
+          };
+        };
+      };
+
       global = {
         nixpkgs = {
           config = {
@@ -208,6 +226,7 @@ in
 
           inherit (fleet)
             azaleoid
+            camellia
             erythron
             bingshan
             root
