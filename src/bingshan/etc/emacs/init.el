@@ -1745,22 +1745,6 @@
 ;; Maintaining Large Programs (info "(emacs) Maintaining")
 ;;
 
-(use-package bs-eat
-  :after (project)
-
-  :bind
-  ( :map global-map
-    ;; Use `eat' to create shell based on project root.
-    ([remap project-shell] . bs/eat-project-dwim)
-
-    :map ctl-c-p-map
-    ;; Switch to an Eat buffer associated with the current project.
-    ("C-s" . bs/eat-project-switch)
-
-    ;; Reuse an idle Eat session for the current project or create
-    ;; one.
-    ("s" . bs/eat-project-dwim)))
-
 (use-package bs-project
   :after (tabspaces)
 
@@ -1802,6 +1786,22 @@
   ;; immediate visual guidance, not as free-form text to be fixed
   ;; later.
   (git-commit-mode-hook . display-fill-column-indicator-mode))
+
+(use-package eat-dwim
+  :after (project)
+
+  :bind
+  ( :map global-map
+    ;; Use `eat' to create shell based on project root.
+    ([remap project-shell] . eat-dwim-project)
+
+    :map ctl-c-p-map
+    ;; Switch to an Eat buffer associated with the current project.
+    ("C-s" . eat-project-switch)
+
+    ;; Reuse an idle Eat session for the current project or create
+    ;; one.
+    ("s" . eat-dwim-project)))
 
 (use-package envrc
   :after (bs-hooks)
@@ -2116,16 +2116,6 @@
 ;; Running Shell Commands from Emacs (info "(emacs) Shell")
 ;;
 
-(use-package bs-eat
-  :bind
-  ( :map ctl-c-a-map
-    ;; Switch to an Eat buffer associated with the current directory.
-    ("C-s" . bs/eat-switch)
-
-    ;; Reuse an idle Eat session for the current directory or create
-    ;; one.
-    ("s" . bs/eat-dwim)))
-
 (use-package comint
   :after (cape)
 
@@ -2200,6 +2190,16 @@
        (eat-self-input 1 'return)
        (eat-term-send-string eat-terminal "clear")
        (eat-self-input 1 'return)))))
+
+(use-package eat-dwim
+  :bind
+  ( :map ctl-c-a-map
+    ;; Switch to an Eat buffer associated with the current directory.
+    ("C-s" . eat-dwim-switch)
+
+    ;; Reuse an idle Eat session for the current directory or create
+    ;; one.
+    ("s" . eat-dwim)))
 
 (use-package with-editor
   :bind

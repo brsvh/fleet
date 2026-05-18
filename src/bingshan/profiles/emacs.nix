@@ -89,6 +89,7 @@ in
           citar-denote
           citar-embark
           citre
+          codex-ide
           consult
           consult-ag
           consult-codesearch
@@ -109,6 +110,7 @@ in
           diredfl
           doom-modeline
           eat
+          eat-dwim
           edit-indirect
           editorconfig
           eglot
