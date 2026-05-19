@@ -27,11 +27,11 @@
     "bingshan-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1778722480,
-        "narHash": "sha256-sl3Ml1+L+y5Q+7ygEIdRFnLETe9Ny7/HEy98Uh7jPqY=",
+        "lastModified": 1779179991,
+        "narHash": "sha256-M4ZdkviKUt/fytOanKPmkMJ8BcU2l+go9oE0UqH4pWw=",
         "ref": "main",
-        "rev": "0816797a2203dcea130208d7b89c4819057201dc",
-        "revCount": 3,
+        "rev": "bb559a371150726ed86043b0f7cc1ef4f5fa5684",
+        "revCount": 7,
         "type": "git",
         "url": "https://codeberg.org/bingshan/skills.git"
       },

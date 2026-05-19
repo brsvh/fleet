@@ -35,7 +35,7 @@
 
 ## Commit message rules
 
-- Follow the shared `$gnu-style-commit` workflow for commit message style.
+- Follow the shared `$nix-gnu-style-commit` workflow for commit message style.
 - Describe staged changes only.
 - Use only `scope: Verb summary` or `scope: subscope: Verb summary`.
 - Derive scope from staged paths and staged diff.

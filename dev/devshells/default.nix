@@ -348,9 +348,9 @@ in
         path = "commit";
       };
 
-      gnu-style-commit = {
+      nix-gnu-style-commit = {
         from = "bingshan";
-        path = "gnu-style-commit";
+        path = "nix-gnu-style-commit";
       };
 
       nix-code-refactor = {
