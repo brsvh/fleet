@@ -39,9 +39,9 @@ in
     nextcloud = {
       config = {
         adminpassFile =
-          config.sops.secrets."nextcloud/admin-password".path;
+          config.sops.secrets."chang@bingshan.org".path;
 
-        adminuser = "administrator";
+        adminuser = "bingshan";
 
         objectstore = {
           s3 = {
@@ -138,7 +138,7 @@ in
 
   systemd = {
     services = {
-      nextcloud-provision-users = {
+      nextcloud-configure = {
         after = [
           "nextcloud-setup.service"
         ];
@@ -150,7 +150,7 @@ in
         script = ''
           set -euo pipefail
 
-          trap 'printf "nextcloud-provision-users failed at line %s\n" "$LINENO" >&2' ERR
+          trap 'printf "nextcloud-configure failed at line %s\n" "$LINENO" >&2' ERR
 
           password_hash() {
             local credential="$1"
@@ -234,132 +234,75 @@ in
             fi
           }
 
-          ensure_display_name() {
-            local uid="$1"
-            local display_name="$2"
+          ensure_bingshan_admin() {
             local current_display_name
+            local marker="$STATE_DIRECTORY/bingshan-password.sha256"
+
+            if user_exists bingshan; then
+              ensure_password \
+                bingshan \
+                chang-password \
+                "$marker"
+            else
+              run_with_password chang-password \
+                user:add \
+                --no-interaction \
+                --password-from-env \
+                --display-name="Bingshan Chang" \
+                --group=admin \
+                bingshan \
+                > /dev/null
+
+              write_password_marker "$marker" chang-password
+            fi
+
+            ${nextcloudOcc} \
+              user:enable bingshan \
+              > /dev/null \
+              2>&1 || true
+
+            ${nextcloudOcc} \
+              group:adduser admin bingshan \
+              > /dev/null \
+              2>&1 || true
 
             current_display_name="$(
               ${nextcloudOcc} \
                 user:setting \
-                "$uid" \
+                bingshan \
                 settings \
                 display_name
             )"
 
-            if test "$current_display_name" != "$display_name"; then
+            if test "$current_display_name" != "Bingshan Chang"; then
               ${nextcloudOcc} \
-                user:setting "$uid" settings display_name "$display_name" \
+                user:setting bingshan settings display_name "Bingshan Chang" \
                 > /dev/null
-            fi
-          }
-
-          ensure_user() {
-            local uid="$1"
-            local display_name="$2"
-            local email="$3"
-            local credential="$4"
-            local marker="$5"
-
-            if user_exists "$uid"; then
-              ensure_password "$uid" "$credential" "$marker"
-            else
-              run_with_password "$credential" \
-                user:add \
-                --no-interaction \
-                --password-from-env \
-                --display-name="$display_name" \
-                "$uid" \
-                > /dev/null
-
-              write_password_marker "$marker" "$credential"
             fi
 
             ${nextcloudOcc} \
-              user:enable "$uid" \
-              > /dev/null \
-              2>&1 || true
-
-            ${nextcloudOcc} \
-              user:setting "$uid" settings email "$email" \
+              user:setting bingshan settings email chang@bingshan.org \
               > /dev/null
 
-            ensure_display_name "$uid" "$display_name"
-
             ${nextcloudOcc} \
-              user:setting "$uid" files quota none \
+              user:setting bingshan files quota none \
               > /dev/null
           }
 
-          ensure_administrator() {
-            local marker="$STATE_DIRECTORY/administrator-password.sha256"
-
-            if user_exists administrator; then
-              ensure_password \
-                administrator \
-                nextcloud-admin-password \
-                "$marker"
-            else
-              run_with_password nextcloud-admin-password \
-                user:add \
-                --no-interaction \
-                --password-from-env \
-                --display-name=administrator \
-                --group=admin \
-                administrator \
-                > /dev/null
-
-              write_password_marker \
-                "$marker" \
-                nextcloud-admin-password
-            fi
-
-            ${nextcloudOcc} \
-              user:enable administrator \
-              > /dev/null \
-              2>&1 || true
-
-            ${nextcloudOcc} \
-              group:adduser admin administrator \
-              > /dev/null \
-              2>&1 || true
-
-            ${nextcloudOcc} \
-              user:setting administrator files quota none \
-              > /dev/null
-          }
-
-          rebuild_bingshan_account_once() {
-            local marker="$STATE_DIRECTORY/bingshan-account-v1.done"
-
-            delete_user_if_exists chang@bingshan.org
+          migrate_legacy_users_once() {
+            local marker="$STATE_DIRECTORY/legacy-users-v1.done"
 
             if ! test -f "$marker"; then
-              delete_user_if_exists bingshan
-
-              rm -f \
-                "$STATE_DIRECTORY/chang-password.sha256" \
-                "$STATE_DIRECTORY/bingshan-password.sha256"
+              delete_user_if_exists chang@bingshan.org
+              delete_user_if_exists administrator
 
               touch "$marker"
             fi
           }
 
-          ensure_administrator
+          ensure_bingshan_admin
 
-          rebuild_bingshan_account_once
-
-          ensure_user \
-            bingshan \
-            "Bingshan Chang" \
-            chang@bingshan.org \
-            chang-password \
-            "$STATE_DIRECTORY/bingshan-password.sha256"
-
-          ${nextcloudOcc} \
-            group:removeuser admin bingshan \
-            > /dev/null \
-            2>&1 || true
+          migrate_legacy_users_once
 
           ${nextcloudOcc} \
             app:disable registration \
@@ -413,9 +356,6 @@ in
             "mail_smtppassword:${
               config.sops.secrets."cloud@bingshan.org".path
             }"
-            "nextcloud-admin-password:${
-              config.sops.secrets."nextcloud/admin-password".path
-            }"
             "onlyoffice-jwt-secret:${
               config.sops.secrets."onlyoffice/jwt-secret".path
             }"
@@ -427,7 +367,7 @@ in
             }"
           ];
 
-          StateDirectory = "nextcloud-provision-users";
+          StateDirectory = "nextcloud-configure";
           Type = "oneshot";
           User = "nextcloud";
         };
@@ -443,20 +383,14 @@ in
     secrets = {
       "chang@bingshan.org" = {
         restartUnits = [
-          "nextcloud-provision-users.service"
+          "nextcloud-configure.service"
+          "nextcloud-setup.service"
         ];
       };
 
       "cloud@bingshan.org" = {
         restartUnits = [
           "phpfpm-nextcloud.service"
-        ];
-      };
-
-      "nextcloud/admin-password" = {
-        restartUnits = [
-          "nextcloud-setup.service"
-          "nextcloud-provision-users.service"
         ];
       };
 
@@ -469,7 +403,7 @@ in
 
       "nextcloud/whiteboard-env" = {
         restartUnits = [
-          "nextcloud-provision-users.service"
+          "nextcloud-configure.service"
           "nextcloud-whiteboard-server.service"
         ];
       };
@@ -480,7 +414,7 @@ in
         owner = "onlyoffice";
 
         restartUnits = [
-          "nextcloud-provision-users.service"
+          "nextcloud-configure.service"
           "onlyoffice-converter.service"
           "onlyoffice-docservice.service"
         ];
