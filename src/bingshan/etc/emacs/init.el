@@ -2086,6 +2086,26 @@
 ;; Sending Mail (info "(emacs) Sending Mail")
 ;;
 
+(use-package mml-sec
+  :after (message)
+
+  :config
+  ;; Show MML signing option prompts in a dedicated bottom side
+  ;; window, keeping the message buffer visible while choosing signing
+  ;; settings.
+  (add-to-list 'display-buffer-alist
+               '("\\*MML sender signing options\\*"
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . fit-window-to-buffer)
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (no-other-window . t)))))
+
+  :hook
+  ;; Sign new outgoing messages with PGP/MIME by default.
+  (message-setup-hook . mml-secure-message-sign-pgpmime))
+
 ;;
 ;; Reading Mail with Rmail (info "(emacs) Rmail")
 ;;
@@ -2568,6 +2588,12 @@
 ;;
 ;; mu4e
 ;;
+
+(use-package mu4e
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open the `mu4e' mail interface from the custom application map.
+    ("m" . mu4e)))
 
 (use-package mu4e
   :when (eq system-type 'gnu/linux)
