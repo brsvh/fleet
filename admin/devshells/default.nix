@@ -44,6 +44,15 @@ in
       package = "deploy-rs";
     }
     {
+      category = "development";
+      help = "Commit staged changes using Codex and the commit skill";
+      name = "commit";
+
+      package = writeShellScriptBin "commit" ''
+        exec ${getExe codex} exec "$@" '$commit'
+      '';
+    }
+    {
       category = "tools";
       package = git;
     }
