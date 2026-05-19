@@ -1,0 +1,5 @@
+# .gitattributes --- Git attributes -*- mode: gitattributes; -*-
+
+**/sops.yaml diff=sops-decrypt
+
+# .gitattributes ends here
