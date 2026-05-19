@@ -9,6 +9,7 @@ let
   inherit (lib)
     makeBinPath
     mapAttrs
+    mkMerge
     ;
 
   inherit (fleet-lib.importers)
@@ -23,6 +24,7 @@ let
     ;
 
   inherit (inputs)
+    deploy
     infix
     llm-agents
     nixpkgs
@@ -41,6 +43,32 @@ in
   imports = [
     infix.flakeModules.devshell
   ];
+
+  flake = {
+    deploy = {
+      nodes = {
+        camellia =
+          let
+            camellia = self.nixosConfigurations.camellia;
+
+            deploy-lib =
+              deploy.lib.${camellia.config.nixpkgs.hostPlatform.system};
+          in
+          {
+            hostname = camellia.config.networking.fqdn;
+
+            profiles = {
+              system = {
+                path = deploy-lib.activate.nixos camellia;
+                user = "root";
+              };
+            };
+
+            sshUser = "root";
+          };
+      };
+    };
+  };
 
   systems = [
     "x86_64-linux"
@@ -61,6 +89,10 @@ in
         ;
     in
     {
+      checks = mkMerge [
+        (deploy.lib.${system}.deployChecks self.deploy)
+      ];
+
       _module = {
         args = {
           pkgs = import nixpkgs {

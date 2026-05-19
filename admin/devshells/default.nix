@@ -37,6 +37,22 @@ let
     ;
 in
 {
+  commands = with pkgs; [
+    {
+      category = "deployment";
+      name = "deploy";
+      package = "deploy-rs";
+    }
+    {
+      category = "tools";
+      package = git;
+    }
+    {
+      category = "tools";
+      package = treefmt;
+    }
+  ];
+
   files = {
     codex = rec {
       data = {
@@ -217,6 +233,7 @@ in
         ];
 
       packages = with pkgs; [
+        git
         lefthook
       ];
 

@@ -127,6 +127,33 @@
         "url": "https://github.com/ipetkov/crane.git"
       }
     },
+    "deploy": {
+      "inputs": {
+        "flake-compat": [
+          "flake-compat"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": [
+          "flake-utils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1770019181,
+        "narHash": "sha256-hwsYgDnby50JNVpTRYlF3UR/Rrpt01OrxVuryF40CFY=",
+        "ref": "master",
+        "rev": "77c906c0ba56aabdbc72041bf9111b565cdd6171",
+        "revCount": 348,
+        "type": "git",
+        "url": "https://github.com/serokell/deploy-rs.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/serokell/deploy-rs.git"
+      }
+    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -229,6 +256,27 @@
         "ref": "main",
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "ref": "main",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "revCount": 102,
+        "type": "git",
+        "url": "https://github.com/numtide/flake-utils.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/flake-utils.git"
       }
     },
     "hermes-agent": {
@@ -573,11 +621,13 @@
         "blueprint": "blueprint",
         "bun": "bun",
         "crane": "crane",
+        "deploy": "deploy",
         "devshell": "devshell",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
+        "flake-utils": "flake-utils",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "import-tree": "import-tree",

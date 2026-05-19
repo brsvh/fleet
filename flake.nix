@@ -65,6 +65,24 @@
       url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.4";
     };
 
+    deploy = {
+      inputs = {
+        flake-compat = {
+          follows = "flake-compat";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        utils = {
+          follows = "flake-utils";
+        };
+      };
+
+      url = "git+https://github.com/serokell/deploy-rs.git?ref=master";
+    };
+
     devshell = {
       inputs = {
         nixpkgs = {
@@ -112,6 +130,16 @@
       };
 
       url = "git+https://github.com/hercules-ci/flake-parts.git?ref=main";
+    };
+
+    flake-utils = {
+      inputs = {
+        systems = {
+          follows = "systems";
+        };
+      };
+
+      url = "git+https://github.com/numtide/flake-utils.git?ref=main";
     };
 
     hermes-agent = {
