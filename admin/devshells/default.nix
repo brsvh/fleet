@@ -49,7 +49,7 @@ in
         plan_mode_reasoning_effort = "xhigh";
 
         project_doc_fallback_filenames = [
-          "dev/agents/AGENTS.md"
+          "admin/agents/AGENTS.md"
         ];
 
         project_doc_max_bytes = 32768;
@@ -374,7 +374,7 @@ in
       fleet = {
         idPrefix = "fleet";
         path = "${self}";
-        subdir = "dev/agents/skills";
+        subdir = "admin/agents/skills";
       };
 
       openai = {
