@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    camellia.profiles.sops
     camellia.profiles.networking
     system.profiles.mailserver
   ];
@@ -23,7 +24,15 @@
           "steam@brsvh.org"
         ];
 
-        hashedPassword = "$y$j9T$f8cxmklj9ft1Sq6iZnMcM1$DnX/HiX8v384G5eUVCYChHxk44Z0348WP/s.btjRUH.";
+        passwordFile =
+          config.sops.secrets."chang@bingshan.org".path;
+      };
+
+      "cloud@bingshan.org" = {
+        passwordFile =
+          config.sops.secrets."cloud@bingshan.org".path;
+
+        sendOnly = true;
       };
     };
 
@@ -33,5 +42,21 @@
     ];
 
     fqdn = "mail.bingshan.org";
+  };
+
+  sops = {
+    secrets = {
+      "chang@bingshan.org" = {
+        restartUnits = [
+          "dovecot.service"
+        ];
+      };
+
+      "cloud@bingshan.org" = {
+        restartUnits = [
+          "dovecot.service"
+        ];
+      };
+    };
   };
 }

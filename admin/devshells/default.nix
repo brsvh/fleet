@@ -247,6 +247,8 @@ in
 
           bingshan = "age170frnnagdmfajd686ahxztn7suxn7890jsqeh4fgpugltrnm4cpqmkdd0h";
 
+          camellia = "age194qvjfwdnntwx9200e5ygepx0fppwh8034ljnzvzhc9zfxn9vfyq90m0z0";
+
           erythron = "age1svqryg3zmt67c6229sfem69hhe8aqup7v82r9req0vmrhd4mk9ks6gh4an";
         in
         {
@@ -261,6 +263,17 @@ in
               ];
 
               path_regex = "^src/azaleoid/etc/sops\.yaml$";
+            }
+            {
+              key_groups = [
+                {
+                  age = [
+                    camellia
+                  ];
+                }
+              ];
+
+              path_regex = "^src/camellia/etc/sops\.yaml$";
             }
             {
               key_groups = [
