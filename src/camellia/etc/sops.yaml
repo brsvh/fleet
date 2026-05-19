@@ -1,5 +1,7 @@
 chang@bingshan.org: ENC[AES256_GCM,data:qXSZvLA6oTCRFV+67Zok,iv:lbn4jn56X9fv7X74hUYB1MXU58ff/32MDTzHpQ6LzQ4=,tag:18P5FpJLPQh4DAzTKN9/Sg==,type:str]
 cloud@bingshan.org: ENC[AES256_GCM,data:2W4hxgiWcXL2XdT7trEy9pQ=,iv:sf8HDKZXMWSnjxy9xKp1AjyU5aBKlNxD+6A9NDc3J9k=,tag:FYhbytkuU2DwLjyntXHQQw==,type:str]
+garage:
+    rpc-secret: ENC[AES256_GCM,data:ESnWmh3j5bEjlnC+VLPd0G7YIkYAfE5G97WFWzuS6v5UTd/eUetAadL7OhCT29xFwXKiEdORvkzPZxvVYe2faw==,iv:H2dRDIZIIZ4ZnJpGRmpPYAVPgEmc2bNifMKzWZtFKPM=,tag:UfM6+cgFnbxE+pskmJADJQ==,type:str]
 sops:
     age:
         - enc: |
@@ -11,7 +13,7 @@ sops:
             +RoIclxJaL8eLIxvyi4ZQf3HD+RBbIds6H0Xdo/YSKAuApyMjqF8Zw==
             -----END AGE ENCRYPTED FILE-----
           recipient: age194qvjfwdnntwx9200e5ygepx0fppwh8034ljnzvzhc9zfxn9vfyq90m0z0
-    lastmodified: "2026-05-19T10:45:22Z"
-    mac: ENC[AES256_GCM,data:e6jFx/SNPI8ZEMNbJIeaItLz0K/vWPB//6hbkxG4bFc5CmkqbIsme7kv9eQtBtVQ4pVPJupOxZEDM+U7DWKYj67xEiuSmbz8R/piFgId/IOjcjVxF4m6p672xBkSUP8GXX9cytDm3DTWG0j0Ih7N3+6ZBdwNXnLN3yzQKeezSik=,iv:oZTi0o8BXfsrZfk0rrpqYuU/aSFYoN10d0+oYMskN/4=,tag:FuBX90OFEIXd2mobmK602g==,type:str]
+    lastmodified: "2026-05-19T11:30:07Z"
+    mac: ENC[AES256_GCM,data:HUrnYWtXMtEuGXwQB05qnIBWSIq4pbakEJsntIdCFgdYSFesBzDnJojkwXijoXDQw7GSEr1NsstUPVkzP1tsOpCaWWv8ggcTyGK2uhriHbKZ0OomvAjHQOGPQa6fZL3f6JJqz7FR0tGU1/EFMnwWDvf0YVxLv4sKHccC1DvHNwE=,iv:h3k0/T23OGUj9biUOt2k7id/MXLpxfXZor/Xw8ffrao=,tag:FhIKH4FANv3JjfbbhBcpDQ==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.0
