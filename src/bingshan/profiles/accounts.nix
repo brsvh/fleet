@@ -22,6 +22,14 @@ in
         ${username} = rec {
           address = "chang@bingshan.org";
 
+          aliases = [
+            "bsc@brsvh.org"
+            "bot@brsvh.org"
+            "open@brsvh.org"
+            "register@brsvh.org"
+            "steam@brsvh.org"
+          ];
+
           gpg = {
             key = "D6E9ED4504C41AD2DA16F39631E62A2FC33802BA";
             signByDefault = true;

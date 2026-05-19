@@ -75,6 +75,7 @@ in
         (use-package message
           :custom
           (message-directory "${maildir}")
+          (message-sendmail-envelope-from 'header)
           (message-signature "${email.signature.text}"))
 
         (use-package mu4e
@@ -117,6 +118,8 @@ in
 
         (use-package sendmail
           :custom
+          (mail-envelope-from 'header)
+          (mail-specify-envelope-from t)
           (send-mail-function 'sendmail-send-it)
           (sendmail-program "msmtp"))
 
