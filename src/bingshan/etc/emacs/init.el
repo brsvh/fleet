@@ -2615,30 +2615,49 @@
 
 (use-package mu4e-headers
   :custom
-  ;; Change default header date format, prefered to use locales' date
-  ;; and time format.
-  (mu4e-headers-date-format "%x %X")
+  ;; Use ASCII markers instead of fancy Unicode or icon glyphs.  This
+  ;; keeps the flags column predictable in header rows.
+  (mu4e-use-fancy-chars nil)
 
-  ;; Show less fields.
-  (mu4e-headers-fields '(( :human-date . 25)
-                         ( :flags . 8)
-                         ( :from . 22)
-                         ( :subject))))
+  ;; `:human-date' uses `mu4e-headers-time-format' for today's mail
+  ;; and `mu4e-headers-date-format' for older mail, so keep them
+  ;; identical.
+  (mu4e-headers-date-format "%m/%d/%Y %I:%M:%S %p")
+  (mu4e-headers-time-format "%m/%d/%Y %I:%M:%S %p")
+
+  ;; Show compact ASCII markers for the useful message flags.  Leave
+  ;; out `seen' and `unread' because those states are already visible
+  ;; through header faces and `new'.
+  (mu4e-headers-visible-flags '(attach
+                                calendar
+                                draft
+                                encrypted
+                                flagged
+                                list
+                                new
+                                passed
+                                personal
+                                replied
+                                signed
+                                trashed))
+
+  ;; Keep every non-final field fixed-width. Leave only the last field
+  ;; unrestricted.
+  (mu4e-headers-fields '(( :flags . 8)
+                         ( :human-date . 24)
+                         ( :from . 40)
+                         ( :subject)))
+
+  ;; Use real padding spaces instead of display-column alignment.  This
+  ;; keeps copied header rows aligned because `display' properties are
+  ;; not preserved when text is copied out of the headers buffer.
+  (mu4e-headers-precise-alignment nil))
 
 (use-package mu4e-main
   :config
   (add-to-list 'display-buffer-alist
                '("\\*mu4e-main\\*"
                  (display-buffer-same-window))))
-
-(use-package mu4e-marker-icons
-  :after (mu4e)
-  :commands (mu4e-marker-icons-mode)
-
-  :init
-  ;; Replace textual mu4e markers with icon glyphs for faster scanning in
-  ;; header and view buffers.
-  (mu4e-marker-icons-mode +1))
 
 (use-package mu4e-thread
   :bind

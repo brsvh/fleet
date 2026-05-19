@@ -201,7 +201,6 @@ in
           modus-themes
           mu4e
           mu4e-alert
-          mu4e-marker-icons
           mwim
           nerd-icons
           nerd-icons-corfu
