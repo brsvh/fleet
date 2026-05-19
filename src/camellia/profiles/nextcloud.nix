@@ -6,9 +6,17 @@
   ...
 }:
 let
-  onlyofficeHostName = "office.bingshan.org";
+  inherit (config.sops)
+    secrets
+    ;
 
-  nextcloudOcc = "${config.services.nextcloud.occ}/bin/nextcloud-occ";
+  cfg = config.services.nextcloud;
+
+  cloudHostName = cfg.hostName;
+
+  occ = "${cfg.occ}/bin/nextcloud-occ";
+
+  onlyofficeHostName = "office.bingshan.org";
 in
 {
   imports = [
@@ -38,8 +46,7 @@ in
   services = {
     nextcloud = {
       config = {
-        adminpassFile =
-          config.sops.secrets."chang@bingshan.org".path;
+        adminpassFile = secrets."chang@bingshan.org".path;
 
         adminuser = "bingshan";
 
@@ -52,7 +59,7 @@ in
             region = "garage";
 
             secretFile =
-              config.sops.secrets."nextcloud/s3-secret-key".path;
+              secrets."nextcloud/s3-secret-key".path;
 
             usePathStyle = true;
             useSsl = false;
@@ -69,7 +76,7 @@ in
 
       secrets = {
         mail_smtppassword =
-          config.sops.secrets."cloud@bingshan.org".path;
+          secrets."cloud@bingshan.org".path;
       };
 
       settings = {
@@ -83,17 +90,14 @@ in
         mail_smtpport = 465;
         mail_smtpsecure = "ssl";
         maintenance_window_start = 5;
-
-        "overwrite.cli.url" =
-          "https://cloud.bingshan.org";
-
+        "overwrite.cli.url" = "https://${cloudHostName}";
         overwriteprotocol = "https";
       };
     };
 
     nginx = {
       virtualHosts = {
-        "cloud.bingshan.org" = {
+        "${cloudHostName}" = {
           enableACME = true;
           forceSSL = true;
 
@@ -121,13 +125,12 @@ in
       enable = true;
 
       secrets = [
-        config.sops.secrets."nextcloud/whiteboard-env".path
+        secrets."nextcloud/whiteboard-env".path
       ];
 
       settings = {
         CHROME_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
-
-        NEXTCLOUD_URL = "https://cloud.bingshan.org";
+        NEXTCLOUD_URL = "https://${cloudHostName}";
         PORT = "3002";
       };
     };
@@ -136,9 +139,9 @@ in
       enable = true;
       hostname = onlyofficeHostName;
       jwtSecretFile =
-        config.sops.secrets."onlyoffice/jwt-secret".path;
+        secrets."onlyoffice/jwt-secret".path;
       securityNonceFile =
-        config.sops.secrets."onlyoffice/security-nonce".path;
+        secrets."onlyoffice/security-nonce".path;
     };
   };
 
@@ -195,13 +198,13 @@ in
             NC_PASS="$(
               cat "$CREDENTIALS_DIRECTORY/$credential"
             )" \
-              ${nextcloudOcc} "$@"
+              ${occ} "$@"
           }
 
           user_exists() {
             local uid="$1"
 
-            ${nextcloudOcc} \
+            ${occ} \
               user:list \
               --output=json \
               | ${pkgs.jq}/bin/jq \
@@ -215,7 +218,7 @@ in
             local uid="$1"
 
             if user_exists "$uid"; then
-              ${nextcloudOcc} \
+              ${occ} \
                 user:delete \
                 --no-interaction \
                 "$uid" \
@@ -262,18 +265,18 @@ in
               write_password_marker "$marker" chang-password
             fi
 
-            ${nextcloudOcc} \
+            ${occ} \
               user:enable bingshan \
               > /dev/null \
               2>&1 || true
 
-            ${nextcloudOcc} \
+            ${occ} \
               group:adduser admin bingshan \
               > /dev/null \
               2>&1 || true
 
             current_display_name="$(
-              ${nextcloudOcc} \
+              ${occ} \
                 user:setting \
                 bingshan \
                 settings \
@@ -281,16 +284,16 @@ in
             )"
 
             if test "$current_display_name" != "Bingshan Chang"; then
-              ${nextcloudOcc} \
+              ${occ} \
                 user:setting bingshan settings display_name "Bingshan Chang" \
                 > /dev/null
             fi
 
-            ${nextcloudOcc} \
+            ${occ} \
               user:setting bingshan settings email chang@bingshan.org \
               > /dev/null
 
-            ${nextcloudOcc} \
+            ${occ} \
               user:setting bingshan files quota none \
               > /dev/null
           }
@@ -310,19 +313,19 @@ in
 
           migrate_legacy_users_once
 
-          ${nextcloudOcc} \
+          ${occ} \
             app:disable registration \
             > /dev/null \
             2>&1 || true
 
           source "$CREDENTIALS_DIRECTORY/whiteboard-env"
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set whiteboard collabBackendUrl \
-            --value="https://cloud.bingshan.org/whiteboard" \
+            --value="https://${cloudHostName}/whiteboard" \
             > /dev/null
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set whiteboard jwt_secret_key \
             --value="$JWT_SECRET_KEY" \
             > /dev/null
@@ -331,22 +334,22 @@ in
             cat "$CREDENTIALS_DIRECTORY/onlyoffice-jwt-secret"
           )"
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set onlyoffice DocumentServerUrl \
             --value="https://${onlyofficeHostName}/" \
             > /dev/null
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set onlyoffice StorageUrl \
-            --value="https://cloud.bingshan.org/" \
+            --value="https://${cloudHostName}/" \
             > /dev/null
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set onlyoffice jwt_secret \
             --value="$onlyoffice_jwt_secret" \
             > /dev/null
 
-          ${nextcloudOcc} \
+          ${occ} \
             config:app:set onlyoffice jwt_header \
             --value="Authorization" \
             > /dev/null
@@ -357,19 +360,19 @@ in
 
           LoadCredential = [
             "chang-password:${
-              config.sops.secrets."chang@bingshan.org".path
+              secrets."chang@bingshan.org".path
             }"
             "mail_smtppassword:${
-              config.sops.secrets."cloud@bingshan.org".path
+              secrets."cloud@bingshan.org".path
             }"
             "onlyoffice-jwt-secret:${
-              config.sops.secrets."onlyoffice/jwt-secret".path
+              secrets."onlyoffice/jwt-secret".path
             }"
             "s3_secret:${
-              config.sops.secrets."nextcloud/s3-secret-key".path
+              secrets."nextcloud/s3-secret-key".path
             }"
             "whiteboard-env:${
-              config.sops.secrets."nextcloud/whiteboard-env".path
+              secrets."nextcloud/whiteboard-env".path
             }"
           ];
 
