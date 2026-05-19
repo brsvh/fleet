@@ -63,6 +63,10 @@ in
 
       hostName = "cloud.bingshan.org";
 
+      phpOptions = {
+        "opcache.interned_strings_buffer" = "32";
+      };
+
       secrets = {
         mail_smtppassword =
           config.sops.secrets."cloud@bingshan.org".path;
@@ -121,6 +125,8 @@ in
       ];
 
       settings = {
+        CHROME_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
+
         NEXTCLOUD_URL = "https://cloud.bingshan.org";
         PORT = "3002";
       };
