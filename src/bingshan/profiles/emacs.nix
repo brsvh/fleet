@@ -158,6 +158,7 @@ in
           consult-eglot
           consult-eglot-embark
           consult-jinx
+          consult-mu
           consult-project-extra
           corfu
           corfu-candidate-overlay

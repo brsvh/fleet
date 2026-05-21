@@ -2589,22 +2589,68 @@
 ;; mu4e
 ;;
 
+(use-package consult-mu
+  :functions (consult-mu--view-action)
+
+  :custom
+  ;; Use the dynamic mu4e-backed search by default so selected
+  ;; candidates keep the normal mu4e header and message actions.
+  (consult-mu-default-command 'consult-mu-dynamic)
+
+  ;; Keep enough matches available for broad mailbox searches without
+  ;; making the minibuffer completion table unbounded.
+  (consult-mu-maxnum 1000)
+
+  ;; Group search results by message date, which keeps recent mail
+  ;; easy to scan and can still be overridden with `--group' in input.
+  (consult-mu-group-by :date)
+
+  ;; Preview the current candidate immediately while moving through
+  ;; completion results.
+  (consult-mu-preview-key 'any)
+
+  ;; Do not mark a message as read merely because it was previewed
+  ;; during minibuffer navigation.
+  (consult-mu-mark-previewed-as-read nil)
+
+  ;; Mark messages as read once they are explicitly opened from the
+  ;; search results.
+  (consult-mu-mark-viewed-as-read t)
+
+  ;; Open the selected message in the regular mu4e view buffer instead
+  ;; of using reply, forward, or a custom action as the default.
+  (consult-mu-action 'consult-mu--view-action)
+
+  :bind
+  ( :map goto-map
+    ;; Put mail search under the standard `goto-map' prefix.
+    ("m" . consult-mu)))
+
+(use-package consult-mu-embark
+  :after (embark)
+
+  ;; Register Embark actions for `consult-mu' candidates as soon as
+  ;; Embark is available, so mail actions work directly from the
+  ;; minibuffer result list.
+  :demand t)
+
 (use-package mu4e
   :bind
   ( :map ctl-c-a-map
     ;; Open the `mu4e' mail interface from the custom application map.
     ("m" . mu4e)))
 
-(use-package mu4e
+(use-package mu4e-alert
+  :after (mu4e)
   :when (eq system-type 'gnu/linux)
 
-  :config
   ;; Load alert integration after mu4e is available so message
   ;; notifications can derive their state from the mu4e index.
-  (require 'mu4e-alert))
+  :demand t)
 
 (use-package mu4e-alert
   :commands (mu4e-alert-enable-notifications)
+  :functions (mu4e-alert-set-default-style)
   :when (eq system-type 'gnu/linux)
 
   :config
