@@ -2589,6 +2589,18 @@
 ;; mu4e
 ;;
 
+(use-package bs-mu4e
+  :after (mu4e-headers)
+  :commands (bs-mu4e-headers-field-value)
+
+  :init
+  ;; Format the From column through `bs-mu4e' so sender names that
+  ;; embed their mailbox are shown as display names, while senders
+  ;; without display names still fall back to their mailbox.
+  (advice-add 'mu4e~headers-field-value
+              :around
+              'bs-mu4e-headers-field-value))
+
 (use-package consult-mu
   :functions (consult-mu--view-action)
 
@@ -2691,12 +2703,13 @@
   ;; unrestricted.
   (mu4e-headers-fields '(( :flags . 8)
                          ( :human-date . 24)
-                         ( :from . 40)
+                         ( :from . 24)
                          ( :subject)))
 
-  ;; Use real padding spaces instead of display-column alignment.  This
-  ;; keeps copied header rows aligned because `display' properties are
-  ;; not preserved when text is copied out of the headers buffer.
+  ;; Use real padding spaces instead of display-column alignment.
+  ;; This keeps copied header rows aligned because `display'
+  ;; properties are not preserved when text is copied out of the
+  ;; headers buffer.
   (mu4e-headers-precise-alignment nil))
 
 (use-package mu4e-main
