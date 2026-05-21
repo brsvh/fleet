@@ -1797,7 +1797,7 @@
 
     :map ctl-c-p-map
     ;; Switch to an Eat buffer associated with the current project.
-    ("C-s" . eat-project-switch)
+    ("C-s" . eat-dwim-project-switch)
 
     ;; Reuse an idle Eat session for the current project or create
     ;; one.
