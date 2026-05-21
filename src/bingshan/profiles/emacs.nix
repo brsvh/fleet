@@ -241,7 +241,7 @@ in
 
       initFile = bingshan.etc.emacs.init;
 
-      package = pkgs.emacs-igc-pgtk;
+      package = pkgs.emacs-git-pgtk;
     };
   };
 }
