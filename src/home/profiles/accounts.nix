@@ -12,6 +12,7 @@ let
 in
 {
   imports = [
+    home.modules.offlineimap
     home.profiles.xdg
   ];
 
@@ -67,45 +68,14 @@ in
   };
 
   services = {
-    vdirsyncer = {
+    offlineimap = {
       enable = mkDefault true;
       frequency = mkDefault "*:0/5";
     };
-  };
 
-  systemd = {
-    user = {
-      services = {
-        offlineimap = {
-          Service = {
-            ExecStart = "${config.programs.offlineimap.package}/bin/offlineimap -u basic -o";
-            Type = "oneshot";
-          };
-
-          Unit = {
-            Description = "OfflineIMAP sync";
-          };
-        };
-      };
-
-      timers = {
-        offlineimap = {
-          Install = {
-            WantedBy = [
-              "timers.target"
-            ];
-          };
-
-          Timer = {
-            OnCalendar = "*:0/5";
-            Unit = "offlineimap.service";
-          };
-
-          Unit = {
-            Description = "OfflineIMAP sync";
-          };
-        };
-      };
+    vdirsyncer = {
+      enable = mkDefault true;
+      frequency = mkDefault "*:0/5";
     };
   };
 }
