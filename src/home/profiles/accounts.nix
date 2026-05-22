@@ -6,16 +6,9 @@
   ...
 }:
 let
-  inherit (config.home)
-    username
-    ;
-
   inherit (lib)
     mkDefault
     ;
-
-  email =
-    config.accounts.email.accounts.${username};
 in
 {
   imports = [
@@ -23,6 +16,14 @@ in
   ];
 
   accounts = {
+    calendar = {
+      basePath = mkDefault "${config.xdg.dataHome}/Calendars";
+    };
+
+    contact = {
+      basePath = mkDefault "${config.xdg.dataHome}/Contacts";
+    };
+
     email = {
       maildirBasePath = mkDefault "${config.xdg.dataHome}/Mail";
     };
@@ -41,15 +42,34 @@ in
 
   programs = {
     offlineimap = {
-      enable = email.offlineimap.enable;
+      enable = mkDefault true;
     };
 
     mu = {
-      enable = email.mu.enable;
+      enable = mkDefault true;
     };
 
     msmtp = {
-      enable = email.msmtp.enable;
+      enable = mkDefault true;
+    };
+
+    khal = {
+      enable = mkDefault true;
+    };
+
+    khard = {
+      enable = mkDefault true;
+    };
+
+    vdirsyncer = {
+      enable = mkDefault true;
+    };
+  };
+
+  services = {
+    vdirsyncer = {
+      enable = mkDefault true;
+      frequency = mkDefault "*:0/5";
     };
   };
 

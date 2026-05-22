@@ -35,8 +35,6 @@ in
 
   accounts = {
     calendar = {
-      basePath = "${config.xdg.dataHome}/Calendars";
-
       accounts = {
         cloud = {
           khal = {
@@ -71,8 +69,6 @@ in
     };
 
     contact = {
-      basePath = "${config.xdg.dataHome}/Contacts";
-
       accounts = {
         cloud = {
           khard = {
@@ -182,27 +178,6 @@ in
           };
         };
       };
-    };
-  };
-
-  programs = {
-    khal = {
-      enable = true;
-    };
-
-    khard = {
-      enable = true;
-    };
-
-    vdirsyncer = {
-      enable = true;
-    };
-  };
-
-  services = {
-    vdirsyncer = {
-      enable = true;
-      frequency = "*:0/15";
     };
   };
 }
