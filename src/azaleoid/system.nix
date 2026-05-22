@@ -23,4 +23,8 @@ in
   system = {
     stateVersion = "25.11";
   };
+
+  time = {
+    timeZone = "Asia/Shanghai";
+  };
 }
