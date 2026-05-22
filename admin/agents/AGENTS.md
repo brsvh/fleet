@@ -33,6 +33,20 @@
 - When writing, changing, generating, or restyling Nix code, use
   `$nix-code-refactor` to refactor the code into the repository style.
 
+## Activation and profile safety
+
+- Do not run commands that activate, switch, roll back, or otherwise change the
+  current NixOS generation, Home Manager generation, or Nix profile.
+- Prohibited commands include `nixos-rebuild switch`, `nixos-rebuild boot`,
+  `nixos-rebuild test`, `home-manager switch`, generated Home Manager `activate`
+  scripts, `nix profile install`, `nix profile upgrade`, `nix profile remove`,
+  `nix profile rollback`, `nix-env --switch-generation`, `nix-env --rollback`,
+  and similar commands that mutate the active generation or profile.
+- Prefer non-activating validation commands such as `nix flake check`,
+  `nix build`, `nix eval`, `nixos-rebuild build`, and `home-manager build`.
+- If activation or profile switching is needed, stop after building or
+  evaluating and ask the user to run the activating command themselves.
+
 ## Commit message rules
 
 - Follow the shared `$nix-gnu-style-commit` workflow for commit message style.
