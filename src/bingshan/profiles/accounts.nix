@@ -1,4 +1,5 @@
 {
+  bingshan,
   config,
   home,
   ...
@@ -8,23 +9,112 @@ let
     username
     ;
 
-  cloudServer = "cloud.bingshan.org";
+  mail = rec {
+    host = "mail.bingshan.org";
+    passwordCommand = "pass show ${host}/${userName}";
+    userName = "chang@bingshan.org";
+  };
 
-  email =
-    config.accounts.email.accounts.${username};
+  cloud = rec {
+    host = "cloud.bingshan.org";
 
-  mailServer = "mail.bingshan.org";
+    passwordCommand = [
+      "pass"
+      "show"
+      "${host}/${userName}"
+    ];
+
+    userName = "bingshan";
+  };
 in
 {
   imports = [
+    bingshan.profiles.password-store
     home.profiles.accounts
   ];
 
   accounts = {
+    calendar = {
+      basePath = "${config.xdg.dataHome}/Calendars";
+
+      accounts = {
+        cloud = {
+          khal = {
+            enable = true;
+            type = "discover";
+          };
+
+          local = {
+            path = "${config.accounts.calendar.basePath}/${cloud.host}";
+          };
+
+          remote = {
+            inherit (cloud)
+              passwordCommand
+              userName
+              ;
+
+            type = "caldav";
+            url = "https://${cloud.host}/remote.php/dav/calendars/${cloud.userName}/";
+          };
+
+          vdirsyncer = {
+            enable = true;
+
+            collections = [
+              "from a"
+              "from b"
+            ];
+          };
+        };
+      };
+    };
+
+    contact = {
+      basePath = "${config.xdg.dataHome}/Contacts";
+
+      accounts = {
+        cloud = {
+          khard = {
+            enable = true;
+            type = "discover";
+          };
+
+          local = {
+            path = "${config.accounts.contact.basePath}/${cloud.host}";
+          };
+
+          remote = {
+            inherit (cloud)
+              passwordCommand
+              userName
+              ;
+
+            type = "carddav";
+            url = "https://${cloud.host}/remote.php/dav/addressbooks/users/${cloud.userName}/";
+          };
+
+          vdirsyncer = {
+            enable = true;
+
+            collections = [
+              "from a"
+              "from b"
+            ];
+          };
+        };
+      };
+    };
+
     email = {
       accounts = {
         ${username} = rec {
-          address = "chang@bingshan.org";
+          inherit (mail)
+            passwordCommand
+            userName
+            ;
+
+          address = userName;
 
           aliases = [
             "bsc@brsvh.org"
@@ -40,7 +130,7 @@ in
           };
 
           imap = {
-            host = mailServer;
+            host = mail.host;
             port = 993;
 
             tls = {
@@ -70,8 +160,6 @@ in
             };
           };
 
-          passwordCommand = "pass show ${imap.host}/${userName}";
-
           primary = true;
           realName = "Bingshan Chang";
 
@@ -85,17 +173,36 @@ in
           };
 
           smtp = {
-            host = mailServer;
+            host = mail.host;
             port = 465;
 
             tls = {
               enable = true;
             };
           };
-
-          userName = address;
         };
       };
+    };
+  };
+
+  programs = {
+    khal = {
+      enable = true;
+    };
+
+    khard = {
+      enable = true;
+    };
+
+    vdirsyncer = {
+      enable = true;
+    };
+  };
+
+  services = {
+    vdirsyncer = {
+      enable = true;
+      frequency = "*:0/15";
     };
   };
 }
