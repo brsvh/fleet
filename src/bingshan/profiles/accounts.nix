@@ -61,6 +61,72 @@ in
             ];
           };
         };
+
+        holidays_in_china = {
+          khal = {
+            enable = true;
+            readOnly = true;
+          };
+
+          local = {
+            path = "${config.accounts.calendar.basePath}/Calendar/holiday@group.v.calendar.google.com/en.china.official";
+          };
+
+          remote = {
+            type = "http";
+            url = "https://calendar.google.com/calendar/ical/en.china%23holiday%40group.v.calendar.google.com/public/basic.ics";
+          };
+
+          vdirsyncer = {
+            conflictResolution = "remote wins";
+            enable = true;
+            partialSync = "revert";
+          };
+        };
+
+        holidays_in_united_states = {
+          khal = {
+            enable = true;
+            readOnly = true;
+          };
+
+          local = {
+            path = "${config.accounts.calendar.basePath}/Calendar/holiday@group.v.calendar.google.com/en.usa.official";
+          };
+
+          remote = {
+            type = "http";
+            url = "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics";
+          };
+
+          vdirsyncer = {
+            conflictResolution = "remote wins";
+            enable = true;
+            partialSync = "revert";
+          };
+        };
+
+        riscv_technical_meetings = {
+          khal = {
+            enable = true;
+            readOnly = true;
+          };
+
+          local = {
+            path = "${config.accounts.calendar.basePath}/Calendar/tech.meetings@riscv.org";
+          };
+
+          remote = {
+            type = "http";
+            url = "https://calendar.google.com/calendar/ical/tech.meetings%40riscv.org/public/basic.ics";
+          };
+
+          vdirsyncer = {
+            conflictResolution = "remote wins";
+            enable = true;
+            partialSync = "revert";
+          };
+        };
       };
     };
 
