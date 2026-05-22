@@ -8,8 +8,12 @@ let
     username
     ;
 
+  cloudServer = "cloud.bingshan.org";
+
   email =
     config.accounts.email.accounts.${username};
+
+  mailServer = "mail.bingshan.org";
 in
 {
   imports = [
@@ -36,7 +40,7 @@ in
           };
 
           imap = {
-            host = "mail.bingshan.org";
+            host = mailServer;
             port = 993;
 
             tls = {
@@ -81,7 +85,7 @@ in
           };
 
           smtp = {
-            host = "mail.bingshan.org";
+            host = mailServer;
             port = 465;
 
             tls = {
