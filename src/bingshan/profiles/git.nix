@@ -2,15 +2,21 @@
   bingshan,
   config,
   home,
+  lib,
   ...
 }:
 let
-  inherit (config.home)
-    username
+  inherit (lib)
+    attrValues
+    filter
+    head
     ;
 
-  email =
-    config.accounts.email.accounts.${username};
+  email = head (
+    filter (
+      account: account.enable && account.primary
+    ) (attrValues config.accounts.email.accounts)
+  );
 in
 {
   imports = [
