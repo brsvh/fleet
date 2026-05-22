@@ -2,21 +2,33 @@
   bingshan,
   config,
   home,
+  lib,
   pkgs,
   ...
 }:
 let
-  inherit (config.home)
-    username
+  inherit (lib)
+    attrValues
+    filter
+    head
     ;
 
-  email =
-    config.accounts.email.accounts.${username};
+  email = head (
+    filter (
+      account: account.enable && account.primary
+    ) (attrValues config.accounts.email.accounts)
+  );
 
   libext =
     pkgs.stdenv.targetPlatform.extensions.sharedLibrary;
 
-  maildir = "${config.accounts.email.maildirBasePath}/${username}";
+  maildir = email.maildir.absPath;
+
+  maildirBase =
+    config.accounts.email.maildirBasePath;
+
+  mkMaildir =
+    folder: "/${email.maildir.path}/${folder}";
 in
 {
   imports = [
@@ -80,18 +92,19 @@ in
 
         (use-package mu4e
           :custom
-          (mu4e-sent-folder "/${username}/Sent")
-          (mu4e-drafts-folder "/${username}/Drafts")
-          (mu4e-trash-folder "/${username}/Trash"))
+          (mu4e-maildir "${maildirBase}")
+          (mu4e-sent-folder "${mkMaildir "Sent"}")
+          (mu4e-drafts-folder "${mkMaildir "Drafts"}")
+          (mu4e-trash-folder "${mkMaildir "Trash"}"))
 
         (use-package mu4e-bookmarks
           :custom
           (mu4e-bookmarks
            '(( :name "${email.realName}'s inbox"
-               :query "maildir:/${username}/INBOX"
+               :query "maildir:${mkMaildir "INBOX"}"
                :key ?i)
              ( :name "${email.realName}'s drafts"
-               :query "maildir:/${username}/Drafts"
+               :query "maildir:${mkMaildir "Drafts"}"
                :key ?d)
              ( :name "Unread messages"
                :query "flag:unread AND NOT flag:trashed"
@@ -106,10 +119,10 @@ in
                :query "date:7d..now"
                :key ?7)
              ( :name "${email.realName}'s sent messages"
-               :query "maildir:/${username}/Sent"
+               :query "maildir:${mkMaildir "Sent"}"
                :key ?s)
              ( :name "${email.realName}'s junk messages"
-               :query "maildir:/${username}/Junk"
+               :query "maildir:${mkMaildir "Junk"}"
                :key ?j))))
 
         (use-package mu4e-update

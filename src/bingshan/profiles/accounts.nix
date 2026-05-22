@@ -5,10 +5,6 @@
   ...
 }:
 let
-  inherit (config.home)
-    username
-    ;
-
   mail = rec {
     host = "mail.bingshan.org";
     passwordCommand = "pass show ${host}/${userName}";
@@ -104,7 +100,7 @@ in
 
     email = {
       accounts = {
-        ${username} = rec {
+        "${mail.userName}" = rec {
           inherit (mail)
             passwordCommand
             userName
