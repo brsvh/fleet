@@ -12,6 +12,7 @@ let
 in
 {
   imports = [
+    home.modules.accounts
     home.modules.offlineimap
     home.profiles.xdg
   ];
