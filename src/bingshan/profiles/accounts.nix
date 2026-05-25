@@ -133,6 +133,11 @@ in
     contact = {
       accounts = {
         cloud = {
+          emacs = {
+            default = true;
+            enable = true;
+          };
+
           khard = {
             enable = true;
             type = "discover";
