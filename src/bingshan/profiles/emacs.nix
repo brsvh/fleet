@@ -11,7 +11,10 @@ let
     attrValues
     filter
     head
+    toJSON
     ;
+
+  contact = config.accounts.contact.emacs;
 
   email = head (
     filter (
@@ -29,6 +32,8 @@ let
 
   mkMaildir =
     folder: "/${email.maildir.path}/${folder}";
+
+  toJSON' = value: toJSON (toJSON value);
 in
 {
   imports = [
@@ -43,6 +48,7 @@ in
       black
       clang-tools
       codesearch
+      curl
       emacs-lsp-booster
       hunspell
       hunspellDicts.en_US-large
@@ -60,6 +66,34 @@ in
       earlyInitFile = bingshan.etc.emacs.early-init;
 
       extraConfig = ''
+        (use-package bs-carddav
+          :demand t
+
+          :preface
+          (require 'json)
+
+          :custom
+          (bs-carddav-addressbooks
+           (json-parse-string ${toJSON' contact.addressbooks}
+                              :object-type 'alist
+                              :array-type 'list
+                              :null-object nil
+                              :false-object nil))
+
+          (bs-carddav-writable-addressbooks
+           (json-parse-string ${toJSON' contact.writableAddressbooks}
+                              :object-type 'alist
+                              :array-type 'list
+                              :null-object nil
+                              :false-object nil))
+
+          (bs-carddav-read-only-addressbooks
+           (json-parse-string ${toJSON' contact.readOnlyAddressbooks}
+                              :object-type 'alist
+                              :array-type 'list
+                              :null-object nil
+                              :false-object nil)))
+
         (use-package emacs
           :demand t
           :no-require t
@@ -186,6 +220,7 @@ in
           doom-modeline
           eat
           eat-dwim
+          ebdb
           edit-indirect
           editorconfig
           eglot
@@ -230,8 +265,10 @@ in
           org-modern-indent
           org-ql
           org-super-agenda
+          org-vcard
           paredit
           pass
+          plz
           rainbow-delimiters
           sly
           sly-asdf

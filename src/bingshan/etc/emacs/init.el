@@ -2586,6 +2586,53 @@
   (epg-pinentry-mode 'loopback))
 
 ;;
+;; EBDB
+;;
+
+(use-package ebdb
+  :commands (ebdb
+             ebdb-create-record
+             ebdb-display-all-records
+             ebdb-open
+             ebdb-search-mail
+             ebdb-search-name)
+
+  :custom
+  ;; Use completion-at-point so `message-mode' and `mu4e-compose-mode'
+  ;; can keep the existing completion UI.
+  (ebdb-complete-mail 'capf)
+
+  ;; Allow small completion result sets to cycle between a contact's
+  ;; mail addresses.
+  (ebdb-complete-mail-allow-cycling 10)
+
+  ;; Keep address insertion readable while avoiding names that merely
+  ;; repeat the address.
+  (ebdb-mail-avoid-redundancy t)
+
+  ;; Store the primary EBDB file with user data rather than generated
+  ;; Emacs configuration.
+  (ebdb-sources (bs-path* bs-data-directory "ebdb")))
+
+(use-package ebdb-complete
+  :after (ebdb)
+  :commands (ebdb-complete
+             ebdb-complete-enable))
+
+(use-package ebdb-message
+  :after (message)
+  :demand t)
+
+(use-package ebdb-mu4e
+  :after (mu4e)
+  :demand t
+
+  :custom
+  ;; Query before creating contacts from mail, preserving the candidate
+  ;; pool boundary until the dedicated review flow exists.
+  (ebdb-mu4e-auto-update-p 'query))
+
+;;
 ;; mu4e
 ;;
 
