@@ -1,4 +1,5 @@
 {
+  home,
   lib,
   ...
 }:
@@ -8,16 +9,22 @@ let
     ;
 in
 {
+  imports = [
+    home.profiles.mcp
+  ];
+
   programs = {
-    enable = mkDefault true;
-    enableMcpIntegration = mkDefault true;
-
-    tui = {
-      theme = "system";
-    };
-
-    web = {
+    opencode = {
       enable = mkDefault true;
+      enableMcpIntegration = mkDefault true;
+
+      tui = {
+        theme = "system";
+      };
+
+      web = {
+        enable = mkDefault true;
+      };
     };
   };
 }

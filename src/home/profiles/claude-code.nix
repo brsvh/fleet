@@ -1,4 +1,5 @@
 {
+  home,
   lib,
   ...
 }:
@@ -8,8 +9,14 @@ let
     ;
 in
 {
+  imports = [
+    home.profiles.mcp
+  ];
+
   programs = {
-    enable = mkDefault true;
-    enableMcpIntegration = mkDefault true;
+    claude-code = {
+      enable = mkDefault true;
+      enableMcpIntegration = mkDefault true;
+    };
   };
 }

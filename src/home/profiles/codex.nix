@@ -1,4 +1,5 @@
 {
+  home,
   lib,
   ...
 }:
@@ -8,6 +9,10 @@ let
     ;
 in
 {
+  imports = [
+    home.profiles.mcp
+  ];
+
   programs = {
     codex = {
       enable = mkDefault true;
