@@ -2586,67 +2586,37 @@
   (epg-pinentry-mode 'loopback))
 
 ;;
-;; EBDB
-;;
-
-(use-package ebdb
-  :commands (ebdb
-             ebdb-create-record
-             ebdb-display-all-records
-             ebdb-open
-             ebdb-search-mail
-             ebdb-search-name)
-
-  :custom
-  ;; Use completion-at-point so `message-mode' and `mu4e-compose-mode'
-  ;; can keep the existing completion UI.
-  (ebdb-complete-mail 'capf)
-
-  ;; Allow small completion result sets to cycle between a contact's
-  ;; mail addresses.
-  (ebdb-complete-mail-allow-cycling 10)
-
-  ;; Keep address insertion readable while avoiding names that merely
-  ;; repeat the address.
-  (ebdb-mail-avoid-redundancy t)
-
-  ;; Store the primary EBDB file with user data rather than generated
-  ;; Emacs configuration.
-  (ebdb-sources (bs-path* bs-data-directory "ebdb")))
-
-(use-package ebdb-complete
-  :after (ebdb)
-  :commands (ebdb-complete
-             ebdb-complete-enable))
-
-(use-package ebdb-message
-  :after (message)
-  :demand t)
-
-(use-package ebdb-mu4e
-  :after (mu4e)
-  :demand t
-
-  :custom
-  ;; Query before creating contacts from mail, preserving the candidate
-  ;; pool boundary until the dedicated review flow exists.
-  (ebdb-mu4e-auto-update-p 'query))
-
-;;
 ;; mu4e
 ;;
 
 (use-package bs-mu4e
-  :after (mu4e-headers)
-  :commands (bs-mu4e-headers-field-value)
+  :after (mu4e-compose)
+  :commands (bs-mu4e-compose-completion-enable
+             bs-mu4e-ebdb-complete-enable
+             bs-mu4e-ebdb-enable)
 
   :init
-  ;; Format the From column through `bs-mu4e' so sender names that
-  ;; embed their mailbox are shown as display names, while senders
-  ;; without display names still fall back to their mailbox.
-  (advice-add 'mu4e~headers-field-value
-              :around
-              'bs-mu4e-headers-field-value))
+  ;; Normalize EBDB mail completion candidates through `bs-mu4e' so
+  ;; display names stay readable and automated senders are hidden.
+  (bs-mu4e-ebdb-enable)
+
+  ;; Apply the same cleaned contact candidate set to mu4e's compose
+  ;; completion handler.
+  (bs-mu4e-compose-completion-enable)
+
+  ;; Register the EBDB Complete compatibility advice before
+  ;; `ebdb-complete' loads, so TAB in compose buffers stays on the
+  ;; standard completion-at-point path.
+  (bs-mu4e-ebdb-complete-enable))
+
+(use-package bs-mu4e
+  :after (mu4e-headers)
+  :commands (bs-mu4e-headers-enable)
+
+  :init
+  ;; Render header `:from' fields with cleaned contact display names
+  ;; instead of exposing embedded email addresses in names.
+  (bs-mu4e-headers-enable))
 
 (use-package consult-mu
   :functions (consult-mu--view-action)
@@ -2692,6 +2662,93 @@
   ;; Embark is available, so mail actions work directly from the
   ;; minibuffer result list.
   :demand t)
+
+(use-package corfu
+  :after (mu4e-compose)
+
+  :hook
+  ;; Enable Corfu in compose buffers so CAPF-based recipient
+  ;; completion uses the configured popup UI.
+  (mu4e-compose-mode-hook . corfu-mode))
+
+(use-package ebdb
+  :commands (ebdb
+             ebdb-create-record
+             ebdb-display-all-records
+             ebdb-open
+             ebdb-search-mail
+             ebdb-search-name)
+
+  :custom
+  ;; Use completion-at-point so `message-mode' and `mu4e-compose-mode'
+  ;; can keep the existing completion UI.
+  (ebdb-complete-mail 'capf)
+
+  ;; Do not display or refresh `*EBDB*' after accepting a mail
+  ;; completion; CAPF candidates should stay in the configured UI.
+  (ebdb-completion-display-record nil)
+
+  ;; Allow small completion result sets to cycle between a contact's
+  ;; mail addresses.
+  (ebdb-complete-mail-allow-cycling 10)
+
+  ;; Keep address insertion readable while avoiding names that merely
+  ;; repeat the address.
+  (ebdb-mail-avoid-redundancy t)
+
+  ;; Store the primary EBDB file with user data rather than generated
+  ;; Emacs configuration.
+  (ebdb-sources (bs-path* bs-data-directory "ebdb"))
+
+  :config
+  ;; Prefer a bottom side window for explicit EBDB display commands.
+  ;; EBDB's own `ebdb-display-records' normally calls
+  ;; `ebdb-pop-up-window', which manages windows directly and bypasses
+  ;; `display-buffer-alist'.  Callers that should honor this rule must
+  ;; populate the EBDB buffer first and then display it with
+  ;; `display-buffer'.
+  (add-to-list 'display-buffer-alist
+               '("\\*EBDB\\*"
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)
+                 (window-height . 0.33))))
+
+(use-package ebdb
+  :custom
+  ;; Let EBDB Complete install its mail-address completion support;
+  ;; `bs-mu4e' restores the standard TAB binding after it is enabled.
+  (ebdb-complete-mail t)
+
+  ;; Show the completed contact record when using EBDB Complete's own
+  ;; mail completion command.
+  (ebdb-completion-display-record t)
+
+  ;; Match EBDB field completions case-insensitively.
+  (ebdb-completion-ignore-case t))
+
+(use-package ebdb-complete
+  :after (message)
+  :commands (ebdb-complete-enable)
+
+  :init
+  ;; Enable EBDB's message-mode integration once `message' is
+  ;; available.
+  (ebdb-complete-enable))
+
+(use-package ebdb-message
+  :after (message)
+  :demand t)
+
+(use-package ebdb-mu4e
+  :after (mu4e)
+  :demand t
+
+  :custom
+  ;; Query before creating contacts from mail, preserving the candidate
+  ;; pool boundary until the dedicated review flow exists.
+  (ebdb-mu4e-auto-update-p 'query))
 
 (use-package mu4e
   :bind

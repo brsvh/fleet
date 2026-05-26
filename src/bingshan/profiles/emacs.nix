@@ -174,6 +174,10 @@ in
           :custom
           (smime-certificate-directory "${maildir}/certs/"))
 
+        (use-package smtpmail
+          :custom
+          (smtpmail-queue-dir "${maildir}/queued-mail/"))
+
         (use-package startup
           :demand t
           :no-require t
@@ -201,6 +205,7 @@ in
           consult
           consult-ag
           consult-codesearch
+          consult-contacts
           consult-denote
           consult-eglot
           consult-eglot-embark
