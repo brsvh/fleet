@@ -176,7 +176,7 @@ in
 
         (use-package smtpmail
           :custom
-          (smtpmail-queue-dir "${maildir}/queued-mail/"))
+          (smtpmail-queue-dir "${maildirBase}/queued-mail/"))
 
         (use-package startup
           :demand t
