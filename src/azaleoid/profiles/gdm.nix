@@ -1,9 +1,23 @@
 {
-  azaleoid,
   config,
+  azaleoid,
+  lib,
   system,
   ...
 }:
+let
+  inherit (lib)
+    concatLists
+    filterAttrs
+    hasPrefix
+    mapAttrsToList
+    ;
+
+  greeterUsers = filterAttrs (
+    name: user:
+    user.enable && hasPrefix "gdm-greeter" name
+  ) config.users.users;
+in
 {
   imports = [
     system.profiles.gdm
@@ -11,16 +25,12 @@
 
   systemd = {
     tmpfiles = {
-      rules =
-        let
-          inherit (config.users.users.gdm)
-            home
-            ;
-        in
-        [
-          "d ${home}/.config 0711 gdm gdm"
-          "L+ ${home}/.config/monitors.xml - - - - ${azaleoid.etc.monitors}"
-        ];
+      rules = concatLists (
+        mapAttrsToList (name: user: [
+          "d ${user.home}/.config 0711 ${name} gdm"
+          "L+ ${user.home}/.config/monitors.xml - - - - ${azaleoid.etc.monitors}"
+        ]) greeterUsers
+      );
     };
   };
 }
