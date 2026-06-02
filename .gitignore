@@ -6,6 +6,7 @@
 # devshells
 /.editorconfig
 /lefthook.yml
+/prek.toml
 /treefmt.toml
 
 # direnv

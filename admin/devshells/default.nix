@@ -12,13 +12,10 @@ let
     ;
 
   inherit (lib)
-    attrNames
     baseNameOf
     concatStringsSep
     getExe
     map
-    optional
-    pipe
     removeAttrs
     ;
 
@@ -171,26 +168,30 @@ in
       path = ".editorconfig";
     };
 
-    lefthook = rec {
+    prek = rec {
       data = {
-        pre-commit = {
-          commands = {
-            treefmt = {
-              run = "treefmt --fail-on-change {staged_files}";
+        default_install_hook_types = [
+          "pre-commit"
+        ];
 
-              skip = [
-                "merge"
-                "rebase"
-              ];
-            };
-          };
+        repos = [
+          {
+            repo = "local";
 
-          skip = [
-            {
-              ref = "update_flake_lock_action";
-            }
-          ];
-        };
+            hooks = [
+              {
+                entry = "treefmt --fail-on-change";
+                id = "treefmt";
+                language = "system";
+                name = "treefmt";
+
+                stages = [
+                  "pre-commit"
+                ];
+              }
+            ];
+          }
+        ];
       };
 
       deps = [
@@ -198,56 +199,61 @@ in
       ];
 
       generator =
-        data: (yaml { }).generate (baseNameOf path) data;
+        data: (toml { }).generate (baseNameOf path) data;
 
       hook =
         let
           inherit (pkgs)
-            lefthook
+            git
+            prek
             runtimeShell
             writeScript
             ;
 
+          mkInstall = stage: ''
+            if gitDir="$(${getExe git} -C "$PRJ_ROOT" rev-parse --absolute-git-dir 2>/dev/null)"; then
+              mkdir -p "$gitDir/hooks"
+              ln -sf "${mkScript stage}" "$gitDir/hooks/${stage}"
+            fi
+          '';
+
           mkScript =
             stage:
-            writeScript "lefthook-${stage}" ''
+            writeScript "prek-${stage}" ''
               #!${runtimeShell}
-              [ "$LEFTHOOK" == "0" ] || \
-                ${getExe lefthook} run "${stage}" "$@"
+              if [ "''${PREK:-}" = "0" ] || [ "''${LEFTHOOK:-}" = "0" ]; then
+                exit 0
+              fi
+
+              gitDir="$(${getExe git} -C "$PRJ_ROOT" rev-parse --absolute-git-dir 2>/dev/null || true)"
+
+              if [ -n "$gitDir" ]; then
+                if [ -e "$gitDir/MERGE_HEAD" ] \
+                  || [ -d "$gitDir/rebase-apply" ] \
+                  || [ -d "$gitDir/rebase-merge" ]; then
+                  exit 0
+                fi
+
+                ref="$(${getExe git} -C "$PRJ_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+
+                if [ "$ref" = "update_flake_lock_action" ]; then
+                  exit 0
+                fi
+              fi
+
+              exec ${getExe prek} -C "$PRJ_ROOT" run --stage "${stage}" "$@"
             '';
         in
-        pipe data [
-          (
-            config:
-            removeAttrs config [
-              "colors"
-              "extends"
-              "skip_output"
-              "source_dir"
-              "source_dir_local"
-            ]
-          )
-          attrNames
-          (map (
-            stage:
-            ''ln -sf "${mkScript stage}" "$PRJ_ROOT/.git/hooks/${stage}"''
-          ))
-          (
-            stages:
-            optional (stages != [ ]) ''
-              mkdir -p "$PRJ_ROOT/.git/hooks"
-            ''
-            ++ stages
-          )
-          (concatStringsSep "\n")
-        ];
+        concatStringsSep "\n" (
+          map mkInstall data.default_install_hook_types
+        );
 
       packages = with pkgs; [
         git
-        lefthook
+        prek
       ];
 
-      path = "lefthook.yml";
+      path = "prek.toml";
     };
 
     sops = rec {
