@@ -46,15 +46,17 @@ in
 
   flake = {
     deploy = {
-      nodes = {
-        camellia =
-          let
-            camellia = self.nixosConfigurations.camellia;
+      nodes =
+        let
+          camellia = self.nixosConfigurations.camellia;
 
-            deploy-lib =
-              deploy.lib.${camellia.config.nixpkgs.hostPlatform.system};
-          in
-          {
+          deploy-lib =
+            deploy.lib.${camellia.config.nixpkgs.hostPlatform.system};
+
+          erythron = self.nixosConfigurations.erythron;
+        in
+        {
+          camellia = {
             hostname = camellia.config.networking.fqdn;
 
             profiles = {
@@ -66,7 +68,18 @@ in
 
             sshUser = "root";
           };
-      };
+
+          erythron = {
+            profiles = {
+              system = {
+                path = deploy-lib.activate.nixos erythron;
+                user = "root";
+              };
+            };
+
+            sshUser = "root";
+          };
+        };
     };
   };
 
