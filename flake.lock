@@ -10,11 +10,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779692292,
-        "narHash": "sha256-1ttGc9LQxmlLz0GlSC629j7Avpp6FF6NqNXoxDZeYoA=",
+        "lastModified": 1779957311,
+        "narHash": "sha256-ay1wGiKQIGIcFpSxlutpoAlsPVerbVhDUXtmaDVLz+o=",
         "ref": "master",
-        "rev": "db664effdb55aecfec2e761b66f459e8270c3520",
-        "revCount": 78,
+        "rev": "df7a6e0fa87655cf28369781232d153c1c7b55ca",
+        "revCount": 79,
         "type": "git",
         "url": "https://github.com/Kyure-A/agent-skills-nix.git"
       },
@@ -182,11 +182,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779699611,
-        "narHash": "sha256-EcCaSTKnmg2o4wLKaN1aqQFomwyhO7ik0bX9COdyCas=",
+        "lastModified": 1780290312,
+        "narHash": "sha256-eTAlX0CwgB84Ts3GaBd944A3DRXVMzgA0EqroZBISUo=",
         "ref": "master",
-        "rev": "5ba0c9555c28685e57fa54c7a25e42c7efdbfc8d",
-        "revCount": 1379,
+        "rev": "115e5211780054d8a890b41f0b7734cafad54dfe",
+        "revCount": 1388,
         "type": "git",
         "url": "https://github.com/nix-community/disko.git"
       },
@@ -206,11 +206,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779733940,
-        "narHash": "sha256-3DhS32jHm6znzblqBWNJJ28wmFXcx9+2EYgtC75+kZ0=",
+        "lastModified": 1780348214,
+        "narHash": "sha256-OUldZpkzAH2U5lAnnUFPbdUVYCBh3jfEbd7++EqsJsM=",
         "ref": "master",
-        "rev": "c7704e4387f66c07a9ce2c76f5081848c61a3f1c",
-        "revCount": 18947,
+        "rev": "f4976ced9eb4ef3d987457c43ef1f816b4ea2361",
+        "revCount": 18974,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -320,11 +320,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779726696,
-        "narHash": "sha256-/p37CB5n6Wpw250b0Lq0CYwNq2D8uGKzDoBulyLcQqA=",
+        "lastModified": 1780347968,
+        "narHash": "sha256-I8ibSDQx+E8cgw6k3UxX6Bm7awmGoKSTXc8Gt1Zbpp4=",
         "ref": "master",
-        "rev": "1a95e2efb477959b70b4a14c51035975c0481df6",
-        "revCount": 6795,
+        "rev": "d0af9b8bf3b4a1d449be7034bebc9f8f9fd6ee99",
+        "revCount": 6807,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -423,11 +423,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779704624,
-        "narHash": "sha256-INy8z/zDl0EQSaxIV+S4Xkq99NCWaqBKtxHmJoOdfyE=",
+        "lastModified": 1780362950,
+        "narHash": "sha256-jWHc4ib841JKvr/ViDy0DScfK2stDX4D7SjUDjPORrQ=",
         "ref": "main",
-        "rev": "b4d59ea23a029466b3e8314835ac7714296f2595",
-        "revCount": 9649,
+        "rev": "9653dc94f94cf618d984fe49b4d7d23bac4cb3c0",
+        "revCount": 10090,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -453,11 +453,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779651995,
-        "narHash": "sha256-JT27OzVt+zKC9OUzG9siqRA2tqRiNwu+aWER67FNnNY=",
+        "lastModified": 1780340963,
+        "narHash": "sha256-rQCWOQXN0/sQxwP7T2Y3hsC1KYxLQgul6l9LPbQdqi4=",
         "ref": "main",
-        "rev": "da16ebd4b5f8c2867f0a5220780f87d94d979626",
-        "revCount": 1024,
+        "rev": "a61228e6918a9d673c3faf48ab23e92a55822012",
+        "revCount": 1028,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -513,11 +513,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1779560665,
-        "narHash": "sha256-tpyBcxPpcQb8ukyNF7DoCwfSY3VPsxHoYwj00Cayv5o=",
+        "lastModified": 1780243769,
+        "narHash": "sha256-x5UQuRsH3MqI0U9afaXSNqzTPSeZlRLvFAav2Ux1pNw=",
         "ref": "nixos-unstable",
-        "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
-        "revCount": 1004030,
+        "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+        "revCount": 1008282,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -551,11 +551,11 @@
     "openai-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779387217,
-        "narHash": "sha256-MpXYiPBzQTBCXN7Hw36qBG82cKqW9havnbCw7JHeSJI=",
+        "lastModified": 1780071638,
+        "narHash": "sha256-drA/ypVE+yK4W2Bj8IUtWaVLF390Pfy7YLcmdju5dow=",
         "ref": "main",
-        "rev": "b0401f07213a66414d84a65cb50c1d226f99485a",
-        "revCount": 110,
+        "rev": "a8924c2a35cfa290458852c4fad17c9133054c2e",
+        "revCount": 111,
         "type": "git",
         "url": "https://github.com/openai/skills.git"
       },
@@ -657,11 +657,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779679233,
-        "narHash": "sha256-qSIAAfK66X6waos6alIYxVze1ZU3C/WPp7NlN4ooP54=",
+        "lastModified": 1780284119,
+        "narHash": "sha256-y2wR4Mk6D/N1ID4FZa2oUMStCUxyIoRzmgOOpLzoWmo=",
         "ref": "master",
-        "rev": "47ab6c7b3c6a68beac60067490240efa32ae344c",
-        "revCount": 2184,
+        "rev": "51390d0bfca0a68a8c337d215a4bbeddc2ca616e",
+        "revCount": 2192,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -718,11 +718,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779411315,
-        "narHash": "sha256-IMFlxeyClau51KplhhSRGhdGTvD/knShHdybP1UOTuk=",
+        "lastModified": 1780358675,
+        "narHash": "sha256-n4jX4svZwmoWpzhz3If9wkvEYKv3WuDvprE8vi57MRY=",
         "ref": "master",
-        "rev": "fdf2a76275d7a9c27deb5d2f2ab33526ac9052ff",
-        "revCount": 466,
+        "rev": "3a557a9e78cc5b11bc9a610f27da4bdd5599edfe",
+        "revCount": 467,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },
