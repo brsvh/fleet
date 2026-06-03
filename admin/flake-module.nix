@@ -70,6 +70,7 @@ in
           };
 
           erythron = {
+            fastConnection = true;
             hostname = "erythron";
 
             profiles = {
