@@ -2405,15 +2405,16 @@
 
 (use-package codex-ide
   :config
-  ;; Display Codex session buffers in a bottom side window, keeping
-  ;; conversations visible without replacing the current editing
-  ;; window.
+  ;; Display Codex session buffers in a persistent right side window,
+  ;; keeping conversations visible without replacing the current
+  ;; editing window.
   (add-to-list 'display-buffer-alist
                '((derived-mode . codex-ide-session-mode)
                  (display-buffer-in-side-window)
-                 (side . bottom)
+                 (preserve-size . (nil . t))
+                 (side . right)
                  (slot . 0)
-                 (window-height . 0.5)))
+                 (window-width . 0.5)))
 
   :bind
   ( :map ctl-c-a-map
