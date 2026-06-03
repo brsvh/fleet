@@ -70,6 +70,8 @@ in
           };
 
           erythron = {
+            hostname = "erythron";
+
             profiles = {
               system = {
                 path = deploy-lib.activate.nixos erythron;
