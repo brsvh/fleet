@@ -42,6 +42,7 @@ in
           collectives
           contacts
           deck
+          drawio
           forms
           mail
           music
