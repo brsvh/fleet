@@ -1113,6 +1113,17 @@
   ;; Resize frame pixel by pixel.
   (frame-resize-pixelwise t))
 
+(use-package knockknock
+  :custom
+  ;; Place notification popups at the top center of the frame so they
+  ;; stay visible without covering the minibuffer or mode line.
+  (knockknock-poshandler 'posframe-poshandler-frame-top-center)
+
+  :hook
+  ;; Load the notification backend after early startup work completes,
+  ;; when frame geometry and Posframe integration are available.
+  (bs-after-startup-early-hook . (lambda () (require 'knockknock))))
+
 (use-package scroll-bar
   :after (bs-hooks)
   :commands (scroll-bar-mode)
@@ -2213,6 +2224,12 @@
     ;; one.
     ("s" . eat-dwim)))
 
+(use-package shell-maker
+  :custom
+  ;; Keep shell-maker state beneath the shared Emacs state directory
+  ;; instead of scattering generated files into project trees.
+  (shell-maker-root-path (bs-path* bs-state-directory)))
+
 (use-package with-editor
   :bind
   ( :map global-map
@@ -2391,27 +2408,171 @@
   copyright-names-regexp
   (format "%s <%s>" user-full-name user-mail-address))
 
+
 ;;
-;; Codex
+;; Agent
 ;;
 
-(use-package codex-ide
+(use-package agent-recall
+  :custom
+  ;; Show recently changed conversations first when browsing recalled
+  ;; agent sessions.
+  (agent-recall-browse-sort 'modified-desc)
+
+  ;; Use `consult-ripgrep' interface for full-text recall searches.
+  (agent-recall-search-function 'consult-ripgrep)
+
+  ;; Limit recall indexing and search to source checkouts.
+  (agent-recall-search-paths '("~/src")))
+
+(use-package agent-review
+  :bind
+  ( :map ctl-c-x-map
+    ;; Start an agent-assisted review from the custom agent prefix
+    ;; map.
+    ("r" . agent-review)))
+
+(use-package agent-shell
+  :custom
+  ;; Default new agent shells to the Codex OpenAI agent configuration.
+  (agent-shell-preferred-agent-config
+   (agent-shell-openai-make-codex-config))
+
+  ;; Open agent shells directly at the prompt without the package
+  ;; welcome text.
+  (agent-shell-show-welcome-message nil)
+
   :config
-  ;; Display Codex session buffers in a persistent right side window,
-  ;; keeping conversations visible without replacing the current
-  ;; editing window.
-  (add-to-list 'display-buffer-alist
-               '((derived-mode . codex-ide-session-mode)
-                 (display-buffer-in-side-window)
-                 (preserve-size . (nil . t))
-                 (side . right)
-                 (slot . 0)
-                 (window-width . 0.5)))
+  ;; Store agent-shell cache entries under `bs-cache-directory' while
+  ;; preserving the package helper's component-based path interface.
+  (advice-add 'agent-shell--cache-dir
+              :override
+              #'(lambda (&rest components)
+                  (let* ((base-dir
+                          (bs-path bs-cache-directory "agent-shell/"))
+                         (cache-dir
+                          (apply #'bs-path base-dir components)))
+                    (make-directory cache-dir t)
+                    cache-dir)))
 
   :bind
-  ( :map ctl-c-a-map
-    ;; Open the Codex IDE command menu from the custom AI prefix map.
-    ("x" . codex-ide-menu)))
+  ( :map agent-shell-mode-map
+    ;; Interrupt the running agent process from inside its shell
+    ;; buffer.
+    ("C-c C-k" . agent-shell-interrupt)))
+
+(use-package agent-shell-knockknock
+  :after (agent-shell knockknock)
+
+  :hook
+  ;; Enable desktop notifications for each interactive agent shell.
+  (agent-shell-mode-hook . agent-shell-knockknock-mode))
+
+(use-package agent-shell-manager
+  :custom
+  ;; Let `display-buffer-alist' choose the regular window placement,
+  ;; matching list buffers such as `ibuffer' instead of forcing a side
+  ;; window.
+  (agent-shell-manager-side nil)
+
+  :config
+  ;; Show the manager in the selected window like `ibuffer'.  The
+  ;; package displays the buffer before enabling
+  ;; `agent-shell-manager-mode', so match the buffer name rather than
+  ;; the major mode.
+  (add-to-list 'display-buffer-alist
+               '("\\*Agent-Shell Buffers\\*"
+                 (display-buffer-same-window)))
+
+  ;; `agent-shell-manager-toggle' dedicates the displayed window.
+  ;; That is appropriate for side windows, but regular same-window
+  ;; display should remain reusable like `ibuffer'.
+  (advice-add 'agent-shell-manager-toggle
+              :around
+              #'(lambda (orig &rest args)
+                  (let* ((buffer
+                          (get-buffer "*Agent-Shell Buffers*"))
+                         (window
+                          (and buffer
+                               (get-buffer-window buffer))))
+                    (if (and (null agent-shell-manager-side)
+                             (window-live-p window))
+                        (progn
+                          (set-window-dedicated-p window nil)
+                          (quit-window nil window))
+                      (prog1 (apply orig args)
+                        (when-let* ((buffer
+                                     (get-buffer "*Agent-Shell Buffers*"))
+                                    (window
+                                     (get-buffer-window buffer)))
+                          (when (null agent-shell-manager-side)
+                            (set-window-dedicated-p window nil))))))))
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Toggle the agent-shell manager from the custom agent prefix
+    ;; map.
+    ("C-b" . agent-shell-manager-toggle)))
+
+(use-package agent-shell-sidebar
+  :custom
+  ;; Use the Codex OpenAI agent configuration for sidebar sessions.
+  (agent-shell-sidebar-default-config
+   (agent-shell-openai-make-codex-config))
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Toggle the persistent agent sidebar from the custom agent
+    ;; prefix map.
+    ("s" . agent-shell-sidebar-toggle)))
+
+(use-package agent-shell-tramp
+  :after (agent-shell)
+  :commands (agent-shell-tramp-mode)
+
+  :config
+  ;; Enable TRAMP integration so agent shells can operate on remote
+  ;; buffers and paths.
+  (agent-shell-tramp-mode +1))
+
+(use-package openspec
+  :custom
+  ;; Disable OpenSpec's default global binding; expose the status
+  ;; command under the custom agent prefix map instead.
+  (openspec-status-key nil)
+
+  :config
+  ;; Show OpenSpec status buffers in a bottom side window so reviewing
+  ;; proposals and tasks does not replace the current editing window.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . openspec-mode)
+                 (display-buffer-in-side-window)
+                 (side . bottom)
+                 (slot . 0)))
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Open the OpenSpec project status from the custom agent prefix
+    ;; map.
+    ("o" . openspec-status)))
+
+(use-package shell-maker
+  :after (agent-shell)
+
+  :bind
+  ( :map agent-shell-mode-map
+    ;; Submit the current shell-maker input without leaving insert
+    ;; flow.
+    ("C-c C-c" . shell-maker-submit)))
+
+(use-package simple
+  :after (agent-shell)
+
+  :bind
+  ( :map agent-shell-mode-map
+    ;; Keep RET as a plain newline inside agent-shell buffers;
+    ;; explicit submission remains on \\`C-c C-c'.
+    ("RET" . newline)))
 
 ;;
 ;; Denote (info "(denote) Top")

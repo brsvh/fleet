@@ -57,8 +57,11 @@ in
       nerd-fonts.symbols-only
       nixd
       nixfmt
+      openspec
       pyright
       ripgrep
+      wl-clipboard
+      xclip
     ];
   };
 
@@ -192,7 +195,6 @@ in
           agent-recall
           agent-review
           agent-shell
-          agent-shell-attention
           agent-shell-sidebar
           agent-shell-tramp
           agent-shell-manager
@@ -210,7 +212,6 @@ in
           citar-denote
           citar-embark
           citre
-          codex-ide
           consult
           consult-codesearch
           consult-contacts
@@ -270,6 +271,7 @@ in
           nerd-icons-ibuffer
           nix-mode
           nix-ts-mode
+          openspec
           orderless
           org-appear
           org-contrib
