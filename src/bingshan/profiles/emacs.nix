@@ -47,7 +47,9 @@ in
     packages = with pkgs; [
       black
       clang-tools
+      claude-agent-acp
       codesearch
+      codex-acp
       curl
       emacs-lsp-booster
       hunspell
@@ -187,6 +189,14 @@ in
 
       extraPackages =
         epkgs: with epkgs; [
+          agent-recall
+          agent-review
+          agent-shell
+          agent-shell-attention
+          agent-shell-sidebar
+          agent-shell-tramp
+          agent-shell-manager
+          agent-shell-knockknock
           anzu
           apheleia
           beframe
