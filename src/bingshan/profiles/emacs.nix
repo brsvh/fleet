@@ -57,7 +57,6 @@ in
       nixfmt
       pyright
       ripgrep
-      silver-searcher
     ];
   };
 
@@ -203,7 +202,6 @@ in
           citre
           codex-ide
           consult
-          consult-ag
           consult-codesearch
           consult-contacts
           consult-denote

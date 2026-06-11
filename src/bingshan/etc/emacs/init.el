@@ -198,14 +198,6 @@
     ;; Go to matched ripgrep search result.
     ("r" . consult-ripgrep)))
 
-(use-package consult-ag
-  :after (consult)
-
-  :bind
-  ( :map goto-map
-    ;; Go to matched ag search result.
-    ("a" . consult-ag)))
-
 (use-package mwim
   :bind
   ( :map global-map
