@@ -33,6 +33,18 @@
 - When writing, changing, generating, or restyling Nix code, use
   `$nix-code-refactor` to refactor the code into the repository style.
 
+## Development workflow
+
+- `steps` means `.agents/steps.md`.
+- `next-step` means `.agents/next-step.md`.
+- For multi-step work, keep `steps` as the compact project log and roadmap:
+  retain 10 completed steps, the current step, and 10 likely future steps.
+- Keep `next-step` focused on the current step's objective, scope, files,
+  acceptance criteria, and non-activating verification commands.
+- Treat each step as a small functional change suitable for one commit.
+- Update `steps` and `next-step` when a step is completed or the planned next
+  action changes materially.
+
 ## Activation and profile safety
 
 - Do not run commands that activate, switch, roll back, or otherwise change the
