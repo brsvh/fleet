@@ -264,6 +264,7 @@ in
           modus-themes
           mu4e
           mu4e-alert
+          mu4e-knockknock
           mwim
           nerd-icons
           nerd-icons-corfu

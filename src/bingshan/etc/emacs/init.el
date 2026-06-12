@@ -2970,6 +2970,15 @@
   ;; headers buffer.
   (mu4e-headers-precise-alignment nil))
 
+(use-package mu4e-knockknock
+  :after (mu4e)
+  :commands (mu4e-knockknock-mode)
+
+  :config
+  ;; Enable Knock Knock's mu4e integration once the mail interface is
+  ;; available.
+  (mu4e-knockknock-mode +1))
+
 (use-package mu4e-main
   :config
   (add-to-list 'display-buffer-alist
