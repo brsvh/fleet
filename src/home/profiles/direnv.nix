@@ -1,4 +1,5 @@
 {
+  home,
   lib,
   ...
 }:
@@ -8,6 +9,10 @@ let
     ;
 in
 {
+  imports = [
+    home.profiles.git
+  ];
+
   programs = {
     direnv = {
       enable = mkDefault true;
@@ -15,6 +20,12 @@ in
       nix-direnv = {
         enable = mkDefault true;
       };
+    };
+
+    git = {
+      ignores = [
+        "/.direnv"
+      ];
     };
   };
 }
