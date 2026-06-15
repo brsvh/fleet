@@ -39,6 +39,7 @@ in
   imports = [
     bingshan.profiles.accounts
     bingshan.profiles.fonts
+    bingshan.profiles.git
     bingshan.profiles.global
     home.profiles.emacs
   ];
@@ -309,6 +310,12 @@ in
       initFile = bingshan.etc.emacs.init;
 
       package = pkgs.emacs-git-pgtk;
+    };
+
+    git = {
+      ignores = [
+        "/.agent-shell"
+      ];
     };
   };
 }
