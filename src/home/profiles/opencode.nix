@@ -10,10 +10,17 @@ let
 in
 {
   imports = [
+    home.profiles.git
     home.profiles.mcp
   ];
 
   programs = {
+    git = {
+      ignores = [
+        "/.opencode"
+      ];
+    };
+
     opencode = {
       enable = mkDefault true;
       enableMcpIntegration = mkDefault true;
