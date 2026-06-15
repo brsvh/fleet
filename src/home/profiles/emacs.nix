@@ -57,6 +57,7 @@ in
 {
   imports = [
     home.modules.emacs
+    home.profiles.git
   ];
 
   programs = {
@@ -73,6 +74,25 @@ in
       '';
 
       package = mkDefault pkgs.emacs-gtk;
+    };
+
+    git = {
+      ignores = [
+        "*.elc"
+        "*.rel"
+        "*.~undo-tree~"
+        "*_archive"
+        "*_flymake.*"
+        "*~"
+        ".\#*"
+        ".org-id-locations"
+        "/.emacs.desktop"
+        "/.emacs.desktop.lock"
+        "/auto/"
+        "\#*\#"
+        "auto-save-list"
+        "tramp"
+      ];
     };
   };
 }
