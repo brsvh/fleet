@@ -61,6 +61,7 @@ in
       openspec
       pyright
       ripgrep
+      spec-kit
       wl-clipboard
       xclip
     ];
@@ -233,8 +234,6 @@ in
           diff-hl
           diredfl
           doom-modeline
-          eat
-          eat-dwim
           ebdb
           edit-indirect
           editorconfig
@@ -251,6 +250,7 @@ in
           geiser
           geiser-guile
           ghostel
+          ghostel-dwim
           git-cliff
           git-modes
           haskell-mode

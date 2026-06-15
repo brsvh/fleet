@@ -301,7 +301,7 @@
                   display-buffer-in-side-window)
                  (preserve-size . (t . t))
                  (side . right)
-                 (window-width . 0.33)
+                 (window-width . 0.35)
                  (window-parameters . ((no-delete-other-windows . t)
                                        (no-other-window . t)))))
 
@@ -474,7 +474,7 @@
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.33))))
+                 (window-height . 0.35))))
 
 ;;
 ;; The Mark and the Region (info "(emacs) Mark")
@@ -1629,7 +1629,7 @@
                '("\\*Pp Macroexpand Output\\*"
                  (display-buffer-reuse-window
                   display-buffer-below-selected)
-                 (window-height . 0.33)))
+                 (window-height . 0.35)))
 
   :bind
   ( :map ctl-x-map
@@ -1790,21 +1790,21 @@
   ;; later.
   (git-commit-mode-hook . display-fill-column-indicator-mode))
 
-(use-package eat-dwim
+(use-package ghostel-dwim
   :after (project)
 
   :bind
   ( :map global-map
-    ;; Use `eat' to create shell based on project root.
-    ([remap project-shell] . eat-dwim-project)
+    ;; Use `ghostel' to create shell based on project root.
+    ([remap project-shell] . ghostel-dwim-project)
 
     :map ctl-c-p-map
-    ;; Switch to an Eat buffer associated with the current project.
-    ("C-s" . eat-dwim-project-switch)
+    ;; Switch to a Ghostel buffer associated with the current project.
+    ("C-s" . ghostel-dwim-project-switch)
 
-    ;; Reuse an idle Eat session for the current project or create
+    ;; Reuse an idle Ghostel session for the current project or create
     ;; one.
-    ("s" . eat-dwim-project)))
+    ("s" . ghostel-dwim-project)))
 
 (use-package envrc
   :after (bs-hooks)
@@ -2157,34 +2157,23 @@
   ;; separate lookup step in command-driven buffers.
   (comint-mode-hook . corfu-mode))
 
-(use-package eat
-  :functions (eat-self-input
-              eat-term-send-string)
-
+(use-package ghostel
   :config
-  ;; Add a display buffer rule to make Eat buffers shown in a side
-  ;; window at the bottom of the frame with its height set to 40% of
-  ;; the total frame height.
+  ;; Add a display buffer rule to make Ghostel buffers shown in a side
+  ;; window at the bottom of the frame.
   (add-to-list 'display-buffer-alist
-               '((derived-mode . eat-mode)
+               '((derived-mode . ghostel-mode)
                  (display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.33)))
+                 (window-height . 0.35)))
 
   :hook
-  ;; Export environment variables so that programs launched from Eat
-  ;; use Emacs as their editor.
-  (eat-exec-hook
+  ;; Export environment variables so that programs launched from
+  ;; Ghostel use Emacs as their editor.
+  (ghostel-pre-spawn-hook
    .
-   (lambda (process &rest _)
-     "Like `with-editor-export-editor', but for `eat-exec-hook'."
-     (unless (derived-mode-p 'eat-mode)
-       (error "Cannot export environment variables in this buffer"))
-
-     (unless (and (boundp 'eat-terminal) eat-terminal)
-       (error "EAT terminal is not available"))
-
+   (lambda ()
      ;; Compute EMACS_SERVER_FILE in a reproducible way.  server-name
      ;; defaults to server; server-socket-dir is auto-chosen by Emacs.
      (let* ((server-file (expand-file-name server-name
@@ -2198,31 +2187,19 @@
                                  "--alternate-editor=\"\""
                                  "--create-frame")
                                " ")))
-       ;; Wait for shell readiness.
-       (while (accept-process-output process 0.1))
+       (setenv "EDITOR" editor)
+       (setenv "EMACS_SERVER_FILE" server-file)))))
 
-       ;; Inject exports into the EAT shell.
-       (eat-term-send-string
-        eat-terminal
-        (format "export EDITOR=%s" (shell-quote-argument editor)))
-       (eat-self-input 1 'return)
-       (eat-term-send-string
-        eat-terminal
-        (format "export EMACS_SERVER_FILE=%s"
-                (shell-quote-argument server-file)))
-       (eat-self-input 1 'return)
-       (eat-term-send-string eat-terminal "clear")
-       (eat-self-input 1 'return)))))
-
-(use-package eat-dwim
+(use-package ghostel-dwim
   :bind
   ( :map ctl-c-a-map
-    ;; Switch to an Eat buffer associated with the current directory.
-    ("C-s" . eat-dwim-switch)
+    ;; Switch to a Ghostel buffer associated with the current
+    ;; directory.
+    ("C-s" . ghostel-dwim-switch)
 
-    ;; Reuse an idle Eat session for the current directory or create
-    ;; one.
-    ("s" . eat-dwim)))
+    ;; Reuse an idle Ghostel session for the current directory or
+    ;; create one.
+    ("s" . ghostel-dwim)))
 
 (use-package shell-maker
   :custom
@@ -2392,7 +2369,7 @@
                '("\\*Password-Store\\*"
                  (display-buffer-reuse-window
                   display-buffer-below-selected)
-                 (window-height . 0.4))))
+                 (window-height . 0.35))))
 
 ;;
 ;; Quitting and Aborting (info "(emacs) Quitting")
@@ -2867,7 +2844,7 @@
                   display-buffer-in-side-window)
                  (side . bottom)
                  (slot . 0)
-                 (window-height . 0.33))))
+                 (window-height . 0.35))))
 
 (use-package ebdb
   :custom
