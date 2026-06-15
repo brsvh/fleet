@@ -26,12 +26,40 @@ let
       ];
     };
   };
+
+  sessionVariables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
+    SDL_IM_MODULE = "fcitx";
+  };
 in
 {
   imports = [
     home.profiles.fcitx5
+    home.profiles.gtk
     home.profiles.xdg
   ];
+
+  gtk = {
+    gtk2.extraConfig = ''
+      gtk-im-module="fcitx"
+    '';
+
+    gtk3.extraConfig = {
+      gtk-im-module = "fcitx";
+    };
+
+    gtk4.extraConfig = {
+      gtk-im-module = "fcitx";
+    };
+  };
+
+  home = {
+    inherit
+      sessionVariables
+      ;
+  };
 
   i18n = {
     inputMethod = {
@@ -68,6 +96,14 @@ in
           };
         };
       };
+    };
+  };
+
+  systemd = {
+    user = {
+      inherit
+        sessionVariables
+        ;
     };
   };
 
