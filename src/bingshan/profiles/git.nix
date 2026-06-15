@@ -26,6 +26,10 @@ in
 
   programs = {
     git = {
+      ignores = [
+        "/.tmp"
+      ];
+
       signing = {
         inherit (email.gpg)
           key
