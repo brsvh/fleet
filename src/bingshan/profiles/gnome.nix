@@ -24,6 +24,7 @@ in
 {
   imports = [
     bingshan.profiles.fonts
+    bingshan.profiles.ghostty
     bingshan.profiles.gtk
     home.profiles.gnome
     home.profiles.xdg
