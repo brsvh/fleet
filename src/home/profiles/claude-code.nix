@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    home.profiles.git
     home.profiles.mcp
   ];
 
@@ -17,6 +18,12 @@ in
     claude-code = {
       enable = mkDefault true;
       enableMcpIntegration = mkDefault true;
+    };
+
+    git = {
+      ignores = [
+        "/.claude"
+      ];
     };
   };
 }
