@@ -250,6 +250,7 @@ in
           form-feed
           geiser
           geiser-guile
+          ghostel
           git-cliff
           git-modes
           haskell-mode
