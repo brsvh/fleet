@@ -2947,6 +2947,16 @@
   ;; headers buffer.
   (mu4e-headers-precise-alignment nil))
 
+(use-package mu4e-helpers
+  :custom
+  ;; Route `mu4e-read-option' through the configured completion
+  ;; function instead of mu4e's built-in option reader.
+  (mu4e-read-option-use-builtin nil)
+
+  ;; Use the standard completion entry point so the active minibuffer
+  ;; completion UI handles mu4e's option prompts.
+  (mu4e-completing-read-function 'completing-read))
+
 (use-package mu4e-knockknock
   :after (mu4e)
   :commands (mu4e-knockknock-mode)
