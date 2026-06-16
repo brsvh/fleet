@@ -2972,6 +2972,12 @@
                '("\\*mu4e-main\\*"
                  (display-buffer-same-window))))
 
+(use-package mu4e-modeline
+  :custom
+  ;; Disable mu4e's global modeline indicators while keeping
+  ;; buffer-specific mu4e modeline information available.
+  (mu4e-modeline-show-global nil))
+
 (use-package mu4e-thread
   :bind
   ( :map mu4e-thread-mode-map
