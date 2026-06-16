@@ -2887,24 +2887,24 @@
     ;; Open the `mu4e' mail interface from the custom application map.
     ("m" . mu4e)))
 
-(use-package mu4e-alert
-  :after (mu4e)
-  :when (eq system-type 'gnu/linux)
+;; (use-package mu4e-alert
+;;   :after (mu4e)
+;;   :when (eq system-type 'gnu/linux)
 
-  ;; Load alert integration after mu4e is available so message
-  ;; notifications can derive their state from the mu4e index.
-  :demand t)
+;;   ;; Load alert integration after mu4e is available so message
+;;   ;; notifications can derive their state from the mu4e index.
+;;   :demand t)
 
-(use-package mu4e-alert
-  :commands (mu4e-alert-enable-notifications)
-  :functions (mu4e-alert-set-default-style)
-  :when (eq system-type 'gnu/linux)
+;; (use-package mu4e-alert
+;;   :commands (mu4e-alert-enable-notifications)
+;;   :functions (mu4e-alert-set-default-style)
+;;   :when (eq system-type 'gnu/linux)
 
-  :config
-  ;; Use the desktop notification backend for new-message alerts, then
-  ;; enable notification delivery once the backend is selected.
-  (mu4e-alert-set-default-style 'notifications)
-  (mu4e-alert-enable-notifications))
+;;   :config
+;;   ;; Use the desktop notification backend for new-message alerts, then
+;;   ;; enable notification delivery once the backend is selected.
+;;   (mu4e-alert-set-default-style 'notifications)
+;;   (mu4e-alert-enable-notifications))
 
 (use-package mu4e-headers
   :custom
