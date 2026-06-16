@@ -8,30 +8,89 @@
 }:
 let
   inherit (lib)
-    attrValues
+    concatStringsSep
     filter
     head
+    mapAttrsToList
     toJSON
+    toSentenceCase
     ;
 
   contact = config.accounts.contact.emacs;
 
-  email = head (
-    filter (
-      account: account.enable && account.primary
-    ) (attrValues config.accounts.email.accounts)
+  maildirBase =
+    config.accounts.email.maildirBasePath;
+
+  mails = filter (mail: mail.account.enable) (
+    mapAttrsToList (name: account: {
+      inherit
+        account
+        name
+        ;
+    }) config.accounts.email.accounts
+  );
+
+  primaryMails = filter (
+    mail: mail.account.primary
+  ) mails;
+
+  secondaryMails = filter (
+    mail: !mail.account.primary
+  ) mails;
+
+  primary = (head primaryMails).account;
+
+  primaryMaildir = primary.maildir.absPath;
+
+  primaryName = (head primaryMails).name;
+
+  mkMaildir =
+    account: folder:
+    "/${account.maildir.path}/${folder}";
+
+  mkPrimaryMaildir = mkMaildir primary;
+
+  mkMu4eContext =
+    mail:
+    let
+      inherit (mail)
+        account
+        name
+        ;
+
+      accountMaildir = mkMaildir account;
+
+      accountMaildirPrefix = "/${account.maildir.path}/";
+    in
+    ''
+      (make-mu4e-context
+       :name ${toJSON name}
+       :match-func
+       (lambda (msg)
+         (when msg
+           (let ((maildir (mu4e-message-field msg :maildir)))
+             (and maildir
+                  (string-prefix-p ${toJSON accountMaildirPrefix}
+                                   maildir)))))
+       :vars
+       '((user-mail-address . ${toJSON account.address})
+         (user-full-name . ${toJSON account.realName})
+         (mail-source-directory . ${toJSON account.maildir.absPath})
+         (message-directory . ${toJSON account.maildir.absPath})
+         (message-signature . ${toJSON account.signature.text})
+         (mml-secure-openpgp-signers . (${toJSON account.gpg.key}))
+         (mu4e-sent-folder . ${toJSON (accountMaildir "Sent")})
+         (mu4e-drafts-folder . ${toJSON (accountMaildir "Drafts")})
+         (mu4e-trash-folder . ${toJSON (accountMaildir "Trash")})
+         (smime-certificate-directory . ${toJSON "${account.maildir.absPath}/certs/"})))
+    '';
+
+  mu4eEmailContexts = concatStringsSep "\n" (
+    map mkMu4eContext (primaryMails ++ secondaryMails)
   );
 
   libext =
     pkgs.stdenv.targetPlatform.extensions.sharedLibrary;
-
-  maildir = email.maildir.absPath;
-
-  maildirBase =
-    config.accounts.email.maildirBasePath;
-
-  mkMaildir =
-    folder: "/${email.maildir.path}/${folder}";
 
   toJSON' = value: toJSON (toJSON value);
 in
@@ -105,7 +164,7 @@ in
           :no-require t
 
           :custom
-          (user-full-name "${email.realName}"))
+          (user-full-name "${primary.realName}"))
 
         (use-package emacs
           :demand t
@@ -118,33 +177,40 @@ in
 
         (use-package epa-hook
           :config
-          (add-to-list 'epa-file-encrypt-to "${email.gpg.key}"))
+          (add-to-list 'epa-file-encrypt-to "${primary.gpg.key}"))
 
         (use-package mail-source
           :custom
-          (mail-source-directory "${maildir}"))
+          (mail-source-directory "${primaryMaildir}"))
 
         (use-package message
           :custom
-          (message-directory "${maildir}")
+          (message-directory "${primaryMaildir}")
           (message-sendmail-envelope-from 'header)
-          (message-signature "${email.signature.text}"))
+          (message-signature "${primary.signature.text}"))
 
         (use-package mu4e
           :custom
+          (mu4e-compose-context-policy 'ask)
+          (mu4e-context-policy 'pick-first)
           (mu4e-maildir "${maildirBase}")
-          (mu4e-sent-folder "${mkMaildir "Sent"}")
-          (mu4e-drafts-folder "${mkMaildir "Drafts"}")
-          (mu4e-trash-folder "${mkMaildir "Trash"}"))
+          (mu4e-sent-folder "${mkPrimaryMaildir "Sent"}")
+          (mu4e-drafts-folder "${mkPrimaryMaildir "Drafts"}")
+          (mu4e-trash-folder "${mkPrimaryMaildir "Trash"}")
+
+          :config
+          (setq mu4e-contexts
+                (list
+                 ${mu4eEmailContexts})))
 
         (use-package mu4e-bookmarks
           :custom
           (mu4e-bookmarks
-           '(( :name "${email.realName}'s inbox"
-               :query "maildir:${mkMaildir "INBOX"}"
+           '(( :name "${toSentenceCase primaryName} inbox"
+               :query "maildir:${mkPrimaryMaildir "INBOX"}"
                :key ?i)
-             ( :name "${email.realName}'s drafts"
-               :query "maildir:${mkMaildir "Drafts"}"
+             ( :name "${toSentenceCase primaryName} drafts"
+               :query "maildir:${mkPrimaryMaildir "Drafts"}"
                :key ?d)
              ( :name "Unread messages"
                :query "flag:unread AND NOT flag:trashed"
@@ -158,11 +224,11 @@ in
              ( :name "Last 7 days"
                :query "date:7d..now"
                :key ?7)
-             ( :name "${email.realName}'s sent messages"
-               :query "maildir:${mkMaildir "Sent"}"
+             ( :name "${toSentenceCase primaryName} sent messages"
+               :query "maildir:${mkPrimaryMaildir "Sent"}"
                :key ?s)
-             ( :name "${email.realName}'s junk messages"
-               :query "maildir:${mkMaildir "Junk"}"
+             ( :name "${toSentenceCase primaryName} junk messages"
+               :query "maildir:${mkPrimaryMaildir "Junk"}"
                :key ?j))))
 
         (use-package mu4e-update
@@ -178,7 +244,7 @@ in
 
         (use-package smime
           :custom
-          (smime-certificate-directory "${maildir}/certs/"))
+          (smime-certificate-directory "${primaryMaildir}/certs/"))
 
         (use-package smtpmail
           :custom
@@ -189,7 +255,7 @@ in
           :no-require t
 
           :custom
-          (user-mail-address "${email.address}"))
+          (user-mail-address "${primary.address}"))
       '';
 
       extraPackages =

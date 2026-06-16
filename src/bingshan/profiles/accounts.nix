@@ -5,13 +5,7 @@
   ...
 }:
 let
-  mail = rec {
-    host = "mail.bingshan.org";
-    passwordCommand = "pass show ${host}/${userName}";
-    userName = "chang@bingshan.org";
-  };
-
-  cloud = rec {
+  personalCloud = rec {
     host = "cloud.bingshan.org";
 
     passwordCommand = [
@@ -21,6 +15,18 @@ let
     ];
 
     userName = "bingshan";
+  };
+
+  personalEmail = rec {
+    host = "mail.bingshan.org";
+    passwordCommand = "pass show ${host}/${userName}";
+    userName = "chang@bingshan.org";
+  };
+
+  workEmail = rec {
+    host = "mail.cstnet.cn";
+    passwordCommand = "pass show ${host}/${userName}";
+    userName = "changbingshan@iscas.ac.cn";
   };
 in
 {
@@ -32,24 +38,24 @@ in
   accounts = {
     calendar = {
       accounts = {
-        cloud = {
+        personal = {
           khal = {
             enable = true;
             type = "discover";
           };
 
           local = {
-            path = "${config.accounts.calendar.basePath}/${cloud.host}";
+            path = "${config.accounts.calendar.basePath}/${personalCloud.host}";
           };
 
           remote = {
-            inherit (cloud)
+            inherit (personalCloud)
               passwordCommand
               userName
               ;
 
             type = "caldav";
-            url = "https://${cloud.host}/remote.php/dav/calendars/${cloud.userName}/";
+            url = "https://${personalCloud.host}/remote.php/dav/calendars/${personalCloud.userName}/";
           };
 
           vdirsyncer = {
@@ -132,7 +138,7 @@ in
 
     contact = {
       accounts = {
-        cloud = {
+        personal = {
           emacs = {
             default = true;
             enable = true;
@@ -144,17 +150,17 @@ in
           };
 
           local = {
-            path = "${config.accounts.contact.basePath}/${cloud.host}";
+            path = "${config.accounts.contact.basePath}/${personalCloud.host}";
           };
 
           remote = {
-            inherit (cloud)
+            inherit (personalCloud)
               passwordCommand
               userName
               ;
 
             type = "carddav";
-            url = "https://${cloud.host}/remote.php/dav/addressbooks/users/${cloud.userName}/";
+            url = "https://${personalCloud.host}/remote.php/dav/addressbooks/users/${personalCloud.userName}/";
           };
 
           vdirsyncer = {
@@ -171,8 +177,8 @@ in
 
     email = {
       accounts = {
-        "${mail.userName}" = rec {
-          inherit (mail)
+        personal = rec {
+          inherit (personalEmail)
             passwordCommand
             userName
             ;
@@ -193,12 +199,16 @@ in
           };
 
           imap = {
-            host = mail.host;
+            host = personalEmail.host;
             port = 993;
 
             tls = {
               enable = true;
             };
+          };
+
+          maildir = {
+            path = userName;
           };
 
           msmtp = {
@@ -236,7 +246,78 @@ in
           };
 
           smtp = {
-            host = mail.host;
+            host = personalEmail.host;
+            port = 465;
+
+            tls = {
+              enable = true;
+            };
+          };
+        };
+
+        work = rec {
+          inherit (workEmail)
+            passwordCommand
+            userName
+            ;
+
+          address = userName;
+
+          gpg = {
+            key = "F178C7173550EA893D32DD07324AE98654C0D86C";
+            signByDefault = true;
+          };
+
+          imap = {
+            host = workEmail.host;
+            port = 993;
+
+            tls = {
+              enable = true;
+            };
+          };
+
+          maildir = {
+            path = userName;
+          };
+
+          msmtp = {
+            enable = true;
+          };
+
+          mu = {
+            enable = true;
+          };
+
+          offlineimap = {
+            enable = true;
+
+            extraConfig = {
+              account = {
+                autorefresh = 20;
+              };
+
+              local = {
+                sync_deletes = true;
+              };
+            };
+          };
+
+          primary = false;
+          realName = "Bingshan Chang";
+
+          signature = {
+            text = ''
+              ${realName}
+              Institute of Software, Chinese Academy of Sciences
+              Nanjing, China
+              Pronoun: He/Him/His
+              GPG: F178 C717 3550 EA89 3D32  DD07 324A E986 54C0 D86C
+            '';
+          };
+
+          smtp = {
+            host = workEmail.host;
             port = 465;
 
             tls = {
