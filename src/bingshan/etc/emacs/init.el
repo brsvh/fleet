@@ -1771,10 +1771,12 @@
 
 (use-package diff-hl
   :after (magit)
+  :commands (diff-hl-magit-post-refresh)
 
-  :hook
-  ;; Synchronize `diff-hl' with Magit refresh cycles.
-  (magit-post-refresh-hook . diff-hl-magit-post-refresh))
+  :config
+  ;; Synchronize `diff-hl' after Magit's own auto-revert pass, so file
+  ;; buffers observe the refreshed Git state.
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t))
 
 (use-package diff-hl-flydiff
   :hook
@@ -1841,6 +1843,13 @@
   ( :map ctl-c-v-map
     ;; Press \\`C-c v g' to display Magit.
     ("g" . magit)))
+
+(use-package magit-auto-revert
+  :hook
+  ;; Enable Magit's repository-aware auto-revert after startup, so Magit
+  ;; operations keep visited Git buffers in sync without adding startup
+  ;; work.
+  (bs-after-startup-late-hook . magit-auto-revert-mode))
 
 (use-package magit-status
   :after (magit)
