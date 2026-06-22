@@ -707,6 +707,27 @@
     ("$" . consult-jinx)))
 
 (use-package jinx
+  :config
+  ;; Treat CJK Unified Ideographs and their extension blocks as word
+  ;; constituents in Jinx's syntax table.  This prevents the spell
+  ;; checker from treating East Asian characters as word boundaries,
+  ;; avoiding false-positive spelling flags within mixed-language
+  ;; text.
+  (add-hook 'jinx-mode-hook
+            #'(lambda ()
+                (defvar jinx--syntax-table)
+                (let ((st jinx--syntax-table))
+                  (modify-syntax-entry '(#x4E00 . #x9FFF) "_" st)
+                  (modify-syntax-entry '(#x3400 . #x4DBF) "_" st)
+                  (modify-syntax-entry '(#x20000 . #x2A6DF) "_" st)
+                  (modify-syntax-entry '(#x2A700 . #x2B73F) "_" st)
+                  (modify-syntax-entry '(#x2B740 . #x2B81F) "_" st)
+                  (modify-syntax-entry '(#x2B820 . #x2CEAF) "_" st)
+                  (modify-syntax-entry '(#x2CEB0 . #x2EBEF) "_" st)
+                  (modify-syntax-entry '(#x30000 . #x3134F) "_" st)
+                  (modify-syntax-entry '(#x31350 . #x323AF) "_" st)
+                  (modify-syntax-entry '(#x2EBF0 . #x2EE5F) "_" st))))
+
   :hook
   ;; Establish global spell checking as part of the normal editing
   ;; environment, while deferring activation until after startup to
@@ -2439,7 +2460,9 @@
                          (cache-dir
                           (apply #'bs-path base-dir components)))
                     (make-directory cache-dir t)
-                    cache-dir)))
+                    cache-dir))
+
+              '((name . agent-shell--cache-dir-redirect)))
 
   :bind
   ( :map agent-shell-mode-map
@@ -2492,7 +2515,8 @@
                                     (window
                                      (get-buffer-window buffer)))
                           (when (null agent-shell-manager-side)
-                            (set-window-dedicated-p window nil))))))))
+                            (set-window-dedicated-p window nil)))))))
+              '((name . agent-shell-manager-buffer-normalize)))
 
   :bind
   ( :map ctl-c-x-map
