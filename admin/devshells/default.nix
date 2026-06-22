@@ -36,12 +36,12 @@ in
 {
   commands = with pkgs; [
     {
-      category = "deployment";
+      category = "[deployment]";
       name = "deploy";
       package = "deploy-rs";
     }
     {
-      category = "development";
+      category = "[development]";
       help = "Commit staged changes using Codex and the commit skill";
       name = "commit";
 
@@ -50,11 +50,11 @@ in
       '';
     }
     {
-      category = "tools";
+      category = "[tools]";
       package = git;
     }
     {
-      category = "tools";
+      category = "[tools]";
       package = treefmt;
     }
   ];
