@@ -211,7 +211,7 @@
         };
       };
 
-      url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.0.0";
+      url = "git+https://github.com/nix-community/lanzaboote.git?ref=master";
     };
 
     llm-agents = {

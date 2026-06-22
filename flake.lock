@@ -387,16 +387,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1765382359,
-        "narHash": "sha256-RJmgVDzjRI18BWVogG6wpsl1UCuV6ui8qr4DJ1LfWZ8=",
-        "ref": "refs/tags/v1.0.0",
-        "rev": "e8c096ade12ec9130ff931b0f0e25d2f1bc63607",
-        "revCount": 907,
+        "lastModified": 1781649287,
+        "narHash": "sha256-ycG9a7svaV/zF9G03waY7BqUcNQn2HODMN/lXy3C7Zc=",
+        "ref": "master",
+        "rev": "001e560fffc8f0235e9db20ebeb4ccde0ade1caf",
+        "revCount": 1049,
         "type": "git",
         "url": "https://github.com/nix-community/lanzaboote.git"
       },
       "original": {
-        "ref": "refs/tags/v1.0.0",
+        "ref": "master",
         "type": "git",
         "url": "https://github.com/nix-community/lanzaboote.git"
       }
