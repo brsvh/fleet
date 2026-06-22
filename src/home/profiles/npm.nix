@@ -7,36 +7,31 @@
 let
   inherit (lib)
     mkDefault
-    removePrefix
     ;
-
-  cacheHome = removePrefix config.home.homeDirectory config.xdg.cacheHome;
-  configHome = removePrefix config.home.homeDirectory config.xdg.configHome;
-  stateHome = removePrefix config.home.homeDirectory config.xdg.stateHome;
 
   cache =
     if config.home.preferXdgDirectories then
-      "$HOME/${cacheHome}/npm"
+      "${config.xdg.cacheHome}/npm"
     else
-      "$HOME/.npm";
+      "${config.home.homeDirectory}/.npm";
 
   init-module =
     if config.home.preferXdgDirectories then
-      "$HOME/${configHome}/npm/config/npm-init.js"
+      "${config.xdg.configHome}/npm/config/npm-init.js"
     else
-      "$HOME/.npm/config/npm-init.js";
+      "${config.home.homeDirectory}/.npm/config/npm-init.js";
 
   logs-dir =
     if config.home.preferXdgDirectories then
-      "$HOME/${stateHome}/npm"
+      "${config.xdg.stateHome}/npm"
     else
-      "$HOME/.npm";
+      "${config.home.homeDirectory}/.npm";
 
   prefix =
     if config.home.preferXdgDirectories then
-      "$HOME/${configHome}/npm"
+      "${config.xdg.configHome}/npm"
     else
-      "$HOME/.npm";
+      "${config.home.homeDirectory}/.npm";
 in
 {
   imports = [
