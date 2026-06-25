@@ -32,6 +32,8 @@
 
 - When writing, changing, generating, or restyling Nix code, use the
   `nix-coding` skill to refactor the code into the repository style.
+- When writing, changing, generating, or restyling Emacs Lisp code, use the
+  `emacs-lisp-coding` skill to follow the repository style.
 
 ## Activation and profile safety
 
