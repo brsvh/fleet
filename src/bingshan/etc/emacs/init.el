@@ -2564,6 +2564,25 @@
                  (slot . 0)
                  (window-width . 0.5))))
 
+(use-package codex-ide-session-mode
+  :bind
+  ( :map codex-ide-session-mode-map
+    ;; Submit Codex prompts with the same key used by shell-maker
+    ;; buffers.
+    ("C-c C-c" . codex-ide-submit)
+
+    ;; Leave \\`C-c RET' unbound so prompt submission has a single
+    ;; mnemonic binding in Codex sessions.
+    ("C-c RET" . nil)))
+
+(use-package corfu
+  :after (codex-ide-session-mode)
+
+  :hook
+  ;; Enable Corfu in Codex sessions so automatic slash command
+  ;; completion uses the popup frontend instead of `*Completions*'.
+  (codex-ide-session-mode-hook . corfu-mode))
+
 (use-package openspec
   :custom
   ;; Disable OpenSpec's default global binding; expose the status
