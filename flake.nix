@@ -2,25 +2,6 @@
   description = "A personal fleet of workstation and server configurations";
 
   inputs = {
-    agent-skills = {
-      inputs = {
-        home-manager = {
-          follows = "home-manager";
-        };
-
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/Kyure-A/agent-skills-nix.git?ref=master";
-    };
-
-    bingshan-skills = {
-      flake = false;
-      url = "git+https://codeberg.org/bingshan/skills.git?ref=main";
-    };
-
     blank = {
       url = "git+https://github.com/divnix/blank.git?ref=master";
     };
@@ -295,11 +276,6 @@
 
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
-    };
-
-    openai-skills = {
-      flake = false;
-      url = "git+https://github.com/openai/skills.git?ref=main";
     };
 
     pyproject = {
