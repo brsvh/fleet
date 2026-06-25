@@ -1,8 +1,5 @@
 # .gitignore --- Git untracked files -*- mode: gitignore; -*-
 
-# agents
-/.agents
-
 # codex
 /.codex
 

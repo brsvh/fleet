@@ -1,4 +1,4 @@
-# AGENTS.md
+# README for agents
 
 ## General response preferences
 
@@ -30,20 +30,8 @@
 
 ## Coding rules
 
-- When writing, changing, generating, or restyling Nix code, use
-  `$nix-code-refactor` to refactor the code into the repository style.
-
-## Development workflow
-
-- `steps` means `.agents/steps.md`.
-- `next-step` means `.agents/next-step.md`.
-- For multi-step work, keep `steps` as the compact project log and roadmap:
-  retain 10 completed steps, the current step, and 10 likely future steps.
-- Keep `next-step` focused on the current step's objective, scope, files,
-  acceptance criteria, and non-activating verification commands.
-- Treat each step as a small functional change suitable for one commit.
-- Update `steps` and `next-step` when a step is completed or the planned next
-  action changes materially.
+- When writing, changing, generating, or restyling Nix code, use the
+  `nix-coding` skill to refactor the code into the repository style.
 
 ## Activation and profile safety
 
@@ -61,7 +49,7 @@
 
 ## Commit message rules
 
-- Follow the shared `$nix-gnu-style-commit` workflow for commit message style.
+- Use the `commit` skill for commit message style.
 - Describe staged changes only.
 - Use only `scope: Verb summary` or `scope: subscope: Verb summary`.
 - Derive scope from staged paths and staged diff.

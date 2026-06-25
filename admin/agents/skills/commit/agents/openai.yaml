@@ -1,4 +1,0 @@
-interface:
-  display_name: "Commit"
-  short_description: "Commit staged changes"
-  default_prompt: "Use $commit to commit the staged changes."
