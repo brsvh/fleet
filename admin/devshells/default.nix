@@ -6,11 +6,6 @@
   ...
 }:
 let
-  inherit (inputs)
-    bingshan-skills
-    openai-skills
-    ;
-
   inherit (lib)
     baseNameOf
     concatStringsSep
@@ -39,15 +34,6 @@ in
       category = "[deployment]";
       name = "deploy";
       package = "deploy-rs";
-    }
-    {
-      category = "[development]";
-      help = "Commit staged changes using Codex and the commit skill";
-      name = "commit";
-
-      package = writeShellScriptBin "commit" ''
-        exec ${getExe codex} exec "$@" '$commit'
-      '';
     }
     {
       category = "[tools]";
@@ -379,63 +365,6 @@ in
         ];
 
       path = "treefmt.toml";
-    };
-  };
-
-  skills = {
-    skills = {
-      cli-creator = {
-        from = "openai";
-        path = "cli-creator";
-      };
-
-      fleet-commit = {
-        from = "fleet";
-        path = "commit";
-      };
-
-      nix-gnu-style-commit = {
-        from = "bingshan";
-        path = "nix-gnu-style-commit";
-      };
-
-      nix-code-refactor = {
-        from = "bingshan";
-
-        packages = with pkgs; [
-          nixfmt
-        ];
-
-        path = "nix-code-refactor";
-      };
-    };
-
-    sources = {
-      bingshan = {
-        idPrefix = "bingshan";
-        path = "${bingshan-skills}";
-        subdir = "skills";
-      };
-
-      fleet = {
-        idPrefix = "fleet";
-        path = "${self}";
-        subdir = "admin/agents/skills";
-      };
-
-      openai = {
-        idPrefix = "openai";
-        path = "${openai-skills}";
-        subdir = "skills/.curated";
-      };
-    };
-
-    targets = {
-      codex = {
-        dest = ".codex/skills";
-        structure = "symlink-tree";
-        enable = true;
-      };
     };
   };
 }
