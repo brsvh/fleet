@@ -280,6 +280,7 @@ in
           citar-denote
           citar-embark
           citre
+          codex-ide
           consult
           consult-codesearch
           consult-contacts
@@ -324,6 +325,7 @@ in
           hl-todo
           htmlize
           ibuffer-project
+          jieba-rs
           jinx
           macrostep-geiser
           magit

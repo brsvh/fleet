@@ -1240,6 +1240,12 @@
   ;; code, not as legacy control characters to be ignored.
   (after-change-major-mode-hook . form-feed-mode))
 
+(use-package jieba-rs
+  :hook
+  ;; Enable Jieba-backed word segmentation in text buffers so CJK
+  ;; editing commands can move across natural word boundaries.
+  (text-mode-hook . jieba-rs-mode))
+
 (use-package paragraphs
   :demand t
   :no-require t
@@ -2417,7 +2423,7 @@
 
 
 ;;
-;; Agent
+;; Agents
 ;;
 
 (use-package agent-recall
@@ -2544,6 +2550,19 @@
   ;; Enable TRAMP integration so agent shells can operate on remote
   ;; buffers and paths.
   (agent-shell-tramp-mode +1))
+
+(use-package codex-ide
+  :config
+  ;; Display Codex session buffers in a persistent right side window,
+  ;; keeping conversations visible without replacing the current
+  ;; editing window.
+  (add-to-list 'display-buffer-alist
+               '((derived-mode . codex-ide-session-mode)
+                 (display-buffer-in-side-window)
+                 (preserve-size . (nil . t))
+                 (side . right)
+                 (slot . 0)
+                 (window-width . 0.5))))
 
 (use-package openspec
   :custom
