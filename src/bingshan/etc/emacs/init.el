@@ -2562,7 +2562,15 @@
                  (preserve-size . (nil . t))
                  (side . right)
                  (slot . 0)
-                 (window-width . 0.5))))
+                 (window-width . 0.5)))
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Start Codex IDE from the custom agent prefix map.
+    ("c" . codex-ide)
+
+    ;; Open the Codex IDE menu from the custom agent prefix map.
+    ("C-c" . codex-ide-menu)))
 
 (use-package codex-ide-session-mode
   :bind
