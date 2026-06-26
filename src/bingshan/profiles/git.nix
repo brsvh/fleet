@@ -85,11 +85,6 @@ in
           password_store_dir = ${passdir}
           username_extractor = static
           username = brsvh
-
-          [*]
-          target = ''${host}/''${username}
-          password_store_dir = ${passdir}
-          username_extractor = entry_name
         '';
       };
     };
