@@ -2558,10 +2558,13 @@
   ;; editing window.
   (add-to-list 'display-buffer-alist
                '((derived-mode . codex-ide-session-mode)
-                 (display-buffer-in-side-window)
-                 (preserve-size . (nil . t))
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (dedicated . t)
+                 (preserve-size . (t . nil))
                  (side . right)
                  (slot . 0)
+                 (window-parameters . ((no-delete-other-windows . t)))
                  (window-width . 0.5)))
 
   :bind
