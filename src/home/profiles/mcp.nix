@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   ...
 }:
 let
@@ -8,6 +9,12 @@ let
     ;
 in
 {
+  home = {
+    packages = with pkgs; [
+      socat
+    ];
+  };
+
   programs = {
     mcp = {
       enable = mkDefault true;
