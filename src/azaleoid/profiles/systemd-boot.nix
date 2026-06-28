@@ -21,8 +21,39 @@ in
   ];
 
   boot = {
+    initrd = {
+      systemd = {
+        enable = true;
+      };
+    };
+
     lanzaboote = {
+      allowUnsigned = false;
+
+      autoEnrollKeys = {
+        allowBrickingMyMachine = true;
+        autoReboot = false;
+        enable = true;
+        includeChecksumsFromTPM = false;
+        includeMicrosoftKeys = false;
+      };
+
+      autoGenerateKeys = {
+        enable = true;
+      };
+
+      configurationLimit = 8;
       enable = true;
+
+      measuredBoot = {
+        enable = true;
+        pcrs = [
+          0
+          4
+          7
+        ];
+      };
+
       pkiBundle = "/var/lib/sbctl";
     };
 
