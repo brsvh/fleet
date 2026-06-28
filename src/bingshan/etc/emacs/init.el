@@ -2594,6 +2594,18 @@
   ;; completion uses the popup frontend instead of `*Completions*'.
   (codex-ide-session-mode-hook . corfu-mode))
 
+(use-package mcp-server
+  :custom
+  ;; Keep MCP server sockets under the Emacs state directory so
+  ;; runtime files do not live in the source tree.
+  (mcp-server-socket-directory (bs-path bs-state-directory "mcp/"))
+
+  :hook
+  ;; Start the Unix socket MCP server after late startup, making the
+  ;; running Emacs session available to agent clients without adding
+  ;; work to the initial startup path.
+  (bs-after-startup-late-hook . mcp-server-start-unix))
+
 (use-package openspec
   :custom
   ;; Disable OpenSpec's default global binding; expose the status

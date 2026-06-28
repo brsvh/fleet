@@ -331,6 +331,7 @@ in
           magit
           magit-section
           marginalia
+          mcp-server
           modus-themes
           mu4e
           mu4e-alert
