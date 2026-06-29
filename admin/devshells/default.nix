@@ -282,6 +282,8 @@ in
 
             options = [
               "--extensions=frontmatter"
+              "--extensions=gfm"
+              "--number"
               "--wrap=80"
             ];
           };
@@ -308,6 +310,7 @@ in
           mdformatWithPlugins = mdformat.withPlugins (
             ps: with ps; [
               mdformat-frontmatter
+              mdformat-gfm
             ]
           );
         in
