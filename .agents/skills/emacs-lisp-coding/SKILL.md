@@ -17,12 +17,12 @@ byte-compilation and natural for Emacs users to customize.
 
 1. Identify the code's role first: personal configuration, reusable library,
    package, major mode, minor mode, macro helper, test, or one-off migration.
-1. Inspect neighboring `.el` files for the package prefix, minimum Emacs
+2. Inspect neighboring `.el` files for the package prefix, minimum Emacs
    version, dependency style, test framework, and local conventions.
-1. Keep changes scoped. Preserve existing public APIs, customization names,
+3. Keep changes scoped. Preserve existing public APIs, customization names,
    autoloads, keymaps, hooks, and feature names unless the user asks for a
    breaking change.
-1. Load only the relevant bundled resource:
+4. Load only the relevant bundled resource:
    - `references/emacs-lisp-quick-reference.md`: quick lookup for syntax,
      naming, interactive specs, hooks, keybindings, modes, macros, and common
      idioms.
@@ -33,10 +33,10 @@ byte-compilation and natural for Emacs users to customize.
      indentation, imenu, eldoc, and mode registration.
    - `references/minor-mode.el`: buffer-local minor modes, globalized minor
      modes, overlays, hooks, timers, and mode maps.
-1. Adapt examples by renaming every placeholder symbol, feature, group, face,
+5. Adapt examples by renaming every placeholder symbol, feature, group, face,
    URL, package header, and footer. Do not paste examples verbatim into a real
    package.
-1. Validate with the narrowest useful command before finishing. Prefer existing
+6. Validate with the narrowest useful command before finishing. Prefer existing
    project test commands when present; otherwise byte-compile changed files.
 
 ## Core Rules

@@ -15,20 +15,20 @@ behavior.
 
 1. Identify the target `.nix` files from the user request, staged diff, or local
    repository context.
-1. Read `references/nix-coding-style.md`, relative to this skill directory.
-1. Inspect nearby Nix code before editing so local conventions can override
+2. Read `references/nix-coding-style.md`, relative to this skill directory.
+3. Inspect nearby Nix code before editing so local conventions can override
    generic guidance where the style reference allows it.
-1. Rewrite only the requested or clearly relevant Nix code. Preserve behavior,
+4. Rewrite only the requested or clearly relevant Nix code. Preserve behavior,
    public interfaces, option names, package choices, and module wiring unless
    the user explicitly asks for semantic changes.
-1. Prefer structured Nix edits over text-only reshuffling. Keep generated,
+5. Prefer structured Nix edits over text-only reshuffling. Keep generated,
    vendored, lock, or machine-produced files unchanged unless the user names
    them.
-1. Format changed `.nix` files with the repository formatter. If the repository
+6. Format changed `.nix` files with the repository formatter. If the repository
    has no formatter command, use `nixfmt --width 50` when available.
-1. Run the narrowest practical validation for the touched code, such as
+7. Run the narrowest practical validation for the touched code, such as
    formatter checks, Nix evaluation, or existing repository checks.
-1. Report the changed files, validations run, and any validation that could not
+8. Report the changed files, validations run, and any validation that could not
    be run.
 
 ## Refactor priorities

@@ -126,9 +126,9 @@ modules, keep it small:
 Use this top-level order inside modules:
 
 1. `imports`, when present.
-1. `options`, for modules that define options.
-1. `config`, when the module has explicit `options` and generated config.
-1. Normal option trees such as `boot`, `environment`, `home`, `programs`,
+2. `options`, for modules that define options.
+3. `config`, when the module has explicit `options` and generated config.
+4. Normal option trees such as `boot`, `environment`, `home`, `programs`,
    `services`, `systemd`, `users`, and `xdg`.
 
 For modules that declare options, put `options` before `config`:

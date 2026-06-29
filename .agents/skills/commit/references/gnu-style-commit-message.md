@@ -8,11 +8,11 @@ A commit message consists of:
 
 1. a scoped subject line;
 
-1. a blank separator line;
+2. a blank separator line;
 
-1. a required GNU-style file bullet list body;
+3. a required GNU-style file bullet list body;
 
-1. optional trailers only when the user or target repository requires them.
+4. optional trailers only when the user or target repository requires them.
 
 The message must describe all staged changes as one commit.
 
@@ -48,23 +48,23 @@ Rules:
 
 1. Scope and subscope tokens must be lowercase.
 
-1. Prefer scope tokens already established by the target repository.
+2. Prefer scope tokens already established by the target repository.
 
-1. The verb must be imperative and capitalized.
+3. The verb must be imperative and capitalized.
 
-1. The subject must not end with a period.
+4. The subject must not end with a period.
 
-1. Prefer subjects within `60` characters.
+5. Prefer subjects within `60` characters.
 
-1. The subject must remain concise even when approaching the limit.
+6. The subject must remain concise even when approaching the limit.
 
-1. Use the narrowest truthful scope supported by the staged paths and staged
+7. Use the narrowest truthful scope supported by the staged paths and staged
    diff.
 
-1. Use the two-level form when one concrete component clearly dominates the
+8. Use the two-level form when one concrete component clearly dominates the
    change.
 
-1. Use the one-level form when the change is area-wide, cross-cutting within one
+9. Use the one-level form when the change is area-wide, cross-cutting within one
    area, or no honest single subscope exists.
 
 ## Deriving `scope`
@@ -76,50 +76,50 @@ Apply these rules in order:
 
 1. If the target repository documents compatible scope rules, follow them.
 
-1. If recent commit subjects consistently use a scope token for the staged area,
+2. If recent commit subjects consistently use a scope token for the staged area,
    prefer that established token.
 
-1. If all staged changes are documentation-only, use the repository's
+3. If all staged changes are documentation-only, use the repository's
    documentation scope if one exists; otherwise use `doc`.
 
-1. If the staged changes clearly belong to one source package, module, service,
+4. If the staged changes clearly belong to one source package, module, service,
    command, library, plugin, skill, or profile, use that stable component name.
 
-1. If all staged paths share a meaningful top-level directory, use that
+5. If all staged paths share a meaningful top-level directory, use that
    directory name after normalizing it to a lowercase scope token.
 
-1. For repository-wide changes, top-level metadata, package manifests, or shared
+6. For repository-wide changes, top-level metadata, package manifests, or shared
    wiring, use the project-name scope.
 
-1. If no narrow truthful scope exists, use the project-name scope.
+7. If no narrow truthful scope exists, use the project-name scope.
 
 Project-name scope:
 
 1. Look for a project name in repository-root files in this order: `README`,
    `README.md`, then `README.org`.
 
-1. Prefer the first meaningful document title, such as the first Markdown H1,
+2. Prefer the first meaningful document title, such as the first Markdown H1,
    setext heading, Org title/level-one heading, or plain README title line.
 
-1. If no project name is found in those files, use the target repository root
+3. If no project name is found in those files, use the target repository root
    directory name.
 
-1. Normalize the selected project name using the scope normalization rules
+4. Normalize the selected project name using the scope normalization rules
    below.
 
 Normalization rules:
 
 1. Keep established repository spelling when it is already lowercase.
 
-1. Lowercase any uppercase letters in derived names.
+2. Lowercase any uppercase letters in derived names.
 
-1. Convert spaces and underscores to hyphens.
+3. Convert spaces and underscores to hyphens.
 
-1. Drop file extensions from file-derived scopes.
+4. Drop file extensions from file-derived scopes.
 
-1. Avoid punctuation other than hyphens.
+5. Avoid punctuation other than hyphens.
 
-1. Do not use placeholder or example scopes unless they match the target
+6. Do not use placeholder or example scopes unless they match the target
    repository.
 
 Common portable scopes include:
@@ -145,16 +145,16 @@ Rules:
 1. Use a subscope only when one stable component under the chosen top-level
    scope clearly dominates the staged changes.
 
-1. Prefer established module, package, command, feature, profile, plugin, skill,
+2. Prefer established module, package, command, feature, profile, plugin, skill,
    or service names already used in the repository.
 
-1. For changes under a repeated collection such as `plugins/<name>/`,
+3. For changes under a repeated collection such as `plugins/<name>/`,
    `skills/<name>/`, `packages/<name>/`, or `services/<name>/`, use `<name>` as
    the subscope when all staged changes belong to the same item.
 
-1. Do not invent a subscope that is not supported by the staged diff.
+4. Do not invent a subscope that is not supported by the staged diff.
 
-1. If the change crosses multiple components under one top-level scope, omit the
+5. If the change crosses multiple components under one top-level scope, omit the
    subscope.
 
 ## Preferred verbs
@@ -189,10 +189,10 @@ Rules:
 
 1. Always insert exactly one blank line after the subject.
 
-1. Always include a file bullet list body, even for a single-file or trivial
+2. Always include a file bullet list body, even for a single-file or trivial
    change.
 
-1. The body must cover the staged files and must not describe unstaged changes.
+3. The body must cover the staged files and must not describe unstaged changes.
 
 ## Body format
 
@@ -207,14 +207,14 @@ Each bullet must use this form:
 Rules:
 
 1. Use one bullet per changed file whenever practical.
-1. Sort bullets by `<path>` in ascending lexicographic order.
-1. Start each bullet description with an uppercase letter.
-1. End each bullet description with a period.
-1. Keep each bullet concise and file-oriented.
-1. State what the file change does.
-1. Include why only when needed.
-1. Do not replace the bullet list with free-form prose.
-1. Do not write `This commit ...`.
+2. Sort bullets by `<path>` in ascending lexicographic order.
+3. Start each bullet description with an uppercase letter.
+4. End each bullet description with a period.
+5. Keep each bullet concise and file-oriented.
+6. State what the file change does.
+7. Include why only when needed.
+8. Do not replace the bullet list with free-form prose.
+9. Do not write `This commit ...`.
 
 ## Wrapping rules
 
@@ -223,10 +223,10 @@ Wrap body lines for readability in GNU style.
 Rules:
 
 1. Keep body lines within `70` characters.
-1. Do not indent continuation lines.
-1. Do not leave trailing spaces before a newline.
-1. If a bullet wraps, continue on the next line at column `0`.
-1. Do not repeat `* <path>:` on continuation lines.
+2. Do not indent continuation lines.
+3. Do not leave trailing spaces before a newline.
+4. If a bullet wraps, continue on the next line at column `0`.
+5. Do not repeat `* <path>:` on continuation lines.
 
 Example:
 
@@ -266,32 +266,32 @@ If scope selection is ambiguous, apply this fallback order:
 
 1. Use the two-level form when one component clearly dominates.
 
-1. Otherwise use the one-level form.
+2. Otherwise use the one-level form.
 
-1. Use a documented or recently used scope from the target repository when it
+3. Use a documented or recently used scope from the target repository when it
    truthfully describes the staged changes.
 
-1. Use the project-name scope for repository-wide changes.
+4. Use the project-name scope for repository-wide changes.
 
-1. Use the project-name scope when no narrower truthful scope exists.
+5. Use the project-name scope when no narrower truthful scope exists.
 
 ## Content rules
 
 1. Describe all staged changes in one commit message.
 
-1. Keep the subject concise and specific.
+2. Keep the subject concise and specific.
 
-1. Keep bullet descriptions concrete and file-oriented.
+3. Keep bullet descriptions concrete and file-oriented.
 
-1. Avoid fluff.
+4. Avoid fluff.
 
-1. Do not use emojis.
+5. Do not use emojis.
 
-1. Do not use decorative Unicode.
+6. Do not use decorative Unicode.
 
-1. Do not include URLs or links.
+7. Do not include URLs or links.
 
-1. Do not use Conventional Commit prefixes unless explicitly requested.
+8. Do not use Conventional Commit prefixes unless explicitly requested.
 
 ## Recommended examples
 

@@ -16,22 +16,22 @@ message.
 Run these commands in order from the target repository root:
 
 1. `git status --short`
-1. `git diff --cached --stat`
-1. `git diff --cached`
+2. `git diff --cached --stat`
+3. `git diff --cached`
 
 Do not skip these checks.
 
 If nothing is staged, say so clearly and stop.
 
 1. Complete the required workflow above.
-1. Read the style reference at `references/gnu-style-commit-message.md`,
+2. Read the style reference at `references/gnu-style-commit-message.md`,
    relative to this skill directory.
-1. Draft the final commit message using that reference and any compatible local
+3. Draft the final commit message using that reference and any compatible local
    commit conventions in the target repository.
-1. Check the final message text using the checklist below.
-1. Write the message to a temporary file and run
+4. Check the final message text using the checklist below.
+5. Write the message to a temporary file and run
    `git commit -F <temporary-file>`.
-1. Report the commit result, including the new commit hash when available.
+6. Report the commit result, including the new commit hash when available.
 
 Do not pause after the user's explicit commit request. Treat that request as
 authorization to create the commit. If the environment blocks access to `.git`,
