@@ -1568,13 +1568,7 @@
 ;; C/C++ Programs
 
 (use-package c-ts-mode
-  :commands (c-ts-mode c++-ts-mode)
-
-  :config
-  ;; Replace C Modes with Tree-Sitter based C Modes When a buffer
-  ;; would normally activate them.
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode) t)
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode) t))
+  :commands (c-ts-mode c++-ts-mode))
 
 (use-package eglot
   :after (cc-mode)
@@ -1595,6 +1589,13 @@
   ((c-ts-mode-hook c++-ts-mode-hook)
    .
    eglot-ensure))
+
+(use-package files
+  :config
+  ;; Replace C Modes with Tree-Sitter based C Modes When a buffer
+  ;; would normally activate them.
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode) t)
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode) t))
 
 ;; Common Lisp programs
 
@@ -1663,19 +1664,70 @@
     ;; Press \\`C-x M-e' to expand macro-expression.
     ("M-e" . pp-macroexpand-last-sexp)))
 
+;; Haskell programs
+
+(use-package eglot
+  :after (haskell-mode)
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for Haskell
+  ;; buffers.
+  (haskell-mode-hook . eglot-ensure))
+
+(use-package eglot
+  :after (haskell-ts-mode)
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for Tree-sitter
+  ;; Haskell buffers.
+  (haskell-ts-mode-hook . eglot-ensure))
+
+(use-package files
+  :config
+  ;; Replace `haskell-mode' with `haskell-ts-mode' When a buffer would
+  ;; normally activate `haskell-mode'.
+  (add-to-list 'major-mode-remap-alist
+               '(haskell-mode . haskell-ts-mode)
+               t))
+
+(use-package haskell-mode
+  :mode
+  ;; Associate haskell files with `haskell-mode'.
+  ("\\.l?hs\\'" . haskell-mode))
+
+(use-package haskell-ts-mode
+  :commands (haskell-ts-mode))
+
 ;; Nix programs
 
-(use-package nix-mode
-  ;; Associate nix files with `nix-mode'.
-  :mode "\\.nix\\'")
+(use-package eglot
+  :after (nix-mode)
 
-(use-package nix-ts-mode
-  :commands (nix-ts-mode)
+  :hook
+  ;; Automatically start or reuse an Eglot session for Nix buffers.
+  (nix-mode-hook . eglot-ensure))
 
+(use-package eglot
+  :after (nix-ts-mode)
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for Tree-sitter Nix
+  ;; buffers.
+  (nix-ts-mode-hook . eglot-ensure))
+
+(use-package files
   :config
   ;; Replace `nix-mode' with `nix-ts-mode' When a buffer would
   ;; normally activate `nix-mode'.
   (add-to-list 'major-mode-remap-alist '(nix-mode . nix-ts-mode) t))
+
+(use-package nix-mode
+  ;; Associate nix files with `nix-mode'.
+  :mode
+  ("\\.nix\\'" . nix-mode))
+
+(use-package nix-ts-mode
+  :commands (nix-ts-mode))
 
 ;; Python programs
 
@@ -1687,21 +1739,22 @@
   (python-mode-hook . eglot-ensure)
   (python-ts-mode-hook . eglot-ensure))
 
-(use-package python
-  :commands (python-ts-mode)
-
+(use-package files
   :config
   ;; Replace `python-mode' with `python-ts-mode' When a buffer would
   ;; normally activate `python-mode'.
   (add-to-list 'major-mode-remap-alist
                '(python-mode . python-ts-mode)
-               t)
+               t))
+
+(use-package python
+  :commands (python-ts-mode)
 
   :mode
   ;; Associate Python source files (including .pyi and .pyw) with
   ;; `python-ts-mode', ensuring Tree-sitter support for all matching
   ;; files.
-  ("\\.py[iw]?\\'" . python-ts-mode))
+  ("\\.py[iw]?\\'" . python-mode))
 
 ;; Scheme programs
 

@@ -112,6 +112,7 @@ in
       codex-acp
       curl
       emacs-lsp-booster
+      haskell-language-server
       hunspell
       hunspellDicts.en_US-large
       nerd-fonts.symbols-only
