@@ -1699,6 +1699,43 @@
 (use-package haskell-ts-mode
   :commands (haskell-ts-mode))
 
+;; JSON
+
+(use-package eglot
+  :after (js-mode)
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for JSON buffers.
+  (js-json-mode-hook . eglot-ensure))
+
+(use-package eglot
+  :after (json-ts-mode)
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for Tree-sitter JSON
+  ;; buffers.
+  (json-ts-mode-hook . eglot-ensure))
+
+(use-package files
+  :config
+  ;; Replace `js-json-mode' with `json-ts-mode' when a buffer would
+  ;; normally activate `js-json-mode'.
+  (add-to-list 'major-mode-remap-alist
+               '(js-json-mode . json-ts-mode)
+               t))
+
+(use-package js
+  :mode
+  ;; Associate JSON-family files with `js-json-mode'.
+  ("\\.json\\(?:ld\\)?\\'" . js-json-mode)
+  ("\\.\\(?:geo\\|topo\\)json\\'" . js-json-mode)
+  ("\\.\\(?:avsc\\|har\\|ipynb\\|sarif\\|webmanifest\\)\\'"
+   .
+   js-json-mode))
+
+(use-package json-ts-mode
+  :commands (json-ts-mode))
+
 ;; Nix programs
 
 (use-package eglot

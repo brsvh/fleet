@@ -122,6 +122,7 @@ in
       pyright
       ripgrep
       spec-kit
+      vscode-json-languageserver
       wl-clipboard
       xclip
     ];
