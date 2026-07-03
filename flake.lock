@@ -56,11 +56,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778446047,
-        "narHash": "sha256-oQvcadh2BCkrog+SGrG6YffKJrveYpjj3TdQJWaKhaM=",
+        "lastModified": 1782772816,
+        "narHash": "sha256-s9BuFv0mRuZx9C1MF8qPHRdcAK14ONi0A5m6E2wqOoM=",
         "ref": "master",
-        "rev": "f2bc12af1a6369648aac41041ceeaa0b866599c6",
-        "revCount": 503,
+        "rev": "5a39d717029e94163ac223aee8d5c9946cafed1c",
+        "revCount": 510,
         "type": "git",
         "url": "https://github.com/nix-community/bun2nix.git"
       },
@@ -68,6 +68,27 @@
         "ref": "master",
         "type": "git",
         "url": "https://github.com/nix-community/bun2nix.git"
+      }
+    },
+    "chinese-fonts-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782963405,
+        "narHash": "sha256-S1kvznFjiiKUhulXgTzAjFF5vp2Wqnr1fr30oavHUEQ=",
+        "ref": "main",
+        "rev": "40b5e8c8f881194b5428c38dacba0c32990d3e68",
+        "revCount": 91,
+        "type": "git",
+        "url": "https://github.com/brsvh/chinese-fonts-overlay.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/chinese-fonts-overlay.git"
       }
     },
     "crane": {
@@ -165,11 +186,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782666553,
-        "narHash": "sha256-/4hp6M8rV0EjGn85C5jByTwgJnpsu69V5LZDSxfKhEg=",
+        "lastModified": 1783017315,
+        "narHash": "sha256-Hd8OsY+xAu9AN8L4C2BfjC0K8zfwR+QL9pLhJ5TYCxY=",
         "ref": "master",
-        "rev": "1415cbf05d3986a6c8c68817fb17dd89843a287b",
-        "revCount": 19219,
+        "rev": "89295cc78aff3450ec13903cc47ffde2945383b9",
+        "revCount": 19254,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -203,11 +224,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778716662,
-        "narHash": "sha256-m1Yf0wZ8j1OHjTc2UwHwyQRSnNeSgLJOd7q5Y45hzi4=",
+        "lastModified": 1782949081,
+        "narHash": "sha256-vp6Y/Grm98ESt6ceOkWiHWyZRDV3J1RID4w+6NWK9yA=",
         "ref": "main",
-        "rev": "f7c1a2d347e4c52d5fb8d10cb4d94b5884e546fb",
-        "revCount": 475,
+        "rev": "17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e",
+        "revCount": 480,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -279,11 +300,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782657028,
-        "narHash": "sha256-PHTCpYZCMzJYS3phhywqRAZphKVr2zjvlGYa+H20ZZ4=",
+        "lastModified": 1783024095,
+        "narHash": "sha256-oE+TNK98Pl7nHW4VU1oBvUKD5JR45U+py/NJmLoTNHI=",
         "ref": "master",
-        "rev": "4ad9aaae70c9aaab504127f926c0fa9cfbc2b365",
-        "revCount": 6995,
+        "rev": "a4d410db95a6416d1008049330bd86b85b5db45a",
+        "revCount": 7020,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -316,11 +337,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782677738,
-        "narHash": "sha256-aTFQt7ywkf6o/46hNvZ3nzp+IHw4Ga3XKcp+tS7gG9s=",
+        "lastModified": 1782697947,
+        "narHash": "sha256-LFPL7o3OJHAAoBssC3wb4JHUIYuMNYrt7Qo+3yi/jFc=",
         "ref": "main",
-        "rev": "9ef9c6eec8864a5e6deccb45a4078559c7766c66",
-        "revCount": 128,
+        "rev": "c7c44f794d685ef9da2db7624f594f54261946c4",
+        "revCount": 130,
         "type": "git",
         "url": "https://codeberg.org/bingshan/infix.git"
       },
@@ -382,11 +403,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782658033,
-        "narHash": "sha256-L6ykftPGNrR5awqcZmAR0h+FheyAoxR8Bv+pHxVi27Q=",
+        "lastModified": 1783031507,
+        "narHash": "sha256-GpKuB8U8j0ca6q51i/enmSzKcjmn3cnrOJjPdU5+kqQ=",
         "ref": "main",
-        "rev": "da71d95da5b1692bb86e7a08aaf56b07ddc47134",
-        "revCount": 11855,
+        "rev": "60b0143d99e01857309b938e6e9b119d67174451",
+        "revCount": 12191,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -472,11 +493,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1782467914,
-        "narHash": "sha256-pGvFkM8N0xEkIIXDe5YYfbEAvHrk4IxBrjB/x8OomhE=",
+        "lastModified": 1782723713,
+        "narHash": "sha256-oPXCU/SSUokcGaJREHibG1CBX3+s/W7orDWQOZDsEeQ=",
         "ref": "nixos-unstable",
-        "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
-        "revCount": 1022855,
+        "rev": "b5aa0fbd538984f6e3d201be0005b4463d8b09f8",
+        "revCount": 1024265,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -514,11 +535,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782089418,
-        "narHash": "sha256-LRD1SuQWr49fGq3A+8GLXfsLE2xqIpQA440YDZwms3M=",
+        "lastModified": 1782905613,
+        "narHash": "sha256-SvXJcAemihifkTn4BGvyE5K1FJX9bl4U8DQ5pqKvD0s=",
         "ref": "master",
-        "rev": "43f0b40edd0a74c63f66b7b48d969ae6b740d611",
-        "revCount": 555,
+        "rev": "7af23cfe91064865ecf2e835da28b45b3c6f49fd",
+        "revCount": 557,
         "type": "git",
         "url": "https://github.com/pyproject-nix/pyproject.nix.git"
       },
@@ -560,6 +581,7 @@
         "blank": "blank",
         "blueprint": "blueprint",
         "bun": "bun",
+        "chinese-fonts-overlay": "chinese-fonts-overlay",
         "crane": "crane",
         "deploy": "deploy",
         "devshell": "devshell",
@@ -596,11 +618,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782616745,
-        "narHash": "sha256-NN5B1cKBXF6h1Ec681gMGZ2o/99d7vKXAAfFNEvyOKA=",
+        "lastModified": 1782962170,
+        "narHash": "sha256-HsaK9yDDypMB2TPxAYz0mPKtmYhgNwFQa72b3Ko6kRE=",
         "ref": "master",
-        "rev": "b916d014dc57eb555f84e51172a82f7f6fb560d7",
-        "revCount": 2221,
+        "rev": "e3fa5cf86b93914b8f312b2a1ca14fbb139c655c",
+        "revCount": 2225,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -657,11 +679,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782100052,
-        "narHash": "sha256-UfyLY3Hfwb3JqxCcj0953GxTFI5dEL85EKEe6DAFiVs=",
+        "lastModified": 1782810559,
+        "narHash": "sha256-loy132LKn8QfiPbFJhdTjm+yZG3zklyOQhVabLyx2l4=",
         "ref": "master",
-        "rev": "920fc6dfaf9f10ec56de93b184055e1a9f380d5e",
-        "revCount": 478,
+        "rev": "2f698e4b5a3c6004edaf051543542f18a36afe77",
+        "revCount": 481,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },

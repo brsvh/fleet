@@ -42,6 +42,16 @@
       url = "git+https://github.com/nix-community/bun2nix.git?ref=master";
     };
 
+    chinese-fonts-overlay = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/chinese-fonts-overlay.git?ref=main";
+    };
+
     crane = {
       url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.4";
     };
