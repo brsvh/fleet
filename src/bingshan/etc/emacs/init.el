@@ -765,10 +765,11 @@
   :after (bs-hooks)
 
   :hook
-  ;; Enable `editorconfig-mode' when the first file is visited, it
-  ;; supports applying coding style settings (such as indentation,
-  ;; charset, and end-of-line rules) based on .editorconfig files.
-  (bs-first-file-hook . editorconfig-mode))
+  ;; Enable `editorconfig-mode' after early startup work completes so
+  ;; files opened during normal editing apply project coding style
+  ;; settings (such as indentation, charset, and end-of-line rules)
+  ;; from `.editorconfig' files.
+  (bs-after-startup-early-hook . editorconfig-mode))
 
 (use-package files
   :after (bs-lib)
