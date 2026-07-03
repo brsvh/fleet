@@ -17,12 +17,4 @@
       "rd.udev.log_level=3"
     ];
   };
-
-  system = {
-    boot = {
-      loader = {
-        kernelFile = "vmlinuz";
-      };
-    };
-  };
 }
