@@ -11,6 +11,7 @@ let
     concatMap
     filterAttrs
     getName
+    isDerivation
     mkDefault
     optional
     pipe
@@ -32,9 +33,7 @@ let
   treeSitterGrammars =
     pipe pkgs.tree-sitter-grammars
       [
-        (filterAttrs (
-          name: _: name != "recurseForDerivations"
-        ))
+        (filterAttrs (_: isDerivation))
         attrValues
       ];
 

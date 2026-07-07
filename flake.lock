@@ -77,11 +77,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782963405,
-        "narHash": "sha256-S1kvznFjiiKUhulXgTzAjFF5vp2Wqnr1fr30oavHUEQ=",
+        "lastModified": 1783394282,
+        "narHash": "sha256-aHKHSvTLProiVzyMKOo+nbRff9Ts3dTX9PpxlYcc084=",
         "ref": "main",
-        "rev": "40b5e8c8f881194b5428c38dacba0c32990d3e68",
-        "revCount": 91,
+        "rev": "da90d47fa1a6f8fbfcc5795bc9351c98142f37ea",
+        "revCount": 149,
         "type": "git",
         "url": "https://github.com/brsvh/chinese-fonts-overlay.git"
       },
@@ -186,11 +186,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783049978,
-        "narHash": "sha256-1birKvKOf3ZThd8uO55iivGs9kqgsGYf8QQqF1wlAq4=",
+        "lastModified": 1783395319,
+        "narHash": "sha256-L9nucc6xpvFUZO0LI74Ru303ajfXW/KjfEF36w4WJ+U=",
         "ref": "master",
-        "rev": "2c3d2ecbd8c0c1f2abfe4faa69724e8cadd91195",
-        "revCount": 19257,
+        "rev": "c51e9cef5ddf3a439d0ac7f8b026cf3e5d3d26a7",
+        "revCount": 19292,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -300,11 +300,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783024095,
-        "narHash": "sha256-oE+TNK98Pl7nHW4VU1oBvUKD5JR45U+py/NJmLoTNHI=",
+        "lastModified": 1783388784,
+        "narHash": "sha256-w+YU5vatysjLZIg1wOKSzo/RL9Z66eBQuIjVnBM/1Zg=",
         "ref": "master",
-        "rev": "a4d410db95a6416d1008049330bd86b85b5db45a",
-        "revCount": 7020,
+        "rev": "63d02d1c19f1c2b47a5bc7e55c620b6af7b218a6",
+        "revCount": 7031,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -403,11 +403,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783064987,
-        "narHash": "sha256-uW5Yqg7ygU6NKD8uDuFaK2SdXVEN4bje3/DHFOxASVU=",
+        "lastModified": 1783395428,
+        "narHash": "sha256-x+xf38Bg14aL+kbcFJAqs1dvuxMifb79axmzl4kEF9g=",
         "ref": "main",
-        "rev": "a2430dc43803db87dd99ae8a71fc8df41c5ac03a",
-        "revCount": 12213,
+        "rev": "e93955c24dff143c67d3a2e771baac1a4118f5a5",
+        "revCount": 12373,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -433,11 +433,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781892035,
-        "narHash": "sha256-e46EhlHo0jupcYCLE4QJRitd3+y+RgIQYNcfcCdLbKg=",
+        "lastModified": 1783272034,
+        "narHash": "sha256-PFVI20RpmBCAjstjfzidH0UciHxZOWc1X6KW6NYAzwM=",
         "ref": "main",
-        "rev": "c37fd9c40877450716692b6478e6dda330dfc46a",
-        "revCount": 1051,
+        "rev": "c8babc10612312e344ddf16472a16a1906f0125c",
+        "revCount": 1053,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -493,11 +493,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1782723713,
-        "narHash": "sha256-oPXCU/SSUokcGaJREHibG1CBX3+s/W7orDWQOZDsEeQ=",
+        "lastModified": 1783224372,
+        "narHash": "sha256-8i/87eeoqiGE4yOTjwSA3Eh/ziJRQEmd/unYU+K27sk=",
         "ref": "nixos-unstable",
-        "rev": "b5aa0fbd538984f6e3d201be0005b4463d8b09f8",
-        "revCount": 1024265,
+        "rev": "d407951447dcd00442e97087bf374aad70c04cea",
+        "revCount": 1027867,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -618,11 +618,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783058364,
-        "narHash": "sha256-felUcVUtcdI15evRNkVfLq3opwceShhbrJt6hDlZvrk=",
+        "lastModified": 1783320166,
+        "narHash": "sha256-l7C/OsjcnWDOk2K3ssj+SBduwL67LashjBqis9+t468=",
         "ref": "master",
-        "rev": "e7a078c7feb51f37955a832b22a96de5fccb1f7a",
-        "revCount": 2226,
+        "rev": "20ee15370c9256669d66968b89ee20a4b0a4e673",
+        "revCount": 2229,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -639,11 +639,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782165805,
-        "narHash": "sha256-478kKQBvK6SYTOdN2h9jhKJv94nbXRbFMfuL1WshErg=",
+        "lastModified": 1783174389,
+        "narHash": "sha256-aCWC8ngycU7OdJrU2+Je3qf+1a2ykuBvpPhZT/9tXMc=",
         "ref": "master",
-        "rev": "56b24064fdcaedca53553b1a6d607fd23b613a24",
-        "revCount": 1221,
+        "rev": "f1406619a3884cd5c47992a70b8b35c9c0fcb4c9",
+        "revCount": 1226,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -679,11 +679,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782810559,
-        "narHash": "sha256-loy132LKn8QfiPbFJhdTjm+yZG3zklyOQhVabLyx2l4=",
+        "lastModified": 1783307743,
+        "narHash": "sha256-oseisp2tblvzYZdojkA5URLnMjrpPiemzr5T7BdUyuU=",
         "ref": "master",
-        "rev": "2f698e4b5a3c6004edaf051543542f18a36afe77",
-        "revCount": 481,
+        "rev": "288b0a580ede39d3d7f96e3d835f9df0a7080223",
+        "revCount": 482,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },
