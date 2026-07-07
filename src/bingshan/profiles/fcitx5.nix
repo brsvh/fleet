@@ -1,14 +1,9 @@
 {
   home,
-  lib,
   pkgs,
   ...
 }:
 let
-  inherit (lib)
-    mkDefault
-    ;
-
   toYAML =
     name: attrs:
     (pkgs.formats.yaml { }).generate name attrs;
