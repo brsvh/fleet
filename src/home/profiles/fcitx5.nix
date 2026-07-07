@@ -109,7 +109,7 @@ in
               "ActiveByDefault" = false;
               "resetStateWhenFocusIn" = "No";
               "ShareInputState" = "No";
-              "PreeditEnabledByDefault" = true;
+              "PreeditEnabledByDefault" = false;
               "ShowInputMethodInformation" = true;
               "showInputMethodInformationWhenFocusIn" = false;
               "CompactInputMethodInformation" = true;
