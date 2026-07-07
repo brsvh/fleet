@@ -9,7 +9,10 @@ let
     concatMapStringsSep
     escapeShellArg
     getExe
+    mapAttrsToList
+    mkDefault
     mkIf
+    mkMerge
     mkOption
     types
     ;
@@ -27,6 +30,8 @@ let
       };
 
   host = "${cfg.host}:${toString cfg.port}";
+
+  xdgModelsDir = "${config.xdg.dataHome}/ollama";
 
   commands = concatMapStringsSep "\n" (
     model:
@@ -103,8 +108,23 @@ in
     };
   };
 
-  config =
-    mkIf
+  config = mkMerge [
+    (mkIf (cfg.enable && config.xdg.enable) {
+      home = {
+        sessionVariables = {
+          OLLAMA_MODELS = mkDefault xdgModelsDir;
+        };
+      };
+
+      services = {
+        ollama = {
+          environmentVariables = {
+            OLLAMA_MODELS = mkDefault xdgModelsDir;
+          };
+        };
+      };
+    })
+    (mkIf
       (
         cfg.enable
         && cfg.loader.enable
@@ -122,6 +142,9 @@ in
                 };
 
                 Service = {
+                  Environment = mapAttrsToList (
+                    name: value: "${name}=${value}"
+                  ) cfg.environmentVariables;
                   ExecStart = "${loader}";
                   Type = "oneshot";
                 };
@@ -140,5 +163,7 @@ in
             };
           };
         };
-      };
+      }
+    )
+  ];
 }
