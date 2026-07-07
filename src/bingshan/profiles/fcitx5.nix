@@ -32,6 +32,7 @@ let
             "non_collocation_penalty" = -4;
           };
 
+          "switches/@4/reset" = 1;
           "translator/contextual_suggestions" = true;
           "translator/max_homographs" = 2;
           "translator/max_homophones" = 4;
