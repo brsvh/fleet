@@ -1,5 +1,4 @@
 {
-  config,
   home,
   lib,
   pkgs,
@@ -8,24 +7,41 @@
 let
   inherit (lib)
     mkDefault
-    mkIf
     ;
 
   toYAML =
     name: attrs:
     (pkgs.formats.yaml { }).generate name attrs;
 
-  rimeConfig = toYAML "default.custom.yaml" {
+  rimeDefaultConfig = toYAML "default.custom.yaml" {
     "patch" = {
-      "__include" = "rime_ice_suggestion:/";
+      "__include" = "rime_frost_suggestion:/";
 
       "schema_list" = [
         {
-          "schema" = "rime_ice";
+          "schema" = "rime_frost";
         }
       ];
     };
   };
+
+  rimeFrostConfig =
+    toYAML "rime_frost.custom.yaml"
+      {
+        "patch" = {
+          "grammar" = {
+            "collocation_max_length" = 5;
+            "collocation_min_length" = 2;
+            "collocation_penalty" = -14;
+            "language" = "zh-moqi";
+            "non_collocation_penalty" = -4;
+          };
+
+          "translator/contextual_suggestions" = true;
+          "translator/max_homographs" = 2;
+          "translator/max_homophones" = 4;
+        };
+      };
 
   sessionVariables = {
     GTK_IM_MODULE = "fcitx";
@@ -66,13 +82,28 @@ in
       fcitx5 = {
         addons = with pkgs; [
           (fcitx5-rime.override {
+            librime = librime.override {
+              plugins = [
+                librime-lua
+                librime-octagram
+              ];
+            };
+
             rimeDataPkgs = [
-              rime-ice
+              rime-frost
             ];
           })
         ];
 
         settings = {
+          addons = {
+            rime = {
+              globalSection = {
+                "PreeditMode" = "No";
+              };
+            };
+          };
+
           inputMethod = {
             GroupOrder = {
               "0" = "Default";
@@ -110,7 +141,11 @@ in
   xdg = {
     dataFile = {
       "fcitx5/rime/default.custom.yaml" = {
-        source = rimeConfig;
+        source = rimeDefaultConfig;
+      };
+
+      "fcitx5/rime/rime_frost.custom.yaml" = {
+        source = rimeFrostConfig;
       };
     };
   };
