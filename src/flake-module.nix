@@ -1,6 +1,5 @@
 {
   config,
-  fleet-lib,
   inputs,
   lib,
   self,
@@ -8,6 +7,7 @@
 }:
 let
   inherit (inputs)
+    chinese-fonts-overlay
     emacs-overlay
     infix
     nixpkgs
@@ -30,7 +30,6 @@ let
     ;
 
   fleet-lib = self.lib;
-  infix-lib = infix.lib;
 
   home = collect ./home [
     filterNix
@@ -118,6 +117,7 @@ in
           input = nixpkgs;
 
           overlays = [
+            chinese-fonts-overlay.overlays.default
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
@@ -234,6 +234,7 @@ in
           input = nixpkgs;
 
           overlays = [
+            chinese-fonts-overlay.overlays.default
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
