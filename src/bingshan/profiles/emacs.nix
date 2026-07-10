@@ -329,6 +329,7 @@ in
           ibuffer-project
           jieba-rs
           jinx
+          llm
           macrostep-geiser
           magit
           magit-section
