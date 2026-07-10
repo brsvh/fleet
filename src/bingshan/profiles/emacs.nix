@@ -104,28 +104,32 @@ in
   ];
 
   home = {
-    packages = with pkgs; [
-      black
-      clang-tools
-      claude-agent-acp
-      codesearch
-      codex-acp
-      curl
-      emacs-lsp-booster
-      haskell-language-server
-      hunspell
-      hunspellDicts.en_US-large
-      nerd-fonts.symbols-only
-      nixd
-      nixfmt
-      openspec
-      pyright
-      ripgrep
-      spec-kit
-      vscode-json-languageserver
-      wl-clipboard
-      xclip
-    ];
+    packages =
+      (with pkgs; [
+        black
+        clang-tools
+        codesearch
+        curl
+        emacs-lsp-booster
+        haskell-language-server
+        hunspell
+        hunspellDicts.en_US-large
+        nerd-fonts.symbols-only
+        nixd
+        nixfmt
+        pyright
+        ripgrep
+        vscode-json-languageserver
+        wl-clipboard
+        xclip
+      ])
+      ++ (with pkgs.llm-agents; [
+        claude-agent-acp
+        codex
+        codex-acp
+        openspec
+        spec-kit
+      ]);
   };
 
   programs = {
