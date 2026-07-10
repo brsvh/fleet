@@ -186,11 +186,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783395319,
-        "narHash": "sha256-L9nucc6xpvFUZO0LI74Ru303ajfXW/KjfEF36w4WJ+U=",
+        "lastModified": 1783655057,
+        "narHash": "sha256-kNh5necxobvvAxKBxhu6CSuEt42USLsdE9sXKuEpBs0=",
         "ref": "master",
-        "rev": "c51e9cef5ddf3a439d0ac7f8b026cf3e5d3d26a7",
-        "revCount": 19292,
+        "rev": "c48bc3386b8f9e224157c4238cdc95d9ab06a8d3",
+        "revCount": 19311,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -300,11 +300,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783388784,
-        "narHash": "sha256-w+YU5vatysjLZIg1wOKSzo/RL9Z66eBQuIjVnBM/1Zg=",
+        "lastModified": 1783618078,
+        "narHash": "sha256-F43DGcBoIO8xOZFAfodg3jy0VghB9NGdb6xbTYAIx1A=",
         "ref": "master",
-        "rev": "63d02d1c19f1c2b47a5bc7e55c620b6af7b218a6",
-        "revCount": 7031,
+        "rev": "144f4e36d0186195037da9fce80a727108978070",
+        "revCount": 7046,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -433,11 +433,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783272034,
-        "narHash": "sha256-PFVI20RpmBCAjstjfzidH0UciHxZOWc1X6KW6NYAzwM=",
+        "lastModified": 1783626363,
+        "narHash": "sha256-QRuF6YabMrlQc4UXrq07uKO6y+Pnjlhy6ul5aKUu89M=",
         "ref": "main",
-        "rev": "c8babc10612312e344ddf16472a16a1906f0125c",
-        "revCount": 1053,
+        "rev": "d80b23bd88fc52cc107d455e7149a0112f289672",
+        "revCount": 1055,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -477,11 +477,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779338171,
-        "narHash": "sha256-affUbv/bwE8SLGhuWKniDr7SVO+Lo1XEPjCZdyU5kgQ=",
+        "lastModified": 1783657646,
+        "narHash": "sha256-q2vSdTzjD1T7TcT/9X3886FqWssnXRDiWdmuZy3qN94=",
         "ref": "main",
-        "rev": "6ab1f232562a01d18b40d5ed6a58718c4f3a74bc",
-        "revCount": 660,
+        "rev": "dd2e1b8cfdb941c7690a23d766a7d26c706e5506",
+        "revCount": 666,
         "type": "git",
         "url": "https://github.com/nix-community/nix-unit.git"
       },
@@ -618,11 +618,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783320166,
-        "narHash": "sha256-l7C/OsjcnWDOk2K3ssj+SBduwL67LashjBqis9+t468=",
+        "lastModified": 1783614422,
+        "narHash": "sha256-zSX553aXiIKJHWzUF6nrDKgeNRlfNK/SdyNYSbs2nkM=",
         "ref": "master",
-        "rev": "20ee15370c9256669d66968b89ee20a4b0a4e673",
-        "revCount": 2229,
+        "rev": "e8e9d70b96113fd49ccde6c3e08fb260b6ef5dd6",
+        "revCount": 2233,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -679,11 +679,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783307743,
-        "narHash": "sha256-oseisp2tblvzYZdojkA5URLnMjrpPiemzr5T7BdUyuU=",
+        "lastModified": 1783511944,
+        "narHash": "sha256-Z/Ss9rWw9QYcRK+Qqkmty7PB1pIik5XGbrtit+ad2qs=",
         "ref": "master",
-        "rev": "288b0a580ede39d3d7f96e3d835f9df0a7080223",
-        "revCount": 482,
+        "rev": "83995ef5e4ece3c9c704aa645bbff439e15a0ac3",
+        "revCount": 484,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },
