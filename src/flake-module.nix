@@ -10,6 +10,7 @@ let
     chinese-fonts-overlay
     emacs-overlay
     infix
+    llm-agents
     nixpkgs
     ;
 
@@ -121,6 +122,7 @@ in
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
+            llm-agents.overlays.default
           ];
 
           system = "x86_64-linux";
@@ -238,6 +240,7 @@ in
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
+            llm-agents.overlays.default
           ];
         };
 
