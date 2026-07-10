@@ -52,7 +52,7 @@
           "systems"
         ],
         "treefmt-nix": [
-          "blank"
+          "treefmt"
         ]
       },
       "locked": {
@@ -399,7 +399,7 @@
           "systems"
         ],
         "treefmt-nix": [
-          "blank"
+          "treefmt"
         ]
       },
       "locked": {
@@ -608,6 +608,7 @@
         "rust-overlay": "rust-overlay",
         "sops": "sops",
         "systems": "systems",
+        "treefmt": "treefmt",
         "uv": "uv"
       }
     },
@@ -667,6 +668,27 @@
         "ref": "main",
         "type": "git",
         "url": "https://github.com/nix-systems/x86_64-linux.git"
+      }
+    },
+    "treefmt": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780220602,
+        "narHash": "sha256-eynAfOmbmxJnkp7YewvCEbShNnnYJ9gLLqkzsYtBPeM=",
+        "ref": "main",
+        "rev": "db947814a175b7ca6ded66e21383d938df01c227",
+        "revCount": 551,
+        "type": "git",
+        "url": "https://github.com/numtide/treefmt-nix.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/numtide/treefmt-nix.git"
       }
     },
     "uv": {

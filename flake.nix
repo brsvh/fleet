@@ -35,7 +35,7 @@
         };
 
         treefmt-nix = {
-          follows = "blank";
+          follows = "treefmt";
         };
       };
 
@@ -228,7 +228,7 @@
         };
 
         treefmt-nix = {
-          follows = "blank";
+          follows = "treefmt";
         };
       };
 
@@ -338,6 +338,16 @@
 
     systems = {
       url = "git+https://github.com/nix-systems/x86_64-linux.git?ref=main";
+    };
+
+    treefmt = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/numtide/treefmt-nix.git?ref=main";
     };
 
     uv = {
