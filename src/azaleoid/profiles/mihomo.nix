@@ -6,9 +6,22 @@
 }:
 {
   imports = [
+    azaleoid.profiles.firewall
     azaleoid.profiles.sops
     system.profiles.mihomo
   ];
+
+  networking = {
+    firewall = {
+      allowedTCPPorts = [
+        7890
+      ];
+
+      allowedUDPPorts = [
+        7890
+      ];
+    };
+  };
 
   services = {
     mihomo = {
