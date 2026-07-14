@@ -14,6 +14,8 @@
     mihomo = {
       configFile =
         config.sops.secrets."mihomo.yaml".path;
+
+      tunMode = true;
     };
   };
 
