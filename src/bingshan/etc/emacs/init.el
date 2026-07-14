@@ -849,6 +849,13 @@
   ;; Enable `recentf-mode' to provide the list of recent files.
   (bs-first-file-hook . recentf-mode))
 
+(use-package so-long
+  :hook
+  ;; Enable protection for newly visited files as soon as normal
+  ;; initialization finishes, so command-line file arguments and early
+  ;; file visits can still be checked for pathological long lines.
+  (after-init-hook . global-so-long-mode))
+
 (use-package switch-window
   :after (treemacs)
 
