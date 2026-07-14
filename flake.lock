@@ -16,30 +16,6 @@
         "url": "https://github.com/divnix/blank.git"
       }
     },
-    "blueprint": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "systems": [
-          "systems"
-        ]
-      },
-      "locked": {
-        "lastModified": 1776249299,
-        "narHash": "sha256-Dt9t1TGRmJFc0xVYhttNBD6QsAgHOHCArqGa0AyjrJY=",
-        "ref": "main",
-        "rev": "56131e8628f173d24a27f6d27c0215eff57e40dd",
-        "revCount": 158,
-        "type": "git",
-        "url": "https://github.com/numtide/blueprint.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "https://github.com/numtide/blueprint.git"
-      }
-    },
     "bun": {
       "inputs": {
         "flake-parts": [
@@ -186,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783655057,
-        "narHash": "sha256-kNh5necxobvvAxKBxhu6CSuEt42USLsdE9sXKuEpBs0=",
+        "lastModified": 1784051497,
+        "narHash": "sha256-SVVJA7e5R6mxwaTzo0tPpx3p8ZHvFh+JlqMUUhC3NZs=",
         "ref": "master",
-        "rev": "c48bc3386b8f9e224157c4238cdc95d9ab06a8d3",
-        "revCount": 19311,
+        "rev": "73d5d861f5b42752af837e0caf55f077c22690ad",
+        "revCount": 19349,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -300,11 +276,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783618078,
-        "narHash": "sha256-F43DGcBoIO8xOZFAfodg3jy0VghB9NGdb6xbTYAIx1A=",
+        "lastModified": 1783963347,
+        "narHash": "sha256-r376E2XpakiXwModDHIxlvB6qLq4iFVEq730vxOO4JY=",
         "ref": "master",
-        "rev": "144f4e36d0186195037da9fce80a727108978070",
-        "revCount": 7046,
+        "rev": "a45a7c451455a51ae740ec3bce4024b312809c29",
+        "revCount": 7061,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -383,9 +359,6 @@
     },
     "llm-agents": {
       "inputs": {
-        "blueprint": [
-          "blueprint"
-        ],
         "bun2nix": [
           "bun"
         ],
@@ -403,11 +376,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783656972,
-        "narHash": "sha256-M30foxi+2JXQ8KEIeWIKpB2uVpDYOw0XGI/gOaTb38I=",
+        "lastModified": 1784062176,
+        "narHash": "sha256-vu+qJa510uJlvU7soTIy8LAN1M1kVHCjDWbBKJoQByA=",
         "ref": "main",
-        "rev": "d17493b6a6d08cc1846a17175df67cd603c80c7d",
-        "revCount": 12625,
+        "rev": "6a09db3eee47bc89866ccd5505f54edb3e9316e5",
+        "revCount": 12966,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -477,11 +450,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783657646,
-        "narHash": "sha256-q2vSdTzjD1T7TcT/9X3886FqWssnXRDiWdmuZy3qN94=",
+        "lastModified": 1784020394,
+        "narHash": "sha256-eG+ETC+lvHDLhlKgQB6/lGfpqr56Lt3+j1pHOeb4tK4=",
         "ref": "main",
-        "rev": "dd2e1b8cfdb941c7690a23d766a7d26c706e5506",
-        "revCount": 666,
+        "rev": "3a484e17e4911ed97d56e37506f22e294c7c0ccd",
+        "revCount": 668,
         "type": "git",
         "url": "https://github.com/nix-community/nix-unit.git"
       },
@@ -493,11 +466,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1783224372,
-        "narHash": "sha256-8i/87eeoqiGE4yOTjwSA3Eh/ziJRQEmd/unYU+K27sk=",
+        "lastModified": 1784007870,
+        "narHash": "sha256-djcLt/JJphyNt4eDY9XTly+/WbCK5lqWq9lSgCmJkkQ=",
         "ref": "nixos-unstable",
-        "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-        "revCount": 1027867,
+        "rev": "18b9261cb3294b6d2a06d03f96872827b8fe2698",
+        "revCount": 1034379,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -579,7 +552,6 @@
     "root": {
       "inputs": {
         "blank": "blank",
-        "blueprint": "blueprint",
         "bun": "bun",
         "chinese-fonts-overlay": "chinese-fonts-overlay",
         "crane": "crane",
@@ -619,11 +591,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783614422,
-        "narHash": "sha256-zSX553aXiIKJHWzUF6nrDKgeNRlfNK/SdyNYSbs2nkM=",
+        "lastModified": 1784004965,
+        "narHash": "sha256-5Dk8H/H9fqjr7kS4MKqdBOzVsTK5r1/PMjC6eQuXd54=",
         "ref": "master",
-        "rev": "e8e9d70b96113fd49ccde6c3e08fb260b6ef5dd6",
-        "revCount": 2233,
+        "rev": "a794b72f1297136a654424de0348d32e76a9f14e",
+        "revCount": 2238,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },

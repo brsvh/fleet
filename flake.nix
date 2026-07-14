@@ -6,20 +6,6 @@
       url = "git+https://github.com/divnix/blank.git?ref=master";
     };
 
-    blueprint = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-
-        systems = {
-          follows = "systems";
-        };
-      };
-
-      url = "git+https://github.com/numtide/blueprint.git?ref=main";
-    };
-
     bun = {
       inputs = {
         flake-parts = {
@@ -207,10 +193,6 @@
 
     llm-agents = {
       inputs = {
-        blueprint = {
-          follows = "blueprint";
-        };
-
         bun2nix = {
           follows = "bun";
         };

@@ -131,7 +131,7 @@ in
 
             overlays = [
               infix.overlays.default
-              llm-agents.overlays.default
+              llm-agents.overlays.shared-nixpkgs
             ];
           };
         };

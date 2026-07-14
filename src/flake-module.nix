@@ -123,7 +123,7 @@ in
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
-            llm-agents.overlays.default
+            llm-agents.overlays.shared-nixpkgs
           ];
 
           system = "x86_64-linux";
@@ -241,7 +241,7 @@ in
             emacs-overlay.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
-            llm-agents.overlays.default
+            llm-agents.overlays.shared-nixpkgs
           ];
         };
 
