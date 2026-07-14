@@ -1,13 +1,15 @@
 {
   infix-lib,
   lib,
+  projectRoot,
   ...
 }:
 let
-  fleet-lib = import ./. {
+  fleet-lib = import (projectRoot + /lib) {
     inherit
       infix-lib
       lib
+      projectRoot
       ;
   };
 in

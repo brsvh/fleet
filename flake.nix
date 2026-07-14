@@ -407,14 +407,14 @@
         pathExists
         ;
 
+      projectRoot = ./.;
+
       flakeModules =
         let
-          root = ./.;
-
-          tree = readDir root;
+          tree = readDir projectRoot;
 
           getFlakeModule =
-            subdir: root + "/${subdir}/flake-module.nix";
+            subdir: projectRoot + /${subdir}/flake-module.nix;
 
           hasFlakeModule =
             subdir:
@@ -432,6 +432,10 @@
           ;
 
         specialArgs = {
+          inherit
+            projectRoot
+            ;
+
           infix-lib = infix.lib;
         };
       }

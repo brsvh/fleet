@@ -2,6 +2,7 @@
   config,
   inputs,
   lib,
+  projectRoot,
   self,
   ...
 }:
@@ -32,19 +33,19 @@ let
 
   fleet-lib = self.lib;
 
-  home = collect ./home [
+  home = collect (projectRoot + /src/home) [
     filterNix
     removeExtension
     removeInternalPath
   ];
 
-  system = collect ./system [
+  system = collect (projectRoot + /src/system) [
     filterNix
     removeExtension
     removeInternalPath
   ];
 
-  fleet = collect ./. [
+  fleet = collect (projectRoot + /src) [
     (excludeTopLevelDirs [
       "home"
       "system"

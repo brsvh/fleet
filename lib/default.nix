@@ -1,6 +1,7 @@
 {
   infix-lib,
   lib,
+  projectRoot,
   ...
 }:
 let
@@ -9,8 +10,6 @@ let
     makeExtensible
     recursiveUpdate
     ;
-
-  projectRoot = ../.;
 in
 makeExtensible (
   final:
@@ -39,12 +38,19 @@ makeExtensible (
       };
   in
   {
-    importers = import' ./importers.nix;
-    transformers = import' ./transformers.nix;
+    importers = import' (
+      projectRoot + /lib/importers.nix
+    );
+
+    transformers = import' (
+      projectRoot + /lib/transformers.nix
+    );
 
     __tests = foldl' recursiveUpdate { } [
-      (importTest ../test/importers.nix)
-      (importTest ../test/transformers.nix)
+      (importTest (projectRoot + /test/importers.nix))
+      (importTest (
+        projectRoot + /test/transformers.nix
+      ))
     ];
   }
 )

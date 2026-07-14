@@ -1,6 +1,6 @@
 {
   inputs,
-  self,
+  projectRoot,
   ...
 }:
 let
@@ -31,11 +31,14 @@ in
               lib
               ;
           };
+
+          projectRoot = ${projectRoot};
         in
-        (import ${self}/lib {
+        (import (projectRoot + /lib) {
           inherit
             infix-lib
             lib
+            projectRoot
             ;
         }).__tests
       '';

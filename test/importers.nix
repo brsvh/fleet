@@ -15,11 +15,11 @@ let
     ;
 
   fixtureDir =
-    projectRoot + "/test/fixtures/importers";
+    projectRoot + /test/fixtures/importers;
 
-  leftDir = fixtureDir + "/left";
+  leftDir = fixtureDir + /left;
 
-  rightDir = fixtureDir + "/right";
+  rightDir = fixtureDir + /right;
 in
 {
   importers = {
@@ -33,16 +33,16 @@ in
         expected = {
           __path = leftDir;
 
-          "left-only" = leftDir + "/left-only.nix";
+          "left-only" = leftDir + /left-only.nix;
 
           nested = {
-            __path = leftDir + "/nested";
+            __path = leftDir + /nested;
 
-            left = leftDir + "/nested/left.nix";
-            shared = leftDir + "/nested/shared.nix";
+            left = leftDir + /nested/left.nix;
+            shared = leftDir + /nested/shared.nix;
           };
 
-          shared = leftDir + "/shared.nix";
+          shared = leftDir + /shared.nix;
         };
       };
     };
@@ -61,16 +61,16 @@ in
             ];
 
         expected = {
-          "left-only" = leftDir + "/left-only.nix";
+          "left-only" = leftDir + /left-only.nix;
 
           nested = {
-            left = leftDir + "/nested/left.nix";
-            right = rightDir + "/nested/right.nix";
-            shared = rightDir + "/nested/shared.nix";
+            left = leftDir + /nested/left.nix;
+            right = rightDir + /nested/right.nix;
+            shared = rightDir + /nested/shared.nix;
           };
 
-          "right-only" = rightDir + "/right-only.nix";
-          shared = rightDir + "/shared.nix";
+          "right-only" = rightDir + /right-only.nix;
+          shared = rightDir + /shared.nix;
         };
       };
     };
