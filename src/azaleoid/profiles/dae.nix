@@ -10,8 +10,7 @@
 
   services = {
     dae = {
-      configFile =
-        config.sops.secrets."config.dae".path;
+      configFile = config.sops.secrets."dae.dae".path;
 
       enable = true;
     };
@@ -19,7 +18,7 @@
 
   sops = {
     secrets = {
-      "config.dae" = {
+      "dae.dae" = {
         restartUnits = [
           "dae.service"
         ];
