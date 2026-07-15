@@ -2650,6 +2650,11 @@
   (agent-shell-tramp-mode +1))
 
 (use-package codex-ide
+  :custom
+  ;; Sit and relax, patiently waiting for the app-server thread to be
+  ;; ready.
+  (codex-ide-request-timeout 60)
+
   :config
   ;; Display Codex session buffers in a persistent right side window,
   ;; keeping conversations visible without replacing the current
