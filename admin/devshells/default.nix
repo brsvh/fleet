@@ -152,7 +152,11 @@ in
             ;
 
           mkInstall = stage: ''
-            if gitDir="$(${getExe git} -C "$PRJ_ROOT" rev-parse --absolute-git-dir 2>/dev/null)"; then
+            if gitDir="$(
+              ${getExe git} -C "$PRJ_ROOT" \
+                rev-parse --absolute-git-dir \
+                2>/dev/null
+            )"; then
               mkdir -p "$gitDir/hooks"
               ln -sf "${mkScript stage}" "$gitDir/hooks/${stage}"
             fi
@@ -166,7 +170,11 @@ in
                 exit 0
               fi
 
-              gitDir="$(${getExe git} -C "$PRJ_ROOT" rev-parse --absolute-git-dir 2>/dev/null || true)"
+              gitDir="$(
+                ${getExe git} -C "$PRJ_ROOT" \
+                  rev-parse --absolute-git-dir \
+                  2>/dev/null || true
+              )"
 
               if [ -n "$gitDir" ]; then
                 if [ -e "$gitDir/MERGE_HEAD" ] \
@@ -175,7 +183,11 @@ in
                   exit 0
                 fi
 
-                ref="$(${getExe git} -C "$PRJ_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+                ref="$(
+                  ${getExe git} -C "$PRJ_ROOT" \
+                    symbolic-ref --quiet --short HEAD \
+                    2>/dev/null || true
+                )"
 
                 if [ "$ref" = "update_flake_lock_action" ]; then
                   exit 0
