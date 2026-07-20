@@ -363,6 +363,8 @@ in
           paredit
           pass
           plz
+          proofread
+          proofread-popup
           rainbow-delimiters
           sly
           sly-asdf

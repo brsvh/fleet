@@ -9,7 +9,9 @@
 let
   inherit (inputs)
     chinese-fonts-overlay
+    emacs-bs
     emacs-overlay
+    emacs-proofread
     infix
     llm-agents
     nixpkgs
@@ -120,7 +122,9 @@ in
 
           overlays = [
             chinese-fonts-overlay.overlays.default
+            emacs-bs.overlays.default
             emacs-overlay.overlays.default
+            emacs-proofread.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
             llm-agents.overlays.shared-nixpkgs
@@ -238,7 +242,9 @@ in
 
           overlays = [
             chinese-fonts-overlay.overlays.default
+            emacs-bs.overlays.default
             emacs-overlay.overlays.default
+            emacs-proofread.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
             llm-agents.overlays.shared-nixpkgs

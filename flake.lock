@@ -152,6 +152,60 @@
         "url": "https://github.com/nix-community/disko.git"
       }
     },
+    "emacs-bs": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784104405,
+        "narHash": "sha256-qPynnYpFNDvphagTUT/IgwKMCD7acOWxAa6LIZUND5w=",
+        "ref": "main",
+        "rev": "7a02c101463ecdbe4521184ac6d3123fdda5bc1f",
+        "revCount": 68,
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/emacs-bs.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://codeberg.org/bingshan/emacs-bs.git"
+      }
+    },
+    "emacs-jieba-rs": {
+      "inputs": {
+        "crane": [
+          "crane"
+        ],
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": [
+          "rust-overlay"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783387292,
+        "narHash": "sha256-S9lCAJXuySslnPROCGTQSQmGiLihZFysouC9h57zIQg=",
+        "ref": "main",
+        "rev": "63ae6a7a25f7060ac7c31fa7b184e90d4f460517",
+        "revCount": 22,
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-jieba-rs.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-jieba-rs.git"
+      }
+    },
     "emacs-overlay": {
       "inputs": {
         "nixpkgs": [
@@ -174,6 +228,30 @@
         "ref": "master",
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
+      }
+    },
+    "emacs-proofread": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784259768,
+        "narHash": "sha256-hLg88cf59trZyLi7cpBaRf+TyhEmVMSlqr0CgsT7Yhk=",
+        "ref": "main",
+        "rev": "2c98a2147f00085c98dbf14f5ffdf2e5da5be4ee",
+        "revCount": 191,
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-proofread.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-proofread.git"
       }
     },
     "flake-compat": {
@@ -376,11 +454,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784062176,
-        "narHash": "sha256-vu+qJa510uJlvU7soTIy8LAN1M1kVHCjDWbBKJoQByA=",
+        "lastModified": 1784269728,
+        "narHash": "sha256-y6VXjRhFxOvlZRk6dd5rWhSKV4s6X6k6Fas7Up4o9DI=",
         "ref": "main",
-        "rev": "6a09db3eee47bc89866ccd5505f54edb3e9316e5",
-        "revCount": 12966,
+        "rev": "dd58861b6a18526539120523960ab0ac3b455b8d",
+        "revCount": 13176,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -558,7 +636,10 @@
         "deploy": "deploy",
         "devshell": "devshell",
         "disko": "disko",
+        "emacs-bs": "emacs-bs",
+        "emacs-jieba-rs": "emacs-jieba-rs",
         "emacs-overlay": "emacs-overlay",
+        "emacs-proofread": "emacs-proofread",
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",

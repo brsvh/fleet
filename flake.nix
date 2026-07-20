@@ -80,6 +80,42 @@
       url = "git+https://github.com/nix-community/disko.git?ref=master";
     };
 
+    emacs-bs = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://codeberg.org/bingshan/emacs-bs.git?ref=main";
+    };
+
+    emacs-jieba-rs = {
+      inputs = {
+        crane = {
+          follows = "crane";
+        };
+
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        rust-overlay = {
+          follows = "rust-overlay";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/emacs-jieba-rs.git?ref=main";
+    };
+
     emacs-overlay = {
       inputs = {
         nixpkgs = {
@@ -92,6 +128,20 @@
       };
 
       url = "git+https://github.com/nix-community/emacs-overlay.git?ref=master";
+    };
+
+    emacs-proofread = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/emacs-proofread.git?ref=main";
     };
 
     flake-compat = {
