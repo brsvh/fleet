@@ -5,25 +5,35 @@
   ...
 }:
 let
-  personalCloud = rec {
-    host = "cloud.bingshan.org";
+  bingshan = {
+    mail = rec {
+      host = "mail.bingshan.org";
+      passwordCommand = "pass show ${host}/${userName}";
+      userName = "chang@bingshan.org";
+    };
 
-    passwordCommand = [
-      "pass"
-      "show"
-      "${host}/${userName}"
-    ];
+    cloud = rec {
+      host = "cloud.bingshan.org";
 
-    userName = "bingshan";
+      passwordCommand = [
+        "pass"
+        "show"
+        "${host}/${userName}"
+      ];
+
+      userName = "bingshan";
+    };
   };
 
-  personalEmail = rec {
-    host = "mail.bingshan.org";
-    passwordCommand = "pass show ${host}/${userName}";
-    userName = "chang@bingshan.org";
+  brsvh = {
+    inherit (bingshan.mail)
+      host
+      passwordCommand
+      userName
+      ;
   };
 
-  workEmail = rec {
+  changbingshan = rec {
     host = "mail.cstnet.cn";
     passwordCommand = "pass show ${host}/${userName}";
     userName = "changbingshan@iscas.ac.cn";
@@ -38,24 +48,24 @@ in
   accounts = {
     calendar = {
       accounts = {
-        personal = {
+        bingshan = {
           khal = {
             enable = true;
             type = "discover";
           };
 
           local = {
-            path = "${config.accounts.calendar.basePath}/${personalCloud.host}";
+            path = "${config.accounts.calendar.basePath}/${bingshan.cloud.host}";
           };
 
           remote = {
-            inherit (personalCloud)
+            inherit (bingshan.cloud)
               passwordCommand
               userName
               ;
 
             type = "caldav";
-            url = "https://${personalCloud.host}/remote.php/dav/calendars/${personalCloud.userName}/";
+            url = "https://${bingshan.cloud.host}/remote.php/dav/calendars/${bingshan.cloud.userName}/";
           };
 
           vdirsyncer = {
@@ -138,7 +148,7 @@ in
 
     contact = {
       accounts = {
-        personal = {
+        bingshan = {
           emacs = {
             default = true;
             enable = true;
@@ -150,17 +160,17 @@ in
           };
 
           local = {
-            path = "${config.accounts.contact.basePath}/${personalCloud.host}";
+            path = "${config.accounts.contact.basePath}/${bingshan.cloud.host}";
           };
 
           remote = {
-            inherit (personalCloud)
+            inherit (bingshan.cloud)
               passwordCommand
               userName
               ;
 
             type = "carddav";
-            url = "https://${personalCloud.host}/remote.php/dav/addressbooks/users/${personalCloud.userName}/";
+            url = "https://${bingshan.cloud.host}/remote.php/dav/addressbooks/users/${bingshan.cloud.userName}/";
           };
 
           vdirsyncer = {
@@ -177,21 +187,13 @@ in
 
     email = {
       accounts = {
-        personal = rec {
-          inherit (personalEmail)
+        bingshan = rec {
+          inherit (bingshan.mail)
             passwordCommand
             userName
             ;
 
           address = userName;
-
-          aliases = [
-            "bsc@brsvh.org"
-            "bot@brsvh.org"
-            "open@brsvh.org"
-            "register@brsvh.org"
-            "steam@brsvh.org"
-          ];
 
           gpg = {
             key = "D6E9ED4504C41AD2DA16F39631E62A2FC33802BA";
@@ -199,7 +201,7 @@ in
           };
 
           imap = {
-            host = personalEmail.host;
+            host = bingshan.mail.host;
             port = 993;
 
             tls = {
@@ -246,7 +248,7 @@ in
           };
 
           smtp = {
-            host = personalEmail.host;
+            host = bingshan.mail.host;
             port = 465;
 
             tls = {
@@ -255,8 +257,62 @@ in
           };
         };
 
-        work = rec {
-          inherit (workEmail)
+        brsvh = rec {
+          inherit (brsvh)
+            passwordCommand
+            userName
+            ;
+
+          address = "bsc@brsvh.org";
+
+          aliases = [
+            "bot@brsvh.org"
+            "open@brsvh.org"
+            "register@brsvh.org"
+            "steam@brsvh.org"
+          ];
+
+          gpg = {
+            key = "7B740DB9F2AC6D3B226BC53078D74502D92E0218";
+            signByDefault = true;
+          };
+
+          maildir = {
+            path = userName;
+          };
+
+          msmtp = {
+            enable = true;
+          };
+
+          mu = {
+            enable = true;
+          };
+
+          primary = false;
+          realName = "Burgess Chang";
+
+          signature = {
+            text = ''
+              ${realName}
+              Nanjing, China
+              Pronoun: He/Him/His
+              GPG: 7B74 0DB9 F2AC 6D3B 226B  C530 78D7 4502 D92E 0218
+            '';
+          };
+
+          smtp = {
+            host = brsvh.host;
+            port = 465;
+
+            tls = {
+              enable = true;
+            };
+          };
+        };
+
+        changbingshan = rec {
+          inherit (changbingshan)
             passwordCommand
             userName
             ;
@@ -269,7 +325,7 @@ in
           };
 
           imap = {
-            host = workEmail.host;
+            host = changbingshan.host;
             port = 993;
 
             tls = {
@@ -317,7 +373,7 @@ in
           };
 
           smtp = {
-            host = workEmail.host;
+            host = changbingshan.host;
             port = 465;
 
             tls = {

@@ -40,6 +40,24 @@ let
 
   primary = (head primaryMails).account;
 
+  sharedMaildirMails = filter (
+    mail:
+    mail.account.maildir.path == primary.maildir.path
+  ) secondaryMails;
+
+  separateMaildirMails = filter (
+    mail:
+    mail.account.maildir.path != primary.maildir.path
+  ) secondaryMails;
+
+  sharedMaildirAddresses = map (
+    mail: mail.account.address
+  ) sharedMaildirMails;
+
+  sharedMaildirAddressesElisp = concatStringsSep " " (
+    map toJSON sharedMaildirAddresses
+  );
+
   primaryMaildir = primary.maildir.absPath;
 
   primaryName = (head primaryMails).name;
@@ -68,10 +86,37 @@ let
        :match-func
        (lambda (msg)
          (when msg
-           (let ((maildir (mu4e-message-field msg :maildir)))
-             (and maildir
-                  (string-prefix-p ${toJSON accountMaildirPrefix}
-                                   maildir)))))
+           ${
+             if account.primary then
+               ''
+                 (let ((maildir (mu4e-message-field msg :maildir)))
+                   (and maildir
+                        (string-prefix-p ${toJSON accountMaildirPrefix}
+                                         maildir)
+                        (not
+                         (mu4e-message-contact-field-matches
+                          msg
+                          '(:from :to :cc :bcc)
+                          (mapcar #'regexp-quote
+                                  '(${sharedMaildirAddressesElisp}))))))
+               ''
+             else if
+               account.maildir.path != primary.maildir.path
+             then
+               ''
+                 (let ((maildir (mu4e-message-field msg :maildir)))
+                   (and maildir
+                        (string-prefix-p ${toJSON accountMaildirPrefix}
+                                         maildir)))
+               ''
+             else
+               ''
+                 (mu4e-message-contact-field-matches
+                  msg
+                  '(:from :to :cc :bcc)
+                  (regexp-quote ${toJSON account.address}))
+               ''
+           }))
        :vars
        '((user-mail-address . ${toJSON account.address})
          (user-full-name . ${toJSON account.realName})
@@ -86,7 +131,11 @@ let
     '';
 
   mu4eEmailContexts = concatStringsSep "\n" (
-    map mkMu4eContext (primaryMails ++ secondaryMails)
+    map mkMu4eContext (
+      primaryMails
+      ++ sharedMaildirMails
+      ++ separateMaildirMails
+    )
   );
 
   libext =
