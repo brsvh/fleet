@@ -168,12 +168,12 @@
         "rev": "7a02c101463ecdbe4521184ac6d3123fdda5bc1f",
         "revCount": 68,
         "type": "git",
-        "url": "https://codeberg.org/bingshan/emacs-bs.git"
+        "url": "https://github.com/brsvh/emacs-bs.git"
       },
       "original": {
         "ref": "main",
         "type": "git",
-        "url": "https://codeberg.org/bingshan/emacs-bs.git"
+        "url": "https://github.com/brsvh/emacs-bs.git"
       }
     },
     "emacs-jieba-rs": {
@@ -391,18 +391,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1783389639,
-        "narHash": "sha256-MJwP0GHdEW3zZD2v4QEavHL8KAh3cvFzENOPKBQMRBs=",
+        "lastModified": 1784270871,
+        "narHash": "sha256-oAABYAi825OMleKEYq90EmNLdGIAYmve61YBtHrjN1c=",
         "ref": "main",
-        "rev": "f3fde1015bf4ce48fda70190d73d9e321e241e9a",
-        "revCount": 133,
+        "rev": "880221523747052cd9e8f03e6069774dcb743e0e",
+        "revCount": 138,
         "type": "git",
-        "url": "https://codeberg.org/bingshan/infix.git"
+        "url": "https://github.com/brsvh/infix.git"
       },
       "original": {
         "ref": "main",
         "type": "git",
-        "url": "https://codeberg.org/bingshan/infix.git"
+        "url": "https://github.com/brsvh/infix.git"
       }
     },
     "lanzaboote": {

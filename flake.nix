@@ -91,7 +91,7 @@
         };
       };
 
-      url = "git+https://codeberg.org/bingshan/emacs-bs.git?ref=main";
+      url = "git+https://github.com/brsvh/emacs-bs.git?ref=main";
     };
 
     emacs-jieba-rs = {
@@ -216,7 +216,7 @@
         };
       };
 
-      url = "git+https://codeberg.org/bingshan/infix.git?ref=main";
+      url = "git+https://github.com/brsvh/infix.git?ref=main";
     };
 
     lanzaboote = {
