@@ -1,0 +1,28 @@
+repository:
+  name: fleet
+  description: A personal fleet of workstation and server configurations.
+  private: false
+  topics:
+    - dotfiles
+    - home-manager
+    - nixos-configuration
+    - nix-flake
+    - nixos-flake
+
+  has_issues: true
+  has_discussions: false
+  has_projects: false
+  has_wiki: false
+  has_downloads: false
+
+  default_branch: main
+
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_auto_merge: false
+  allow_update_branch: true
+  delete_branch_on_merge: true
+
+  enable_vulnerability_alerts: false
+  enable_automated_security_fixes: false
