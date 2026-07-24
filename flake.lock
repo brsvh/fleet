@@ -32,11 +32,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782772816,
-        "narHash": "sha256-s9BuFv0mRuZx9C1MF8qPHRdcAK14ONi0A5m6E2wqOoM=",
+        "lastModified": 1784665499,
+        "narHash": "sha256-9BMxlTxCCDAeoNLtb1a/st7udtTIJep+wpUzquA29VU=",
         "ref": "master",
-        "rev": "5a39d717029e94163ac223aee8d5c9946cafed1c",
-        "revCount": 510,
+        "rev": "0f2a1f0b6f42cebe3b149bf62d38754c5e0e9729",
+        "revCount": 519,
         "type": "git",
         "url": "https://github.com/nix-community/bun2nix.git"
       },
@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784104405,
-        "narHash": "sha256-qPynnYpFNDvphagTUT/IgwKMCD7acOWxAa6LIZUND5w=",
+        "lastModified": 1784880403,
+        "narHash": "sha256-lo4OQurYuQ15/KxDo/vfpkpxRJPtBIFSAeAYLKm2ThI=",
         "ref": "main",
-        "rev": "7a02c101463ecdbe4521184ac6d3123fdda5bc1f",
-        "revCount": 68,
+        "rev": "fd55afac23ab9a868ef20ddb9679d3d9461e6587",
+        "revCount": 69,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-bs.git"
       },
@@ -192,11 +192,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783387292,
-        "narHash": "sha256-S9lCAJXuySslnPROCGTQSQmGiLihZFysouC9h57zIQg=",
+        "lastModified": 1784542470,
+        "narHash": "sha256-rlrngKUOtLEh0JXFapYJR2yWlGOpbxHcoOzV4dpLIsM=",
         "ref": "main",
-        "rev": "63ae6a7a25f7060ac7c31fa7b184e90d4f460517",
-        "revCount": 22,
+        "rev": "8045904bd7f31e7db832db1fdaa4bf9d64ccc2de",
+        "revCount": 31,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-jieba-rs.git"
       },
@@ -216,11 +216,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784051497,
-        "narHash": "sha256-SVVJA7e5R6mxwaTzo0tPpx3p8ZHvFh+JlqMUUhC3NZs=",
+        "lastModified": 1784863074,
+        "narHash": "sha256-Oy+uMLFK4EQ1bLyn6U82Lpz5yMgouFGMMCQ6JFXduxQ=",
         "ref": "master",
-        "rev": "73d5d861f5b42752af837e0caf55f077c22690ad",
-        "revCount": 19349,
+        "rev": "b2865e251c6ca6230cae22f5628c48a7a4c8c7a1",
+        "revCount": 19424,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -354,11 +354,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783963347,
-        "narHash": "sha256-r376E2XpakiXwModDHIxlvB6qLq4iFVEq730vxOO4JY=",
+        "lastModified": 1784877405,
+        "narHash": "sha256-W649GocILahx7Vb/JMx834217+OLKBrq014VmC/8+NM=",
         "ref": "master",
-        "rev": "a45a7c451455a51ae740ec3bce4024b312809c29",
-        "revCount": 7061,
+        "rev": "32de400b6ac9f43042bca706f4a64f6ad08117e8",
+        "revCount": 7084,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -370,11 +370,11 @@
     },
     "import-tree": {
       "locked": {
-        "lastModified": 1778781969,
-        "narHash": "sha256-Jjuz5CmSkur8KvLDoGa+vylEp+RkQtv4mt/qcMznpH0=",
+        "lastModified": 1784254960,
+        "narHash": "sha256-iI88R3wHz8wTKQb5orvpc51L/Xr64AJyxid/0MKa/b8=",
         "ref": "main",
-        "rev": "d321337efd0f23a9eb14a42adb7b2c29313ab274",
-        "revCount": 99,
+        "rev": "4ebb10ae17d5f1ad366e7aef5b92cb8eecf24f69",
+        "revCount": 100,
         "type": "git",
         "url": "https://github.com/denful/import-tree.git"
       },
@@ -454,11 +454,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784269728,
-        "narHash": "sha256-y6VXjRhFxOvlZRk6dd5rWhSKV4s6X6k6Fas7Up4o9DI=",
+        "lastModified": 1784877872,
+        "narHash": "sha256-Y270/EgraTJpT4uI84YJKpcqOcVFJwDBZpHYT4Ydtpw=",
         "ref": "main",
-        "rev": "dd58861b6a18526539120523960ab0ac3b455b8d",
-        "revCount": 13176,
+        "rev": "f9a30d16da12fcf83886b66d3df9b1b8c168a3f7",
+        "revCount": 13679,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -484,11 +484,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783626363,
-        "narHash": "sha256-QRuF6YabMrlQc4UXrq07uKO6y+Pnjlhy6ul5aKUu89M=",
+        "lastModified": 1784545776,
+        "narHash": "sha256-aU4ftMXSp6Y4Q5iKzSoJdUQcVP5UA4aDQp2DalAJNJE=",
         "ref": "main",
-        "rev": "d80b23bd88fc52cc107d455e7149a0112f289672",
-        "revCount": 1055,
+        "rev": "a0e427dd77c7d985394bab609c1bc0bbd4d6dd1f",
+        "revCount": 1062,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -528,11 +528,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784020394,
-        "narHash": "sha256-eG+ETC+lvHDLhlKgQB6/lGfpqr56Lt3+j1pHOeb4tK4=",
+        "lastModified": 1784811128,
+        "narHash": "sha256-jZ6YOb5L7FShPUcq63qDKT3W83mVzAaM2y1V4CLcdq8=",
         "ref": "main",
-        "rev": "3a484e17e4911ed97d56e37506f22e294c7c0ccd",
-        "revCount": 668,
+        "rev": "3168acfa75907680a627bc933526bad458046425",
+        "revCount": 681,
         "type": "git",
         "url": "https://github.com/nix-community/nix-unit.git"
       },
@@ -544,11 +544,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1784007870,
-        "narHash": "sha256-djcLt/JJphyNt4eDY9XTly+/WbCK5lqWq9lSgCmJkkQ=",
+        "lastModified": 1784796856,
+        "narHash": "sha256-wWFrV5/Qbm+lyt5x20E/bSbfJiGKMo4RCxZV8cl/WZI=",
         "ref": "nixos-unstable",
-        "rev": "18b9261cb3294b6d2a06d03f96872827b8fe2698",
-        "revCount": 1034379,
+        "rev": "e2587caef70cea85dd97d7daab492899902dbf5d",
+        "revCount": 1040357,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -586,11 +586,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782905613,
-        "narHash": "sha256-SvXJcAemihifkTn4BGvyE5K1FJX9bl4U8DQ5pqKvD0s=",
+        "lastModified": 1784591072,
+        "narHash": "sha256-zP/WaDxrRu8GANZM61+V2LT/7ycEEdoyLWn7M6WzU7M=",
         "ref": "master",
-        "rev": "7af23cfe91064865ecf2e835da28b45b3c6f49fd",
-        "revCount": 557,
+        "rev": "e3b599ca2e7fcf93d4edf65d7f19bbf6491724f3",
+        "revCount": 558,
         "type": "git",
         "url": "https://github.com/pyproject-nix/pyproject.nix.git"
       },
@@ -613,11 +613,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782093830,
-        "narHash": "sha256-6gmEVe69+KlRkZD4PEEV5xAlB9CB0Y9TiuEgQjDrKTQ=",
+        "lastModified": 1784580899,
+        "narHash": "sha256-65qjoshs2FUkt+3NzaVutCWjydUpiHElXLo+0SGuvPk=",
         "ref": "master",
-        "rev": "430680a19bc85a3bda55f12e4cc1a1aadcf2e478",
-        "revCount": 78,
+        "rev": "5c4cc964cfb1e3cab9134dabe2d86bc4858f3867",
+        "revCount": 79,
         "type": "git",
         "url": "https://github.com/pyproject-nix/build-system-pkgs.git"
       },
@@ -672,11 +672,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784004965,
-        "narHash": "sha256-5Dk8H/H9fqjr7kS4MKqdBOzVsTK5r1/PMjC6eQuXd54=",
+        "lastModified": 1784870759,
+        "narHash": "sha256-ZaS89rj5u6pygXKDRfCzPMGm7isJxLsSeIAR5EaSyu8=",
         "ref": "master",
-        "rev": "a794b72f1297136a654424de0348d32e76a9f14e",
-        "revCount": 2238,
+        "rev": "471286a5fadc690e2408ad854eb32325f5e74da7",
+        "revCount": 2249,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -730,11 +730,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780220602,
-        "narHash": "sha256-eynAfOmbmxJnkp7YewvCEbShNnnYJ9gLLqkzsYtBPeM=",
+        "lastModified": 1784369104,
+        "narHash": "sha256-47cxbcZODibHv3rELFQ9vZly0vUNkND/atn/U7HLeb0=",
         "ref": "main",
-        "rev": "db947814a175b7ca6ded66e21383d938df01c227",
-        "revCount": 551,
+        "rev": "df3c0640565d04a0261253cdd89fce78ec50168a",
+        "revCount": 553,
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
       },
@@ -754,11 +754,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783511944,
-        "narHash": "sha256-Z/Ss9rWw9QYcRK+Qqkmty7PB1pIik5XGbrtit+ad2qs=",
+        "lastModified": 1784582828,
+        "narHash": "sha256-uPeuFNSYO429IEiud3iJKWIpN/xrH2CANj1uYNiDxqc=",
         "ref": "master",
-        "rev": "83995ef5e4ece3c9c704aa645bbff439e15a0ac3",
-        "revCount": 484,
+        "rev": "49dac8d206c42175b069b7c6050ba27060a21106",
+        "revCount": 485,
         "type": "git",
         "url": "https://github.com/pyproject-nix/uv2nix.git"
       },
