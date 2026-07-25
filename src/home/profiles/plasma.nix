@@ -13,6 +13,10 @@ let
   inherit (lib)
     mkDefault
     ;
+
+  inherit (pkgs)
+    appmenu-gtk-module
+    ;
 in
 {
   imports = [
@@ -37,6 +41,28 @@ in
     theme = {
       name = mkDefault "Breeze";
       package = mkDefault pkgs.kdePackages.breeze-gtk;
+    };
+  };
+
+  home = {
+    packages = [
+      appmenu-gtk-module
+    ];
+
+    sessionSearchVariables = {
+      GTK_PATH = [
+        "${appmenu-gtk-module}/lib/gtk-2.0"
+        "${appmenu-gtk-module}/lib/gtk-3.0"
+      ];
+
+      XDG_DATA_DIRS = [
+        "${appmenu-gtk-module}/share/gsettings-schemas/${appmenu-gtk-module.name}"
+      ];
+    };
+
+    sessionVariables = {
+      GTK_MODULES = "appmenu-gtk-module";
+      UBUNTU_MENUPROXY = 1;
     };
   };
 
