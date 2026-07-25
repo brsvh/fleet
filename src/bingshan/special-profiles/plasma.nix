@@ -26,9 +26,7 @@
             "org.kde.plasma.panelspacer"
             {
               iconTasks = {
-                launchers = [
-                  "preferred://browser"
-                ];
+                launchers = [ ];
               };
             }
             "org.kde.plasma.pager"
