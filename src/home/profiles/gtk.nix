@@ -19,6 +19,8 @@ let
 in
 {
   gtk = {
+    enable = mkDefault true;
+
     font = {
       name = mkDefault "IBM Plex Sans";
       package = mkDefault ibm-plex-sans;
