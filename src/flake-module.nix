@@ -254,7 +254,13 @@ in
               user
               ;
 
-            home = config.configurations.home.bingshan;
+            home = config.configurations.home.bingshan // {
+              profiles =
+                config.configurations.home.bingshan.profiles
+                ++ [
+                  fleet.bingshan.special-profiles.plasma
+                ];
+            };
           };
 
           root = {
