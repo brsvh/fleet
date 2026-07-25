@@ -70,7 +70,7 @@
 
                       swap = {
                         swapfile = {
-                          size = "16G";
+                          size = "32G";
                         };
                       };
                     };
