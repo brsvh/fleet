@@ -26,7 +26,7 @@ in
   gtk = {
     font = {
       name = mkForce "${first fonts.sansSerif}";
-      package = mkForce pkgs.windowns-fonts;
+      package = mkForce pkgs.windows-fonts;
     };
   };
 }
