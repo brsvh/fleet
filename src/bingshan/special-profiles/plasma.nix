@@ -1,14 +1,9 @@
 {
-  pkgs,
+  home,
   ...
 }:
 {
-  services = {
-    gpg-agent = {
-      pinentry = {
-        package = pkgs.pinentry-qt;
-        program = "pinentry-qt";
-      };
-    };
-  };
+  imports = [
+    home.profiles.plasma
+  ];
 }
