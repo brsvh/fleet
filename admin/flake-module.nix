@@ -145,6 +145,7 @@ in
             lib
             pkgs
             self
+            system
             ;
         }
       ) dev.devshells;

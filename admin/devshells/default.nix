@@ -2,10 +2,14 @@
   inputs,
   lib,
   pkgs,
-  self,
+  system,
   ...
 }:
 let
+  inherit (inputs)
+    plasma-manager
+    ;
+
   inherit (lib)
     baseNameOf
     concatStringsSep
@@ -27,13 +31,21 @@ let
     toml
     yaml
     ;
+
+  plasma-manager-pkgs =
+    plasma-manager.packages.${system};
 in
 {
   commands = with pkgs; [
     {
       category = "[deployment]";
       name = "deploy";
-      package = "deploy-rs";
+      package = deploy-rs;
+    }
+    {
+      category = "[tools]";
+      help = "Convert Plasma configuration file to Nix";
+      package = plasma-manager-pkgs.default;
     }
     {
       category = "[tools]";
