@@ -9,6 +9,7 @@ let
     concatMapStringsSep
     escapeShellArg
     getExe
+    hiPrio
     mapAttrsToList
     mkDefault
     mkIf
@@ -32,6 +33,11 @@ let
   host = "${cfg.host}:${toString cfg.port}";
 
   xdgModelsDir = "${config.xdg.dataHome}/ollama";
+
+  xdgWrapper = pkgs.writeShellScriptBin "ollama" ''
+    export HOME=${escapeShellArg config.xdg.dataHome}
+    exec ${getExe package} "$@"
+  '';
 
   commands = concatMapStringsSep "\n" (
     model:
@@ -111,6 +117,10 @@ in
   config = mkMerge [
     (mkIf (cfg.enable && config.xdg.enable) {
       home = {
+        packages = [
+          (hiPrio xdgWrapper)
+        ];
+
         sessionVariables = {
           OLLAMA_MODELS = mkDefault xdgModelsDir;
         };
@@ -119,7 +129,16 @@ in
       services = {
         ollama = {
           environmentVariables = {
+            HOME = mkDefault config.xdg.dataHome;
             OLLAMA_MODELS = mkDefault xdgModelsDir;
+          };
+        };
+      };
+
+      xdg = {
+        dataFile = {
+          ".ollama" = {
+            source = config.lib.file.mkOutOfStoreSymlink xdgModelsDir;
           };
         };
       };
