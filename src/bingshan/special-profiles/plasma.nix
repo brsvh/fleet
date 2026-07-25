@@ -58,7 +58,6 @@ in
           lengthMode = "fill";
           location = "top";
           opacity = "adaptive";
-          screen = 0;
 
           widgets = [
             "org.kde.plasma.kickoff"
