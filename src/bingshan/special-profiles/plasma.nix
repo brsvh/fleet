@@ -1,29 +1,13 @@
 {
   home,
-  lib,
-  pkgs,
   ...
 }:
-let
-  inherit (lib)
-    mkForce
-    ;
-in
 {
   imports = [
     home.profiles.plasma
   ];
 
   programs = {
-    emacs = {
-      package = mkForce (
-        pkgs.emacs-git.override {
-          withGTK3 = true;
-          withPgtk = false;
-        }
-      );
-    };
-
     plasma = {
       panels = [
         {
