@@ -219,6 +219,8 @@ in
           camellia = "age194qvjfwdnntwx9200e5ygepx0fppwh8034ljnzvzhc9zfxn9vfyq90m0z0";
 
           erythron = "age1svqryg3zmt67c6229sfem69hhe8aqup7v82r9req0vmrhd4mk9ks6gh4an";
+
+          magnolia = "age10eqf23zmmhrdhlcxtk47as2e582e7kws35478rwu466ygjzgm56sd9c4at";
         in
         {
           creation_rules = [
@@ -254,6 +256,17 @@ in
               ];
 
               path_regex = "^src/erythron/etc/sops\.yaml$";
+            }
+            {
+              key_groups = [
+                {
+                  age = [
+                    magnolia
+                  ];
+                }
+              ];
+
+              path_regex = "^src/magnolia/etc/sops\.yaml$";
             }
           ];
         };
