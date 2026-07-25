@@ -579,6 +579,30 @@
         "type": "github"
       }
     },
+    "plasma-manager": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783574839,
+        "narHash": "sha256-ICof1tV4/9XheBLBGf7dhMhfMq4dOs1zwTHrr7zGFlA=",
+        "ref": "trunk",
+        "rev": "c551f0687658e4bb699cfff6015436ad7ee57a0d",
+        "revCount": 323,
+        "type": "git",
+        "url": "https://github.com/nix-community/plasma-manager.git"
+      },
+      "original": {
+        "ref": "trunk",
+        "type": "git",
+        "url": "https://github.com/nix-community/plasma-manager.git"
+      }
+    },
     "pyproject": {
       "inputs": {
         "nixpkgs": [
@@ -656,6 +680,7 @@
         "nixpkgs": [
           "nixos"
         ],
+        "plasma-manager": "plasma-manager",
         "pyproject": "pyproject",
         "pyproject-overlay": "pyproject-overlay",
         "rust-overlay": "rust-overlay",

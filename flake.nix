@@ -320,6 +320,20 @@
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
     };
 
+    plasma-manager = {
+      inputs = {
+        home-manager = {
+          follows = "home-manager";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/nix-community/plasma-manager.git?ref=trunk";
+    };
+
     pyproject = {
       inputs = {
         nixpkgs = {
