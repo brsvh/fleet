@@ -159,16 +159,19 @@ in
 
         profiles = profilesToList fleet.azaleoid.profiles;
 
-        modules = [
-
-        ];
-
         users = {
           bingshan = {
-            home = config.configurations.home.bingshan;
             inherit (fleet.bingshan)
               user
               ;
+
+            home = config.configurations.home.bingshan // {
+              profiles =
+                config.configurations.home.bingshan.profiles
+                ++ [
+                  fleet.bingshan.special-profiles.gnome
+                ];
+            };
           };
 
           root = {
@@ -187,23 +190,27 @@ in
 
         profiles = profilesToList fleet.erythron.profiles;
 
-        modules = [
-
-        ];
-
         users = {
           bingshan = {
-            home = config.configurations.home.bingshan;
             inherit (fleet.bingshan)
               user
               ;
+
+            home = config.configurations.home.bingshan // {
+              profiles =
+                config.configurations.home.bingshan.profiles
+                ++ [
+                  fleet.bingshan.special-profiles.gnome
+                ];
+            };
           };
 
           root = {
-            home = config.configurations.home.root;
             inherit (fleet.root)
               user
               ;
+
+            home = config.configurations.home.root;
           };
         };
       };
@@ -222,6 +229,32 @@ in
             inherit (fleet.ops)
               user
               ;
+          };
+
+          root = {
+            inherit (fleet.root)
+              user
+              ;
+
+            home = config.configurations.home.root;
+          };
+        };
+      };
+
+      magnolia = {
+        inherit (fleet.magnolia)
+          system
+          ;
+
+        profiles = profilesToList fleet.magnolia.profiles;
+
+        users = {
+          bingshan = {
+            inherit (fleet.bingshan)
+              user
+              ;
+
+            home = config.configurations.home.bingshan;
           };
 
           root = {

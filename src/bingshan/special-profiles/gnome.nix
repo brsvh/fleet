@@ -1,5 +1,4 @@
 {
-  azaleoid,
   bingshan,
   config,
   home,
