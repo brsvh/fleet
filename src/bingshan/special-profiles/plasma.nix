@@ -36,6 +36,14 @@ in
 
   programs = {
     plasma = {
+      configFile = {
+        kded5rc = {
+          "Module-browserintegrationflatpakintegrator" = {
+            autoload = false;
+          };
+        };
+      };
+
       fonts = {
         fixedWidth = fixedWidthFont;
         general = generalFont;
