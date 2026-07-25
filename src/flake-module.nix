@@ -298,6 +298,7 @@ in
             azaleoid
             camellia
             erythron
+            magnolia
             bingshan
             ops
             root
