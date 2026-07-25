@@ -1,14 +1,54 @@
 {
+  bingshan,
+  config,
   home,
+  lib,
   ...
 }:
+let
+  inherit (lib)
+    elemAt
+    ;
+
+  first = list: elemAt list 0;
+
+  fontFamilies =
+    config.fonts.fontconfig.defaultFonts;
+
+  fontSize = config.gtk.font.size;
+
+  fixedWidthFont = {
+    family = first fontFamilies.monospace;
+    pointSize = fontSize;
+  };
+
+  generalFont = {
+    family = first fontFamilies.sansSerif;
+    pointSize = fontSize;
+  };
+in
 {
   imports = [
+    bingshan.profiles.fonts
+    bingshan.profiles.gtk
     home.profiles.plasma
   ];
 
   programs = {
     plasma = {
+      fonts = {
+        fixedWidth = fixedWidthFont;
+        general = generalFont;
+        menu = generalFont;
+
+        small = generalFont // {
+          pointSize = fontSize - 2;
+        };
+
+        toolbar = generalFont;
+        windowTitle = generalFont;
+      };
+
       panels = [
         {
           alignment = "center";
