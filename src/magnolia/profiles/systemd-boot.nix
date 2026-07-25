@@ -22,6 +22,20 @@ in
 
   boot = {
     lanzaboote = {
+      allowUnsigned = false;
+
+      autoEnrollKeys = {
+        allowBrickingMyMachine = false;
+        autoReboot = false;
+        enable = true;
+        includeChecksumsFromTPM = false;
+        includeMicrosoftKeys = true;
+      };
+
+      autoGenerateKeys = {
+        enable = false;
+      };
+
       enable = true;
       pkiBundle = "/var/lib/sbctl";
     };
