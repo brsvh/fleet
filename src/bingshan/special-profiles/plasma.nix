@@ -37,7 +37,7 @@ in
   programs = {
     plasma = {
       configFile = {
-        kded5rc = {
+        kded6rc = {
           "Module-browserintegrationflatpakintegrator" = {
             autoload = false;
           };
