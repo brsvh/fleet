@@ -41,6 +41,10 @@ in
           "Module-browserintegrationflatpakintegrator" = {
             autoload = false;
           };
+
+          "Module-browserintegrationreminder" = {
+            autoload = false;
+          };
         };
       };
 
