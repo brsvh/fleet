@@ -382,6 +382,24 @@
       url = "git+https://github.com/Mic92/sops-nix.git?ref=master";
     };
 
+    steam = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+
+        systems = {
+          follows = "systems";
+        };
+      };
+
+      url = "git+https://github.com/different-name/steam-config-nix.git?ref=master";
+    };
+
     systems = {
       url = "git+https://github.com/nix-systems/x86_64-linux.git?ref=main";
     };

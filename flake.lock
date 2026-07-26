@@ -685,6 +685,7 @@
         "pyproject-overlay": "pyproject-overlay",
         "rust-overlay": "rust-overlay",
         "sops": "sops",
+        "steam": "steam",
         "systems": "systems",
         "treefmt": "treefmt",
         "uv": "uv"
@@ -730,6 +731,33 @@
         "ref": "master",
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
+      }
+    },
+    "steam": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784628692,
+        "narHash": "sha256-N8ccJ1g3YoJXdNtTwPT6olwN0VervTSPe6J+hUCa0hA=",
+        "ref": "master",
+        "rev": "0ff179e83623eb730fc37ce7fda293e202e53fac",
+        "revCount": 142,
+        "type": "git",
+        "url": "https://github.com/different-name/steam-config-nix.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "https://github.com/different-name/steam-config-nix.git"
       }
     },
     "systems": {

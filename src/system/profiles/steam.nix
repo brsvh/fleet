@@ -1,10 +1,15 @@
 {
+  inputs,
   lib,
   pkgs,
   system,
   ...
 }:
 let
+  inherit (inputs)
+    steam
+    ;
+
   inherit (lib)
     mkDefault
     mkForce
@@ -12,6 +17,7 @@ let
 in
 {
   imports = [
+    steam.nixosModules.default
     system.profiles.firewall
   ];
 
