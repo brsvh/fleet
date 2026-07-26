@@ -15,8 +15,6 @@ in
   ];
 
   hardware = {
-    enable32Bit = true;
-
     facter = {
       reportPath = magnolia.etc.facter;
     };
