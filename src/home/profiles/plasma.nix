@@ -11,6 +11,7 @@ let
     ;
 
   inherit (lib)
+    getExe
     mkDefault
     ;
 in
@@ -43,6 +44,8 @@ in
   home = {
     packages = with pkgs; [
       haruna
+      plasma-plugin-waywallen
+      waywallen
     ];
   };
 
@@ -105,6 +108,31 @@ in
           Service = {
             Environment = [
               "PINENTRY_KDE_USE_WALLET=1"
+            ];
+          };
+        };
+
+        waywallen = {
+          Install = {
+            WantedBy = [
+              "graphical-session.target"
+            ];
+          };
+
+          Service = {
+            ExecStart = "${getExe pkgs.waywallen} --no-ui";
+            Restart = "on-failure";
+          };
+
+          Unit = {
+            After = [
+              "graphical-session.target"
+            ];
+
+            Description = "Waywallen wallpaper manager";
+
+            PartOf = [
+              "graphical-session.target"
             ];
           };
         };
