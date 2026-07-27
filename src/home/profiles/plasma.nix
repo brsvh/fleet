@@ -40,6 +40,12 @@ in
     };
   };
 
+  home = {
+    packages = with pkgs; [
+      haruna
+    ];
+  };
+
   i18n = {
     inputMethod = {
       fcitx5 = {
