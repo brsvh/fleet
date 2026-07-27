@@ -3215,6 +3215,7 @@
 
 (use-package org
   :after (bs-lib)
+  :commands (org-set-tags-command)
 
   :custom
   ;; Directory beneath org files.
@@ -3255,6 +3256,14 @@
   ;; columns from the right border regardless of window width.
   (org-tags-column -80)
   (org-auto-align-tags t)
+
+  ;; Offer only the execution contexts defined for the GTD workflow:
+  ;; required locations, calls, errands, and discussion agendas.
+  (org-tag-alist '(("@agenda")
+                   ("@errand")
+                   ("@home")
+                   ("@office")
+                   ("@phone")))
 
   ;; Define a single sequential task workflow with active states
   ;; before `|' and terminal states after it: `TODO' for newly
@@ -3326,8 +3335,51 @@
   :preface
   ;; Acknowledge the required Org GTD 4.x upgrade steps up front so
   ;; the package does not emit its one-time migration warning on load.
-  (setq org-gtd-update-ack "4.0.0")
+  (setq org-gtd-update-ack "4.0.0"))
 
+(use-package org-gtd-agenda-transient
+  :after (org-agenda)
+
+  :bind
+  ( :map org-agenda-mode-map
+    ;; Open the Org GTD action menu for the agenda item at point,
+    ;; including state, time, clocking, and clarification operations.
+    ("C-c ." . org-gtd-agenda-transient)))
+
+(use-package org-gtd-areas-of-focus
+  :commands (org-gtd-set-area-of-focus)
+
+  :custom
+  ;; Classify GTD projects and actions by the continuing
+  ;; responsibility they support, independently of their execution
+  ;; context tags.
+  (org-gtd-areas-of-focus '("Administration"
+                            "Development"
+                            "Family"
+                            "Finance"
+                            "Infrastructure"
+                            "Personal"
+                            "Research")))
+
+(use-package org-gtd-capture
+  :after (bs-ext)
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Capture a new item directly into the GTD inbox, ensuring the
+    ;; inbox file exists before delegating to `org-capture'.
+    ("c" . org-gtd-capture)))
+
+(use-package org-gtd-command-center
+  :after (bs-ext)
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open the central Org GTD menu for capture, engagement, system
+    ;; review, reflection, and archival commands.
+    ("g" . org-gtd-command-center)))
+
+(use-package org-gtd-core
   :custom
   ;; Store Org GTD's inbox, archive, and supporting files inside the
   ;; GTD subtree already included in `org-agenda-files'.
@@ -3340,18 +3392,61 @@
                              (next . "NEXT")
                              (wait . "WAIT")
                              (done . "DONE")
-                             (canceled . "CNCL")))
+                             (canceled . "CNCL"))))
+
+(use-package org-gtd-engage
+  :after (bs-ext)
 
   :bind
   ( :map ctl-c-a-map
     ;; Open the org-gtd agenda view focused on actionable work and
     ;; other GTD-specific reviews.
-    ("a" . org-gtd-engage)
+    ("a" . org-gtd-engage)))
 
-    ;; Capture a new item directly into the GTD inbox, ensuring the
-    ;; inbox file exists before delegating to `org-capture'.
-    ("c" . org-gtd-capture)
+(use-package org-gtd-mode
+  :after (bs-hooks)
 
+  :hook
+  ;; Enable global Org GTD integration shortly after startup,
+  ;; including inbox counts, dependency handling, and TODO-state
+  ;; maintenance.
+  (bs-after-startup-early-hook . org-gtd-mode))
+
+(use-package org-gtd-organize
+  :after (org-gtd-clarify)
+  :functions (org-gtd-organize-type-member-p)
+
+  :bind
+  ( :map org-gtd-clarify-mode-map
+    ;; Finish clarifying the current inbox item by opening the
+    ;; organizer that assigns its GTD type and files it accordingly.
+    ("C-c C-c" . org-gtd-organize)))
+
+(use-package org-gtd-organize-core
+  :after (org)
+
+  :config
+  ;; Replace the package default, which prompts for tags on every
+  ;; item, with type-aware metadata hooks defined below.
+  (setq-default org-gtd-organize-hooks nil)
+
+  ;; Prompt for optional execution-context tags only on standalone and
+  ;; project actions, calendar items, and habits.
+  (add-to-list 'org-gtd-organize-hooks
+               #'(lambda ()
+                   (when (org-gtd-organize-type-member-p
+                          '(next-action calendar habit project-task))
+                     (org-set-tags-command))))
+
+  ;; Assign the applicable items to a continuing Area of Focus after
+  ;; any execution-context tags have been selected.
+  (add-to-list 'org-gtd-organize-hooks 'org-gtd-set-area-of-focus t))
+
+(use-package org-gtd-process
+  :after (bs-ext)
+
+  :bind
+  ( :map ctl-c-a-map
     ;; Process inbox items sequentially through Org GTD's clarify
     ;; workflow until the configured inbox files are exhausted.
     ("i" . org-gtd-process-inbox)))
