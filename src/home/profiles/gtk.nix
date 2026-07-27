@@ -29,6 +29,7 @@ in
 
     gtk2 = {
       configLocation = mkDefault "${configHome}/gtk-2.0/gtkrc";
+      force = mkDefault true;
     };
   };
 }
