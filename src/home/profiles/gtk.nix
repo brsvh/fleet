@@ -11,6 +11,7 @@ let
 
   inherit (lib)
     mkDefault
+    optionalAttrs
     ;
 
   ibm-plex-sans = pkgs.ibm-plex.override {
@@ -31,5 +32,13 @@ in
       configLocation = mkDefault "${configHome}/gtk-2.0/gtkrc";
       force = mkDefault true;
     };
+  };
+
+  home = {
+    sessionVariables =
+      optionalAttrs (config.gtk.cursorTheme != null)
+        {
+          XCURSOR_THEME = config.gtk.cursorTheme.name;
+        };
   };
 }
