@@ -36,6 +36,7 @@ in
   imports = [
     bingshan.profiles.fonts
     bingshan.profiles.gtk
+    bingshan.profiles.xdg
     home.profiles.plasma
   ];
 
@@ -47,6 +48,10 @@ in
       ++ (with pkgs.kdePackages; [
         kdenlive
       ]);
+
+    sessionVariables = {
+      PULSE_COOKIE = "${config.xdg.configHome}/pulse/cookie";
+    };
   };
 
   programs = {
