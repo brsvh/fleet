@@ -97,4 +97,18 @@ in
       };
     };
   };
+
+  systemd = {
+    user = {
+      services = {
+        gpg-agent = {
+          Service = {
+            Environment = [
+              "PINENTRY_KDE_USE_WALLET=1"
+            ];
+          };
+        };
+      };
+    };
+  };
 }
