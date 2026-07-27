@@ -3,6 +3,7 @@
   config,
   home,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -33,6 +34,16 @@ in
     bingshan.profiles.gtk
     home.profiles.plasma
   ];
+
+  home = {
+    packages =
+      (with pkgs; [
+        subtitlecomposer
+      ])
+      ++ (with pkgs.kdePackages; [
+        kdenlive
+      ]);
+  };
 
   programs = {
     plasma = {
