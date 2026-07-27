@@ -18,14 +18,18 @@ let
 
   fontSize = config.gtk.font.size;
 
-  fixedWidthFont = {
+  monospace = {
     family = first fontFamilies.monospace;
     pointSize = fontSize;
   };
 
-  generalFont = {
+  sansSerif = {
     family = first fontFamilies.sansSerif;
     pointSize = fontSize;
+  };
+
+  waywallen = {
+    plugin = "org.waywallen.kde";
   };
 in
 {
@@ -60,16 +64,22 @@ in
       };
 
       fonts = {
-        fixedWidth = fixedWidthFont;
-        general = generalFont;
-        menu = generalFont;
+        fixedWidth = monospace;
+        general = sansSerif;
+        menu = sansSerif;
 
-        small = generalFont // {
+        small = sansSerif // {
           pointSize = fontSize - 2;
         };
 
-        toolbar = generalFont;
-        windowTitle = generalFont;
+        toolbar = sansSerif;
+        windowTitle = sansSerif;
+      };
+
+      kscreenlocker = {
+        appearance = {
+          wallpaperCustomPlugin = waywallen;
+        };
       };
 
       panels = [
@@ -130,6 +140,10 @@ in
           ];
         }
       ];
+
+      workspace = {
+        wallpaperCustomPlugin = waywallen;
+      };
     };
   };
 }
