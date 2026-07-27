@@ -19,6 +19,8 @@ in
   imports = [
     steam.nixosModules.default
     system.profiles.firewall
+    system.profiles.gamemode
+    system.profiles.gamescope
   ];
 
   hardware = {
