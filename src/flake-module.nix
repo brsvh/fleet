@@ -258,6 +258,7 @@ in
               profiles =
                 config.configurations.home.bingshan.profiles
                 ++ [
+                  fleet.bingshan.special-profiles.nvidia
                   fleet.bingshan.special-profiles.plasma
                   fleet.bingshan.special-profiles.steam
                 ];
