@@ -3482,6 +3482,13 @@
     ;; workflow until the configured inbox files are exhausted.
     ("i" . org-gtd-process-inbox)))
 
+(use-package org-gtd-wip
+  :after (org-gtd-mode)
+
+  ;; `org-gtd-mode' adds a WIP cleanup function to `kill-emacs-hook'
+  ;; without loading its defining library.
+  :demand t)
+
 (use-package org-modern
   :after (org)
   :hook
