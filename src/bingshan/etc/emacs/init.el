@@ -2854,6 +2854,17 @@
 (use-package denote
   :after (dired)
 
+  :custom
+  ;; Define the controlled vocabulary offered during keyword
+  ;; completion, combining note roles with the `emacs' topic.
+  (denote-known-keywords '("decision"
+                           "emacs"
+                           "journal"
+                           "meeting"
+                           "person"
+                           "project"
+                           "reference"))
+
   :bind
   ( :map dired-mode-map
     ;;  Rename marked Denote files using their front matter.
@@ -2874,6 +2885,24 @@
   ;; Enable `denote-dired-mode' in Dired buffers.  This augments Dired
   ;; with Denote-specific commands and metadata handling.
   (dired-mode-hook . denote-dired-mode))
+
+(use-package denote-journal
+  :after (denote)
+
+  :custom
+  ;; Reuse one journal entry per calendar day instead of creating a
+  ;; separate entry on every invocation.
+  (denote-journal-interval 'daily)
+
+  ;; Mark every journal entry with `journal' so it can be identified
+  ;; and retrieved independently of ordinary Denote notes.
+  (denote-journal-keyword "journal")
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Visit today's journal entry or create it when absent; a prefix
+    ;; argument selects another date.
+    ("j" . denote-journal-new-or-existing-entry)))
 
 ;;
 ;; EasyPG Assistant (info "(epa) Top")
