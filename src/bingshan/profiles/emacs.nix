@@ -288,7 +288,7 @@ in
 
         (use-package mu4e-update
           :custom
-          (mu4e-get-mail-command "offlineimap -u basic -o || true"))
+          (mu4e-get-mail-command "true"))
 
         (use-package sendmail
           :custom
