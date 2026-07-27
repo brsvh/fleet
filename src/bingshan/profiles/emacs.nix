@@ -138,9 +138,6 @@ let
     )
   );
 
-  libext =
-    pkgs.stdenv.targetPlatform.extensions.sharedLibrary;
-
   toJSON' = value: toJSON (toJSON value);
 in
 {
@@ -212,7 +209,9 @@ in
                               :object-type 'alist
                               :array-type 'list
                               :null-object nil
-                              :false-object nil)))
+                              :false-object nil))
+
+          :defer t)
 
         (use-package emacs
           :demand t
@@ -232,31 +231,21 @@ in
 
         (use-package epa-hook
           :config
-          (add-to-list 'epa-file-encrypt-to "${primary.gpg.key}"))
+          (add-to-list 'epa-file-encrypt-to "${primary.gpg.key}")
+
+          :defer t)
 
         (use-package mail-source
           :custom
-          (mail-source-directory "${primaryMaildir}"))
+          (mail-source-directory "${primaryMaildir}")
+
+          :defer t)
 
         (use-package message
           :custom
           (message-directory "${primaryMaildir}")
           (message-sendmail-envelope-from 'header)
           (message-signature "${primary.signature.text}"))
-
-        (use-package mu4e
-          :custom
-          (mu4e-compose-context-policy 'ask)
-          (mu4e-context-policy 'pick-first)
-          (mu4e-maildir "${maildirBase}")
-          (mu4e-sent-folder "${mkPrimaryMaildir "Sent"}")
-          (mu4e-drafts-folder "${mkPrimaryMaildir "Drafts"}")
-          (mu4e-trash-folder "${mkPrimaryMaildir "Trash"}")
-
-          :config
-          (setq mu4e-contexts
-                (list
-                 ${mu4eEmailContexts})))
 
         (use-package mu4e-bookmarks
           :custom
@@ -284,26 +273,65 @@ in
                :key ?s)
              ( :name "${toSentenceCase primaryName} junk messages"
                :query "maildir:${mkPrimaryMaildir "Junk"}"
-               :key ?j))))
+               :key ?j)))
+
+          :defer t)
+
+        (use-package mu4e-context
+          :custom
+          (mu4e-context-policy 'pick-first)
+
+          :config
+          (setq mu4e-contexts (list ${mu4eEmailContexts}))
+
+          :defer t)
+
+        (use-package mu4e-draft
+          :custom
+          (mu4e-compose-context-policy 'ask)
+
+          :defer t)
+
+        (use-package mu4e-folders
+          :custom
+          (mu4e-sent-folder "${mkPrimaryMaildir "Sent"}")
+          (mu4e-drafts-folder "${mkPrimaryMaildir "Drafts"}")
+          (mu4e-trash-folder "${mkPrimaryMaildir "Trash"}")
+
+          :defer t)
+
+        (use-package mu4e-message
+          :commands (mu4e-message-contact-field-matches
+        	     mu4e-message-field)
+
+          :defer t)
 
         (use-package mu4e-update
           :custom
-          (mu4e-get-mail-command "true"))
+          (mu4e-get-mail-command "true")
+
+          :defer t)
 
         (use-package sendmail
           :custom
           (mail-envelope-from 'header)
           (mail-specify-envelope-from t)
           (send-mail-function 'sendmail-send-it)
-          (sendmail-program "msmtp"))
+          (sendmail-program "msmtp")
+
+          :defer t)
 
         (use-package smime
           :custom
-          (smime-certificate-directory "${primaryMaildir}/certs/"))
+          (smime-certificate-directory "${primaryMaildir}/certs/")
+
+          :defer t)
 
         (use-package smtpmail
           :custom
-          (smtpmail-queue-dir "${maildirBase}/queued-mail/"))
+          (smtpmail-queue-dir "${maildirBase}/queued-mail/")
+
+          :defer t)
 
         (use-package startup
           :demand t

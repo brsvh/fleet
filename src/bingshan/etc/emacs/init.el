@@ -699,6 +699,8 @@
 ;;
 
 (use-package consult-jinx
+  :after (bs-ext)
+
   :bind
   ( :map ctl-c-map
     ;; Provide a focused, interactive way to review and fix spelling
@@ -3214,7 +3216,7 @@
 (use-package mu4e-update
   :custom
   ;; Hide annoying "mu4e Retrieving mail..." msg in mini buffer:
-  (mu4e-hide-index-messages nil)
+  (mu4e-hide-index-messages t)
 
   ;; Retrieving and indexing messages every 5 minutes.
   (mu4e-update-interval 300)
