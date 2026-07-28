@@ -19,7 +19,7 @@ in
       spotify = {
         enable = mkEnableOption "Spotify client";
 
-        package = mkPackageOption pkgs "psst" { };
+        package = mkPackageOption pkgs "spotify" { };
       };
     };
   };
