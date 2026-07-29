@@ -1,16 +1,33 @@
 {
+  bingshan,
+  config,
   home,
   lib,
   pkgs,
   ...
 }:
 let
+  inherit (builtins)
+    readDir
+    ;
+
   inherit (lib)
+    filterAttrs
+    getExe'
+    hasSuffix
+    mapAttrs'
     mkForce
+    nameValuePair
+    removeSuffix
+    ;
+
+  inherit (pkgs)
+    fontconfig
     ;
 in
 {
   imports = [
+    bingshan.profiles.sops
     home.profiles.fonts
   ];
 
@@ -153,6 +170,43 @@ in
 
     sessionVariables = {
       FREETYPE_PROPERTIES = "truetype:interpreter-version=40";
+    };
+  };
+
+  sops = {
+    secrets =
+      let
+        directory = bingshan.etc.fonts.mbtype.__path;
+
+        files = filterAttrs (
+          name: type:
+          type == "regular" && hasSuffix ".otf.sops" name
+        ) (readDir directory);
+      in
+      mapAttrs' (
+        name: _:
+        let
+          filename = removeSuffix ".sops" name;
+        in
+        nameValuePair "fonts/${filename}" {
+          format = "binary";
+          path = "${config.xdg.dataHome}/fonts/mbtype/${filename}";
+          sopsFile = directory + "/${name}";
+        }
+      ) files;
+  };
+
+  systemd = {
+    user = {
+      services = {
+        sops-nix = {
+          Service = {
+            ExecStartPost = ''
+              ${getExe' fontconfig "fc-cache"} -f ${config.xdg.dataHome}/fonts/mbtype
+            '';
+          };
+        };
+      };
     };
   };
 }
