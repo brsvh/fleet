@@ -50,6 +50,9 @@
       calendar = {
         accounts = {
           bingshan = {
+            primary = true;
+            primaryCollection = "personal";
+
             khal = {
               enable = true;
               type = "discover";
@@ -385,4 +388,18 @@
         };
       };
     };
+
+  programs = {
+    khal = {
+      locale = {
+        dateformat = "%Y-%m-%d";
+        datetimeformat = "%Y-%m-%d %H:%M";
+        default_timezone = "Asia/Shanghai";
+        local_timezone = "Asia/Shanghai";
+        longdateformat = "%Y-%m-%d %a";
+        longdatetimeformat = "%Y-%m-%d %a %H:%M";
+        timeformat = "%H:%M";
+      };
+    };
+  };
 }
