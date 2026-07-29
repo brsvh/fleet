@@ -251,6 +251,17 @@ in
               key_groups = [
                 {
                   age = [
+                    bingshan
+                  ];
+                }
+              ];
+
+              path_regex = "^src/bingshan/etc/(sops\.yaml|fonts/.*\.(otf|ttf)\.sops)$";
+            }
+            {
+              key_groups = [
+                {
+                  age = [
                     camellia
                   ];
                 }
