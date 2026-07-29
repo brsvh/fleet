@@ -135,6 +135,7 @@ in
         ];
 
         monospace = [
+          "Triplicate A Code"
           "Consolas"
           "Cascadia Mono"
           "Courier New"
