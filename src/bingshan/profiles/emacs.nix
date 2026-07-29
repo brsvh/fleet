@@ -252,7 +252,9 @@ in
           :custom
           (message-directory "${primaryMaildir}")
           (message-sendmail-envelope-from 'header)
-          (message-signature "${primary.signature.text}"))
+          (message-signature "${primary.signature.text}")
+
+          :defer t)
 
         (use-package mu4e-bookmarks
           :custom
