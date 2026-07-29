@@ -3072,17 +3072,18 @@
                  (window-height . 0.35))))
 
 (use-package ebdb-message
-  :after (message)
-  :demand t)
+  :after (message sendmail)
+  :commands (ebdb-insinuate-mail
+             ebdb-insinuate-message)
 
-(use-package ebdb-mu4e
-  :after (mu4e)
-  :demand t
+  :hook
+  ;; Load EBDB only when Mail Mode prepares an outgoing message, then
+  ;; install its address-completion integration.
+  (mail-setup-hook . ebdb-insinuate-mail)
 
-  :custom
-  ;; Query before creating contacts from mail, preserving the candidate
-  ;; pool boundary until the dedicated review flow exists.
-  (ebdb-mu4e-auto-update-p 'query))
+  ;; Load EBDB only when a Message buffer is actually created, keeping
+  ;; ordinary mu4e navigation independent of the contacts database.
+  (message-mode-hook . ebdb-insinuate-message))
 
 (use-package mu4e
   :bind
