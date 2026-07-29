@@ -2628,10 +2628,11 @@
                           (set-window-dedicated-p window nil)
                           (quit-window nil window))
                       (prog1 (apply orig args)
-                        (when-let* ((buffer
-                                     (get-buffer "*Agent-Shell Buffers*"))
-                                    (window
-                                     (get-buffer-window buffer)))
+                        (when-let*
+                            ((buffer
+                              (get-buffer "*Agent-Shell Buffers*"))
+                             (window
+                              (get-buffer-window buffer)))
                           (when (null agent-shell-manager-side)
                             (set-window-dedicated-p window nil)))))))
               '((name . agent-shell-manager-buffer-normalize)))
@@ -2987,9 +2988,9 @@
   :functions (consult-mu--view-action)
 
   :custom
-  ;; Use the dynamic mu4e-backed search by default so selected
+  ;; Use the async mu4e-backed search by default so selected
   ;; candidates keep the normal mu4e header and message actions.
-  (consult-mu-default-command 'consult-mu-dynamic)
+  (consult-mu-default-command 'consult-mu-async)
 
   ;; Keep enough matches available for broad mailbox searches without
   ;; making the minibuffer completion table unbounded.
@@ -3295,7 +3296,8 @@
   (mu4e-update-interval 300)
 
   :config
-  ;; Keep background mail indexing from opening a visible update buffer.
+  ;; Keep background mail indexing from opening a visible update
+  ;; buffer.
   (add-to-list 'display-buffer-alist
                '("\\*mu4e-update\\*"
                  (display-buffer-no-window)
