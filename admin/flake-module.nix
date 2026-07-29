@@ -53,6 +53,8 @@ in
     deploy = {
       nodes =
         let
+          azaleoid = self.nixosConfigurations.azaleoid;
+
           camellia = self.nixosConfigurations.camellia;
 
           deploy-lib =
@@ -61,6 +63,20 @@ in
           erythron = self.nixosConfigurations.erythron;
         in
         {
+          azaleoid = {
+            fastConnection = true;
+            hostname = "azaleoid";
+
+            profiles = {
+              system = {
+                path = deploy-lib.activate.nixos azaleoid;
+                user = "root";
+              };
+            };
+
+            sshUser = "root";
+          };
+
           camellia = {
             hostname = camellia.config.networking.fqdn;
 
