@@ -2951,7 +2951,6 @@
 (use-package bs-mu4e
   :after (mu4e-compose)
   :commands (bs-mu4e-compose-completion-enable
-             bs-mu4e-ebdb-complete-enable
              bs-mu4e-ebdb-enable)
 
   :init
@@ -2961,12 +2960,7 @@
 
   ;; Apply the same cleaned contact candidate set to mu4e's compose
   ;; completion handler.
-  (bs-mu4e-compose-completion-enable)
-
-  ;; Register the EBDB Complete compatibility advice before
-  ;; `ebdb-complete' loads, so TAB in compose buffers stays on the
-  ;; standard completion-at-point path.
-  (bs-mu4e-ebdb-complete-enable))
+  (bs-mu4e-compose-completion-enable))
 
 (use-package bs-mu4e
   :after (mu4e-headers)
@@ -3051,6 +3045,9 @@
   ;; mail addresses.
   (ebdb-complete-mail-allow-cycling 10)
 
+  ;; Match EBDB field completions case-insensitively.
+  (ebdb-completion-ignore-case t)
+
   ;; Keep address insertion readable while avoiding names that merely
   ;; repeat the address.
   (ebdb-mail-avoid-redundancy t)
@@ -3073,28 +3070,6 @@
                  (side . bottom)
                  (slot . 0)
                  (window-height . 0.35))))
-
-(use-package ebdb
-  :custom
-  ;; Let EBDB Complete install its mail-address completion support;
-  ;; `bs-mu4e' restores the standard TAB binding after it is enabled.
-  (ebdb-complete-mail t)
-
-  ;; Show the completed contact record when using EBDB Complete's own
-  ;; mail completion command.
-  (ebdb-completion-display-record t)
-
-  ;; Match EBDB field completions case-insensitively.
-  (ebdb-completion-ignore-case t))
-
-(use-package ebdb-complete
-  :after (message)
-  :commands (ebdb-complete-enable)
-
-  :init
-  ;; Enable EBDB's message-mode integration once `message' is
-  ;; available.
-  (ebdb-complete-enable))
 
 (use-package ebdb-message
   :after (message)
