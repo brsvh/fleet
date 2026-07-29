@@ -3171,18 +3171,17 @@
   (mu4e-headers-date-format "%m/%d/%Y %I:%M:%S %p")
   (mu4e-headers-time-format "%m/%d/%Y %I:%M:%S %p")
 
-  ;; Show compact markers for the useful message flags.  Leave out
-  ;; `seen' and `unread' because those states are already visible
-  ;; through header faces and `new'.
+  ;; Show compact markers only for flags that distinguish messages.
+  ;; Leave out `list' and `personal' because they add no useful
+  ;; distinction here, and omit `seen' and `unread' because header
+  ;; faces and `new' already expose those states.
   (mu4e-headers-visible-flags '(attach
                                 calendar
                                 draft
                                 encrypted
                                 flagged
-                                list
                                 new
                                 passed
-                                personal
                                 replied
                                 signed
                                 trashed))
