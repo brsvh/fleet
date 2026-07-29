@@ -1961,6 +1961,8 @@
 
 (use-package magit
   :after (bs-ext)
+  :commands (magit-init
+             magit-status-setup-buffer)
 
   :custom
   ;; Disable Magit's global key bindings.
@@ -1971,12 +1973,14 @@
     ;; Press \\`C-c v g' to display Magit.
     ("g" . magit)))
 
-(use-package magit-auto-revert
-  :hook
-  ;; Enable Magit's repository-aware auto-revert after startup, so Magit
-  ;; operations keep visited Git buffers in sync without adding startup
-  ;; work.
-  (bs-after-startup-late-hook . magit-auto-revert-mode))
+(use-package magit-autorevert
+  :after (magit)
+  :commands (magit-auto-revert-mode)
+
+  :init
+  ;; Enable repository-aware auto-revert only after Magit is first
+  ;; loaded, keeping the integration out of the startup path.
+  (magit-auto-revert-mode +1))
 
 (use-package magit-status
   :after (magit)
@@ -2033,11 +2037,6 @@
   ;; Keep buffer selection unified under a single interface instead of
   ;; fragmenting navigation between competing buffer lists.
   (tabspaces-use-filtered-buffers-as-default nil)
-
-  :config
-  ;; Ensure project-aware tooling is available for workspace
-  ;; operations.
-  (require 'magit)
 
   :bind
   ( :map global-map
@@ -2100,16 +2099,17 @@
   :commands (treemacs-git-mode)
 
   :init
-  ;; Ensure Treemacs reflects Git state changes caused by Magit
-  ;; operations.  Since staging and committing do not emit file-system
-  ;; events, this bridges the gap so file faces update correctly
-  ;; without requiring manual refresh.
-  (require 'treemacs-magit)
-
   ;; Allow Git state updates to be applied asynchronously, so visual
   ;; corrections from version-control actions do not block tree
   ;; navigation.
   (treemacs-git-mode 'deferred))
+
+(use-package treemacs-magit
+  :after (magit treemacs)
+
+  ;; Load the bridge only when both applications are in use, so
+  ;; opening either one alone does not pull in the other.
+  :demand t)
 
 (use-package treemacs-git-commit-diff-mode
   :after (treemacs)
