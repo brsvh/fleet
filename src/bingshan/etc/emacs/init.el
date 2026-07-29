@@ -1321,6 +1321,18 @@
      (add-hook 'completion-at-point-functions 'cape-file -10 t))))
 
 (use-package citre
+  :commands (citre-auto-enable-citre-mode)
+
+  :preface
+  (defun citre--auto-enable-citre-mode ()
+    "Load Citre and try to enable it in programming file buffers."
+    (when (derived-mode-p 'prog-mode)
+      (require 'citre-config)
+      ;; Keep this wrapper as the sole auto-enable entry point; the
+      ;; default configuration installs an unfiltered hook itself.
+      (remove-hook 'find-file-hook #'citre-auto-enable-citre-mode)
+      (citre-auto-enable-citre-mode)))
+
   :custom
   ;; Enable our citre back-ends.
   (citre-auto-enable-citre-mode-backends '(global tags))
@@ -1355,15 +1367,9 @@
     ("u" . citre-update-this-tags-file))
 
   :hook
-  ;; Load Citre default configuration after early startup has
-  ;; completed.  This ensures that core startup hooks run first, while
-  ;; still making Citre fully available before interactive use.
-  (bs-after-startup-early-hook . (lambda ()
-                                   (require 'citre-config)))
-
-  ;; Automatically enable `citre-mode' when visiting a file, provided
-  ;; its major mode matches `citre-auto-enable-citre-mode-modes'.
-  (find-file-hook . citre-auto-enable-citre-mode))
+  ;; Load Citre's default configuration and try to enable `citre-mode'
+  ;; only when visiting a file whose major mode is configured.
+  (find-file-hook . citre--auto-enable-citre-mode))
 
 (use-package consult-eglot-embark
   :after (eglot embark)
