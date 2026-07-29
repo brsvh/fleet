@@ -231,10 +231,6 @@ in
           :when (display-graphic-p)
 
           :config
-          (set-face-attribute 'default nil
-                              :family ${toJSON monospaceFont})
-          (set-face-attribute 'fixed-pitch nil
-                              :family ${toJSON monospaceFont})
           (set-fontset-font t 'cjk-misc
                             (font-spec :family ${toJSON cjkFont}))
           (set-fontset-font t 'han
@@ -350,6 +346,14 @@ in
 
           :custom
           (user-mail-address "${primary.address}"))
+      '';
+
+      extraEarlyConfig = ''
+        (when (display-graphic-p)
+          (set-face-attribute 'default nil
+                              :family ${toJSON monospaceFont})
+          (set-face-attribute 'fixed-pitch nil
+                              :family ${toJSON monospaceFont}))
       '';
 
       extraPackages =
