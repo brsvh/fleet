@@ -594,7 +594,6 @@
 
 (use-package modus-themes
   :after (bs-hooks)
-  :demand t
   :commands (modus-themes-select)
 
   :custom
