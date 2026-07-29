@@ -3121,6 +3121,12 @@
   (mu4e-alert-set-default-style 'notifications)
   (mu4e-alert-enable-notifications))
 
+(use-package mu4e-compose
+  :hook
+  ;; Keep the major-mode label compact in Mu4e compose buffers.
+  (mu4e-compose-mode-hook . (lambda ()
+                              (setq-local mode-name "Mail"))))
+
 (use-package mu4e-headers
   :defines (mu4e-headers-attach-mark
             mu4e-headers-calendar-mark
@@ -3214,7 +3220,12 @@
         mu4e-headers-thread-blank-prefix '("   " . "   ")
         mu4e-headers-thread-orphan-prefix '("╶─ " . "╶─ ")
         mu4e-headers-thread-single-orphan-prefix '("╶─ " . "╶─ ")
-        mu4e-headers-thread-duplicate-prefix '("═ " . "═ ")))
+        mu4e-headers-thread-duplicate-prefix '("═ " . "═ "))
+
+  :hook
+  ;; Keep the major-mode label compact in Mu4e headers buffers.
+  (mu4e-headers-mode-hook . (lambda ()
+                              (setq-local mode-name "Mail"))))
 
 (use-package mu4e-helpers
   :custom
@@ -3239,13 +3250,27 @@
   :config
   (add-to-list 'display-buffer-alist
                '("\\*mu4e-main\\*"
-                 (display-buffer-same-window))))
+                 (display-buffer-same-window)))
+
+  :hook
+  ;; Keep the major-mode label compact in Mu4e main and info buffers.
+  ((mu4e-main-mode-hook
+    mu4e-org-mode-hook)
+   . (lambda ()
+       (setq-local mode-name "Mail"))))
 
 (use-package mu4e-modeline
   :custom
   ;; Disable mu4e's global modeline indicators while keeping
   ;; buffer-specific mu4e modeline information available.
   (mu4e-modeline-show-global nil))
+
+(use-package mu4e-org
+  :hook
+  ;; Keep the major-mode label compact in Mu4e Org link buffers.
+  (mu4e-org-agenda-links-mode-hook
+   . (lambda ()
+       (setq-local mode-name "Mail"))))
 
 (use-package mu4e-search
   :custom
@@ -3274,7 +3299,20 @@
   (add-to-list 'display-buffer-alist
                '("\\*mu4e-update\\*"
                  (display-buffer-no-window)
-                 (allow-no-window . t))))
+                 (allow-no-window . t)))
+
+  :hook
+  ;; Keep the major-mode label compact in Mu4e update buffers.
+  (mu4e--update-mail-mode-hook . (lambda ()
+                                   (setq-local mode-name "Mail"))))
+
+(use-package mu4e-view
+  :hook
+  ;; Keep the major-mode label compact in rendered and raw mail views.
+  ((mu4e-raw-view-mode-hook
+    mu4e-view-mode-hook)
+   . (lambda ()
+       (setq-local mode-name "Mail"))))
 
 (use-package simple
   :custom
