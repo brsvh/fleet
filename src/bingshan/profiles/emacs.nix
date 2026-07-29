@@ -16,6 +16,8 @@ let
     toSentenceCase
     ;
 
+  cjkFont = "Zhuque Fangsong (technical preview)";
+
   monospaceFont = head config.fonts.fontconfig.defaultFonts.monospace;
 
   contact = config.accounts.contact.emacs;
@@ -167,6 +169,7 @@ in
         nixfmt
         pyright
         ripgrep
+        trionestypePackages.zhuque-fangsong
         vscode-json-languageserver
         wl-clipboard
         xclip
@@ -233,9 +236,9 @@ in
           (set-face-attribute 'fixed-pitch nil
                               :family ${toJSON monospaceFont})
           (set-fontset-font t 'cjk-misc
-                            (font-spec :family "Microsoft YaHei"))
+                            (font-spec :family ${toJSON cjkFont}))
           (set-fontset-font t 'han
-                            (font-spec :family "Microsoft YaHei")))
+                            (font-spec :family ${toJSON cjkFont})))
 
         (use-package epa-hook
           :config
