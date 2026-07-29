@@ -3047,11 +3047,103 @@
 (use-package bs-mu4e
   :after (mu4e-compose)
   :commands (bs-mu4e-compose-completion-enable)
+  :defines (bs-mu4e-ignored-contact-display-name-regexp)
+
+  :custom
+  ;; Ignore account-specific automated and non-person addresses.
+  (bs-mu4e-ignored-contact-email-regexps
+   '(;; Amazon SES envelope sender addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
+
+     ;; Atlassian bounce domains whose pre-organization label
+     ;; contains "bounces".
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*bounces[^@.]*\\.atlassian\\.[^@]+\\'"
+
+     ;; Stripe's dedicated bounce domain.
+     "\\`[^@]+@bounce\\.stripe\\.com\\'"
+
+     ;; Linux Foundation encoded-recipient envelope addresses.
+     "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+linuxfoundation\\.org\\'"
+
+     ;; Mailing-list rewritten senders, preserving normal list
+     ;; posting addresses without an equals sign.
+     "\\`[^@=]+=.+@lists\\.[^@]+\\'"
+
+     ;; KDE Invent generated incoming addresses.
+     "\\`incoming\\+[^@]+@invent\\.kde\\.org\\'"
+
+     ;; SurveyMonkey outbound platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*outbound\\.surveymonkey\\.com\\'"
+
+     ;; Substack platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*substack\\.com\\'"
+
+     ;; SparkPost delivery platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*sparkpost\\.com\\'"
+
+     ;; DingTalk generated forwarding addresses.
+     "\\`fw[[:digit:]]+-[[:alnum:]]+@dingtalk\\.com\\'"
+
+     ;; Cloudflare transactional addresses.
+     "\\`em@em[[:digit:]]+\\.cloudflare\\.com\\'"
+
+     ;; Mailing-list notice bounce addresses.
+     "\\`noticebounce\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated notice addresses.
+     "\\`\\(?:notice\\|[^@+]+[._-]notice\\)\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated verification addresses.
+     "\\`[^@+]*verification\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated return addresses.
+     "\\`return-to\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Generic role addresses that do not identify a person.
+     "\\`automation\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`bulletin\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`confluence\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`email\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`events\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`hello\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`help\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`info\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`invoice\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`mailer\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`marketing\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`meetings\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`membership\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`payments\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`receipts\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`reports\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`service\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`shop\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`support\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`webmaster\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Account-specific organization addresses.
+     "\\`nscc-cas@cnic\\.cn\\'"
+     "\\`cstcloud@cnic\\.cn\\'"
+     "\\`dccloud@cnic\\.cn\\'"
+     "\\`it_fapiao@meituan\\.com\\'"
+     "\\`12306@rails\\.com\\.cn\\'"))
 
   :init
   ;; Normalize mu4e's compose completion candidates so display names
   ;; stay readable and automated senders are hidden.
-  (bs-mu4e-compose-completion-enable))
+  (bs-mu4e-compose-completion-enable)
+
+  :config
+  ;; Extend the default automated display names with GitLab after
+  ;; `bs-mu4e' has initialized its customization variables.
+  (unless
+      (string-match-p
+       bs-mu4e-ignored-contact-display-name-regexp
+       "gitlab")
+    (setq bs-mu4e-ignored-contact-display-name-regexp
+          (concat
+           bs-mu4e-ignored-contact-display-name-regexp
+           "\\|\\`gitlab\\'"))))
 
 (use-package bs-mu4e
   :after (mu4e-headers)
