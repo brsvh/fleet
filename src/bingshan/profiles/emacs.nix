@@ -25,6 +25,21 @@ let
     calendar: calendar.local.path
   ) calendars;
 
+  contact = config.accounts.contact.emacs;
+
+  elispBool = value: if value then "t" else "nil";
+
+  mkContactAddressbook = addressbook: ''
+    ((accountName . ${toJSON addressbook.accountName})
+     (addressbookId . ${toJSON addressbook.addressbookId})
+     (default . ${elispBool addressbook.default})
+     (id . ${toJSON addressbook.id})
+     (khardName . ${toJSON addressbook.khardName})
+     (name . ${toJSON addressbook.name})
+     (path . ${toJSON addressbook.path})
+     (readOnly . ${elispBool addressbook.readOnly})
+     (syncCollection . ${toJSON addressbook.syncCollection}))'';
+
   primaryCalendars = filter (
     calendar: calendar.primary
   ) calendars;
@@ -40,8 +55,6 @@ let
   cjkFont = "Zhuque Fangsong (technical preview)";
 
   monospaceFont = head config.fonts.fontconfig.defaultFonts.monospace;
-
-  contact = config.accounts.contact.emacs;
 
   maildirBase =
     config.accounts.email.maildirBasePath;
@@ -163,7 +176,6 @@ let
     )
   );
 
-  toJSON' = value: toJSON (toJSON value);
 in
 {
   imports = [
@@ -209,31 +221,28 @@ in
       earlyInitFile = bingshan.etc.emacs.early-init;
 
       extraConfig = ''
-        (use-package bs-carddav
-          :preface
-          (require 'json)
-
+        (use-package bs-contacts
           :custom
-          (bs-carddav-addressbooks
-           (json-parse-string ${toJSON' contact.addressbooks}
-                              :object-type 'alist
-                              :array-type 'list
-                              :null-object nil
-                              :false-object nil))
+          (bs-contacts-addressbooks
+           '(${
+             concatStringsSep "\n" (
+               mapAttrsToList (
+                 id: addressbook:
+                 "(${toJSON id} . ${mkContactAddressbook addressbook})"
+               ) contact.addressbooks
+             )
+           }))
 
-          (bs-carddav-writable-addressbooks
-           (json-parse-string ${toJSON' contact.writableAddressbooks}
-                              :object-type 'alist
-                              :array-type 'list
-                              :null-object nil
-                              :false-object nil))
+          (bs-contacts-default-addressbook
+           '${
+             if contact.defaultAddressbook == null then
+               "nil"
+             else
+               mkContactAddressbook contact.defaultAddressbook
+           })
 
-          (bs-carddav-read-only-addressbooks
-           (json-parse-string ${toJSON' contact.readOnlyAddressbooks}
-                              :object-type 'alist
-                              :array-type 'list
-                              :null-object nil
-                              :false-object nil))
+          (bs-contacts-sync-collections
+           '(${concatStringsSep " " (map toJSON contact.syncCollections)}))
 
           :defer t)
 
@@ -411,7 +420,6 @@ in
           codex-ide
           consult
           consult-codesearch
-          consult-contacts
           consult-denote
           consult-eglot
           consult-eglot-embark
@@ -429,7 +437,6 @@ in
           diff-hl
           diredfl
           doom-modeline
-          ebdb
           edit-indirect
           editorconfig
           eglot
@@ -482,7 +489,6 @@ in
           org-modern-indent
           org-ql
           org-super-agenda
-          org-vcard
           paredit
           pass
           plz
