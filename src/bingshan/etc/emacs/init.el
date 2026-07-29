@@ -3115,30 +3115,55 @@
     ;; Open the `mu4e' mail interface from the custom application map.
     ("m" . mu4e)))
 
-;; (use-package mu4e-alert
-;;   :after (mu4e)
-;;   :when (eq system-type 'gnu/linux)
+(use-package mu4e-alert
+  :after (mu4e)
+  :when (eq system-type 'gnu/linux)
 
-;;   ;; Load alert integration after mu4e is available so message
-;;   ;; notifications can derive their state from the mu4e index.
-;;   :demand t)
+  ;; Load alert integration after mu4e is available so message
+  ;; notifications can derive their state from the mu4e index.
+  :demand t)
 
-;; (use-package mu4e-alert
-;;   :commands (mu4e-alert-enable-notifications)
-;;   :functions (mu4e-alert-set-default-style)
-;;   :when (eq system-type 'gnu/linux)
+(use-package mu4e-alert
+  :commands (mu4e-alert-enable-notifications)
+  :functions (mu4e-alert-set-default-style)
+  :when (eq system-type 'gnu/linux)
 
-;;   :config
-;;   ;; Use the desktop notification backend for new-message alerts, then
-;;   ;; enable notification delivery once the backend is selected.
-;;   (mu4e-alert-set-default-style 'notifications)
-;;   (mu4e-alert-enable-notifications))
+  :config
+  ;; Use the desktop notification backend for new-message alerts, then
+  ;; enable notification delivery once the backend is selected.
+  (mu4e-alert-set-default-style 'notifications)
+  (mu4e-alert-enable-notifications))
 
 (use-package mu4e-headers
+  :defines (mu4e-headers-attach-mark
+            mu4e-headers-calendar-mark
+            mu4e-headers-draft-mark
+            mu4e-headers-encrypted-mark
+            mu4e-headers-flagged-mark
+            mu4e-headers-list-mark
+            mu4e-headers-new-mark
+            mu4e-headers-passed-mark
+            mu4e-headers-personal-mark
+            mu4e-headers-replied-mark
+            mu4e-headers-seen-mark
+            mu4e-headers-signed-mark
+            mu4e-headers-trashed-mark
+            mu4e-headers-unread-mark
+            mu4e-headers-thread-blank-prefix
+            mu4e-headers-thread-child-prefix
+            mu4e-headers-thread-connection-prefix
+            mu4e-headers-thread-duplicate-prefix
+            mu4e-headers-thread-first-child-prefix
+            mu4e-headers-thread-last-child-prefix
+            mu4e-headers-thread-orphan-prefix
+            mu4e-headers-thread-root-prefix
+            mu4e-headers-thread-single-orphan-prefix)
+
   :custom
-  ;; Use ASCII markers instead of fancy Unicode or icon glyphs.  This
-  ;; keeps the flags column predictable in header rows.
-  (mu4e-use-fancy-chars nil)
+  ;; Select the fancy side of mark pairs.  Every configured glyph
+  ;; below is provided by most fonts, which keeps the header layout
+  ;; strictly monospaced without font fallback.
+  (mu4e-use-fancy-chars t)
 
   ;; `:human-date' uses `mu4e-headers-time-format' for today's mail
   ;; and `mu4e-headers-date-format' for older mail, so keep them
@@ -3146,8 +3171,8 @@
   (mu4e-headers-date-format "%m/%d/%Y %I:%M:%S %p")
   (mu4e-headers-time-format "%m/%d/%Y %I:%M:%S %p")
 
-  ;; Show compact ASCII markers for the useful message flags.  Leave
-  ;; out `seen' and `unread' because those states are already visible
+  ;; Show compact markers for the useful message flags.  Leave out
+  ;; `seen' and `unread' because those states are already visible
   ;; through header faces and `new'.
   (mu4e-headers-visible-flags '(attach
                                 calendar
@@ -3164,7 +3189,7 @@
 
   ;; Keep every non-final field fixed-width. Leave only the last field
   ;; unrestricted.
-  (mu4e-headers-fields '(( :flags . 8)
+  (mu4e-headers-fields '(( :flags . 4)
                          ( :human-date . 24)
                          ( :from . 24)
                          ( :subject)))
@@ -3173,7 +3198,37 @@
   ;; This keeps copied header rows aligned because `display'
   ;; properties are not preserved when text is copied out of the
   ;; headers buffer.
-  (mu4e-headers-precise-alignment nil))
+  (mu4e-headers-precise-alignment nil)
+
+  :init
+  ;; These marks are ordinary `defvar' values rather than Custom
+  ;; options, so bind them before `mu4e-headers' loads.
+  (setq mu4e-headers-draft-mark '("D" . "D")
+        mu4e-headers-flagged-mark '("★" . "★")
+        mu4e-headers-new-mark '("•" . "•")
+        mu4e-headers-passed-mark '("→" . "→")
+        mu4e-headers-replied-mark '("←" . "←")
+        mu4e-headers-seen-mark '("S" . "S")
+        mu4e-headers-trashed-mark '("×" . "×")
+        mu4e-headers-attach-mark '("+" . "+")
+        mu4e-headers-encrypted-mark '("x" . "x")
+        mu4e-headers-signed-mark '("§" . "§")
+        mu4e-headers-unread-mark '("◊" . "◊")
+        mu4e-headers-list-mark '("=" . "=")
+        mu4e-headers-personal-mark '("@" . "@")
+        mu4e-headers-calendar-mark '("◦" . "◦"))
+
+  ;; Use three fixed-width cells for every thread-tree level.  These
+  ;; box-drawing glyphs are also ordinary `defvar' values.
+  (setq mu4e-headers-thread-root-prefix '("*  " . "*  ")
+        mu4e-headers-thread-child-prefix '("├─ " . "├─ ")
+        mu4e-headers-thread-first-child-prefix '("├─ " . "├─ ")
+        mu4e-headers-thread-last-child-prefix '("└─ " . "└─ ")
+        mu4e-headers-thread-connection-prefix '("│  " . "│  ")
+        mu4e-headers-thread-blank-prefix '("   " . "   ")
+        mu4e-headers-thread-orphan-prefix '("╶─ " . "╶─ ")
+        mu4e-headers-thread-single-orphan-prefix '("╶─ " . "╶─ ")
+        mu4e-headers-thread-duplicate-prefix '("═ " . "═ ")))
 
 (use-package mu4e-helpers
   :custom
