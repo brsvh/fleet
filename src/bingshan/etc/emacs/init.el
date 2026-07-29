@@ -27,6 +27,7 @@
 (require 'bs-hooks)
 (require 'bs-lib)
 (require 'cl-lib)
+(require 'orderless)
 (require 'use-package)
 
 ;;
@@ -329,9 +330,6 @@
   (bs-first-ui-hook . marginalia-mode))
 
 (use-package minibuffer
-  :preface
-  (require 'orderless)
-
   :custom
   ;; Use mini-buffer completion as the UI for ‘completion-at-point’.
   (completion-in-region-function 'consult-completion-in-region)
@@ -960,19 +958,21 @@
   (treemacs-nerd-icons-config))
 
 (use-package treemacs-scope
-  :after (treemacs)
+  :after (treemacs treemacs-tab-bar)
   :commands (treemacs-set-scope-type)
-
-  :init
-  ;; Align the Treemacs instance with tab-based workflows, so each tab
-  ;; maintains its own project context instead of sharing a single
-  ;; global tree across unrelated tasks.
-  (require 'treemacs-tab-bar)
 
   :config
   ;; Scope Treemacs to tabs, treating each tab as an independent
   ;; workspace with its own navigation state.
   (treemacs-set-scope-type 'Tabs))
+
+(use-package treemacs-tab-bar
+  :after (treemacs)
+
+  ;; Align the Treemacs instance with tab-based workflows, so each tab
+  ;; maintains its own project context instead of sharing a single
+  ;; global tree across unrelated tasks.
+  :demand t)
 
 ;;
 ;; Using Multiple Buffers (info "(emacs) Buffers")
@@ -1562,13 +1562,15 @@
 (use-package smartparens
   :after (prog-mode)
 
-  :config
-  ;; Load `smartparens' config for different major modes.
-  (require 'smartparens-config)
-
   :hook
   ;; Automatic parentheses operating.
   (prog-mode-hook . smartparens-mode))
+
+(use-package smartparens-config
+  :after (smartparens)
+
+  ;; Load `smartparens' config for different major modes.
+  :demand t)
 
 (use-package subword
   :after (prog-mode)
@@ -2232,6 +2234,76 @@
 ;;
 ;; The Calendar and the Diary (info "(emacs) Calendar/Diary")
 ;;
+
+(use-package calfw-org
+  :after (org)
+  :commands (calfw-org-open-calendar)
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open a calendar view backed by the same Org files used by the
+    ;; agenda.  Press \\`v w' or \\`v m' there to switch between week
+    ;; and month views.
+    ("k" . calfw-org-open-calendar)))
+
+(use-package bs-khal
+  :after (bs-ext)
+  :commands (bs-khal-capture
+             bs-khal-import-events
+             bs-khal-setup)
+
+  :config
+  (bs-khal-setup)
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Create a simple event through Org capture and export it to the
+    ;; primary calendar selected by the account configuration.
+    ("e" . bs-khal-capture)
+
+    ;; Rebuild the read-only Org calendar mirror from all calendars
+    ;; currently exposed by `khal'.
+    ("r" . bs-khal-import-events))
+
+  :hook
+  (bs-after-startup-early-hook . bs-khal-import-events))
+
+(use-package khalel
+  :custom
+  ;; Include events up to ninety days in the future in the generated
+  ;; Org calendar mirror.
+  (khalel-import-end-date "+90d")
+
+  ;; Let `bs-khal' refresh the mirror asynchronously after exporting a
+  ;; captured event.
+  (khalel-import-events-after-capture nil)
+
+  ;; Let `bs-khal' refresh the mirror asynchronously after khal edit
+  ;; exits successfully.
+  (khalel-import-events-after-khal-edit nil)
+
+  ;; Let `bs-khal' refresh the mirror asynchronously after a
+  ;; vdirsyncer process exits successfully.
+  (khalel-import-events-after-vdirsyncer nil)
+
+  ;; Store the generated calendar mirror alongside the other Org data.
+  (khalel-import-org-file
+   (bs-path* org-directory "calendar.org"))
+
+  ;; Replace the generated mirror without prompting, since it contains
+  ;; imported data rather than user-authored entries.
+  (khalel-import-org-file-confirm-overwrite nil)
+
+  ;; Protect imported entries from accidental edits; changes should be
+  ;; made through Khalel or the source calendar.
+  (khalel-import-org-file-read-only t)
+
+  ;; Include the previous seven days so recent events remain available
+  ;; in agenda and calendar views.
+  (khalel-import-start-date "-7d")
+
+  ;; Keep remote synchronization independent from event capture.
+  (khalel-run-vdirsyncer-after-capture nil))
 
 ;;
 ;; Sending Mail (info "(emacs) Sending Mail")
@@ -3343,7 +3415,8 @@
   ;; Restrict agenda discovery to the GTD subtree so agenda commands
   ;; operate on the curated task set instead of every Org file under
   ;; `org-directory'.
-  (org-agenda-files (list (bs-path* org-directory "gtd/")))
+  (org-agenda-files (list (bs-path* org-directory "gtd/")
+                          (bs-path org-directory "calendar.org")))
 
   ;; Set the string displayed at folded outline boundaries.  Setting
   ;; this to nil disables the display of a custom ellipsis and lets

@@ -8,6 +8,7 @@
 }:
 let
   inherit (lib)
+    attrValues
     concatStringsSep
     filter
     head
@@ -15,6 +16,22 @@ let
     toJSON
     toSentenceCase
     ;
+
+  calendars = filter (
+    calendar: calendar.khal.enable
+  ) (attrValues config.accounts.calendar.accounts);
+
+  primaryCalendars = filter (
+    calendar: calendar.primary
+  ) calendars;
+
+  primaryCalendar = head primaryCalendars;
+
+  defaultCalendar =
+    if primaryCalendar.primaryCollection == null then
+      primaryCalendar.name
+    else
+      primaryCalendar.primaryCollection;
 
   cjkFont = "Zhuque Fangsong (technical preview)";
 
@@ -216,6 +233,12 @@ in
 
           :defer t)
 
+        (use-package bs-khal
+          :custom
+          (bs-khal-default-calendar ${toJSON defaultCalendar})
+
+          :defer t)
+
         (use-package emacs
           :demand t
           :no-require t
@@ -372,6 +395,7 @@ in
           bs
           bufferlo
           calfw
+          calfw-org
           cape
           citar
           citar-denote
@@ -424,6 +448,7 @@ in
           ibuffer-project
           jieba-rs
           jinx
+          khalel
           llm
           macrostep-geiser
           magit
