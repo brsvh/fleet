@@ -220,15 +220,6 @@ in
           :custom
           (user-full-name "${primary.realName}"))
 
-        (use-package emacs
-          :demand t
-          :no-require t
-          :when (display-graphic-p)
-
-          :config
-          (set-fontset-font t 'cjk-misc (font-spec :family "Microsoft YaHei"))
-          (set-fontset-font t 'han (font-spec :family "Microsoft YaHei")))
-
         (use-package epa-hook
           :config
           (add-to-list 'epa-file-encrypt-to "${primary.gpg.key}")
