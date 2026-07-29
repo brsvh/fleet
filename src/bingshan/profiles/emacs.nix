@@ -21,6 +21,10 @@ let
     calendar: calendar.khal.enable
   ) (attrValues config.accounts.calendar.accounts);
 
+  calendarDirectories = map (
+    calendar: calendar.local.path
+  ) calendars;
+
   primaryCalendars = filter (
     calendar: calendar.primary
   ) calendars;
@@ -235,6 +239,9 @@ in
 
         (use-package bs-khal
           :custom
+          (bs-khal-calendar-directories
+           '(${concatStringsSep " " (map toJSON calendarDirectories)}))
+
           (bs-khal-default-calendar ${toJSON defaultCalendar})
 
           :defer t)

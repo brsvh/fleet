@@ -2247,29 +2247,26 @@
     ("k" . calfw-org-open-calendar)))
 
 (use-package bs-khal
-  :after (bs-ext)
+  :after (bs-ext khalel)
   :commands (bs-khal-capture
              bs-khal-import-events
              bs-khal-setup)
 
+  :custom
+  ;; Check the calendar sources every five minutes, importing only
+  ;; when their persisted state differs from the last successful run.
+  (bs-khal-import-check-interval 300)
+
   :config
-  (bs-khal-setup)
-
-  :bind
-  ( :map ctl-c-a-map
-    ;; Create a simple event through Org capture and export it to the
-    ;; primary calendar selected by the account configuration.
-    ("e" . bs-khal-capture)
-
-    ;; Rebuild the read-only Org calendar mirror from all calendars
-    ;; currently exposed by `khal'.
-    ("r" . bs-khal-import-events))
-
-  :hook
-  (bs-after-startup-early-hook . bs-khal-import-events))
+  ;; Apply the account-derived default calendar, register Khalel's
+  ;; event template, and start change-aware background imports.
+  (bs-khal-setup))
 
 (use-package khalel
   :custom
+  ;; Use \\`c' for calendar events in the Org capture menu.
+  (khalel-capture-key "c")
+
   ;; Include events up to ninety days in the future in the generated
   ;; Org calendar mirror.
   (khalel-import-end-date "+90d")
@@ -3554,12 +3551,19 @@
                             "Research")))
 
 (use-package org-gtd-capture
-  :after (bs-ext)
+  :after (bs-ext bs-khal)
+
+  :config
+  ;; Reuse Khalel's event template in the unified Org GTD capture
+  ;; menu, after the default inbox templates.
+  (when-let* ((template
+               (assoc khalel-capture-key org-capture-templates)))
+    (add-to-list 'org-gtd-capture-templates template t))
 
   :bind
   ( :map ctl-c-a-map
-    ;; Capture a new item directly into the GTD inbox, ensuring the
-    ;; inbox file exists before delegating to `org-capture'.
+    ;; Open the unified capture menu for GTD inbox items and calendar
+    ;; events.
     ("c" . org-gtd-capture)))
 
 (use-package org-gtd-command-center
