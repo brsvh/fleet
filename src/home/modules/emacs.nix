@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -16,6 +17,17 @@ in
   options = {
     programs = {
       emacs = {
+        extraEarlyConfig = mkOption {
+          default = "";
+
+          description = ''
+            Configuration included in the early-default library after
+            the user's early init file.
+          '';
+
+          type = types.lines;
+        };
+
         earlyInitFile = mkOption {
           default = null;
 
@@ -52,6 +64,19 @@ in
         cfg.enable && v != null && pathExists v && xdg;
     in
     mkMerge [
+      (mkIf (cfg.enable && cfg.extraEarlyConfig != "") {
+        programs = {
+          emacs = {
+            extraPackages = epkgs: [
+              (epkgs.trivialBuild {
+                pname = "early-default";
+                src = pkgs.writeText "early-default.el" cfg.extraEarlyConfig;
+                version = "0.1.0";
+              })
+            ];
+          };
+        };
+      })
       (mkIf (cond cfg.initFile isXDG) {
         xdg = {
           configFile = {
