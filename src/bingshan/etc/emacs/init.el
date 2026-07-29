@@ -1487,24 +1487,31 @@
   (prog-mode-hook . hs-minor-mode))
 
 (use-package hl-todo
-  :after (modus-themes prog-mode)
+  :defines (hl-todo-keyword-faces)
+
+  :preface
+  (defun hl-todo--set-keyword-faces ()
+    "Apply local keyword face overrides when `hl-todo' is loaded."
+    (when (featurep 'hl-todo)
+      (dolist (entry '(("CNCL" . warning)
+                       ("WAIT" . warning)))
+        (setf (alist-get (car entry)
+                         hl-todo-keyword-faces
+                         nil
+                         nil
+                         #'string=)
+              (cdr entry)))))
+
+  :config
+  ;; Apply local keyword face overrides when `hl-todo' first loads.
+  (hl-todo--set-keyword-faces)
 
   :hook
-  ;; Reapply local keyword face overrides after each Modus theme load,
-  ;; because the theme repopulates `hl-todo-keyword-faces' with its
-  ;; own defaults.
+  ;; Reapply the overrides after each Modus theme load, but only when
+  ;; `hl-todo' has already been used.
   (modus-themes-after-load-theme-hook
    .
-   (lambda ()
-     (require 'hl-todo)
-     (dolist (entry '(("CNCL" . warning)
-                      ("WAIT" . warning)))
-       (setf (alist-get (car entry)
-                        hl-todo-keyword-faces
-                        nil
-                        nil
-                        #'string=)
-             (cdr entry)))))
+   hl-todo--set-keyword-faces)
 
   ;; Treat TODO markers as active signals during development, not
   ;; passive comments to be rediscovered later.
