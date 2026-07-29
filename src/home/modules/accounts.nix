@@ -7,67 +7,18 @@ let
   inherit (lib)
     attrNames
     concatStringsSep
+    filter
     filterAttrs
-    hasSuffix
-    last
+    foldlAttrs
+    head
     length
     mapAttrs'
-    match
-    mkEnableOption
+    mapAttrsToList
     mkOption
     nameValuePair
-    removeSuffix
-    splitString
+    unique
     types
     ;
-
-  trimTrailingSlashes =
-    value:
-    if hasSuffix "/" value then
-      trimTrailingSlashes (removeSuffix "/" value)
-    else
-      value;
-
-  isAddressbookHomeSet =
-    url:
-    match ".*/addressbooks/users/[^/]+" (
-      trimTrailingSlashes url
-    ) != null;
-
-  remoteUrl =
-    account:
-    if account.remote == null then
-      null
-    else
-      account.remote.url;
-
-  mkAddressbookId =
-    account:
-    let
-      url = remoteUrl account;
-    in
-    if url == null || isAddressbookHomeSet url then
-      "contacts"
-    else
-      last (splitString "/" (trimTrailingSlashes url));
-
-  mkAddressbookUrl =
-    url: addressbookId:
-    if url == null then
-      null
-    else
-      let
-        trimmedUrl = trimTrailingSlashes url;
-
-        lastSegment = last (splitString "/" trimmedUrl);
-
-        collectionUrl =
-          if lastSegment == addressbookId then
-            trimmedUrl
-          else
-            "${trimmedUrl}/${addressbookId}";
-      in
-      "${collectionUrl}/";
 
   mkDisplayName =
     accountName: addressbookId:
@@ -86,9 +37,9 @@ let
         type = types.str;
       };
 
-      addressbook-id = mkOption {
+      addressbookId = mkOption {
         description = ''
-          Remote CardDAV collection identifier.
+          Identifier of the local vCard addressbook.
         '';
 
         type = types.str;
@@ -98,7 +49,7 @@ let
         default = false;
 
         description = ''
-          Whether this addressbook is the default write target.
+          Whether this addressbook is the default Emacs write target.
         '';
 
         type = types.bool;
@@ -112,9 +63,25 @@ let
         type = types.str;
       };
 
+      khardName = mkOption {
+        description = ''
+          Addressbook name accepted by khard.
+        '';
+
+        type = types.str;
+      };
+
       name = mkOption {
         description = ''
-          Human-readable addressbook name.
+          Human-readable addressbook name shown in Emacs.
+        '';
+
+        type = types.str;
+      };
+
+      path = mkOption {
+        description = ''
+          Local directory containing this addressbook's vCard files.
         '';
 
         type = types.str;
@@ -130,21 +97,9 @@ let
         type = types.bool;
       };
 
-      source = mkOption {
-        default = "carddav";
-
+      syncCollection = mkOption {
         description = ''
-          Source backend used by this addressbook.
-        '';
-
-        type = types.enum [
-          "carddav"
-        ];
-      };
-
-      url = mkOption {
-        description = ''
-          CardDAV collection URL for this addressbook.
+          Vdirsyncer collection selected when Emacs synchronizes contacts.
         '';
 
         type = types.str;
@@ -152,34 +107,33 @@ let
     };
   };
 
-  enabledAccounts = filterAttrs (
-    _: account: account.emacs.enable
-  ) config.accounts.contact.accounts;
+  contactAccounts =
+    config.accounts.contact.accounts;
 
-  addressbooks = mapAttrs' (
-    accountName: account:
-    nameValuePair account.emacs.id {
-      inherit accountName;
+  addressbooks = foldlAttrs (
+    result: accountName: account:
+    result
+    // mapAttrs' (
+      addressbookId: addressbook:
+      nameValuePair "${accountName}/${addressbookId}" {
+        inherit
+          accountName
+          addressbookId
+          ;
 
-      inherit (account.emacs)
-        addressbook-id
-        default
-        id
-        name
-        readOnly
-        source
-        url
-        ;
-    }
-  ) enabledAccounts;
+        inherit (addressbook)
+          default
+          khardName
+          name
+          path
+          readOnly
+          syncCollection
+          ;
 
-  writableAddressbooks = filterAttrs (
-    _: addressbook: !addressbook.readOnly
-  ) addressbooks;
-
-  readOnlyAddressbooks = filterAttrs (
-    _: addressbook: addressbook.readOnly
-  ) addressbooks;
+        id = "${accountName}/${addressbookId}";
+      }
+    ) account.emacs.addressbooks
+  ) { } contactAccounts;
 
   defaultAddressbookNames = attrNames (
     filterAttrs (
@@ -187,10 +141,46 @@ let
     ) addressbooks
   );
 
-  missingUrlAccountNames = attrNames (
+  defaultAddressbook =
+    if length defaultAddressbookNames == 1 then
+      addressbooks.${head defaultAddressbookNames}
+    else
+      null;
+
+  syncCollections = unique (
+    mapAttrsToList (
+      _: addressbook: addressbook.syncCollection
+    ) addressbooks
+  );
+
+  invalidAddressbookNames = attrNames (
     filterAttrs (
-      _: account: account.emacs.url == null
-    ) enabledAccounts
+      _: addressbook:
+      addressbook.addressbookId == ""
+      || addressbook.khardName == ""
+      || addressbook.path == ""
+      || addressbook.syncCollection == ""
+    ) addressbooks
+  );
+
+  readOnlyDefaultAddressbookNames = filter (
+    name: addressbooks.${name}.readOnly
+  ) defaultAddressbookNames;
+
+  missingKhardAccountNames = attrNames (
+    filterAttrs (
+      _: account:
+      account.emacs.addressbooks != { }
+      && !account.khard.enable
+    ) contactAccounts
+  );
+
+  missingVdirsyncerAccountNames = attrNames (
+    filterAttrs (
+      _: account:
+      account.emacs.addressbooks != { }
+      && !account.vdirsyncer.enable
+    ) contactAccounts
   );
 in
 {
@@ -201,84 +191,93 @@ in
           type = types.attrsOf (
             types.submodule (
               { name, config, ... }:
+              let
+                accountName = name;
+                account = config;
+              in
               {
                 options = {
                   emacs = {
-                    addressbook-id = mkOption {
-                      default = mkAddressbookId config;
+                    addressbooks = mkOption {
+                      default = { };
 
                       description = ''
-                        Remote CardDAV collection identifier consumed by Emacs.
+                        Local vCard addressbooks exposed to Emacs.
                       '';
 
-                      type = types.str;
-                    };
+                      type = types.attrsOf (
+                        types.submodule (
+                          { name, ... }:
+                          {
+                            options = {
+                              default = mkOption {
+                                default = false;
 
-                    default = mkOption {
-                      default = false;
+                                description = ''
+                                  Whether this addressbook is the default Emacs
+                                  write target.
+                                '';
 
-                      description = ''
-                        Whether this addressbook is the default Emacs write
-                        target.
-                      '';
+                                type = types.bool;
+                              };
 
-                      type = types.bool;
-                    };
+                              khardName = mkOption {
+                                default = name;
 
-                    enable = mkEnableOption "Emacs contact addressbook access";
+                                description = ''
+                                  Addressbook name accepted by khard.
+                                '';
 
-                    id = mkOption {
-                      default = "${name}/${config.emacs.addressbook-id}";
+                                type = types.str;
+                              };
 
-                      description = ''
-                        Stable internal identifier used as the generated Emacs
-                        addressbook key.
-                      '';
+                              name = mkOption {
+                                default = mkDisplayName accountName name;
 
-                      type = types.str;
-                    };
+                                description = ''
+                                  Human-readable addressbook name shown in
+                                  Emacs.
+                                '';
 
-                    name = mkOption {
-                      default = mkDisplayName name config.emacs.addressbook-id;
+                                type = types.str;
+                              };
 
-                      description = ''
-                        Human-readable addressbook name shown in Emacs.
-                      '';
+                              path = mkOption {
+                                default = "${account.local.path}/${name}";
 
-                      type = types.str;
-                    };
+                                description = ''
+                                  Local directory containing this addressbook's
+                                  vCard files.
+                                '';
 
-                    readOnly = mkOption {
-                      default = false;
+                                type = types.str;
+                              };
 
-                      description = ''
-                        Whether Emacs should treat this addressbook as
-                        read-only.
-                      '';
+                              readOnly = mkOption {
+                                default = false;
 
-                      type = types.bool;
-                    };
+                                description = ''
+                                  Whether Emacs should treat this addressbook
+                                  as read-only.
+                                '';
 
-                    source = mkOption {
-                      default = "carddav";
+                                type = types.bool;
+                              };
 
-                      description = ''
-                        Contact synchronization backend consumed by Emacs.
-                      '';
+                              syncCollection = mkOption {
+                                default = "contacts_${accountName}/${name}";
 
-                      type = types.enum [
-                        "carddav"
-                      ];
-                    };
+                                description = ''
+                                  Vdirsyncer collection selected when Emacs
+                                  synchronizes contacts.
+                                '';
 
-                    url = mkOption {
-                      default = mkAddressbookUrl (remoteUrl config) config.emacs.addressbook-id;
-
-                      description = ''
-                        CardDAV collection URL consumed by Emacs.
-                      '';
-
-                      type = with types; nullOr str;
+                                type = types.str;
+                              };
+                            };
+                          }
+                        )
+                      );
                     };
                   };
                 };
@@ -292,31 +291,30 @@ in
             readOnly = true;
 
             description = ''
-              Emacs-consumable contact addressbooks generated from
-              `accounts.contact.accounts`.
+              Local contact addressbooks exposed to Emacs.
             '';
 
             type = types.attrsOf emacsAddressbookType;
           };
 
-          readOnlyAddressbooks = mkOption {
+          defaultAddressbook = mkOption {
             readOnly = true;
 
             description = ''
-              Emacs contact addressbooks that should not be written to.
+              Default writable addressbook exposed to Emacs.
             '';
 
-            type = types.attrsOf emacsAddressbookType;
+            type = with types; nullOr emacsAddressbookType;
           };
 
-          writableAddressbooks = mkOption {
+          syncCollections = mkOption {
             readOnly = true;
 
             description = ''
-              Emacs contact addressbooks that can be written to.
+              Vdirsyncer contact collections synchronized by Emacs.
             '';
 
-            type = types.attrsOf emacsAddressbookType;
+            type = types.listOf types.str;
           };
         };
       };
@@ -329,8 +327,8 @@ in
         emacs = {
           inherit
             addressbooks
-            readOnlyAddressbooks
-            writableAddressbooks
+            defaultAddressbook
+            syncCollections
             ;
         };
       };
@@ -338,16 +336,36 @@ in
 
     assertions = [
       {
-        assertion = missingUrlAccountNames == [ ];
-        message =
-          "Emacs contact accounts must define a CardDAV URL: "
-          + concatStringsSep ", " missingUrlAccountNames;
-      }
-      {
         assertion = length defaultAddressbookNames <= 1;
         message =
           "At most one Emacs contact addressbook may be default, but found: "
           + concatStringsSep ", " defaultAddressbookNames;
+      }
+      {
+        assertion =
+          readOnlyDefaultAddressbookNames == [ ];
+        message =
+          "Default Emacs contact addressbooks must be writable: "
+          + concatStringsSep ", " readOnlyDefaultAddressbookNames;
+      }
+      {
+        assertion = invalidAddressbookNames == [ ];
+        message =
+          "Emacs contact addressbooks must define non-empty local identifiers, "
+          + "paths, khard names, and vdirsyncer collections: "
+          + concatStringsSep ", " invalidAddressbookNames;
+      }
+      {
+        assertion = missingKhardAccountNames == [ ];
+        message =
+          "Emacs contact accounts must enable khard: "
+          + concatStringsSep ", " missingKhardAccountNames;
+      }
+      {
+        assertion = missingVdirsyncerAccountNames == [ ];
+        message =
+          "Emacs contact accounts must enable vdirsyncer: "
+          + concatStringsSep ", " missingVdirsyncerAccountNames;
       }
     ];
   };
