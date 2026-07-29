@@ -3021,11 +3021,10 @@
     ("m" . consult-mu)))
 
 (use-package consult-mu-embark
-  :after (embark)
+  :after (embark consult-mu)
 
-  ;; Register Embark actions for `consult-mu' candidates as soon as
-  ;; Embark is available, so mail actions work directly from the
-  ;; minibuffer result list.
+  ;; Register mail actions only after both Embark and `consult-mu' are
+  ;; in use, so loading either one alone does not pull in the other.
   :demand t)
 
 (use-package corfu
