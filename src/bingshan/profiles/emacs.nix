@@ -189,8 +189,6 @@ in
 
       extraConfig = ''
         (use-package bs-carddav
-          :demand t
-
           :preface
           (require 'json)
 
