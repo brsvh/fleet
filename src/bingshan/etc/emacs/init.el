@@ -3247,6 +3247,13 @@
   ;; buffer-specific mu4e modeline information available.
   (mu4e-modeline-show-global nil))
 
+(use-package mu4e-search
+  :custom
+  ;; Return complete search results so inbox threads retain related
+  ;; sent replies after the number of direct matches exceeds Mu4e's
+  ;; default result limit.
+  (mu4e-search-full t))
+
 (use-package mu4e-thread
   :bind
   ( :map mu4e-thread-mode-map
