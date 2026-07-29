@@ -154,8 +154,11 @@
         accounts = {
           bingshan = {
             emacs = {
-              default = true;
-              enable = true;
+              addressbooks = {
+                contacts = {
+                  default = true;
+                };
+              };
             };
 
             khard = {
