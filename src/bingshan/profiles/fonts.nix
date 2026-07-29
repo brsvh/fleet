@@ -9,13 +9,11 @@
 let
   inherit (builtins)
     readDir
-    toJSON
     ;
 
   inherit (lib)
     filterAttrs
     getExe'
-    head
     hasSuffix
     mapAttrs'
     mkForce
@@ -173,27 +171,6 @@ in
 
     sessionVariables = {
       FREETYPE_PROPERTIES = "truetype:interpreter-version=40";
-    };
-  };
-
-  programs = {
-    emacs = {
-      extraConfig =
-        let
-          monospace = head config.fonts.fontconfig.defaultFonts.monospace;
-        in
-        ''
-          (use-package emacs
-            :demand t
-            :no-require t
-            :when (display-graphic-p)
-
-            :config
-            (set-face-attribute 'default nil :family ${toJSON monospace})
-            (set-face-attribute 'fixed-pitch nil :family ${toJSON monospace})
-            (set-fontset-font t 'cjk-misc (font-spec :family "Microsoft YaHei"))
-            (set-fontset-font t 'han (font-spec :family "Microsoft YaHei")))
-        '';
     };
   };
 

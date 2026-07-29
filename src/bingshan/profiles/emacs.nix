@@ -16,6 +16,8 @@ let
     toSentenceCase
     ;
 
+  monospaceFont = head config.fonts.fontconfig.defaultFonts.monospace;
+
   contact = config.accounts.contact.emacs;
 
   maildirBase =
@@ -219,6 +221,21 @@ in
 
           :custom
           (user-full-name "${primary.realName}"))
+
+        (use-package emacs
+          :demand t
+          :no-require t
+          :when (display-graphic-p)
+
+          :config
+          (set-face-attribute 'default nil
+                              :family ${toJSON monospaceFont})
+          (set-face-attribute 'fixed-pitch nil
+                              :family ${toJSON monospaceFont})
+          (set-fontset-font t 'cjk-misc
+                            (font-spec :family "Microsoft YaHei"))
+          (set-fontset-font t 'han
+                            (font-spec :family "Microsoft YaHei")))
 
         (use-package epa-hook
           :config
