@@ -934,9 +934,9 @@
   :commands (treemacs-filewatch-mode)
 
   :init
-  ;; Keep the project tree reflecting file-system changes in real time,
-  ;; so Treemacs can be relied on as an accurate representation of the
-  ;; current project state during navigation and refactoring.
+  ;; Keep the project tree reflecting file-system changes in real
+  ;; time, so Treemacs can be relied on as an accurate representation
+  ;; of the current project state during navigation and refactoring.
   (treemacs-filewatch-mode +1))
 
 (use-package treemacs-follow-mode
@@ -1735,8 +1735,8 @@
   :after (json-ts-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Tree-sitter JSON
-  ;; buffers.
+  ;; Automatically start or reuse an Eglot session for Tree-sitter
+  ;; JSON buffers.
   (json-ts-mode-hook . eglot-ensure))
 
 (use-package files
@@ -2247,7 +2247,7 @@
     ("k" . calfw-org-open-calendar)))
 
 (use-package bs-khal
-  :after (bs-ext khalel)
+  :after (bs-ext)
   :commands (bs-khal-capture
              bs-khal-import-events
              bs-khal-setup)
@@ -2255,14 +2255,11 @@
   :custom
   ;; Check the calendar sources every five minutes, importing only
   ;; when their persisted state differs from the last successful run.
-  (bs-khal-import-check-interval 300)
-
-  :config
-  ;; Apply the account-derived default calendar, register Khalel's
-  ;; event template, and start change-aware background imports.
-  (bs-khal-setup))
+  (bs-khal-import-check-interval 300))
 
 (use-package khalel
+  :defines (khalel-capture-key)
+
   :custom
   ;; Use \\`c' for calendar events in the Org capture menu.
   (khalel-capture-key "c")
@@ -3510,6 +3507,9 @@
   ;; cursor moves onto them.
   (org-mode-hook . org-appear-mode))
 
+(use-package org-capture
+  :defines (org-capture-templates))
+
 (use-package org-edna
   :after (org)
   :commands (org-edna-mode)
@@ -3551,20 +3551,27 @@
                             "Research")))
 
 (use-package org-gtd-capture
-  :after (bs-ext bs-khal)
-
-  :config
-  ;; Reuse Khalel's event template in the unified Org GTD capture
-  ;; menu, after the default inbox templates.
-  (when-let* ((template
-               (assoc khalel-capture-key org-capture-templates)))
-    (add-to-list 'org-gtd-capture-templates template t))
+  :after (bs-ext)
+  :defines (org-gtd-capture-templates)
 
   :bind
   ( :map ctl-c-a-map
     ;; Open the unified capture menu for GTD inbox items and calendar
     ;; events.
-    ("c" . org-gtd-capture)))
+    ("c" . org-gtd-capture))
+
+  :hook
+  ;; Apply the account-derived calendar settings and start
+  ;; change-aware background imports shortly after startup, then make
+  ;; the registered event template available through Org GTD capture.
+  (bs-after-startup-early-hook
+   .
+   (lambda ()
+     (bs-khal-setup)
+     (with-eval-after-load 'org-gtd-capture
+       (when-let* ((template
+                    (assoc khalel-capture-key org-capture-templates)))
+         (add-to-list 'org-gtd-capture-templates template t))))))
 
 (use-package org-gtd-command-center
   :after (bs-ext)
