@@ -330,6 +330,12 @@ in
 
             :defer t)
 
+          (use-package info
+            :custom
+            (Info-additional-directory-list '("${pkgs.mu.mu4e}/share/info"))
+
+            :defer t)
+
           (use-package mail-source
             :custom
             (mail-source-directory "${maildir}")
@@ -399,7 +405,7 @@ in
 
           (use-package mu4e-message
             :commands (mu4e-message-contact-field-matches
-          	     mu4e-message-field)
+                       mu4e-message-field)
 
             :defer t)
 
