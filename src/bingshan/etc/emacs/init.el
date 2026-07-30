@@ -2434,6 +2434,29 @@
 ;; Email and Usenet News with Gnus (info "(emacs) Gnus")
 ;;
 
+(use-package bs-gnus
+  :after (gnus-sum)
+  :commands (bs-gnus-summary-enable)
+  :defines (gnus-summary-mode-map)
+
+  :config
+  ;; Replace the native Summary layout only after Gnus itself loads.
+  (bs-gnus-summary-enable)
+
+  :bind
+  ( :map gnus-summary-mode-map
+    ;; Move between concrete articles rather than decoration lines.
+    ("n" . bs-gnus-summary-next)
+    ("p" . bs-gnus-summary-previous)
+    ("<M-down>" . bs-gnus-summary-next)
+    ("<M-up>" . bs-gnus-summary-previous)
+
+    ;; Fold or expand the thread containing the current article.
+    ("TAB" . bs-gnus-summary-fold-toggle)
+    ("<tab>" . bs-gnus-summary-fold-toggle))
+
+  :demand t)
+
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
@@ -2465,6 +2488,9 @@
            (nntp-port-number 119)
            (nntp-open-connection-function
             nntp-open-network-stream))))
+
+  ;; Mark articles selected for later batch processing with a hash.
+  (gnus-process-mark ?#)
 
   :config
   ;; Use authenticated, encrypted Eternal September access for normal
@@ -2562,7 +2588,123 @@
   ;; Keep articles within each thread in chronological order.
   (gnus-subthread-sort-functions
    '(gnus-thread-sort-by-number
-     gnus-thread-sort-by-date)))
+     gnus-thread-sort-by-date))
+
+  ;; Mark unread articles with the same lozenge used by Mu4e.
+  (gnus-unread-mark ?◊)
+
+  ;; Mark articles retained for later attention with a star.
+  (gnus-ticked-mark ?★)
+
+  ;; Mark dormant articles with a quiet hollow bullet.
+  (gnus-dormant-mark ?◦)
+
+  ;; Mark manually dismissed articles with a minus sign.
+  (gnus-del-mark ?−)
+
+  ;; Leave articles read during the current session visually quiet.
+  (gnus-read-mark ?\s)
+
+  ;; Mark articles read in earlier sessions with a middle dot.
+  (gnus-ancient-mark ?·)
+
+  ;; Mark articles eligible for expiration with a tilde.
+  (gnus-expirable-mark ?~)
+
+  ;; Identify articles removed by an explicit kill operation.
+  (gnus-killed-mark ?K)
+
+  ;; Highlight articles classified as spam with an exclamation mark.
+  (gnus-spam-mark ?!)
+
+  ;; Identify articles excluded by kill-file rules with inequality.
+  (gnus-kill-file-mark ?≠)
+
+  ;; Mark articles read because their score fell below the threshold.
+  (gnus-low-score-mark ?≤)
+
+  ;; Mark articles skipped by catch-up operations with a double angle.
+  (gnus-catchup-mark ?»)
+
+  ;; Mark sparse thread references with an ellipsis.
+  (gnus-sparse-mark ?…)
+
+  ;; Mark canceled articles with a multiplication sign.
+  (gnus-canceled-mark ?×)
+
+  ;; Mark articles suppressed as duplicates with an equals sign.
+  (gnus-duplicate-mark ?=)
+
+  ;; Identify articles stored in the Gnus article cache with `C'.
+  (gnus-cached-mark ?C)
+
+  ;; Mark replied articles with a left arrow, matching Mu4e.
+  (gnus-replied-mark ?←)
+
+  ;; Mark forwarded articles with a right arrow, matching Mu4e.
+  (gnus-forwarded-mark ?→)
+
+  ;; Identify articles saved outside their group with `S'.
+  (gnus-saved-mark ?S)
+
+  ;; Mark articles not previously seen by Gnus with a bullet.
+  (gnus-unseen-mark ?•)
+
+  ;; Identify recently arrived articles with `N'.
+  (gnus-recent-mark ?N)
+
+  ;; Reserve a blank cell when no auxiliary article mark applies.
+  (gnus-no-mark ?\s)
+
+  ;; Mark articles available through the Agent with a down arrow.
+  (gnus-downloaded-mark ?↓)
+
+  ;; Mark articles unavailable to the Agent with a minus sign.
+  (gnus-undownloaded-mark ?−)
+
+  ;; Mark articles explicitly queued for Agent download with a plus.
+  (gnus-downloadable-mark ?+)
+
+  ;; Mark articles that the Agent cannot send with multiplication.
+  (gnus-unsendable-mark ?×)
+
+  ;; Mark scores above the group default with an upward arrow.
+  (gnus-score-over-mark ?↑)
+
+  ;; Mark scores below the group default with a downward arrow.
+  (gnus-score-below-mark ?↓)
+
+  ;; Reserve a blank marker for threads without descendants.
+  (gnus-empty-thread-mark ?\s)
+
+  ;; Mark threads containing descendants with a plus sign.
+  (gnus-not-empty-thread-mark ?+)
+
+  ;; Prefix each real thread root with a compact asterisk branch.
+  (gnus-sum-thread-tree-root "*  ")
+
+  ;; Render synthesized thread roots like real roots.
+  (gnus-sum-thread-tree-false-root "*  ")
+
+  ;; Render single-message thread indentation like a root branch.
+  (gnus-sum-thread-tree-single-indent "*  ")
+
+  ;; Draw continuing ancestor branches with a vertical box line.
+  (gnus-sum-thread-tree-vertical "│  ")
+
+  ;; Reserve three columns for an inactive ancestor branch.
+  (gnus-sum-thread-tree-indent "   ")
+
+  ;; Draw non-final children with a branching box line.
+  (gnus-sum-thread-tree-leaf-with-other "├─ ")
+
+  ;; Draw final children with a terminating box line.
+  (gnus-sum-thread-tree-single-leaf "└─ ")
+
+  :hook
+  ;; Use a concise mode-line name for Gnus Summary buffers.
+  (gnus-summary-mode-hook . (lambda ()
+                              (setq-local mode-name "News"))))
 
 (use-package gnus-async
   :after (gnus)
