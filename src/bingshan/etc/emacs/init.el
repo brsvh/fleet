@@ -2702,6 +2702,11 @@
 
   :bind
   ( :map gnus-summary-mode-map
+    ;; Display the current article and move focus into its window,
+    ;; instead of scrolling it remotely from the Summary buffer.
+    ("RET" . gnus-summary-select-article-buffer)
+    ("<return>" . gnus-summary-select-article-buffer)
+
     ;; Move between concrete articles rather than decoration lines.
     ("n" . bs-gnus-summary-next)
     ("p" . bs-gnus-summary-previous)
@@ -3900,10 +3905,10 @@
 
   :hook
   ;; Keep the major-mode label compact in Mu4e main and info buffers.
-  ((mu4e-main-mode-hook
-    mu4e-org-mode-hook)
-   . (lambda ()
-       (setq-local mode-name "Mail"))))
+  ((mu4e-main-mode-hook mu4e-org-mode-hook)
+   .
+   (lambda ()
+     (setq-local mode-name "Mail"))))
 
 (use-package mu4e-modeline
   :custom
@@ -3915,8 +3920,9 @@
   :hook
   ;; Keep the major-mode label compact in Mu4e Org link buffers.
   (mu4e-org-agenda-links-mode-hook
-   . (lambda ()
-       (setq-local mode-name "Mail"))))
+   .
+   (lambda ()
+     (setq-local mode-name "Mail"))))
 
 (use-package mu4e-search
   :custom
@@ -3954,12 +3960,33 @@
                                    (setq-local mode-name "Mail"))))
 
 (use-package mu4e-view
+  ;; Declare the Gnus MIME preference used below without loading its
+  ;; implementation during initialization.
+  :defines (mm-discouraged-alternatives)
+
   :hook
+  ;; Prefer a usable plain-text alternative in Mu4e views, while
+  ;; retaining HTML as the fallback when plain text is absent or empty.
+  (mu4e-view-mode-hook
+   .
+   (lambda ()
+     (setq-local mm-discouraged-alternatives '("text/html"))))
+
   ;; Keep the major-mode label compact in rendered and raw mail views.
-  ((mu4e-raw-view-mode-hook
-    mu4e-view-mode-hook)
-   . (lambda ()
-       (setq-local mode-name "Mail"))))
+  ((mu4e-raw-view-mode-hook mu4e-view-mode-hook)
+   .
+   (lambda ()
+     (setq-local mode-name "Mail"))))
+
+(use-package bs-mu4e
+  :after (mu4e-view)
+  :commands (bs-mu4e-view-xwidget-enable)
+
+  :init
+  ;; Open an HTML alternative in Xwidget when WebKit support is
+  ;; available, both after initial rendering and after toggling from
+  ;; plain text to HTML.
+  (bs-mu4e-view-xwidget-enable))
 
 (use-package simple
   :custom
