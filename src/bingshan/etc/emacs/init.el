@@ -2828,6 +2828,15 @@
 ;; Network Security (info "(emacs) Network Security")
 ;;
 
+(use-package nsm
+  :after (bs-ext)
+
+  :custom
+  ;; Store remembered network-security decisions as persistent state
+  ;; instead of placing them under `user-emacs-directory'.
+  (nsm-settings-file
+   (bs-path bs-state-directory "network-security.eld")))
+
 
 
 ;;
