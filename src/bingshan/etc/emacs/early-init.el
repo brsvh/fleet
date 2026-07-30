@@ -28,6 +28,8 @@
 (require 'seq)
 (require 'use-package)
 
+
+
 ;;
 ;; use-package (info "(use-package) Top")
 ;;
@@ -54,6 +56,12 @@
   ;; from invoking any package manager, making package availability an
   ;; explicit responsibility of the surrounding system configuration.
   (use-package-ensure-function 'ignore))
+
+
+
+;;
+;; Early Initialization (info "(emacs) Early Init File")
+;;
 
 (use-package emacs
   :demand t
@@ -136,6 +144,12 @@
                                     (tool-bar-lines . 0)
                                     (vertical-scroll-bars . 0)
                                     (width . 80))))))
+
+
+
+;;
+;; Emacs Lisp Packages (info "(emacs) Packages")
+;;
 
 (use-package package
   :custom

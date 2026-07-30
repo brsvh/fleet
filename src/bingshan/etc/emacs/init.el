@@ -30,6 +30,8 @@
 (require 'orderless)
 (require 'use-package)
 
+
+
 ;;
 ;; use-package (info "(use-package) Top")
 ;;
@@ -56,6 +58,8 @@
   ;; names.  This preserves the original hook names without
   ;; modification and avoids implicit renaming.
   (use-package-hook-name-suffix nil))
+
+
 
 ;;
 ;; The Organization of the Screen (info "(emacs) Screen")
@@ -159,6 +163,8 @@
   ;; Disable the tool bar for all frames once the UI is initialized.
   (bs-first-ui-hook . (lambda () (tool-bar-mode -1))))
 
+
+
 ;;
 ;; Entering Emacs (info "(emacs) Entering Emacs")
 ;;
@@ -176,9 +182,13 @@
   ;; any introductory distractions.
   (inhibit-startup-screen t))
 
+
+
 ;;
 ;; Exiting Emacs (info "(emacs) Exiting")
 ;;
+
+
 
 ;;
 ;; Basic Editing Commands (info "(emacs) Basic")
@@ -225,6 +235,8 @@
 
   ;; Display the current Line number.b
   (bs-first-buffer-hook . line-number-mode))
+
+
 
 ;;
 ;; The Minibuffer (info "(emacs) Minibuffer")
@@ -430,6 +442,8 @@
   (add-to-list 'winner-boring-buffers "*Embark Collect Completions*" t)
   (add-to-list 'winner-boring-buffers "*Embark Collect Live*" t))
 
+
+
 ;;
 ;; Running Commands by Name (info "(emacs) M-x")
 ;;
@@ -439,6 +453,8 @@
   ;; Only show available commands in current mode.
   (read-extended-command-predicate
    'command-completion-default-include-p))
+
+
 
 ;;
 ;; Help (info "(emacs) Help")
@@ -474,6 +490,8 @@
                  (slot . 0)
                  (window-height . 0.35))))
 
+
+
 ;;
 ;; The Mark and the Region (info "(emacs) Mark")
 ;;
@@ -484,6 +502,8 @@
   :hook
   ;; When typing with a selected region, replace it directly.
   (bs-first-buffer-hook . delete-selection-mode))
+
+
 
 ;;
 ;; Killing and Moving Text (info "(emacs) Killing")
@@ -518,6 +538,8 @@
   ;; Sync kill ring to the system clipboard.
   (save-interprogram-paste-before-kill t))
 
+
+
 ;;
 ;; Registers (info "(emacs) Registers")
 ;;
@@ -534,6 +556,8 @@
   ( :map global-map
     ;; Replace default bookmark list command with `consult-bookmark'.
     ([remap bookmark-bmenu-list] . consult-bookmark)))
+
+
 
 ;;
 ;; Controlling the Display (info "(emacs) Display")
@@ -582,6 +606,22 @@
 
   ;; Enable category-based line breaking for word wrapping.
   (word-wrap-by-category t))
+
+(use-package form-feed
+  :commands (form-feed-mode)
+
+  :hook
+  (after-change-major-mode-hook
+   .
+   (lambda ()
+     ;; Treat form-feed characters as structural landmarks only in
+     ;; buffers that actually contain them.
+     (when (save-restriction
+             (widen)
+             (save-excursion
+               (goto-char (point-min))
+               (search-forward "\f" nil t)))
+       (form-feed-mode +1)))))
 
 (use-package hl-line
   :after (prog-mode)
@@ -680,6 +720,8 @@
   ;; highlighting becomes active.
   (whitespace-mode-hook . whitespace--follow-fill-column))
 
+
+
 ;;
 ;; Searching and Replacement (info "(emacs) Search")
 ;;
@@ -690,6 +732,8 @@
   :hook
   ;; Get real-time match counts and context search by `anzu-mode'.
   (bs-first-file-hook . global-anzu-mode))
+
+
 
 ;;
 ;; Commands for Fixing Typos (info "(emacs) Fixit")
@@ -734,9 +778,13 @@
   ;; `ispell'.
   (bs-first-buffer-hook . global-jinx-mode))
 
+
+
 ;;
 ;; Keyboard Macros (info "(emacs) Keyboard Macros")
 ;;
+
+
 
 ;;
 ;; File Handling (info "(emacs) Files")
@@ -833,7 +881,7 @@
        (add-hook 'before-save-hook 'bs/untabify nil t)))))
 
 (use-package recentf
-  :after (:all bs-hooks bs-lib)
+  :after (bs-hooks bs-lib)
 
   :custom
   ;; Store recent files list in our state directory.
@@ -974,6 +1022,8 @@
   ;; global tree across unrelated tasks.
   :demand t)
 
+
+
 ;;
 ;; Using Multiple Buffers (info "(emacs) Buffers")
 ;;
@@ -1044,6 +1094,8 @@
   ;;  bar/mumble/name quux/mumble/name
   (uniquify-buffer-name-style 'forward))
 
+
+
 ;;
 ;; Multiple Windows (info "(emacs) Windows")
 ;;
@@ -1102,6 +1154,8 @@
   ;; frames are visible, supporting quick window selection during
   ;; interactive work.
   (bs-first-ui-hook . winum-mode))
+
+
 
 ;;
 ;; Frames and Graphical Displays (info "(emacs) Frames")
@@ -1173,6 +1227,8 @@
   ;; Enable `tab-bar-mode'.
   (bs-first-ui-hook . tab-bar-mode))
 
+
+
 ;;
 ;; International Character Set Support (info "(emacs) International")
 ;;
@@ -1196,6 +1252,8 @@
   ;; processes, and inter-program communication.
   (prefer-coding-system 'utf-8))
 
+
+
 ;;
 ;; Major and Minor Modes (info "(emacs) Modes")
 ;;
@@ -1204,6 +1262,8 @@
   :hook
   ;; Guess major mode when saving the buffer.
   (after-save-hook . bs/guess-file-major-mode))
+
+
 
 ;;
 ;; Indentation (info "(emacs) Indentation")
@@ -1224,9 +1284,12 @@
 
 (use-package electric
   :after prog-mode
+
   :hook
   ;; Auto re-indentation when programming.
   (prog-mode-hook . electric-indent-local-mode))
+
+
 
 ;;
 ;; Commands for Human Languages (info "(emacs) Text")
@@ -1242,12 +1305,6 @@
   ;; commands, while allowing major modes or hooks to override it
   ;; buffer-locally as needed.
   (fill-column 70))
-
-(use-package form-feed
-  :hook
-  ;; Treat form-feed characters as structural landmarks in source
-  ;; code, not as legacy control characters to be ignored.
-  (after-change-major-mode-hook . form-feed-mode))
 
 (use-package grip-mode
   :after (markdown-ts-mode)
@@ -1301,6 +1358,8 @@
   ;; buffers.
   (org-mode-hook . (lambda ()
                      (setq-local fill-column 80))))
+
+
 
 ;;
 ;; Editing Programs (info "(emacs) Programs")
@@ -1452,6 +1511,7 @@
 (use-package corfu-history
   :after (corfu)
   :commands (corfu-history-mode)
+
   :config
   ;; Sort Corfu candidates by history.
   (corfu-history-mode +1))
@@ -1559,6 +1619,7 @@
 
 (use-package rainbow-delimiters
   :after (prog-mode)
+
   :hook
   ;; Colorful parentheses.
   (prog-mode-hook . rainbow-delimiters-mode))
@@ -1585,6 +1646,7 @@
 
 (use-package subword
   :after (prog-mode)
+
   :hook
   ;; Improve cursor movement by treating Camel-case sub-words as
   ;; separate units.
@@ -1663,7 +1725,8 @@
 
 (use-package sly-completion
   :custom
-  ;;
+  ;; Use the standard completion UI instead of SLY's global,
+  ;; Lisp-specific symbol completion interface.
   (sly-symbol-completion-mode nil))
 
 (use-package sly-mrepl
@@ -1678,6 +1741,7 @@
 
 (use-package paredit
   :after (elisp-mode)
+
   :hook
   ;; Enable structured editing to enforcing balanced parentheses
   ;; and S-expression integrity by `paredit'.
@@ -1840,15 +1904,19 @@
 
 (use-package macrostep-geiser
   :after (geiser-mode)
+
   :hook
-  ;;
+  ;; Expand Scheme macros through Geiser in source buffers.
   (geiser-mode-hook . macrostep-geiser-setup))
 
 (use-package macrostep-geiser
   :after (geiser-repl)
+
   :hook
-  ;;
+  ;; Expand Scheme macros through Geiser in REPL buffers.
   (geiser-repl-mode-hook . macrostep-geiser-setup))
+
+
 
 ;;
 ;; Compiling and Testing Programs (info "(emacs) Building")
@@ -1864,6 +1932,7 @@
 
 (use-package flymake
   :after (prog-mode)
+
   :hook
   ;; Enable Flymake.
   (prog-mode-hook . flymake-mode))
@@ -1895,6 +1964,8 @@
   :custom
   ;; Clearing the *scratch* buffer.
   initial-scratch-message nil)
+
+
 
 ;;
 ;; Maintaining Large Programs (info "(emacs) Maintaining")
@@ -2165,9 +2236,13 @@
   ;; being overlooked among substantive code changes.
   (magit-diff-mode-hook . whitespace-mode))
 
+
+
 ;;
 ;; Abbrevs (info "(emacs) Abbrevs")
 ;;
+
+
 
 ;;
 ;; Dired, the Directory Editor (info "(emacs) Dired")
@@ -2242,6 +2317,8 @@
   ;; roles without reading full filenames.
   (dired-mode-hook . nerd-icons-dired-mode))
 
+
+
 ;;
 ;; The Calendar and the Diary (info "(emacs) Calendar/Diary")
 ;;
@@ -2310,6 +2387,8 @@
   ;; Keep remote synchronization independent from event capture.
   (khalel-run-vdirsyncer-after-capture nil))
 
+
+
 ;;
 ;; Sending Mail (info "(emacs) Sending Mail")
 ;;
@@ -2334,13 +2413,19 @@
   ;; Sign new outgoing messages with PGP/MIME by default.
   (message-setup-hook . mml-secure-message-sign-pgpmime))
 
+
+
 ;;
 ;; Reading Mail with Rmail (info "(emacs) Rmail")
 ;;
 
+
+
 ;;
 ;; Email and Usenet News with Gnus (info "(emacs) Gnus")
 ;;
+
+
 
 ;;
 ;; Host Security (info "(emacs) Host Security")
@@ -2352,13 +2437,19 @@
   ;; directory.
   (add-to-list 'trusted-content "~/" t))
 
+
+
 ;;
 ;; Network Security (info "(emacs) Network Security")
 ;;
 
+
+
 ;;
 ;; Document Viewing (info "(emacs) Document View")
 ;;
+
+
 
 ;;
 ;; Running Shell Commands from Emacs (info "(emacs) Shell")
@@ -2460,6 +2551,8 @@
   ;; Export $EDITOR/$VISUAL for `term-mode' sessions.
   (term-mode-hook . with-editor-export-editor))
 
+
+
 ;;
 ;; Using Emacs as a Server (info "(emacs) Emacs Server")
 ;;
@@ -2474,28 +2567,38 @@
   ;; for subsequent emacsclient connections.
   (bs-after-startup-early-hook . bs/server-start))
 
+
+
 ;;
 ;; Printing Hard Copies (info "(emacs) Printing")
 ;;
+
+
 
 ;;
 ;; Sorting Text (info "(emacs) Sorting")
 ;;
 
+
+
 ;;
 ;; Editing Pictures (info "(emacs) Picture Mode")
 ;;
 
+
+
 ;;
 ;; Editing Binary Files (info "(emacs) Editing Binary Files")
 ;;
+
+
 
 ;;
 ;; Saving Emacs Sessions (info "(emacs) Saving Emacs Sessions")
 ;;
 
 (use-package saveplace
-  :after (:all bs-hooks bs-lib)
+  :after (bs-hooks bs-lib)
 
   :custom
   ;; Store persistent data in our state directory.
@@ -2522,22 +2625,32 @@
                                                 "auto-save-list/")
                                       "saves-")))
 
+
+
 ;;
 ;; Recursive Editing Levels (info "(emacs) Recursive Edit")
 ;;
+
+
 
 ;;
 ;; Hyperlinking and Web Navigation Features
 ;; (info "(emacs) Hyperlinking")
 ;;
 
+
+
 ;;
 ;; Games and Other Amusements (info "(emacs) Amusements")
 ;;
 
+
+
 ;;
 ;; Emacs Lisp Packages (info "(emacs) Packages")
 ;;
+
+
 
 ;;
 ;; Customization (info "(emacs) Customization")
@@ -2596,9 +2709,13 @@
                   display-buffer-below-selected)
                  (window-height . 0.35))))
 
+
+
 ;;
 ;; Quitting and Aborting (info "(emacs) Quitting")
 ;;
+
+
 
 ;;
 ;; Contributing to Emacs Development (info "(emacs) Contributing")
@@ -2610,6 +2727,7 @@
   copyright-names-regexp
   (format "%s <%s>" user-full-name user-mail-address))
 
+
 
 ;;
 ;; Agents
@@ -2840,6 +2958,8 @@
     ;; explicit submission remains on \\`C-c C-c'.
     ("RET" . newline)))
 
+
+
 ;;
 ;; Denote (info "(denote) Top")
 ;;
@@ -2996,6 +3116,8 @@
     ;; argument selects another date.
     ("j" . denote-journal-new-or-existing-entry)))
 
+
+
 ;;
 ;; EasyPG Assistant (info "(epa) Top")
 ;;
@@ -3034,6 +3156,8 @@
   ;; in the mini-buffer.
   (epg-pinentry-mode 'loopback))
 
+
+
 ;;
 ;; Contacts
 ;;
@@ -3051,8 +3175,10 @@
 
   :defer t)
 
+
+
 ;;
-;; mu4e
+;; mu4e (info "(mu4e) Top")
 ;;
 
 (use-package bs-mu4e
@@ -3442,6 +3568,8 @@
   ;; mu4e's compose interface.
   (mail-user-agent 'mu4e-user-agent))
 
+
+
 ;;
 ;; Org (info "(org) Top")
 ;;
@@ -3725,6 +3853,7 @@
 
 (use-package org-modern
   :after (org-agenda)
+
   :hook
   ;; Enable modern rendering for Org Agenda buffers.  The hook runs
   ;; after the agenda is fully generated, ensuring that all agenda
@@ -3733,6 +3862,7 @@
 
 (use-package org-modern-indent
   :after (org)
+
   :hook
   ;; Add indentation support for `org-modern', aligning visual
   ;; elements with the structural indentation defined by Org.  This
@@ -3744,6 +3874,8 @@
   ;; Keep `org-id' location cache next to the configured Org files
   ;; instead of using the default file in the user Emacs directory.
   (org-id-locations-file (bs-path org-directory ".id-locations")))
+
+
 
 ;;
 ;; Transparent Remote (file) Access (info "(tramp) Top")
@@ -3770,6 +3902,8 @@
   ;; Save the connection history we created with `tramp'.
   (tramp-persistency-file-name (bs-path* bs-state-directory
                                          "tramp/connections.el")))
+
+
 
 ;;
 ;; Transient (info "(transient) Top")
