@@ -221,12 +221,12 @@ This is useful for writing hygienic macros."
 The directory is automatically deleted after BODY completes."
   (declare (indent 1))
   (library-with-gensyms (dir)
-			`(let ((,dir (make-temp-file "elisp-" t)))
-			   (unwind-protect
-			       (let ((,var ,dir))
-				 ,@body)
-			     (when (file-exists-p ,dir)
-			       (delete-directory ,dir t))))))
+    `(let ((,dir (make-temp-file "elisp-" t)))
+       (unwind-protect
+	   (let ((,var ,dir))
+	     ,@body)
+	 (when (file-exists-p ,dir)
+	   (delete-directory ,dir t))))))
 
 ;;; Error Handling
 
