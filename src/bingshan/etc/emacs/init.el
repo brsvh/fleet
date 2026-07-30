@@ -1249,6 +1249,17 @@
   ;; code, not as legacy control characters to be ignored.
   (after-change-major-mode-hook . form-feed-mode))
 
+(use-package grip-mode
+  :after (markdown-ts-mode)
+
+  :custom
+  ;; Prefer an embedded WebKit preview when Emacs supports xwidgets.
+  (grip-preview-in-webkit t)
+
+  :hook
+  ;; Start a GitHub-style preview for Tree-sitter Markdown buffers.
+  (markdown-ts-mode-hook . grip-mode))
+
 (use-package jieba-rs
   :hook
   ;; Enable Jieba-backed word segmentation in text buffers so CJK

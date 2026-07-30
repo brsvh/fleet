@@ -242,6 +242,7 @@ in
     bingshan.profiles.fonts
     bingshan.profiles.git
     bingshan.profiles.global
+    bingshan.profiles.grip
     home.profiles.emacs
   ];
 
@@ -510,6 +511,7 @@ in
           ghostel-dwim
           git-cliff
           git-modes
+          grip-mode
           haskell-mode
           haskell-ts-mode
           hl-todo
@@ -572,7 +574,9 @@ in
 
       initFile = bingshan.etc.emacs.init;
 
-      package = pkgs.emacs-git-pgtk;
+      package = pkgs.emacs-git-pgtk.override {
+        withXwidgets = true;
+      };
     };
 
     git = {
