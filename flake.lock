@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785433744,
-        "narHash": "sha256-epBbvENd4CNC6+YWbwmqKKAT8tazrIy2q55YqprO1hc=",
+        "lastModified": 1785446066,
+        "narHash": "sha256-/J81nSc8zU3JKfl21O0FA2hRsH3A6kjLpAnyogLwDNU=",
         "ref": "main",
-        "rev": "3b63eb99936742c6d24d50d24a9c602aa24ded47",
-        "revCount": 89,
+        "rev": "e71616510cef6444010f599fc8f8ebd8441a9f2b",
+        "revCount": 95,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-bs.git"
       },

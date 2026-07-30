@@ -2435,25 +2435,19 @@
 ;;
 
 (use-package bs-gnus
-  :after (gnus-sum)
-  :commands (bs-gnus-summary-enable)
-  :defines (gnus-summary-mode-map)
+  :after (gnus)
+  :commands (bs-gnus-group-enable
+             bs-gnus-group-topic-toggle
+             bs-gnus-summary-enable
+             bs-gnus-summary-fold-toggle
+             bs-gnus-summary-next
+             bs-gnus-summary-previous)
 
   :config
-  ;; Replace the native Summary layout only after Gnus itself loads.
+  ;; Replace the native Group and Summary layouts only after Gnus
+  ;; itself loads.
+  (bs-gnus-group-enable)
   (bs-gnus-summary-enable)
-
-  :bind
-  ( :map gnus-summary-mode-map
-    ;; Move between concrete articles rather than decoration lines.
-    ("n" . bs-gnus-summary-next)
-    ("p" . bs-gnus-summary-previous)
-    ("<M-down>" . bs-gnus-summary-next)
-    ("<M-up>" . bs-gnus-summary-previous)
-
-    ;; Fold or expand the thread containing the current article.
-    ("TAB" . bs-gnus-summary-fold-toggle)
-    ("<tab>" . bs-gnus-summary-fold-toggle))
 
   :demand t)
 
@@ -2566,6 +2560,7 @@
 
 (use-package gnus-sum
   :after (gnus)
+  :defines (gnus-summary-mode-map)
 
   :custom
   ;; Display conversations as threads, matching threaded Mu4e
@@ -2578,6 +2573,10 @@
 
   ;; Retrieve enough older headers to reconnect incomplete threads.
   (gnus-fetch-old-headers 'some)
+
+  ;; Fill only the missing reference nodes needed to connect otherwise
+  ;; incomplete threads.
+  (gnus-build-sparse-threads 'some)
 
   ;; Order threads by the date of their newest article, with the most
   ;; recently active conversation first.
@@ -2701,6 +2700,18 @@
   ;; Draw final children with a terminating box line.
   (gnus-sum-thread-tree-single-leaf "└─ ")
 
+  :bind
+  ( :map gnus-summary-mode-map
+    ;; Move between concrete articles rather than decoration lines.
+    ("n" . bs-gnus-summary-next)
+    ("p" . bs-gnus-summary-previous)
+    ("<M-down>" . bs-gnus-summary-next)
+    ("<M-up>" . bs-gnus-summary-previous)
+
+    ;; Fold or expand replies to the current article.
+    ("TAB" . bs-gnus-summary-fold-toggle)
+    ("<tab>" . bs-gnus-summary-fold-toggle))
+
   :hook
   ;; Use a concise mode-line name for Gnus Summary buffers.
   (gnus-summary-mode-hook . (lambda ()
@@ -2745,8 +2756,54 @@
   ;; `gnus-agent' loads instead of passing it through Custom.
   (setq gnus-agent-predicate 'false))
 
+(use-package gnus-group
+  :after (gnus)
+
+  :custom
+  ;; Leave only the group name in native rows; `bs-gnus' supplies the
+  ;; responsive count, status, and source fields after preparation.
+  (gnus-group-line-format "%P%g\n")
+
+  ;; Keep every subscribed group visible even when it has no unread
+  ;; articles.
+  (gnus-permanently-visible-groups ".*")
+
+  ;; Keep groups alphabetical within each topic.
+  (gnus-group-sort-function 'gnus-group-sort-by-alphabet)
+
+  :hook
+  ;; Highlight the current Group row without changing its contents.
+  (gnus-group-mode-hook . hl-line-mode)
+
+  ;; Use a concise mode-line name for Gnus Group buffers.
+  (gnus-group-mode-hook . (lambda ()
+                            (setq-local mode-name "News Groups"))))
+
 (use-package gnus-topic
   :after (gnus)
+  :defines (gnus-topic-mode-map)
+
+  :custom
+  ;; Leave only indentation and the topic name in native rows;
+  ;; `bs-gnus' supplies fold indicators and unread counts.
+  (gnus-topic-line-format "%i%n\n")
+
+  ;; Preserve the configured hierarchy even when a topic is empty.
+  (gnus-topic-display-empty-topics t)
+
+  ;; Indent each topic hierarchy level by two columns.
+  (gnus-topic-indent-level 2)
+
+  :bind
+  ( :map gnus-topic-mode-map
+    ;; Fold or expand the topic at point without changing hierarchy.
+    ("TAB" . bs-gnus-group-topic-toggle)
+    ("<tab>" . bs-gnus-group-topic-toggle)
+
+    ;; Keep hierarchy changes behind explicit topic-prefix keys.
+    ("T >" . gnus-topic-indent)
+    ("T <" . gnus-topic-unindent)
+    ("T TAB" . nil))
 
   :hook
   ;; Organize subscribed groups into collapsible topics in the normal
