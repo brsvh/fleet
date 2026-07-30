@@ -2446,6 +2446,17 @@
   ;; from runtime state.
   (gnus-directory (bs-path bs-data-directory "gnus/"))
 
+  ;; Limit the initial Summary for NNTP groups, download short Eternal
+  ;; September articles on explicit Agent requests, and require
+  ;; explicit download marks for Gmane articles.
+  (gnus-parameters
+   '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
+      (display . 100))
+     ("\\`comp\\."
+      (agent-predicate . short))
+     ("\\`nntp\\+gmane:"
+      (agent-predicate . false))))
+
   ;; Keep the Gmane mailing-list archive available as a secondary NNTP
   ;; source, upgrading its standard connection with STARTTLS.
   (gnus-secondary-select-methods
@@ -2487,8 +2498,9 @@
   ;; setup.
   (gnus-site-init-file nil)
 
-  ;; Ask each server for newly created groups when Gnus starts.
-  (gnus-check-new-newsgroups 'ask-server)
+  ;; Discover newly created groups only on explicit request instead of
+  ;; querying every server when Gnus starts.
+  (gnus-check-new-newsgroups nil)
 
   ;; Read only the active data needed for subscribed and requested
   ;; groups instead of downloading each server's complete active file.
@@ -2534,6 +2546,10 @@
   ;; searches.
   (gnus-show-threads t)
 
+  ;; Extend a limited Summary on demand when article movement reaches
+  ;; beyond its current boundary.
+  (gnus-auto-extend-newsgroup t)
+
   ;; Retrieve enough older headers to reconnect incomplete threads.
   (gnus-fetch-old-headers 'some)
 
@@ -2547,6 +2563,20 @@
   (gnus-subthread-sort-functions
    '(gnus-thread-sort-by-number
      gnus-thread-sort-by-date)))
+
+(use-package gnus-async
+  :after (gnus)
+
+  :custom
+  ;; Prefetch articles over a second connection while the current
+  ;; article is being read.
+  (gnus-asynchronous t)
+
+  ;; Limit asynchronous work to the next ten articles.
+  (gnus-use-article-prefetch 10)
+
+  ;; Avoid prefetching articles that have already been read.
+  (gnus-async-prefetch-article-p #'gnus-async-unread-p))
 
 (use-package gnus-agent
   :after (gnus)
@@ -2565,23 +2595,13 @@
   ;; reconsidering the complete group history.
   (gnus-agent-consider-all-articles nil)
 
-  ;; Retain downloaded read articles for 30 days.
-  (gnus-agent-expire-days 30)
-
-  ;; Protect unread and explicitly marked articles from expiration.
-  (gnus-agent-expire-all nil)
+  ;; Preserve all downloaded articles regardless of their read state.
+  (gnus-agent-enable-expiration 'DISABLE)
 
   :init
   ;; This predicate is an ordinary `defvar', so bind it before
   ;; `gnus-agent' loads instead of passing it through Custom.
-  (setq gnus-agent-predicate 'true)
-
-  :hook
-  ;; Populate the Agent after initial startup and after later checks
-  ;; for new news.  This work happens inside Gnus, never during Emacs
-  ;; initialization.
-  (gnus-started-hook . gnus-agent-fetch-session)
-  (gnus-after-getting-new-news-hook . gnus-agent-fetch-session))
+  (setq gnus-agent-predicate 'false))
 
 (use-package gnus-topic
   :after (gnus)
