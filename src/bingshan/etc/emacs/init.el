@@ -2393,8 +2393,12 @@
 ;; Sending Mail (info "(emacs) Sending Mail")
 ;;
 
+(use-package message
+  :commands (message-mail-p))
+
 (use-package mml-sec
   :after (message)
+  :commands (mml-secure-message-sign-pgpmime)
 
   :config
   ;; Show MML signing option prompts in a dedicated bottom side
@@ -2410,8 +2414,13 @@
                                        (no-other-window . t)))))
 
   :hook
-  ;; Sign new outgoing messages with PGP/MIME by default.
-  (message-setup-hook . mml-secure-message-sign-pgpmime))
+  ;; Sign outgoing mail with PGP/MIME by default, while leaving Usenet
+  ;; articles unsigned.
+  (message-setup-hook
+   .
+   (lambda ()
+     (when (message-mail-p)
+       (mml-secure-message-sign-pgpmime)))))
 
 
 
@@ -2424,6 +2433,163 @@
 ;;
 ;; Email and Usenet News with Gnus (info "(emacs) Gnus")
 ;;
+
+(use-package gnus
+  :after (bs-lib)
+  :commands (gnus)
+
+  :custom
+  ;; Store Gnus state beneath the shared Emacs state directory.
+  (gnus-home-directory (bs-path bs-state-directory "gnus/"))
+
+  ;; Store drafts, scores, and other persistent Gnus data separately
+  ;; from runtime state.
+  (gnus-directory (bs-path bs-data-directory "gnus/"))
+
+  ;; Keep the Gmane mailing-list archive available as a secondary NNTP
+  ;; source, upgrading its standard connection with STARTTLS.
+  (gnus-secondary-select-methods
+   '((nntp "gmane"
+           (nntp-address "news.gmane.io")
+           (nntp-port-number 119)
+           (nntp-open-connection-function
+            nntp-open-network-stream))))
+
+  :config
+  ;; Use authenticated, encrypted Eternal September access for normal
+  ;; Usenet reading and posting.
+  (setq gnus-select-method
+        '(nntp "eternal-september"
+               (nntp-address "news.eternal-september.org")
+               (nntp-port-number 563)
+               (nntp-open-connection-function nntp-open-tls-stream)
+               (nntp-authinfo-force t)))
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Start Gnus explicitly; loading this init file performs no NNTP
+    ;; connection, active-file scan, or Gnus state initialization.
+    ("n" . gnus)))
+
+(use-package gnus-start
+  :after (gnus)
+
+  :custom
+  ;; Keep subscriptions, read ranges, and topic state with the other
+  ;; persistent Emacs state.
+  (gnus-startup-file (bs-path bs-state-directory "gnus/newsrc"))
+
+  ;; Keep all Gnus configuration in this init file instead of loading
+  ;; a separate user Gnus file.
+  (gnus-init-file nil)
+
+  ;; Do not load site-wide Gnus configuration outside this controlled
+  ;; setup.
+  (gnus-site-init-file nil)
+
+  ;; Ask each server for newly created groups when Gnus starts.
+  (gnus-check-new-newsgroups 'ask-server)
+
+  ;; Read only the active data needed for subscribed and requested
+  ;; groups instead of downloading each server's complete active file.
+  (gnus-read-active-file 'some))
+
+(use-package gnus-msg
+  :after (gnus)
+  :defines (gnus-newsgroup-name message-wide-reply-to-function)
+
+  :custom
+  ;; Treat Gmane groups as mailing lists so ordinary followups are
+  ;; sent as mail instead of posted through Gmane.
+  (gnus-mailing-list-groups "\\`nntp\\+gmane:")
+
+  :config
+  ;; Prefer the address advertised by Gmane's List-Post header when
+  ;; following up, then let Message deliver it through the configured
+  ;; mail transport.  Bind the Message-wide reply resolver only while
+  ;; Gnus is composing a Gmane reply, preserving its global value.
+  (advice-add
+   'gnus-post-news
+   :around
+   (lambda (function &rest arguments)
+     (let ((message-wide-reply-to-function
+            (if (string-match-p
+                 "\\`nntp\\+gmane:"
+                 (or (nth 1 arguments) gnus-newsgroup-name ""))
+                (lambda ()
+                  (when-let*
+                      ((list-post
+                        (message-fetch-field "list-post"))
+                       ((string-match
+                         "<mailto:\\([^>?]+\\)" list-post)))
+                    `((To . ,(match-string 1 list-post)))))
+              message-wide-reply-to-function)))
+       (apply function arguments)))))
+
+(use-package gnus-sum
+  :after (gnus)
+
+  :custom
+  ;; Display conversations as threads, matching threaded Mu4e
+  ;; searches.
+  (gnus-show-threads t)
+
+  ;; Retrieve enough older headers to reconnect incomplete threads.
+  (gnus-fetch-old-headers 'some)
+
+  ;; Order threads by the date of their newest article, with the most
+  ;; recently active conversation first.
+  (gnus-thread-sort-functions
+   '(gnus-thread-sort-by-number
+     gnus-thread-sort-by-most-recent-date))
+
+  ;; Keep articles within each thread in chronological order.
+  (gnus-subthread-sort-functions
+   '(gnus-thread-sort-by-number
+     gnus-thread-sort-by-date)))
+
+(use-package gnus-agent
+  :after (gnus)
+
+  :custom
+  ;; Cache NNTP data separately from persistent read and subscription
+  ;; state.
+  (gnus-agent-directory
+   (bs-path bs-cache-directory "gnus/agent/"))
+
+  ;; Agentize all NNTP methods automatically when their servers are
+  ;; first registered.
+  (gnus-agent-auto-agentize-methods '(nntp))
+
+  ;; Apply the Agent predicate only to unread articles instead of
+  ;; reconsidering the complete group history.
+  (gnus-agent-consider-all-articles nil)
+
+  ;; Retain downloaded read articles for 30 days.
+  (gnus-agent-expire-days 30)
+
+  ;; Protect unread and explicitly marked articles from expiration.
+  (gnus-agent-expire-all nil)
+
+  :init
+  ;; This predicate is an ordinary `defvar', so bind it before
+  ;; `gnus-agent' loads instead of passing it through Custom.
+  (setq gnus-agent-predicate 'true)
+
+  :hook
+  ;; Populate the Agent after initial startup and after later checks
+  ;; for new news.  This work happens inside Gnus, never during Emacs
+  ;; initialization.
+  (gnus-started-hook . gnus-agent-fetch-session)
+  (gnus-after-getting-new-news-hook . gnus-agent-fetch-session))
+
+(use-package gnus-topic
+  :after (gnus)
+
+  :hook
+  ;; Organize subscribed groups into collapsible topics in the normal
+  ;; Gnus Group buffer.
+  (gnus-group-mode-hook . gnus-topic-mode))
 
 
 
@@ -2666,6 +2832,11 @@
 (use-package auth-source-pass
   :after (auth-source)
   :commands (auth-source-pass-enable)
+
+  :custom
+  ;; Recognize host/user password-store paths when callers such as the
+  ;; NNTP backend query by host before knowing the login name.
+  (auth-source-pass-extra-query-keywords t)
 
   :init
   ;; Treat the password store as the authoritative source for secrets,
