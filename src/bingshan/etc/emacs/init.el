@@ -2561,6 +2561,7 @@
 (use-package gnus-sum
   :after (gnus)
   :defines (gnus-summary-mode-map)
+  :functions (gnus-summary-select-article-buffer)
 
   :custom
   ;; Display conversations as threads, matching threaded Mu4e
@@ -2700,22 +2701,23 @@
   ;; Draw final children with a terminating box line.
   (gnus-sum-thread-tree-single-leaf "└─ ")
 
-  :bind
-  ( :map gnus-summary-mode-map
-    ;; Display the current article and move focus into its window,
-    ;; instead of scrolling it remotely from the Summary buffer.
-    ("RET" . gnus-summary-select-article-buffer)
-    ("<return>" . gnus-summary-select-article-buffer)
+  :config
+  ;; Display the current article and move focus into its window,
+  ;; instead of scrolling it remotely from the Summary buffer.
+  (keymap-set gnus-summary-mode-map
+              "RET" #'gnus-summary-select-article-buffer)
+  (keymap-set gnus-summary-mode-map
+              "<return>" #'gnus-summary-select-article-buffer)
 
-    ;; Move between concrete articles rather than decoration lines.
-    ("n" . bs-gnus-summary-next)
-    ("p" . bs-gnus-summary-previous)
-    ("<M-down>" . bs-gnus-summary-next)
-    ("<M-up>" . bs-gnus-summary-previous)
+  ;; Move between concrete articles rather than decoration lines.
+  (keymap-set gnus-summary-mode-map "n" #'bs-gnus-summary-next)
+  (keymap-set gnus-summary-mode-map "p" #'bs-gnus-summary-previous)
+  (keymap-set gnus-summary-mode-map "M-<down>" #'bs-gnus-summary-next)
+  (keymap-set gnus-summary-mode-map "M-<up>" #'bs-gnus-summary-previous)
 
-    ;; Fold or expand replies to the current article.
-    ("TAB" . bs-gnus-summary-fold-toggle)
-    ("<tab>" . bs-gnus-summary-fold-toggle))
+  ;; Fold or expand replies to the current article.
+  (keymap-set gnus-summary-mode-map "TAB" #'bs-gnus-summary-fold-toggle)
+  (keymap-set gnus-summary-mode-map "<tab>" #'bs-gnus-summary-fold-toggle)
 
   :hook
   ;; Use a concise mode-line name for Gnus Summary buffers.
