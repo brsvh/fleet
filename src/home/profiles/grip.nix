@@ -1,21 +1,22 @@
 {
-  config,
   home,
-  pkgs,
+  lib,
   ...
 }:
+let
+  inherit (lib)
+    mkDefault
+    ;
+in
 {
   imports = [
+    home.modules.grip
     home.profiles.xdg
   ];
 
-  home = {
-    packages = [
-      pkgs.python3Packages.grip
-    ];
-
-    sessionVariables = {
-      GRIPHOME = "${config.xdg.configHome}/grip";
+  programs = {
+    grip = {
+      enable = mkDefault true;
     };
   };
 }
