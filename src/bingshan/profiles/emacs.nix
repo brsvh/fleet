@@ -11,6 +11,7 @@ let
     attrValues
     concatStringsSep
     filter
+    findFirst
     head
     mapAttrsToList
     toJSON
@@ -21,40 +22,7 @@ let
     calendar: calendar.khal.enable
   ) (attrValues config.accounts.calendar.accounts);
 
-  calendarDirectories = map (
-    calendar: calendar.local.path
-  ) calendars;
-
   contact = config.accounts.contact.emacs;
-
-  elispBool = value: if value then "t" else "nil";
-
-  mkContactAddressbook = addressbook: ''
-    ((accountName . ${toJSON addressbook.accountName})
-     (addressbookId . ${toJSON addressbook.addressbookId})
-     (default . ${elispBool addressbook.default})
-     (id . ${toJSON addressbook.id})
-     (khardName . ${toJSON addressbook.khardName})
-     (name . ${toJSON addressbook.name})
-     (path . ${toJSON addressbook.path})
-     (readOnly . ${elispBool addressbook.readOnly})
-     (syncCollection . ${toJSON addressbook.syncCollection}))'';
-
-  primaryCalendars = filter (
-    calendar: calendar.primary
-  ) calendars;
-
-  primaryCalendar = head primaryCalendars;
-
-  defaultCalendar =
-    if primaryCalendar.primaryCollection == null then
-      primaryCalendar.name
-    else
-      primaryCalendar.primaryCollection;
-
-  cjkFont = "Zhuque Fangsong (technical preview)";
-
-  monospaceFont = head config.fonts.fontconfig.defaultFonts.monospace;
 
   maildirBase =
     config.accounts.email.maildirBasePath;
@@ -68,114 +36,205 @@ let
     }) config.accounts.email.accounts
   );
 
-  primaryMails = filter (
-    mail: mail.account.primary
-  ) mails;
+  mail =
+    findFirst (mail: mail.account.primary)
+      (throw "Emacs requires an enabled primary email account")
+      mails;
 
-  secondaryMails = filter (
-    mail: !mail.account.primary
-  ) mails;
+  maildir = mail.account.maildir.absPath;
 
-  primary = (head primaryMails).account;
+  el = rec {
+    cjkFont = toJSON "Zhuque Fangsong (technical preview)";
 
-  sharedMaildirMails = filter (
-    mail:
-    mail.account.maildir.path == primary.maildir.path
-  ) secondaryMails;
+    genAddressbook =
+      addressbook:
+      let
+        accountName = toJSON addressbook.accountName;
+        addressbookId = toJSON addressbook.addressbookId;
+        default = genBool addressbook.default;
+        id = toJSON addressbook.id;
+        khardName = toJSON addressbook.khardName;
+        name = toJSON addressbook.name;
+        path = toJSON addressbook.path;
+        readOnly = genBool addressbook.readOnly;
+        syncCollection = toJSON addressbook.syncCollection;
+      in
+      ''
+        ((accountName . ${accountName})
+         (addressbookId . ${addressbookId})
+         (default . ${default})
+         (id . ${id})
+         (khardName . ${khardName})
+         (name . ${name})
+         (path . ${path})
+         (readOnly . ${readOnly})
+         (syncCollection . ${syncCollection}))
+      '';
 
-  separateMaildirMails = filter (
-    mail:
-    mail.account.maildir.path != primary.maildir.path
-  ) secondaryMails;
+    genAddressbooks =
+      addressbooks:
+      concatStringsSep "\n" (
+        mapAttrsToList (
+          id: addressbook:
+          "(${toJSON id} . ${genAddressbook addressbook})"
+        ) addressbooks
+      );
 
-  sharedMaildirAddresses = map (
-    mail: mail.account.address
-  ) sharedMaildirMails;
+    genBool = value: if value then "t" else "nil";
 
-  sharedMaildirAddressesElisp = concatStringsSep " " (
-    map toJSON sharedMaildirAddresses
-  );
+    genCalendarDirectories =
+      calendars:
+      concatStringsSep " " (
+        map (
+          calendar: toJSON calendar.local.path
+        ) calendars
+      );
 
-  primaryMaildir = primary.maildir.absPath;
+    genDefaultAddressbook =
+      addressbook:
+      if addressbook == null then
+        "nil"
+      else
+        genAddressbook addressbook;
 
-  primaryName = (head primaryMails).name;
+    genDefaultCalendarName =
+      calendars:
+      let
+        calendar =
+          findFirst (calendar: calendar.primary)
+            (throw "Emacs requires a khal-enabled primary calendar account")
+            calendars;
+      in
+      toJSON (
+        if calendar.primaryCollection == null then
+          calendar.name
+        else
+          calendar.primaryCollection
+      );
 
-  mkMaildir =
-    account: folder:
-    "/${account.maildir.path}/${folder}";
+    genMailFolder =
+      account: folder:
+      "/${account.maildir.path}/${folder}";
 
-  mkPrimaryMaildir = mkMaildir primary;
+    genMu4eContext =
+      mail:
+      let
+        inherit (mail)
+          account
+          sharedMaildirAddresses
+          sharesPrimaryMaildir
+          ;
 
-  mkMu4eContext =
-    mail:
+        name = toJSON mail.name;
+
+        address = toJSON account.address;
+
+        certdirAbsPath = toJSON "${account.maildir.absPath}/certs/";
+
+        genMailFolder' =
+          folder: toJSON (genMailFolder account folder);
+
+        isPrimary = account.primary;
+
+        maildir = toJSON "/${account.maildir.path}/";
+
+        maildirAbsPath = toJSON account.maildir.absPath;
+
+        realName = toJSON account.realName;
+
+        sharedMaildirAddresses' = concatStringsSep " " (
+          map toJSON sharedMaildirAddresses
+        );
+
+        signature = toJSON account.signature.text;
+
+        signkey = toJSON account.gpg.key;
+      in
+      ''
+        (make-mu4e-context
+         :name ${name}
+         :match-func
+         (lambda (msg)
+           (when msg
+             ${
+               if isPrimary then
+                 ''
+                   (let ((maildir (mu4e-message-field msg :maildir)))
+                     (and maildir
+                          (string-prefix-p ${maildir} maildir)
+                          (not
+                           (mu4e-message-contact-field-matches
+                   	 msg
+                   	 '( :from :to :cc :bcc)
+                   	 (mapcar #'regexp-quote '(${sharedMaildirAddresses'}))))))
+                 ''
+               else if !sharesPrimaryMaildir then
+                 ''
+                   (let ((maildir (mu4e-message-field msg :maildir)))
+                     (and maildir
+                          (string-prefix-p ${maildir} maildir)))
+                 ''
+               else
+                 ''
+                   (mu4e-message-contact-field-matches
+                    msg
+                    '( :from :to :cc :bcc)
+                    (regexp-quote ${address}))
+                 ''
+             }))
+         :vars
+         '((user-mail-address . ${address})
+           (user-full-name . ${realName})
+           (mail-source-directory . ${maildirAbsPath})
+           (message-directory . ${maildirAbsPath})
+           (message-signature . ${signature})
+           (mml-secure-openpgp-signers . (${signkey}))
+           (mu4e-sent-folder . ${genMailFolder' "Sent"})
+           (mu4e-drafts-folder . ${genMailFolder' "Drafts"})
+           (mu4e-trash-folder . ${genMailFolder' "Trash"})
+           (smime-certificate-directory . ${certdirAbsPath})))
+      '';
+
+    genSyncCollections =
+      collections:
+      concatStringsSep " " (map toJSON collections);
+  };
+
+  mu4eContexts =
     let
-      inherit (mail)
-        account
-        name
-        ;
+      sameMaildir =
+        candidate:
+        candidate.account.maildir.path
+        == mail.account.maildir.path;
 
-      accountMaildir = mkMaildir account;
+      shared = filter (
+        mail: !mail.account.primary && sameMaildir mail
+      ) mails;
 
-      accountMaildirPrefix = "/${account.maildir.path}/";
+      addresses = map (
+        mail: mail.account.address
+      ) shared;
+
+      gen =
+        mail:
+        el.genMu4eContext (
+          mail
+          // {
+            sharedMaildirAddresses = addresses;
+
+            sharesPrimaryMaildir = sameMaildir mail;
+          }
+        );
     in
-    ''
-      (make-mu4e-context
-       :name ${toJSON name}
-       :match-func
-       (lambda (msg)
-         (when msg
-           ${
-             if account.primary then
-               ''
-                 (let ((maildir (mu4e-message-field msg :maildir)))
-                   (and maildir
-                        (string-prefix-p ${toJSON accountMaildirPrefix}
-                                         maildir)
-                        (not
-                         (mu4e-message-contact-field-matches
-                          msg
-                          '(:from :to :cc :bcc)
-                          (mapcar #'regexp-quote
-                                  '(${sharedMaildirAddressesElisp}))))))
-               ''
-             else if
-               account.maildir.path != primary.maildir.path
-             then
-               ''
-                 (let ((maildir (mu4e-message-field msg :maildir)))
-                   (and maildir
-                        (string-prefix-p ${toJSON accountMaildirPrefix}
-                                         maildir)))
-               ''
-             else
-               ''
-                 (mu4e-message-contact-field-matches
-                  msg
-                  '(:from :to :cc :bcc)
-                  (regexp-quote ${toJSON account.address}))
-               ''
-           }))
-       :vars
-       '((user-mail-address . ${toJSON account.address})
-         (user-full-name . ${toJSON account.realName})
-         (mail-source-directory . ${toJSON account.maildir.absPath})
-         (message-directory . ${toJSON account.maildir.absPath})
-         (message-signature . ${toJSON account.signature.text})
-         (mml-secure-openpgp-signers . (${toJSON account.gpg.key}))
-         (mu4e-sent-folder . ${toJSON (accountMaildir "Sent")})
-         (mu4e-drafts-folder . ${toJSON (accountMaildir "Drafts")})
-         (mu4e-trash-folder . ${toJSON (accountMaildir "Trash")})
-         (smime-certificate-directory . ${toJSON "${account.maildir.absPath}/certs/"})))
-    '';
-
-  mu4eEmailContexts = concatStringsSep "\n" (
-    map mkMu4eContext (
-      primaryMails
-      ++ sharedMaildirMails
-      ++ separateMaildirMails
-    )
-  );
-
+    concatStringsSep "\n" (
+      map gen (
+        [ mail ]
+        ++ shared
+        ++ filter (
+          mail: !mail.account.primary && !sameMaildir mail
+        ) mails
+      )
+    );
 in
 {
   imports = [
@@ -220,179 +279,175 @@ in
     emacs = {
       earlyInitFile = bingshan.etc.emacs.early-init;
 
-      extraConfig = ''
-        (use-package bs-contacts
-          :custom
-          (bs-contacts-addressbooks
-           '(${
-             concatStringsSep "\n" (
-               mapAttrsToList (
-                 id: addressbook:
-                 "(${toJSON id} . ${mkContactAddressbook addressbook})"
-               ) contact.addressbooks
-             )
-           }))
+      extraConfig =
+        let
+          inherit (contact)
+            addressbooks
+            defaultAddressbook
+            syncCollections
+            ;
+        in
+        with el;
+        ''
+          (use-package bs-contacts
+            :custom
+            (bs-contacts-addressbooks '(${genAddressbooks addressbooks}))
 
-          (bs-contacts-default-addressbook
-           '${
-             if contact.defaultAddressbook == null then
-               "nil"
-             else
-               mkContactAddressbook contact.defaultAddressbook
-           })
+            (bs-contacts-default-addressbook '${genDefaultAddressbook defaultAddressbook})
 
-          (bs-contacts-sync-collections
-           '(${concatStringsSep " " (map toJSON contact.syncCollections)}))
+            (bs-contacts-sync-collections '(${genSyncCollections syncCollections}))
 
-          :defer t)
+            :defer t)
 
-        (use-package bs-khal
-          :custom
-          (bs-khal-calendar-directories
-           '(${concatStringsSep " " (map toJSON calendarDirectories)}))
+          (use-package bs-khal
+            :custom
+            (bs-khal-calendar-directories '(${genCalendarDirectories calendars}))
 
-          (bs-khal-default-calendar ${toJSON defaultCalendar})
+            (bs-khal-default-calendar ${genDefaultCalendarName calendars})
 
-          :defer t)
+            :defer t)
 
-        (use-package emacs
-          :demand t
-          :no-require t
+          (use-package emacs
+            :demand t
+            :no-require t
 
-          :custom
-          (user-full-name "${primary.realName}"))
+            :custom
+            (user-full-name "${mail.account.realName}"))
 
-        (use-package emacs
-          :demand t
-          :no-require t
-          :when (display-graphic-p)
+          (use-package emacs
+            :demand t
+            :no-require t
+            :when (display-graphic-p)
 
-          :config
-          (set-fontset-font t 'cjk-misc
-                            (font-spec :family ${toJSON cjkFont}))
-          (set-fontset-font t 'han
-                            (font-spec :family ${toJSON cjkFont})))
+            :config
+            (set-fontset-font t 'cjk-misc (font-spec :family ${cjkFont}))
+            (set-fontset-font t 'han (font-spec :family ${cjkFont})))
 
-        (use-package epa-hook
-          :config
-          (add-to-list 'epa-file-encrypt-to "${primary.gpg.key}")
+          (use-package epa-hook
+            :config
+            (add-to-list 'epa-file-encrypt-to "${mail.account.gpg.key}")
 
-          :defer t)
+            :defer t)
 
-        (use-package mail-source
-          :custom
-          (mail-source-directory "${primaryMaildir}")
+          (use-package mail-source
+            :custom
+            (mail-source-directory "${maildir}")
 
-          :defer t)
+            :defer t)
 
-        (use-package message
-          :custom
-          (message-directory "${primaryMaildir}")
-          (message-sendmail-envelope-from 'header)
-          (message-signature "${primary.signature.text}")
+          (use-package message
+            :custom
+            (message-directory "${maildir}")
+            (message-sendmail-envelope-from 'header)
+            (message-signature "${mail.account.signature.text}")
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-bookmarks
-          :custom
-          (mu4e-bookmarks
-           '(( :name "${toSentenceCase primaryName} inbox"
-               :query "maildir:${mkPrimaryMaildir "INBOX"}"
-               :key ?i)
-             ( :name "${toSentenceCase primaryName} drafts"
-               :query "maildir:${mkPrimaryMaildir "Drafts"}"
-               :key ?d)
-             ( :name "Unread messages"
-               :query "flag:unread AND NOT flag:trashed"
-               :key ?u)
-             ( :name "Today's messages"
-               :query "date:today..now"
-               :key ?t)
-             ( :name "Last 3 days"
-               :query "date:3d..now"
-               :key ?3)
-             ( :name "Last 7 days"
-               :query "date:7d..now"
-               :key ?7)
-             ( :name "${toSentenceCase primaryName} sent messages"
-               :query "maildir:${mkPrimaryMaildir "Sent"}"
-               :key ?s)
-             ( :name "${toSentenceCase primaryName} junk messages"
-               :query "maildir:${mkPrimaryMaildir "Junk"}"
-               :key ?j)))
+          (use-package mu4e-bookmarks
+            :custom
+            (mu4e-bookmarks
+             '(( :name "${toSentenceCase mail.name} inbox"
+                 :query "maildir:${genMailFolder mail.account "INBOX"}"
+                 :key ?i)
+               ( :name "${toSentenceCase mail.name} drafts"
+                 :query "maildir:${genMailFolder mail.account "Drafts"}"
+                 :key ?d)
+               ( :name "Unread messages"
+                 :query "flag:unread AND NOT flag:trashed"
+                 :key ?u)
+               ( :name "Today's messages"
+                 :query "date:today..now"
+                 :key ?t)
+               ( :name "Last 3 days"
+                 :query "date:3d..now"
+                 :key ?3)
+               ( :name "Last 7 days"
+                 :query "date:7d..now"
+                 :key ?7)
+               ( :name "${toSentenceCase mail.name} sent messages"
+                 :query "maildir:${genMailFolder mail.account "Sent"}"
+                 :key ?s)
+               ( :name "${toSentenceCase mail.name} junk messages"
+                 :query "maildir:${genMailFolder mail.account "Junk"}"
+                 :key ?j)))
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-context
-          :custom
-          (mu4e-context-policy 'pick-first)
+          (use-package mu4e-context
+            :custom
+            (mu4e-context-policy 'pick-first)
 
-          :config
-          (setq mu4e-contexts (list ${mu4eEmailContexts}))
+            :config
+            (setq mu4e-contexts (list ${mu4eContexts}))
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-draft
-          :custom
-          (mu4e-compose-context-policy 'ask)
+          (use-package mu4e-draft
+            :custom
+            (mu4e-compose-context-policy 'ask)
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-folders
-          :custom
-          (mu4e-sent-folder "${mkPrimaryMaildir "Sent"}")
-          (mu4e-drafts-folder "${mkPrimaryMaildir "Drafts"}")
-          (mu4e-trash-folder "${mkPrimaryMaildir "Trash"}")
+          (use-package mu4e-folders
+            :custom
+            (mu4e-sent-folder "${genMailFolder mail.account "Sent"}")
+            (mu4e-drafts-folder "${genMailFolder mail.account "Drafts"}")
+            (mu4e-trash-folder "${genMailFolder mail.account "Trash"}")
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-message
-          :commands (mu4e-message-contact-field-matches
-        	     mu4e-message-field)
+          (use-package mu4e-message
+            :commands (mu4e-message-contact-field-matches
+          	     mu4e-message-field)
 
-          :defer t)
+            :defer t)
 
-        (use-package mu4e-update
-          :custom
-          (mu4e-get-mail-command "true")
+          (use-package mu4e-update
+            :custom
+            (mu4e-get-mail-command "true")
 
-          :defer t)
+            :defer t)
 
-        (use-package sendmail
-          :custom
-          (mail-envelope-from 'header)
-          (mail-specify-envelope-from t)
-          (send-mail-function 'sendmail-send-it)
-          (sendmail-program "msmtp")
+          (use-package sendmail
+            :custom
+            (mail-envelope-from 'header)
+            (mail-specify-envelope-from t)
+            (send-mail-function 'sendmail-send-it)
+            (sendmail-program "msmtp")
 
-          :defer t)
+            :defer t)
 
-        (use-package smime
-          :custom
-          (smime-certificate-directory "${primaryMaildir}/certs/")
+          (use-package smime
+            :custom
+            (smime-certificate-directory "${maildir}/certs/")
 
-          :defer t)
+            :defer t)
 
-        (use-package smtpmail
-          :custom
-          (smtpmail-queue-dir "${maildirBase}/queued-mail/")
+          (use-package smtpmail
+            :custom
+            (smtpmail-queue-dir "${maildirBase}/queued-mail/")
 
-          :defer t)
+            :defer t)
 
-        (use-package startup
-          :demand t
-          :no-require t
+          (use-package startup
+            :demand t
+            :no-require t
 
-          :custom
-          (user-mail-address "${primary.address}"))
-      '';
+            :custom
+            (user-mail-address "${mail.account.address}"))
+        '';
 
-      extraEarlyConfig = ''
-        (set-face-attribute 'default nil
-                            :family ${toJSON monospaceFont})
-        (set-face-attribute 'fixed-pitch nil
-                            :family ${toJSON monospaceFont})
-      '';
+      extraEarlyConfig =
+        with el;
+        let
+          font = head config.fonts.fontconfig.defaultFonts.monospace;
+
+          monospace = toJSON font;
+        in
+        ''
+          (set-face-attribute 'default nil :family ${monospace})
+          (set-face-attribute 'fixed-pitch nil :family ${monospace})
+        '';
 
       extraPackages =
         epkgs: with epkgs; [
