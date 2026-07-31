@@ -166,7 +166,67 @@ in
   home = {
     packages = with pkgs; [
       cascadia-code
-      windows-fonts
+      microsoftPackages.arial
+      microsoftPackages.bahnschrift
+      microsoftPackages.calibri
+      microsoftPackages.cambria
+      microsoftPackages.cambria-math
+      microsoftPackages.candara
+      microsoftPackages.comic-sans-ms
+      microsoftPackages.consolas
+      microsoftPackages.constantia
+      microsoftPackages.corbel
+      microsoftPackages.courier-new
+      microsoftPackages.dengxian
+      microsoftPackages.ebrima
+      microsoftPackages.fangsong
+      microsoftPackages.franklin-gothic-medium
+      microsoftPackages.gabriola
+      microsoftPackages.gadugi
+      microsoftPackages.georgia
+      microsoftPackages.impact
+      microsoftPackages.ink-free
+      microsoftPackages.javanese-text
+      microsoftPackages.kaiti
+      microsoftPackages.leelawadee-ui
+      microsoftPackages.lucida-console
+      microsoftPackages.lucida-sans-unicode
+      microsoftPackages.malgun-gothic
+      microsoftPackages.marlett
+      microsoftPackages.microsoft-himalaya
+      microsoftPackages.microsoft-jhenghei
+      microsoftPackages.microsoft-new-tai-lue
+      microsoftPackages.microsoft-phagspa
+      microsoftPackages.microsoft-sans-serif
+      microsoftPackages.microsoft-tai-le
+      microsoftPackages.microsoft-yahei
+      microsoftPackages.microsoft-yi-baiti
+      microsoftPackages.mingliu
+      microsoftPackages.mongolian-baiti
+      microsoftPackages.ms-gothic
+      microsoftPackages.mv-boli
+      microsoftPackages.myanmar-text
+      microsoftPackages.nirmala
+      microsoftPackages.palatino-linotype
+      microsoftPackages.sans-serif-collection
+      microsoftPackages.segoe-icons
+      microsoftPackages.segoe-print
+      microsoftPackages.segoe-script
+      microsoftPackages.segoe-ui
+      microsoftPackages.segoe-ui-symbols
+      microsoftPackages.segoe-ui-variable
+      microsoftPackages.simhei
+      microsoftPackages.simsun
+      microsoftPackages.sitka
+      microsoftPackages.sylfaen
+      microsoftPackages.symbol
+      microsoftPackages.tahoma
+      microsoftPackages.times-new-roman
+      microsoftPackages.trebuchet-ms
+      microsoftPackages.verdana
+      microsoftPackages.webdings
+      microsoftPackages.wingdings
+      microsoftPackages.yu-gothic
     ];
 
     sessionVariables = {
