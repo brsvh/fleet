@@ -2,7 +2,6 @@
   bingshan,
   config,
   home,
-  pkgs,
   lib,
   ...
 }:
@@ -26,7 +25,7 @@ in
   gtk = {
     font = {
       name = mkForce "${first fonts.sansSerif}";
-      package = mkForce pkgs.windows-fonts;
+      package = mkForce null;
     };
   };
 }
