@@ -2443,6 +2443,17 @@
              bs-gnus-summary-next
              bs-gnus-summary-previous)
 
+  :custom
+  ;; Name NNTP sources by their configured server addresses in the
+  ;; Group buffer.
+  (bs-gnus-group-source-names
+   '(("news.eternal-september.org" . "Eternal September")
+     ("news.gmane.io" . "Gmane")))
+
+  ;; Right-align complete thread counts through `999/999+', keeping
+  ;; subjects in a stable column.
+  (bs-gnus-summary-thread-count-digits 8)
+
   :config
   ;; Replace the native Group and Summary layouts only after Gnus
   ;; itself loads.
@@ -2525,6 +2536,14 @@
   ;; Read only the active data needed for subscribed and requested
   ;; groups instead of downloading each server's complete active file.
   (gnus-read-active-file 'some))
+
+(use-package gnus-win
+  :after (gnus)
+
+  :custom
+  ;; Preserve unrelated windows and confine Gnus layouts to the window
+  ;; from which Gnus was entered.
+  (gnus-use-full-window nil))
 
 (use-package gnus-msg
   :after (gnus)
