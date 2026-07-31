@@ -1295,55 +1295,6 @@
 ;; Commands for Human Languages (info "(emacs) Text")
 ;;
 
-(use-package edit-indirect
-  :after (markdown-ts-mode)
-  :commands (edit-indirect-region)
-  :defines (markdown-ts-default-code-block-mode
-            markdown-ts-mode-map)
-  :functions (markdown-ts--code-block-language-mode)
-
-  :init
-  (defun markdown-ts-mode--edit-code-block ()
-    "Edit the fenced Markdown code block at point indirectly."
-    (interactive)
-    (eval-and-compile
-      (require 'treesit)
-      (defvar edit-indirect-guess-mode-function))
-    (let* ((root (treesit-buffer-root-node 'markdown))
-           (capture
-            (car (treesit-query-capture
-                  root '((fenced_code_block) @block)
-                  (point) (min (1+ (point)) (point-max)))))
-           (block (cdr capture)))
-      (unless block
-        (user-error "Point is not in a fenced Markdown code block"))
-      (let* ((last-child (treesit-node-child block -1 'named))
-             (beg (save-excursion
-                    (goto-char (treesit-node-start block))
-                    (forward-line 1)
-                    (point)))
-             (end (if (and last-child
-                           (equal (treesit-node-type last-child)
-                                  "fenced_code_block_delimiter"))
-                      (treesit-node-start last-child)
-                    (treesit-node-end block)))
-             (language-node
-              (treesit-search-subtree block "\\`language\\'"))
-             (mode
-              (or (and language-node
-                       (markdown-ts--code-block-language-mode
-                        (intern (treesit-node-text language-node t))))
-                  markdown-ts-default-code-block-mode))
-             (edit-indirect-guess-mode-function
-              (lambda (_parent-buffer _beg _end)
-                (funcall mode))))
-        (edit-indirect-region beg end t))))
-
-  ;; Edit the fenced code block at point in a separate buffer.
-  (keymap-set markdown-ts-mode-map
-              "C-c '"
-              'markdown-ts-mode--edit-code-block))
-
 (use-package emacs
   :demand t
   :no-require t
@@ -1354,17 +1305,6 @@
   ;; commands, while allowing major modes or hooks to override it
   ;; buffer-locally as needed.
   (fill-column 70))
-
-(use-package grip-mode
-  :after (markdown-ts-mode)
-
-  :custom
-  ;; Prefer an embedded WebKit preview when Emacs supports xwidgets.
-  (grip-preview-in-webkit t)
-
-  :hook
-  ;; Start a GitHub-style preview for Tree-sitter Markdown buffers.
-  (markdown-ts-mode-hook . grip-mode))
 
 (use-package jieba-rs
   :hook
@@ -1395,6 +1335,57 @@
   ;; buffers.
   (text-mode-hook . (lambda ()
                       (setq-local fill-column 80))))
+
+;; Markdown
+
+(use-package bs-edit-indirect
+  :after (markdown-mode)
+
+  :bind
+  ( :map markdown-mode-map
+    ;; Edit the fenced code block at point in a separate buffer.
+    ("C-c '" . bs-edit-indirect-markdown-code-block)))
+
+(use-package bs-edit-indirect
+  :after (markdown-ts-mode)
+
+  :bind
+  ( :map markdown-ts-mode-map
+    ;; Edit the fenced code block at point in a separate buffer.
+    ("C-c '" . bs-edit-indirect-markdown-code-block)))
+
+(use-package files
+  :config
+  ;; Replace `markdown-mode' with `markdown-ts-mode' When a buffer
+  ;; would normally activate `markdown-mode'.
+  (add-to-list 'major-mode-remap-alist
+               '(markdown-mode . markdown-ts-mode)
+               t))
+
+(use-package grip-mode
+  :after (markdown-ts-mode)
+
+  :custom
+  ;; Prefer an embedded WebKit preview when Emacs supports xwidgets.
+  (grip-preview-in-webkit t)
+
+  :hook
+  ;; Start a GitHub-style preview for Tree-sitter Markdown buffers.
+  (markdown-ts-mode-hook . grip-mode))
+
+(use-package simple
+  :after (markdown-ts-mode)
+
+  :hook
+  ;; Enable `auto-fill-mode' in Markdown Mode buffers.
+  (markdown-ts-mode-hook . auto-fill-mode)
+
+  ;; Set the fill column to 80 characters locally for Markdown Mode
+  ;; buffers.
+  (markdown-ts-mode-hook . (lambda ()
+                             (setq-local fill-column 80))))
+
+;; Org
 
 (use-package simple
   :after (org-mode)
@@ -1884,6 +1875,22 @@
   :commands (json-ts-mode))
 
 ;; Nix programs
+
+(use-package bs-edit-indirect
+  :after (nix-mode)
+
+  :bind
+  ( :map nix-mode-map
+    ;; Edit the literal string at point in a separate buffer.
+    ("C-c '" . bs-edit-indirect-nix-literal-string)))
+
+(use-package bs-edit-indirect
+  :after (nix-ts-mode)
+
+  :bind
+  ( :map nix-ts-mode-map
+    ;; Edit the literal string at point in a separate buffer.
+    ("C-c '" . bs-edit-indirect-nix-literal-string)))
 
 (use-package eglot
   :after (nix-mode)

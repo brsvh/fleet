@@ -499,7 +499,6 @@ in
           diff-hl
           diredfl
           doom-modeline
-          edit-indirect
           editorconfig
           eglot
           eglot-booster
@@ -531,6 +530,7 @@ in
           magit
           magit-section
           marginalia
+          markdown-mode
           mcp-server
           modus-themes
           mu4e
