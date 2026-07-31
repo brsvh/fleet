@@ -35,19 +35,19 @@ in
 
     fontconfig = {
       defaultFonts = {
-        emoji = [
+        emoji = mkForce [
           "Twitter Color Emoji"
         ];
 
-        monospace = [
+        monospace = mkForce [
           "IBM Plex Mono"
         ];
 
-        sansSerif = [
+        sansSerif = mkForce [
           "IBM Plex Sans"
         ];
 
-        serif = [
+        serif = mkForce [
           "IBM Plex Serif"
         ];
       };
@@ -58,12 +58,15 @@ in
       };
     };
 
-    packages = with pkgs; [
-      ibm-plex-math
-      ibm-plex-mono
-      ibm-plex-sans
-      ibm-plex-serif
-      twitter-color-emoji
-    ];
+    packages = mkForce (
+      with pkgs;
+      [
+        ibm-plex-math
+        ibm-plex-mono
+        ibm-plex-sans
+        ibm-plex-serif
+        twitter-color-emoji
+      ]
+    );
   };
 }
