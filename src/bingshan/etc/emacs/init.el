@@ -1295,6 +1295,55 @@
 ;; Commands for Human Languages (info "(emacs) Text")
 ;;
 
+(use-package edit-indirect
+  :after (markdown-ts-mode)
+  :commands (edit-indirect-region)
+  :defines (markdown-ts-default-code-block-mode
+            markdown-ts-mode-map)
+  :functions (markdown-ts--code-block-language-mode)
+
+  :init
+  (defun markdown-ts-mode--edit-code-block ()
+    "Edit the fenced Markdown code block at point indirectly."
+    (interactive)
+    (eval-and-compile
+      (require 'treesit)
+      (defvar edit-indirect-guess-mode-function))
+    (let* ((root (treesit-buffer-root-node 'markdown))
+           (capture
+            (car (treesit-query-capture
+                  root '((fenced_code_block) @block)
+                  (point) (min (1+ (point)) (point-max)))))
+           (block (cdr capture)))
+      (unless block
+        (user-error "Point is not in a fenced Markdown code block"))
+      (let* ((last-child (treesit-node-child block -1 'named))
+             (beg (save-excursion
+                    (goto-char (treesit-node-start block))
+                    (forward-line 1)
+                    (point)))
+             (end (if (and last-child
+                           (equal (treesit-node-type last-child)
+                                  "fenced_code_block_delimiter"))
+                      (treesit-node-start last-child)
+                    (treesit-node-end block)))
+             (language-node
+              (treesit-search-subtree block "\\`language\\'"))
+             (mode
+              (or (and language-node
+                       (markdown-ts--code-block-language-mode
+                        (intern (treesit-node-text language-node t))))
+                  markdown-ts-default-code-block-mode))
+             (edit-indirect-guess-mode-function
+              (lambda (_parent-buffer _beg _end)
+                (funcall mode))))
+        (edit-indirect-region beg end t))))
+
+  ;; Edit the fenced code block at point in a separate buffer.
+  (keymap-set markdown-ts-mode-map
+              "C-c '"
+              'markdown-ts-mode--edit-code-block))
+
 (use-package emacs
   :demand t
   :no-require t
@@ -2514,37 +2563,67 @@
     ;; connection, active-file scan, or Gnus state initialization.
     ("n" . gnus)))
 
-(use-package gnus-start
+(use-package gnus-agent
   :after (gnus)
 
   :custom
-  ;; Keep subscriptions, read ranges, and topic state with the other
-  ;; persistent Emacs state.
-  (gnus-startup-file (bs-path bs-state-directory "gnus/newsrc"))
+  ;; Cache NNTP data separately from persistent read and subscription
+  ;; state.
+  (gnus-agent-directory
+   (bs-path bs-cache-directory "gnus/agent/"))
 
-  ;; Keep all Gnus configuration in this init file instead of loading
-  ;; a separate user Gnus file.
-  (gnus-init-file nil)
+  ;; Agentize all NNTP methods automatically when their servers are
+  ;; first registered.
+  (gnus-agent-auto-agentize-methods '(nntp))
 
-  ;; Do not load site-wide Gnus configuration outside this controlled
-  ;; setup.
-  (gnus-site-init-file nil)
+  ;; Apply the Agent predicate only to unread articles instead of
+  ;; reconsidering the complete group history.
+  (gnus-agent-consider-all-articles nil)
 
-  ;; Discover newly created groups only on explicit request instead of
-  ;; querying every server when Gnus starts.
-  (gnus-check-new-newsgroups nil)
+  ;; Preserve all downloaded articles regardless of their read state.
+  (gnus-agent-enable-expiration 'DISABLE)
 
-  ;; Read only the active data needed for subscribed and requested
-  ;; groups instead of downloading each server's complete active file.
-  (gnus-read-active-file 'some))
+  :init
+  ;; This predicate is an ordinary `defvar', so bind it before
+  ;; `gnus-agent' loads instead of passing it through Custom.
+  (setq gnus-agent-predicate 'false))
 
-(use-package gnus-win
+(use-package gnus-async
   :after (gnus)
 
   :custom
-  ;; Preserve unrelated windows and confine Gnus layouts to the window
-  ;; from which Gnus was entered.
-  (gnus-use-full-window nil))
+  ;; Prefetch articles over a second connection while the current
+  ;; article is being read.
+  (gnus-asynchronous t)
+
+  ;; Limit asynchronous work to the next ten articles.
+  (gnus-use-article-prefetch 10)
+
+  ;; Avoid prefetching articles that have already been read.
+  (gnus-async-prefetch-article-p #'gnus-async-unread-p))
+
+(use-package gnus-group
+  :after (gnus)
+
+  :custom
+  ;; Leave only the group name in native rows; `bs-gnus' supplies the
+  ;; responsive count, status, and source fields after preparation.
+  (gnus-group-line-format "%P%g\n")
+
+  ;; Keep every subscribed group visible even when it has no unread
+  ;; articles.
+  (gnus-permanently-visible-groups ".*")
+
+  ;; Keep groups alphabetical within each topic.
+  (gnus-group-sort-function 'gnus-group-sort-by-alphabet)
+
+  :hook
+  ;; Highlight the current Group row without changing its contents.
+  (gnus-group-mode-hook . hl-line-mode)
+
+  ;; Use a concise mode-line name for Gnus Group buffers.
+  (gnus-group-mode-hook . (lambda ()
+                            (setq-local mode-name "News Groups"))))
 
 (use-package gnus-msg
   :after (gnus)
@@ -2596,6 +2675,30 @@
                      `((To . ,(match-string 1 list-post)))))
                message-wide-reply-to-function)))
        (apply function arguments)))))
+
+(use-package gnus-start
+  :after (gnus)
+
+  :custom
+  ;; Keep subscriptions, read ranges, and topic state with the other
+  ;; persistent Emacs state.
+  (gnus-startup-file (bs-path bs-state-directory "gnus/newsrc"))
+
+  ;; Keep all Gnus configuration in this init file instead of loading
+  ;; a separate user Gnus file.
+  (gnus-init-file nil)
+
+  ;; Do not load site-wide Gnus configuration outside this controlled
+  ;; setup.
+  (gnus-site-init-file nil)
+
+  ;; Discover newly created groups only on explicit request instead of
+  ;; querying every server when Gnus starts.
+  (gnus-check-new-newsgroups nil)
+
+  ;; Read only the active data needed for subscribed and requested
+  ;; groups instead of downloading each server's complete active file.
+  (gnus-read-active-file 'some))
 
 (use-package gnus-sum
   :after (gnus)
@@ -2763,68 +2866,6 @@
   (gnus-summary-mode-hook . (lambda ()
                               (setq-local mode-name "News"))))
 
-(use-package gnus-async
-  :after (gnus)
-
-  :custom
-  ;; Prefetch articles over a second connection while the current
-  ;; article is being read.
-  (gnus-asynchronous t)
-
-  ;; Limit asynchronous work to the next ten articles.
-  (gnus-use-article-prefetch 10)
-
-  ;; Avoid prefetching articles that have already been read.
-  (gnus-async-prefetch-article-p #'gnus-async-unread-p))
-
-(use-package gnus-agent
-  :after (gnus)
-
-  :custom
-  ;; Cache NNTP data separately from persistent read and subscription
-  ;; state.
-  (gnus-agent-directory
-   (bs-path bs-cache-directory "gnus/agent/"))
-
-  ;; Agentize all NNTP methods automatically when their servers are
-  ;; first registered.
-  (gnus-agent-auto-agentize-methods '(nntp))
-
-  ;; Apply the Agent predicate only to unread articles instead of
-  ;; reconsidering the complete group history.
-  (gnus-agent-consider-all-articles nil)
-
-  ;; Preserve all downloaded articles regardless of their read state.
-  (gnus-agent-enable-expiration 'DISABLE)
-
-  :init
-  ;; This predicate is an ordinary `defvar', so bind it before
-  ;; `gnus-agent' loads instead of passing it through Custom.
-  (setq gnus-agent-predicate 'false))
-
-(use-package gnus-group
-  :after (gnus)
-
-  :custom
-  ;; Leave only the group name in native rows; `bs-gnus' supplies the
-  ;; responsive count, status, and source fields after preparation.
-  (gnus-group-line-format "%P%g\n")
-
-  ;; Keep every subscribed group visible even when it has no unread
-  ;; articles.
-  (gnus-permanently-visible-groups ".*")
-
-  ;; Keep groups alphabetical within each topic.
-  (gnus-group-sort-function 'gnus-group-sort-by-alphabet)
-
-  :hook
-  ;; Highlight the current Group row without changing its contents.
-  (gnus-group-mode-hook . hl-line-mode)
-
-  ;; Use a concise mode-line name for Gnus Group buffers.
-  (gnus-group-mode-hook . (lambda ()
-                            (setq-local mode-name "News Groups"))))
-
 (use-package gnus-topic
   :after (gnus)
   :defines (gnus-topic-mode-map)
@@ -2855,6 +2896,14 @@
   ;; Organize subscribed groups into collapsible topics in the normal
   ;; Gnus Group buffer.
   (gnus-group-mode-hook . gnus-topic-mode))
+
+(use-package gnus-win
+  :after (gnus)
+
+  :custom
+  ;; Preserve unrelated windows and confine Gnus layouts to the window
+  ;; from which Gnus was entered.
+  (gnus-use-full-window nil))
 
 
 
