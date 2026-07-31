@@ -2437,6 +2437,7 @@
 (use-package bs-gnus
   :after (gnus)
   :commands (bs-gnus-group-enable
+             bs-gnus-group-posting-status
              bs-gnus-group-topic-toggle
              bs-gnus-summary-enable
              bs-gnus-summary-fold-toggle
@@ -2547,34 +2548,53 @@
 
 (use-package gnus-msg
   :after (gnus)
-  :defines (gnus-newsgroup-name message-wide-reply-to-function)
-
-  :custom
-  ;; Treat Gmane groups as mailing lists so ordinary followups are
-  ;; sent as mail instead of posted through Gmane.
-  (gnus-mailing-list-groups "\\`nntp\\+gmane:")
+  :defines (gnus-mailing-list-groups
+            gnus-newsgroup-name
+            message-wide-reply-to-function)
 
   :config
-  ;; Prefer the address advertised by Gmane's List-Post header when
-  ;; following up, then let Message deliver it through the configured
-  ;; mail transport.  Bind the Message-wide reply resolver only while
-  ;; Gnus is composing a Gmane reply, preserving its global value.
+  ;; Follow Gmane's LIST ACTIVE posting policy for ordinary replies:
+  ;; post `y' groups through NNTP, ask before using SMTP for `m'
+  ;; groups, and use SMTP automatically for `n' groups.  Explicit
+  ;; force-news commands retain their native override.
   (advice-add
    'gnus-post-news
    :around
    (lambda (function &rest arguments)
-     (let ((message-wide-reply-to-function
-            (if (string-match-p
-                 "\\`nntp\\+gmane:"
-                 (or (nth 1 arguments) gnus-newsgroup-name ""))
-                (lambda ()
-                  (when-let*
-                      ((list-post
-                        (message-fetch-field "list-post"))
-                       ((string-match
-                         "<mailto:\\([^>?]+\\)" list-post)))
-                    `((To . ,(match-string 1 list-post)))))
-              message-wide-reply-to-function)))
+     (let* ((post (nth 0 arguments))
+            (group (or (nth 1 arguments) gnus-newsgroup-name ""))
+            (force-news (nth 6 arguments))
+            (gmane-reply-p
+             (and (null post)
+                  (null force-news)
+                  (string-match-p "\\`nntp\\+gmane:" group)))
+            (route
+             (when gmane-reply-p
+               (pcase (bs-gnus-group-posting-status group)
+                 (?y 'nntp)
+                 (?n 'smtp)
+                 (?m
+                  (if (y-or-n-p
+                       (format
+                        "%s is moderated; use SMTP instead of NNTP? "
+                        (gnus-group-real-name group)))
+                      'smtp
+                    'nntp)))))
+            (gnus-mailing-list-groups
+             (pcase route
+               ('nntp nil)
+               ('smtp "\\`nntp\\+gmane:")
+               (_ gnus-mailing-list-groups)))
+            (message-wide-reply-to-function
+             (if (eq route 'smtp)
+                 (lambda ()
+                   (when-let*
+                       ((list-post
+                         (message-fetch-field "list-post"))
+                        ((string-match
+                          "<mailto:\\([^>?]+\\)" list-post)))
+                     `((To . ,(match-string 1 list-post)))))
+               message-wide-reply-to-function)))
        (apply function arguments)))))
 
 (use-package gnus-sum
