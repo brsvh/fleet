@@ -1340,6 +1340,7 @@
 
 (use-package bs-edit-indirect
   :after (markdown-mode)
+  :defines (markdown-mode-map)
 
   :bind
   ( :map markdown-mode-map
@@ -1348,6 +1349,7 @@
 
 (use-package bs-edit-indirect
   :after (markdown-ts-mode)
+  :defines (markdown-ts-mode-map)
 
   :bind
   ( :map markdown-ts-mode-map
@@ -1910,6 +1912,7 @@
 
 (use-package bs-edit-indirect
   :after (nix-mode)
+  :defines (nix-mode-map)
 
   :bind
   ( :map nix-mode-map
@@ -1918,6 +1921,7 @@
 
 (use-package bs-edit-indirect
   :after (nix-ts-mode)
+  :defines (nix-ts-mode-map)
 
   :bind
   ( :map nix-ts-mode-map
