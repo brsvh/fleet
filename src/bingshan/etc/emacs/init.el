@@ -1972,6 +1972,33 @@
   ;; Expand Scheme macros through Geiser in REPL buffers.
   (geiser-repl-mode-hook . macrostep-geiser-setup))
 
+;; TypeScript programs
+
+(use-package eglot
+  :after (typescript-ts-mode)
+
+  :config
+  ;; Use TypeScript 7's native language server for TypeScript and TSX
+  ;; buffers.
+  (add-to-list 'eglot-server-programs
+               '(((typescript-ts-mode :language-id "typescript")
+                  (tsx-ts-mode :language-id "typescriptreact"))
+                 .
+                 ("tsc" "--lsp" "--stdio")))
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for TypeScript and
+  ;; TSX buffers.
+  ((typescript-ts-mode-hook tsx-ts-mode-hook)
+   .
+   eglot-ensure))
+
+(use-package typescript-ts-mode
+  :mode
+  ;; Associate TypeScript source files with their Tree-sitter modes.
+  ("\\.[cm]?ts\\'" . typescript-ts-mode)
+  ("\\.tsx\\'" . tsx-ts-mode))
+
 
 
 ;;

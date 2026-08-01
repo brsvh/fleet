@@ -263,6 +263,7 @@ in
         pyright
         ripgrep
         trionestypePackages.zhuque-fangsong
+        typescript-go
         vscode-json-languageserver
         wl-clipboard
         xclip
