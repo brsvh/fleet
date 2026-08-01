@@ -3500,57 +3500,54 @@
      (window-width . 0.5)))
 
   :config
-  ;; Bundle common instructions without pinning a backend or model, so
-  ;; applying a preset preserves the current run-time selection.
-  (gptel-make-preset 'coding
-                     :description "Write, modify, and review code."
-                     :system
-                     (concat
-                      "Act as a coding assistant. Provide correct, "
-                      "maintainable solutions, preserve existing "
-                      "conventions, and explain non-obvious "
-                      "trade-offs concisely. Respond in Simplified "
-                      "Chinese unless the user explicitly requests "
-                      "another language. Preserve code, identifiers, "
-                      "commands, paths, and quoted text "
-                      "exactly."))
+  ;; Guide implementation and review without changing the selected
+  ;; backend or model.
+  (gptel-make-preset
+   'coding
+   :description "Write, modify, and review code."
+   :system
+   (concat
+    "Act as a coding assistant. Provide correct, maintainable "
+    "solutions, preserve existing conventions, and explain "
+    "non-obvious trade-offs concisely. Respond in Simplified Chinese "
+    "unless the user explicitly requests another language. Preserve "
+    "code, identifiers, commands, paths, and quoted text exactly."))
 
-  (gptel-make-preset 'explain
-                     :description "Explain code or technical material clearly."
-                     :system
-                     (concat
-                      "Explain the provided code or technical "
-                      "material clearly. State assumptions, use the "
-                      "relevant context, and distinguish facts from "
-                      "inferences. Respond in Simplified Chinese "
-                      "unless the user explicitly requests another "
-                      "language. Preserve code, identifiers, "
-                      "commands, paths, and "
-                      "technical terms where "
-                      "needed."))
+  ;; Explain technical material while making assumptions and evidence
+  ;; explicit.
+  (gptel-make-preset
+   'explain
+   :description "Explain code or technical material clearly."
+   :system
+   (concat
+    "Explain the provided code or technical material clearly. State "
+    "assumptions, use the relevant context, and distinguish facts "
+    "from inferences. Respond in Simplified Chinese unless the user "
+    "explicitly requests another language. Preserve code, "
+    "identifiers, commands, paths and technical terms where needed."))
 
-  (gptel-make-preset 'summary
-                     :description
-                     "Summarize conclusions, facts, actions, and open questions."
-                     :system
-                     (concat
-                      "Summarize in Simplified Chinese unless "
-                      "the user explicitly requests another "
-                      "language. "
-                      "Extract the main conclusions, key facts, "
-                      "action items, and unresolved questions "
-                      "without adding unsupported claims. Preserve "
-                      "code, identifiers, paths, and quoted text "
-                      "exactly."))
+  ;; Extract conclusions, facts, actions, and unresolved questions.
+  (gptel-make-preset
+   'summary
+   :description
+   "Summarize conclusions, facts, actions, and open questions."
+   :system
+   (concat
+    "Summarize in Simplified Chinese unless the user "
+    "explicitly requests another language. Extract the main "
+    "conclusions, key facts, action items, and unresolved "
+    "questions without adding unsupported claims. Preserve "
+    "code, identifiers, paths, and quoted text exactly."))
 
-  (gptel-make-preset 'translate
-                     :description "Translate between Chinese and English."
-                     :system
-                     (concat
-                      "Translate between Chinese and English "
-                      "according to the source language. Preserve "
-                      "meaning, tone, structure, formatting, and "
-                      "code exactly unless asked otherwise."))
+  ;; Translate between Chinese and English while preserving structure.
+  (gptel-make-preset
+   'translate
+   :description "Translate between Chinese and English."
+   :system
+   (concat
+    "Translate between Chinese and English according to the "
+    "source language. Preserve meaning, tone, structure, "
+    "formatting, and code exactly unless asked otherwise."))
 
   :hook
   ;; Render read-only fallback responses as Markdown without starting
@@ -3559,8 +3556,9 @@
    . (lambda ()
        (when (and (string= (buffer-name) "*LLM response*")
                   (not (eq major-mode 'markdown-ts-mode)))
-         (let ((markdown-ts-mode-hook
-                (remq #'grip-mode markdown-ts-mode-hook)))
+         (require 'markdown-ts-mode)
+         (cl-letf (((symbol-value 'markdown-ts-mode-hook)
+                    (remq #'grip-mode markdown-ts-mode-hook)))
            (markdown-ts-mode)))))
 
   ;; Distinguish model output from prompts without changing response
@@ -3586,6 +3584,23 @@
 
     ;; Keep one unambiguous prompt-submission binding in gptel chats.
     ("C-c RET" . nil)))
+
+(use-package gptel-transient
+  :commands (gptel-menu)
+  :functions (transient-append-suffix
+               transient-get-suffix)
+
+  :config
+  ;; Treat the GUI Return event like `RET' in the gptel transient.
+  ;; Gnus binds `<return>' directly, preventing its usual translation
+  ;; to `RET' before Transient sees it.
+  (unless (ignore-errors
+            (transient-get-suffix 'gptel-menu "<return>"))
+    (transient-append-suffix
+      'gptel-menu 'gptel--suffix-send
+      '("<return>" gptel--suffix-send
+        :description "" :format "")
+      'always)))
 
 (use-package gptel-context
   :commands (gptel-add)
