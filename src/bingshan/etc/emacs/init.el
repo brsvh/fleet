@@ -2551,6 +2551,7 @@
              bs-gnus-group-topic-toggle
              bs-gnus-summary-enable
              bs-gnus-summary-fold-toggle
+             bs-gnus-summary-mark-subthread
              bs-gnus-summary-next
              bs-gnus-summary-previous)
   :demand t
@@ -3588,11 +3589,33 @@
 
 (use-package gptel-context
   :commands (gptel-add)
+  :defines (gptel-context)
 
   :custom
   ;; Exclude ignored and other non-project files when a directory is
   ;; added recursively to the request context.
   (gptel-context-restrict-to-project-files t)
+
+  :hook
+  ;; Give only the originating mail or news buffer access to the most
+  ;; recently prepared hidden thread context.
+  ((bs-gnus-summary-thread-context-hook
+    bs-mu4e-headers-thread-context-hook)
+   .
+   (lambda ()
+     (require 'gptel-context)
+     (when-let* ((context (get-buffer "*Thread Context*"))
+                 (source (current-buffer)))
+       (dolist (buffer (buffer-list))
+         (with-current-buffer buffer
+           (when (local-variable-p 'gptel-context)
+             (setq gptel-context
+                   (delq context gptel-context)))))
+       (with-current-buffer source
+         (unless (local-variable-p 'gptel-context)
+           (setq-local gptel-context
+                       (copy-sequence gptel-context)))
+         (cl-pushnew context gptel-context :test #'eq)))))
 
   :bind
   ( :map ctl-c-x-map
@@ -4029,7 +4052,8 @@
 
 (use-package bs-mu4e
   :after (mu4e-headers)
-  :commands (bs-mu4e-headers-enable)
+  :commands (bs-mu4e-headers-enable
+             bs-mu4e-headers-mark-subthread)
 
   :init
   ;; Render header `:from' fields with cleaned contact display names
