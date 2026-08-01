@@ -517,6 +517,7 @@ in
           ghostel-dwim
           git-cliff
           git-modes
+          gptel
           grip-mode
           haskell-mode
           haskell-ts-mode

@@ -1016,10 +1016,6 @@
 
 (use-package treemacs-tab-bar
   :after (treemacs)
-
-  ;; Align the Treemacs instance with tab-based workflows, so each tab
-  ;; maintains its own project context instead of sharing a single
-  ;; global tree across unrelated tasks.
   :demand t)
 
 
@@ -1234,10 +1230,10 @@
 ;;
 
 (use-package mule-cmds
-  :demand t
-  :no-require t
   :commands (set-language-environment prefer-coding-system)
+  :demand t
   :functions (set-default-coding-systems)
+  :no-require t
 
   :init
   ;; Set the default coding system to UTF-8 for new buffers, files
@@ -1682,8 +1678,6 @@
 
 (use-package smartparens-config
   :after (smartparens)
-
-  ;; Load `smartparens' config for different major modes.
   :demand t)
 
 (use-package subword
@@ -2321,9 +2315,6 @@
 
 (use-package treemacs-magit
   :after (magit treemacs)
-
-  ;; Load the bridge only when both applications are in use, so
-  ;; opening either one alone does not pull in the other.
   :demand t)
 
 (use-package treemacs-git-commit-diff-mode
@@ -2562,6 +2553,7 @@
              bs-gnus-summary-fold-toggle
              bs-gnus-summary-next
              bs-gnus-summary-previous)
+  :demand t
 
   :custom
   ;; Name NNTP sources by their configured server addresses in the
@@ -2578,9 +2570,7 @@
   ;; Replace the native Group and Summary layouts only after Gnus
   ;; itself loads.
   (bs-gnus-group-enable)
-  (bs-gnus-summary-enable)
-
-  :demand t)
+  (bs-gnus-summary-enable))
 
 (use-package gnus
   :after (bs-lib)
@@ -3168,9 +3158,9 @@
   (bs-first-file-hook . save-place-mode))
 
 (use-package startup
+  :after (bs-lib)
   :demand t
   :no-require t
-  :after (bs-lib)
 
   :custom
   ;; Emacs maintains auto-save-list files to track existing auto-save
@@ -3322,6 +3312,17 @@
   (agent-shell-preferred-agent-config
    (agent-shell-openai-make-codex-config))
 
+  ;; Share a protected right side window with Codex IDE, leaving slot
+  ;; zero available for the dedicated agent-shell sidebar.
+  (agent-shell-display-action
+   '((display-buffer-reuse-window
+      display-buffer-in-side-window)
+     (preserve-size . (t . nil))
+     (side . right)
+     (slot . 1)
+     (window-parameters . ((no-delete-other-windows . t)))
+     (window-width . 0.5)))
+
   ;; Open agent shells directly at the prompt without the package
   ;; welcome text.
   (agent-shell-show-welcome-message nil)
@@ -3430,17 +3431,16 @@
   (codex-ide-request-timeout 60)
 
   :config
-  ;; Display Codex session buffers in a persistent right side window,
-  ;; keeping conversations visible without replacing the current
-  ;; editing window.
+  ;; Share the protected right side window used by regular agent-shell
+  ;; sessions, while retaining each conversation buffer for later
+  ;; reuse.
   (add-to-list 'display-buffer-alist
                '((derived-mode . codex-ide-session-mode)
                  (display-buffer-reuse-window
                   display-buffer-in-side-window)
-                 (dedicated . t)
                  (preserve-size . (t . nil))
                  (side . right)
-                 (slot . 0)
+                 (slot . 1)
                  (window-parameters . ((no-delete-other-windows . t)))
                  (window-width . 0.5)))
 
@@ -3470,6 +3470,163 @@
   ;; Enable Corfu in Codex sessions so automatic slash command
   ;; completion uses the popup frontend instead of `*Completions*'.
   (codex-ide-session-mode-hook . corfu-mode))
+
+(use-package gptel
+  :commands (gptel
+             gptel-send)
+  :defines (gptel-mode-map)
+  :functions (gptel-make-preset)
+
+  :custom
+  ;; Use Org Mode for dedicated chats so conversations can use Org's
+  ;; native structure without enabling branching context globally.
+  (gptel-default-mode 'org-mode)
+
+  ;; Keep backend, model, and request status visible above each chat.
+  (gptel-use-header-line t)
+
+  ;; Share a protected right side window with regular agent-shell and
+  ;; Codex IDE sessions, leaving slot zero to agent-shell-sidebar.
+  (gptel-display-buffer-action
+   '((display-buffer-reuse-window
+      display-buffer-in-side-window)
+     (body-function . select-window)
+     (preserve-size . (t . nil))
+     (side . right)
+     (slot . 1)
+     (window-parameters . ((no-delete-other-windows . t)))
+     (window-width . 0.5)))
+
+  :config
+  ;; Bundle common instructions without pinning a backend or model, so
+  ;; applying a preset preserves the current run-time selection.
+  (gptel-make-preset
+   'coding
+   :description "Write, modify, and review code."
+   :system
+   (concat
+    "Act as a coding assistant. Provide correct, maintainable "
+    "solutions, preserve existing conventions, and explain "
+    "non-obvious trade-offs concisely."))
+
+  (gptel-make-preset
+   'explain
+   :description "Explain code or technical material clearly."
+   :system
+   (concat
+    "Explain the provided code or technical material clearly. "
+    "State assumptions, use the relevant context, and distinguish "
+    "facts from inferences."))
+
+  (gptel-make-preset
+   'summary
+   :description
+   "Summarize conclusions, facts, actions, and open questions."
+   :system
+   (concat
+    "Summarize in the source language. Extract the main conclusions, "
+    "key facts, action items, and unresolved questions without adding "
+    "unsupported claims."))
+
+  (gptel-make-preset
+   'translate
+   :description "Translate between Chinese and English."
+   :system
+   (concat
+    "Translate between Chinese and English according to the source "
+    "language. Preserve meaning, tone, structure, formatting, and "
+    "code exactly unless asked otherwise."))
+
+  :hook
+  ;; Distinguish model output from prompts without changing response
+  ;; text or moving point while a response is streaming.
+  (gptel-mode-hook . gptel-highlight-mode)
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Create or switch to a dedicated gptel chat.
+    ("g" . gptel)
+
+    ;; Send the active region or buffer text from any buffer.
+    ("RET" . gptel-send)
+
+    :map gptel-mode-map
+    ;; Submit prompts with the same mnemonic used by agent-shell and
+    ;; Codex IDE; a prefix argument opens the gptel menu.
+    ("C-c C-c" . gptel-send)
+
+    ;; Retain access to Org's context-sensitive command after taking
+    ;; over its usual binding for prompt submission.
+    ("C-c C-M-c" . org-ctrl-c-ctrl-c)
+
+    ;; Keep one unambiguous prompt-submission binding in gptel chats.
+    ("C-c RET" . nil)))
+
+(use-package gptel-context
+  :commands (gptel-add)
+
+  :custom
+  ;; Exclude ignored and other non-project files when a directory is
+  ;; added recursively to the request context.
+  (gptel-context-restrict-to-project-files t)
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Add or remove the active region or buffer from gptel context.
+    ("a" . gptel-add)))
+
+(use-package gptel-openai-oauth
+  :after (bs-lib gptel)
+  :demand t
+  :defines (gptel--openai-oauth-token-file)
+
+  :config
+  ;; Keep the refresh token with other persistent Emacs state instead
+  ;; of placing it below `user-emacs-directory'.
+  (setq gptel--openai-oauth-token-file
+        (bs-path bs-state-directory "gptel/openai-oauth-token")))
+
+(use-package gptel-request
+  :after (gptel-openai-oauth)
+  :demand t
+  :functions (gptel-make-openai-oauth)
+
+  :custom
+  ;; Use ChatGPT subscription authentication with a balanced Codex
+  ;; model as the initial selection.  Both remain adjustable at run
+  ;; time through `gptel-menu'.
+  (gptel-backend (gptel-make-openai-oauth "Codex"))
+  (gptel-model 'gpt-5.6-terra)
+
+  ;; Mark reasoning in the chat while excluding it from subsequent
+  ;; conversation turns.
+  (gptel-include-reasoning 'ignore)
+
+  ;; Show model responses as they arrive without moving point to keep
+  ;; editing and window navigation under explicit user control.
+  (gptel-stream t)
+
+  ;; Follow supported Org links so chats can send linked text, images,
+  ;; and other media to capable models.
+  (gptel-track-media t))
+
+(use-package gptel-org
+  :custom
+  ;; Keep conversations linear unless branching is enabled for a
+  ;; specific workflow at run time.
+  (gptel-org-branching-context nil))
+
+(use-package gptel-rewrite
+  :commands (gptel-rewrite)
+
+  :custom
+  ;; Replace the selected region as soon as a rewrite succeeds.
+  (gptel-rewrite-default-action 'accept)
+
+  :bind
+  ( :map ctl-c-x-map
+    ;; Rewrite the active region with gptel.
+    ("e" . gptel-rewrite)))
 
 (use-package mcp-server
   :custom
@@ -3894,9 +4051,6 @@
 
 (use-package consult-mu-embark
   :after (embark consult-mu)
-
-  ;; Register mail actions only after both Embark and `consult-mu' are
-  ;; in use, so loading either one alone does not pull in the other.
   :demand t)
 
 (use-package corfu
@@ -3915,11 +4069,8 @@
 
 (use-package mu4e-alert
   :after (mu4e)
-  :when (eq system-type 'gnu/linux)
-
-  ;; Load alert integration after mu4e is available so message
-  ;; notifications can derive their state from the mu4e index.
-  :demand t)
+  :demand t
+  :when (eq system-type 'gnu/linux))
 
 (use-package mu4e-alert
   :commands (mu4e-alert-enable-notifications)
@@ -4424,9 +4575,6 @@
 
 (use-package org-gtd-wip
   :after (org-gtd-mode)
-
-  ;; `org-gtd-mode' adds a WIP cleanup function to `kill-emacs-hook'
-  ;; without loading its defining library.
   :demand t)
 
 (use-package org-modern
