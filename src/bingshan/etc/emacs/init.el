@@ -1837,6 +1837,38 @@
 (use-package haskell-ts-mode
   :commands (haskell-ts-mode))
 
+;; JavaScript programs
+
+(use-package eglot
+  :after (js)
+
+  :config
+  ;; Use TypeScript 7's native language server for JavaScript and JSX
+  ;; buffers.
+  (add-to-list 'eglot-server-programs
+               '(((js-mode :language-id "javascript")
+                  (js-ts-mode :language-id "javascript"))
+                 .
+                 ("tsc" "--lsp" "--stdio")))
+
+  :hook
+  ;; Automatically start or reuse an Eglot session for JavaScript
+  ;; buffers.
+  ((js-mode-hook js-ts-mode-hook)
+   .
+   eglot-ensure))
+
+(use-package files
+  :config
+  ;; Replace `js-mode' with `js-ts-mode' when a buffer would normally
+  ;; activate `js-mode'.
+  (add-to-list 'major-mode-remap-alist '(js-mode . js-ts-mode) t))
+
+(use-package js
+  :mode
+  ;; Associate JavaScript source files with `js-mode'.
+  ("\\.\\(?:[cm]?js\\|jsx\\)\\'" . js-mode))
+
 ;; JSON
 
 (use-package eglot
