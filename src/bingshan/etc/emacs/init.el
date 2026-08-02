@@ -2551,7 +2551,6 @@
              bs-gnus-group-topic-toggle
              bs-gnus-summary-enable
              bs-gnus-summary-fold-toggle
-             bs-gnus-summary-mark-subthread
              bs-gnus-summary-next
              bs-gnus-summary-previous)
   :demand t
@@ -2570,6 +2569,11 @@
   ;; Right-align complete thread counts through `999/999+', keeping
   ;; subjects in a stable column.
   (bs-gnus-summary-thread-count-digits 8)
+
+  :bind
+  ( :map gnus-summary-mode-map
+    ;; Prepare the current article and its replies as LLM context.
+    ("t" . bs-gnus-summary-mark-subthread))
 
   :config
   ;; Replace the native Group and Summary layouts only after Gnus
@@ -3499,7 +3503,8 @@
   :defines (gptel-display-buffer-action
             gptel-mode-map
             markdown-ts-mode-hook)
-  :functions (gptel-fsm-info
+  :functions (gptel--handle-wait@display-read-only-response
+              gptel-fsm-info
               gptel-make-preset)
 
   :custom
@@ -3526,9 +3531,9 @@
   ;; Display fallback output as soon as a request from a read-only
   ;; target starts, rather than waiting for its first response chunk.
   (define-advice gptel--handle-wait
-      (:around (function fsm) bs-display-read-only-response)
-    "Call FUNCTION with FSM, then display its read-only response target."
-    (prog1 (funcall function fsm)
+      (:around (original-function fsm) display-read-only-response)
+    "Call ORIGINAL-FUNCTION with FSM, then display its response target."
+    (prog1 (funcall original-function fsm)
       (let* ((info (gptel-fsm-info fsm))
              (position (plist-get info :position))
              (target
@@ -4137,8 +4142,13 @@
 
 (use-package bs-mu4e
   :after (mu4e-headers)
-  :commands (bs-mu4e-headers-enable
-             bs-mu4e-headers-mark-subthread)
+  :commands (bs-mu4e-headers-enable)
+  :defines (mu4e-headers-mode-map)
+
+  :bind
+  ( :map mu4e-headers-mode-map
+    ;; Prepare the current message and its replies as LLM context.
+    ("t" . bs-mu4e-headers-mark-subthread))
 
   :init
   ;; Render header `:from' fields with cleaned contact display names
