@@ -12,6 +12,10 @@ let
     pathExists
     types
     ;
+
+  inherit (pkgs)
+    runCommandLocal
+    ;
 in
 {
   options = {
@@ -62,6 +66,23 @@ in
       cond =
         v: xdg:
         cfg.enable && v != null && pathExists v && xdg;
+
+      compileElisp =
+        source: file:
+        runCommandLocal "emacs-${file}-byte-code" { } ''
+          cp ${source} ${file}
+          ${cfg.finalPackage}/bin/emacs \
+            --batch \
+            --quick \
+            --funcall batch-byte-compile \
+            ${file}
+          mkdir -p $out
+          cp ${file}c $out/
+        '';
+
+      compiledEarlyInitFile = compileElisp cfg.earlyInitFile "early-init.el";
+
+      compiledInitFile = compileElisp cfg.initFile "init.el";
     in
     mkMerge [
       (mkIf (cfg.enable && cfg.extraEarlyConfig != "") {
@@ -83,6 +104,10 @@ in
             "emacs/init.el" = {
               source = cfg.initFile;
             };
+
+            "emacs/init.elc" = {
+              source = "${compiledInitFile}/init.elc";
+            };
           };
         };
       })
@@ -91,6 +116,10 @@ in
           configFile = {
             "emacs/early-init.el" = {
               source = cfg.earlyInitFile;
+            };
+
+            "emacs/early-init.elc" = {
+              source = "${compiledEarlyInitFile}/early-init.elc";
             };
           };
         };
@@ -101,6 +130,10 @@ in
             ".emacs.d/init.el" = {
               source = cfg.initFile;
             };
+
+            ".emacs.d/init.elc" = {
+              source = "${compiledInitFile}/init.elc";
+            };
           };
         };
       })
@@ -109,6 +142,10 @@ in
           file = {
             ".emacs.d/early-init.el" = {
               source = cfg.earlyInitFile;
+            };
+
+            ".emacs.d/early-init.elc" = {
+              source = "${compiledEarlyInitFile}/early-init.elc";
             };
           };
         };
