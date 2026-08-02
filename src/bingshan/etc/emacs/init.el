@@ -682,6 +682,7 @@
    (lambda ()
      ;; Enable the first theme we used, if not set, fallback to
      ;; `modus-operandi-tinted'.
+     (require 'modus-themes)
      (modus-themes-select (or (car modus-themes-to-toggle)
                               'modus-operandi-tinted)))))
 

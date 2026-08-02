@@ -357,11 +357,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785124180,
-        "narHash": "sha256-PF0RsofW3uggABox+9ZBX30qRzwI13UtYnYCw0mkMVs=",
+        "lastModified": 1785713766,
+        "narHash": "sha256-ondMbi/745XK9CCc8dmJ+LD8B5UlxP32dCsN/DC84VM=",
         "ref": "main",
-        "rev": "fc6723fb100ddf1e3c147593714a8627fb644e8d",
-        "revCount": 143,
+        "rev": "3738511bf639ad40802480b859f22d22f954cfb4",
+        "revCount": 144,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
