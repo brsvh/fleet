@@ -28,7 +28,7 @@ in
         font-family = "${first fonts.monospace}";
         font-size = config.gtk.font.size;
         shell-integration-features = "no-cursor,ssh-env,ssh-terminfo,sudo,title";
-        theme = "Modus Vivendi Tinted";
+        theme = "Modus Operandi Tinted";
       };
     };
   };
