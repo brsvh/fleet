@@ -2563,6 +2563,10 @@
    '(("news.eternal-september.org" . "Eternal September")
      ("news.gmane.io" . "Gmane")))
 
+  ;; Follow Summary navigation in an already visible Article window
+  ;; without opening one solely for movement.
+  (bs-gnus-summary-follow-visible-article t)
+
   ;; Right-align complete thread counts through `999/999+', keeping
   ;; subjects in a stable column.
   (bs-gnus-summary-thread-count-digits 8)
@@ -2934,6 +2938,15 @@
   ;; Use a concise mode-line name for Gnus Summary buffers.
   (gnus-summary-mode-hook . (lambda ()
                               (setq-local mode-name "News"))))
+
+(use-package gnus-art
+  :after (gnus)
+  :defines (gnus-article-mode-map)
+
+  :bind
+  ( :map gnus-article-mode-map
+    ;; Delete the Article window without exiting its Summary group.
+    ("q" . delete-window)))
 
 (use-package gnus-topic
   :after (gnus)
