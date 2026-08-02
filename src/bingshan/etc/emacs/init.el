@@ -3417,16 +3417,26 @@
   (agent-shell-preferred-agent-config
    (agent-shell-openai-make-codex-config))
 
-  ;; Share a protected right side window with Codex IDE, leaving slot
-  ;; zero available for the dedicated `agent-shell' sidebar.
+  ;; Share an adaptive protected side window with Codex IDE, leaving
+  ;; slot zero available for the dedicated `agent-shell' sidebar.
   (agent-shell-display-action
-   '((display-buffer-reuse-window
-      display-buffer-in-side-window)
-     (preserve-size . (t . nil))
-     (side . right)
-     (slot . 1)
-     (window-parameters . ((no-delete-other-windows . t)))
-     (window-width . 0.5)))
+   `((display-buffer-reuse-window
+      ,#'(lambda (buffer alist)
+           (let ((wide-p
+                  (and (integerp split-width-threshold)
+                       (>= (frame-width) split-width-threshold))))
+             (display-buffer-in-side-window
+              buffer
+              (append
+               `((preserve-size
+                  . ,(if wide-p '(t . nil) '(nil . t)))
+                 (side . ,(if wide-p 'right 'bottom))
+                 (slot . 1)
+                 ,(if wide-p
+                      '(window-width . 0.5)
+                    '(window-height . 0.35)))
+               alist)))))
+     (window-parameters . ((no-delete-other-windows . t)))))
 
   ;; Open agent shells directly at the prompt without the package
   ;; welcome text.
@@ -3537,18 +3547,30 @@
   (codex-ide-request-timeout 60)
 
   :config
-  ;; Share the protected right side window used by regular
+  ;; Share the adaptive protected side window used by regular
   ;; `agent-shell' sessions, while retaining each conversation buffer
   ;; for later reuse.
   (add-to-list 'display-buffer-alist
-               '((derived-mode . codex-ide-session-mode)
+               `((derived-mode . codex-ide-session-mode)
                  (display-buffer-reuse-window
-                  display-buffer-in-side-window)
-                 (preserve-size . (t . nil))
-                 (side . right)
-                 (slot . 1)
-                 (window-parameters . ((no-delete-other-windows . t)))
-                 (window-width . 0.5))))
+                  ,#'(lambda (buffer alist)
+                       (let ((wide-p
+                              (and
+                               (integerp split-width-threshold)
+                               (>= (frame-width)
+                                   split-width-threshold))))
+                         (display-buffer-in-side-window
+                          buffer
+                          (append
+                           `((preserve-size
+                              . ,(if wide-p '(t . nil) '(nil . t)))
+                             (side . ,(if wide-p 'right 'bottom))
+                             (slot . 1)
+                             ,(if wide-p
+                                  '(window-width . 0.5)
+                                '(window-height . 0.35)))
+                           alist)))))
+                 (window-parameters . ((no-delete-other-windows . t))))))
 
 (use-package codex-ide-session
   :bind
@@ -3604,18 +3626,28 @@
   ;; Keep backend, model, and request status visible above each chat.
   (gptel-use-header-line t)
 
-  ;; Share a protected right side window with regular `agent-shell'
-  ;; and `codex-ide' sessions, leaving slot zero to
+  ;; Share an adaptive protected side window with regular
+  ;; `agent-shell' and `codex-ide' sessions, leaving slot zero to
   ;; agent-shell-sidebar.
   (gptel-display-buffer-action
-   '((display-buffer-reuse-window
-      display-buffer-in-side-window)
+   `((display-buffer-reuse-window
+      ,#'(lambda (buffer alist)
+           (let ((wide-p
+                  (and (integerp split-width-threshold)
+                       (>= (frame-width) split-width-threshold))))
+             (display-buffer-in-side-window
+              buffer
+              (append
+               `((preserve-size
+                  . ,(if wide-p '(t . nil) '(nil . t)))
+                 (side . ,(if wide-p 'right 'bottom))
+                 (slot . 1)
+                 ,(if wide-p
+                      '(window-width . 0.5)
+                    '(window-height . 0.35)))
+               alist)))))
      (body-function . select-window)
-     (preserve-size . (t . nil))
-     (side . right)
-     (slot . 1)
-     (window-parameters . ((no-delete-other-windows . t)))
-     (window-width . 0.5)))
+     (window-parameters . ((no-delete-other-windows . t)))))
 
   :config
   ;; Display fallback output as soon as a request from a read-only
