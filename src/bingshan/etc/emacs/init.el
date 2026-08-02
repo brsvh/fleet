@@ -4914,11 +4914,21 @@
 
 (use-package elfeed-tree
   :after (elfeed)
+  :functions (elfeed-tree--print@default-empty-title-width)
 
   :custom
   ;; Build tree counts and searches from unread entries, matching the
   ;; default Search filter.
-  (elfeed-tree-filter "+unread"))
+  (elfeed-tree-filter "+unread")
+
+  :config
+  ;; Treat an empty feed database as having a zero-width title column
+  ;; until the first asynchronous update has imported entries.
+  (define-advice elfeed-tree--print
+      (:filter-args (arguments) default-empty-title-width)
+    "Default the title width in ARGUMENTS when the database is empty."
+    (setf (nth 2 arguments) (or (nth 2 arguments) 0))
+    arguments))
 
 (use-package elfeed-org
   :after (elfeed)
