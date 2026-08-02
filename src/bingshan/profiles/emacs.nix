@@ -506,7 +506,6 @@ in
           eldoc-box
           eldoc-mouse
           elfeed
-          elfeed-ai
           elfeed-org
           elfeed-score
           elfeed-webkit

@@ -19,7 +19,7 @@
 
 ;;; Commentary:
 
-;; This file is load before normal init file is loaded.
+;; This file is loaded before the normal init file.
 
 ;;; Code:
 
@@ -34,17 +34,12 @@
 ;; use-package (info "(use-package) Top")
 ;;
 
-(use-package use-package
+(use-package use-package-core
   :custom
   ;; Defer loading of all packages by default.  Each package declared
   ;; with `use-package' will be loaded lazily unless explicitly marked
   ;; otherwise, reducing startup time and making load order explicit.
   (use-package-always-defer t)
-
-  ;; Do not append a suffix to automatically generated hook variable
-  ;; names.  This preserves the original hook names without
-  ;; modification and avoids implicit renaming.
-  (use-package-hook-name-suffix nil)
 
   ;; Collect and compute loading statistics for `use-package'
   ;; declarations.  This enables post-startup analysis of package load
@@ -55,7 +50,12 @@
   ;; Setting the ensure function to `ignore' prevents `use-package'
   ;; from invoking any package manager, making package availability an
   ;; explicit responsibility of the surrounding system configuration.
-  (use-package-ensure-function 'ignore))
+  (use-package-ensure-function 'ignore)
+
+  ;; Do not append a suffix to automatically generated hook variable
+  ;; names.  This preserves the original hook names without
+  ;; modification and avoids implicit renaming.
+  (use-package-hook-name-suffix nil))
 
 
 
@@ -63,10 +63,18 @@
 ;; Early Initialization (info "(emacs) Early Init File")
 ;;
 
-(use-package emacs
-  :demand t
-  :no-require t
+(use-package comp
+  :init
+  ;; After Emacs 28.1, native compilation is available.  It looks for
+  ;; the first entry of `native-comp-eln-load-path', which holds the
+  ;; compiled .eln files to speed up startup and execution.  We want
+  ;; the eln-cache to live in our cache directory (by default the
+  ;; eln-cache subdirectory under `user-emacs-directory'), so we
+  ;; replace its first element with our custom path.
+  (setcar native-comp-eln-load-path
+          (bs-path bs-cache-directory "eln-cache/")))
 
+(use-package emacs
   :custom
   ;; Temporarily increase GC threshold during startup.
   (gc-cons-threshold most-positive-fixnum)
@@ -83,12 +91,13 @@
    (lambda ()
      ;; Restore to normal value after startup (e.g. 100MiB)
      (let ((threshold (* 100 1024 1024)))
-       (set-default-toplevel-value 'gc-cons-threshold threshold)))))
+       (set-default-toplevel-value 'gc-cons-threshold threshold))))
+
+  :demand t
+  :no-require t)
 
 (use-package emacs
   :unless (or (daemonp) noninteractive)
-  :demand t
-  :no-require t
 
   :init
   ;; Keep the initial file name handler.
@@ -109,26 +118,20 @@
      (let* ((init (get 'file-name-handler-alist 'initial-value))
             (new file-name-handler-alist)
             (v (delete-dups (append init new))))
-       (set-default-toplevel-value 'file-name-handler-alist v)))))
+       (set-default-toplevel-value 'file-name-handler-alist v))))
+
+  :demand t
+  :no-require t)
 
 (use-package emacs
   :unless noninteractive
-  :demand t
-  :no-require t
+
   :custom
   ;; Avoid window resizing caused by font changes at the startup.
-  (frame-inhibit-implied-resize t))
+  (frame-inhibit-implied-resize t)
 
-(use-package comp
-  :init
-  ;; After Emacs 28.1, native compilation is available.  It looks for
-  ;; the first entry of `native-comp-eln-load-path', which holds the
-  ;; compiled .eln files to speed up startup and execution.  We want
-  ;; the eln-cache to live in our cache directory (by default the
-  ;; eln-cache subdirectory under `user-emacs-directory'), so we
-  ;; replace its first element with our custom path.
-  (setcar native-comp-eln-load-path
-          (bs-path bs-cache-directory "eln-cache/")))
+  :demand t
+  :no-require t)
 
 (use-package frame
   :config

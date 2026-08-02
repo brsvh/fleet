@@ -36,7 +36,7 @@
 ;; use-package (info "(use-package) Top")
 ;;
 
-(use-package use-package
+(use-package use-package-core
   :custom
   ;; Defer loading of all packages by default.  Each package declared
   ;; with `use-package' will be loaded lazily unless explicitly marked
@@ -66,6 +66,15 @@
 ;;
 
 (use-package doom-modeline
+  :hook
+  ;; Establish the enhanced modeline as part of the normal UI once the
+  ;; graphical interface is ready, rather than during early startup.
+  (bs-first-ui-hook . doom-modeline-mode))
+
+(use-package doom-modeline-core
+  :after (doom-modeline)
+  :functions (doom-modeline-remove-segment)
+
   :custom
   ;; Avoid dedicating vertical space to a rich modeline when the
   ;; window is too narrow, so limited screen width remains focused on
@@ -76,15 +85,6 @@
   ;; unambiguous, avoiding decorative glyphs that may reduce clarity
   ;; or consistency across fonts and environments.
   (doom-modeline-unicode-number nil)
-
-  :hook
-  ;; Establish the enhanced modeline as part of the normal UI once the
-  ;; graphical interface is ready, rather than during early startup.
-  (bs-first-ui-hook . doom-modeline-mode))
-
-(use-package doom-modeline-core
-  :after (doom-modeline)
-  :functions (doom-modeline-remove-segment)
 
   :config
   ;; Remove the left-edge status bar from every built-in modeline
@@ -170,9 +170,6 @@
 ;;
 
 (use-package startup
-  :demand t
-  :no-require t
-
   :custom
   ;; Use a simple initial Major Mode to avoid heavy loading overhead.
   (initial-major-mode 'fundamental-mode)
@@ -180,7 +177,10 @@
   ;; Let Emacs skip the initial splash screen and splash message on
   ;; startup, so we can taken directly to our editing buffer without
   ;; any introductory distractions.
-  (inhibit-startup-screen t))
+  (inhibit-startup-screen t)
+
+  :demand t
+  :no-require t)
 
 
 
@@ -246,7 +246,7 @@
   :after (minibuffer)
 
   :bind-keymap
-  ;; Bind `cape' prefix keymap providing all Cape commands under a
+  ;; Bind `cape' prefix keymap providing all `cape' commands under a
   ;; mnemonic key.
   ("M-p" . cape-prefix-map))
 
@@ -262,9 +262,9 @@
   (minibuffer-setup-hook
    .
    (lambda ()
-     ;; Enable Corfu in the mini-buffer for CAPF-style in-region
+     ;; Enable `corfu' in the mini-buffer for CAPF-style in-region
      ;; completion, but avoid interfering with completing-read UI
-     ;; (Vertico/MCT) and sensitive input prompts (e.g. password
+     ;; (`vertico'/`mct') and sensitive input prompts (e.g. password
      ;; entry).
      (unless (or (bound-and-true-p mct--active)
                  (bound-and-true-p vertico--input)
@@ -272,9 +272,6 @@
        (corfu-mode +1)))))
 
 (use-package emacs
-  :demand t
-  :no-require t
-
   :custom
   ;; Allow nested mini buffers.
   (enable-recursive-minibuffers t)
@@ -284,18 +281,21 @@
 
   ;; Prefer to use `y-or-n-p' to confirm the interactive commands
   ;; requires reconfirmation.
-  (use-short-answers t))
+  (use-short-answers t)
+
+  :demand t
+  :no-require t)
 
 (use-package embark
   :custom
-  ;; Pop up embark buffers below the current buffer.
+  ;; Pop up `embark' buffers below the current buffer.
   (embark-verbose-indicator-display-action
    '(display-buffer-reuse-window display-buffer-below-selected))
 
   :config
-  ;; Show the transient Embark action menu in a dedicated bottom side
-  ;; window so action discovery stays visible without replacing the
-  ;; current editing window.
+  ;; Show the transient `embark' action menu in a dedicated bottom
+  ;; side window so action discovery stays visible without replacing
+  ;; the current editing window.
   (add-to-list 'display-buffer-alist
                '("\\*Embark Actions\\*"
                  (display-buffer-in-side-window)
@@ -305,7 +305,7 @@
                                        (no-other-window . t)))
                  (window-height . fit-window-to-buffer)))
 
-  ;; Place Embark collect buffers in a persistent side window on the
+  ;; Place `embark' collect buffers in a persistent side window on the
   ;; right so live candidate views remain inspectable while the main
   ;; window keeps focus on the current task.
   (add-to-list 'display-buffer-alist
@@ -334,11 +334,11 @@
   :after (bs-hooks)
 
   :custom
-  ;; Display marginalia at right.
+  ;; Display `marginalia' at right.
   (marginalia-align 'right)
 
   :hook
-  ;; Show marginalia of the mini-buffer completions.
+  ;; Show `marginalia' of the mini-buffer completions.
   (bs-first-ui-hook . marginalia-mode))
 
 (use-package minibuffer
@@ -365,6 +365,11 @@
   ;; wildcard.
   (completion-pcm-leading-wildcard t))
 
+(use-package orderless
+  :custom
+  ;; Allow escape with the black-splash.
+  (orderless-component-separator 'orderless-escapable-split-on-space))
+
 (use-package savehist
   :after (bs-lib)
 
@@ -376,16 +381,11 @@
   ;; Persist our mini-buffer history.
   (bs-first-ui-hook . savehist-mode))
 
-(use-package orderless
-  :custom
-  ;; Allow escape with the black-splash.
-  (orderless-component-separator 'orderless-escapable-split-on-space))
-
 (use-package switch-window
   :after (embark)
 
   :config
-  ;; Exclude Embark collect helper windows from `switch-window' so
+  ;; Exclude `embark' collect helper windows from `switch-window' so
   ;; window selection targets only primary work buffers.
   (add-to-list 'switch-window-ignore-rules
                '(:mode embark-collect-mode)))
@@ -394,7 +394,7 @@
   :after (bs-hooks)
 
   :custom
-  ;; Resize the Vertico buffer size when the number of candidates
+  ;; Resize the `vertico' buffer size when the number of candidates
   ;; changed.
   (vertico-resize t)
 
@@ -437,8 +437,9 @@
 
 (use-package winner
   :after embark
+
   :config
-  ;; Ignore embark buffers when undo/redo window layout.
+  ;; Ignore `embark' buffers when undo/redo window layout.
   (add-to-list 'winner-boring-buffers "*Embark Collect Completions*" t)
   (add-to-list 'winner-boring-buffers "*Embark Collect Live*" t))
 
@@ -460,13 +461,14 @@
 ;; Help (info "(emacs) Help")
 ;;
 
-(use-package embark
-  :commands (embark-prefix-help-command)
-
+(use-package emacs
   :custom
   ;; Use `embark-prefix-help-command' to provide the help prompt of
   ;; prefix commands.
   (prefix-help-command 'embark-prefix-help-command))
+
+(use-package embark
+  :commands (embark-prefix-help-command))
 
 (use-package help-fns
   :after (help)
@@ -520,7 +522,7 @@
 
     ;; Remap the built-in `yank-pop' command globally to
     ;; `consult-yank-pop' which replaces the default cycling behavior
-    ;; with a Consult-based selection interface over the kill ring,
+    ;; with a `consult'-based selection interface over the kill ring,
     ;; keeping the original command semantics (replace the last yanked
     ;; text) but changing the UI.
     ([remap yank-pop] . consult-yank-pop)))
@@ -578,9 +580,6 @@
   (prog-mode-hook . display-line-numbers-mode))
 
 (use-package emacs
-  :demand t
-  :no-require t
-
   :custom
   ;; Inhibit automatically adjust the window's vertical position to
   ;; keep point centered vertically.
@@ -605,7 +604,10 @@
   (scroll-margin 0)
 
   ;; Enable category-based line breaking for word wrapping.
-  (word-wrap-by-category t))
+  (word-wrap-by-category t)
+
+  :demand t
+  :no-require t)
 
 (use-package form-feed
   :commands (form-feed-mode)
@@ -635,7 +637,7 @@
   :commands (modus-themes-select)
 
   :custom
-  ;; Disable all other themes when loading a Modus Theme.
+  ;; Disable all other themes when loading a `modus-themes' theme.
   (modus-themes-disable-other-themes t)
 
   ;;Use bold for code syntax highlighting and related.
@@ -648,15 +650,8 @@
   (modus-themes-to-toggle '(modus-operandi-tinted
                             modus-vivendi-tinted))
 
-  ;; Use `fixed-pitch' face for Org tables and code blocks.
+  ;; Use `fixed-pitch' face for `org' tables and code blocks.
   (modus-themes-mixed-fonts t)
-
-  ;; Use bold prompts.
-  (modus-themes-prompts '(bold))
-
-  ;; Change boldness of completion faces.
-  (modus-themes-completions '((matches . (extrabold))
-                              (selection . (semibold italic))))
 
   ;; Set different font sizes for headings of various levels.
   (modus-themes-headings '((0 . (1.40 ultrabold))
@@ -692,12 +687,6 @@
 (use-package whitespace
   :defines (whitespace-line-column)
 
-  :preface
-  (defun whitespace--follow-fill-column (&rest _)
-    "Keep `whitespace-line-column' in sync with `fill-column'."
-    (when (bound-and-true-p whitespace-mode)
-      (setq-local whitespace-line-column fill-column)))
-
   :custom
   ;; Focus whitespace highlighting on cases that tend to indicate
   ;; formatting mistakes or policy violations, so attention is drawn
@@ -709,16 +698,18 @@
                       trailing))
 
   :config
-  ;; Keep the visual indication of overlong lines aligned with the
-  ;; current column policy, so changes to line width expectations are
-  ;; reflected immediately in what is highlighted.
-  (add-variable-watcher 'fill-column
-                        'whitespace--follow-fill-column)
+  (let ((follow-fill-column
+         (lambda (&rest _)
+           (when (bound-and-true-p whitespace-mode)
+             (setq-local whitespace-line-column fill-column)))))
+    ;; Keep the visual indication of overlong lines aligned with the
+    ;; current column policy, so changes to line width expectations
+    ;; are reflected immediately in what is highlighted.
+    (add-variable-watcher 'fill-column follow-fill-column)
 
-  :hook
-  ;; Ensure the visual boundary stays consistent whenever whitespace
-  ;; highlighting becomes active.
-  (whitespace-mode-hook . whitespace--follow-fill-column))
+    ;; Ensure the visual boundary stays consistent whenever whitespace
+    ;; highlighting becomes active.
+    (add-hook 'whitespace-mode-hook follow-fill-column)))
 
 
 
@@ -752,7 +743,7 @@
 (use-package jinx
   :config
   ;; Treat CJK Unified Ideographs and their extension blocks as word
-  ;; constituents in Jinx's syntax table.  This prevents the spell
+  ;; constituents in the `jinx' syntax table.  This prevents the spell
   ;; checker from treating East Asian characters as word boundaries,
   ;; avoiding false-positive spelling flags within mixed-language
   ;; text.
@@ -828,9 +819,9 @@
   (backup-by-copying t)
 
   ;; Turn on numbered backups, so Emacs creates multiple versions of
-  ;; each file, and automatically prunes excess backups, retaining
-  ;; the five oldest and the five most recent versions of each file
-  ;; to balance safety with disk usage.
+  ;; each file, and automatically prunes excess backups, retaining the
+  ;; five oldest and the five most recent versions of each file to
+  ;; balance safety with disk usage.
   (version-control t)
   (delete-old-versions t)
   (kept-old-versions 5)
@@ -914,7 +905,7 @@
 
 (use-package treemacs
   :config
-  ;; Treat Treemacs as a persistent project sidebar rather than a
+  ;; Treat `treemacs' as a persistent project sidebar rather than a
   ;; transient buffer, anchoring it to a fixed location so spatial
   ;; memory can be built around the file tree.
   (add-to-list 'display-buffer-alist
@@ -929,30 +920,35 @@
 
   :bind
   ( :map ctl-c-f-map
-    ;; Press \\`C-c f b' to find bookmark.
-    ("b" . treemacs-bookmark)
-
     ;; Press \\`C-c f d' to open the specified directory in the
-    ;; Treemacs window.
+    ;; `treemacs' window.
     ("d" . treemacs-select-directory)
 
-    ;; Press \\`C-c f f' to focus the current file in the Treemacs
+    ;; Press \\`C-c f f' to focus the current file in the `treemacs'
     ;; window.
     ("f" . treemacs-find-file)
 
     ;; The primary entry.
     ("t" . treemacs)
 
-    ;; Focus to the Treemacs window.
+    ;; Focus to the `treemacs' window.
     ("s" . treemacs-select-window)))
 
-(use-package treemacs-customiztion
+(use-package treemacs-bookmarks
+  :after (treemacs)
+
+  :bind
+  ( :map ctl-c-f-map
+    ;; Press \\`C-c f b' to find bookmark.
+    ("b" . treemacs-bookmark)))
+
+(use-package treemacs-customization
   :custom
   ;; Favor a dense tree representation to maximize information within
   ;; limited horizontal space.
   (treemacs-indentation 1)
 
-  ;; Prevent Treemacs from participating in normal window selection,
+  ;; Prevent `treemacs' from participating in normal window selection,
   ;; reinforcing its role as a fixed navigation panel rather than an
   ;; editing target.
   (treemacs-is-never-other-window t)
@@ -961,7 +957,7 @@
   ;; structure instead of an opinionated subset.
   (treemacs-show-hidden-files t)
 
-  ;; Persist Treemacs state across sessions so project context
+  ;; Persist `treemacs' state across sessions so project context
   ;; survives restarts and remains stable over time.
   (treemacs-persist-file (bs-path bs-state-directory
                                   "treemacs/state"))
@@ -983,8 +979,9 @@
 
   :init
   ;; Keep the project tree reflecting file-system changes in real
-  ;; time, so Treemacs can be relied on as an accurate representation
-  ;; of the current project state during navigation and refactoring.
+  ;; time, so `treemacs' can be relied on as an accurate
+  ;; representation of the current project state during navigation and
+  ;; refactoring.
   (treemacs-filewatch-mode +1))
 
 (use-package treemacs-follow-mode
@@ -1010,12 +1007,13 @@
   :commands (treemacs-set-scope-type)
 
   :config
-  ;; Scope Treemacs to tabs, treating each tab as an independent
+  ;; Scope `treemacs' to tabs, treating each tab as an independent
   ;; workspace with its own navigation state.
   (treemacs-set-scope-type 'Tabs))
 
 (use-package treemacs-tab-bar
   :after (treemacs)
+
   :demand t)
 
 
@@ -1186,12 +1184,12 @@
     ([remap switch-to-buffer-other-tab] . consult-buffer-other-tab)))
 
 (use-package emacs
-  :demand t
-  :no-require t
-
   :custom
   ;; Resize frame pixel by pixel.
-  (frame-resize-pixelwise t))
+  (frame-resize-pixelwise t)
+
+  :demand t
+  :no-require t)
 
 (use-package knockknock
   :custom
@@ -1201,7 +1199,7 @@
 
   :hook
   ;; Load the notification backend after early startup work completes,
-  ;; when frame geometry and Posframe integration are available.
+  ;; when frame geometry and `posframe' integration are available.
   (bs-after-startup-early-hook . (lambda () (require 'knockknock))))
 
 (use-package scroll-bar
@@ -1231,22 +1229,23 @@
 
 (use-package mule-cmds
   :commands (set-language-environment prefer-coding-system)
-  :demand t
   :functions (set-default-coding-systems)
-  :no-require t
 
   :init
-  ;; Set the default coding system to UTF-8 for new buffers, files
-  ;; and sub-process.
+  ;; Set the default coding system to UTF-8 for new buffers, files and
+  ;; sub-process.
   (set-default-coding-systems 'utf-8)
 
-  ;; Configure the language environment to UTF-8 for system
-  ;; messages, input methods, and other locale-sensitive features.
+  ;; Configure the language environment to UTF-8 for system messages,
+  ;; input methods, and other locale-sensitive features.
   (set-language-environment "utf-8")
 
   ;; Prefer UTF-8 when negotiating coding systems for files,
   ;; processes, and inter-program communication.
-  (prefer-coding-system 'utf-8))
+  (prefer-coding-system 'utf-8)
+
+  :demand t
+  :no-require t)
 
 
 
@@ -1254,7 +1253,7 @@
 ;; Major and Minor Modes (info "(emacs) Modes")
 ;;
 
-(use-package files
+(use-package bs-ext
   :hook
   ;; Guess major mode when saving the buffer.
   (after-save-hook . bs/guess-file-major-mode))
@@ -1264,14 +1263,6 @@
 ;;
 ;; Indentation (info "(emacs) Indentation")
 ;;
-
-(use-package indent
-  :demand t
-  :no-require t
-
-  :custom
-  ;; Always complete first using \\`TAB' key.
-  (tab-always-indent 'complete))
 
 (use-package electric
   :config
@@ -1285,6 +1276,14 @@
   ;; Auto re-indentation when programming.
   (prog-mode-hook . electric-indent-local-mode))
 
+(use-package indent
+  :custom
+  ;; Always complete first using \\`TAB' key.
+  (tab-always-indent 'complete)
+
+  :demand t
+  :no-require t)
+
 
 
 ;;
@@ -1292,15 +1291,15 @@
 ;;
 
 (use-package emacs
-  :demand t
-  :no-require t
-
   :custom
   ;; Set the global default value of `fill-column' to 70 characters.
   ;; This serves as the baseline for line filling and wrapping
   ;; commands, while allowing major modes or hooks to override it
   ;; buffer-locally as needed.
-  (fill-column 70))
+  (fill-column 70)
+
+  :demand t
+  :no-require t)
 
 (use-package jieba-rs
   :hook
@@ -1309,16 +1308,16 @@
   (text-mode-hook . jieba-rs-mode))
 
 (use-package paragraphs
-  :demand t
-  :no-require t
-
   :custom
   ;; Ensure treat two consecutive spaces after sentence-ending
   ;; punctuation as the canonical sentence boundary.  This affects
   ;; commands such as `forward-sentence', `backward-sentence', and
   ;; filling operations, without modifying the buffer contents or
   ;; inserting extra spaces.
-  (sentence-end-double-space t))
+  (sentence-end-double-space t)
+
+  :demand t
+  :no-require t)
 
 (use-package simple
   :after (text-mode)
@@ -1332,7 +1331,11 @@
   (text-mode-hook . (lambda ()
                       (setq-local fill-column 80))))
 
+
+
+;;
 ;; Markdown
+;;
 
 (use-package bs-edit-indirect
   :after (markdown-mode)
@@ -1368,31 +1371,35 @@
   (grip-preview-in-webkit t)
 
   :hook
-  ;; Start a GitHub-style preview for Tree-sitter Markdown buffers.
+  ;; Start a GitHub-style preview for `markdown-ts-mode' buffers.
   (markdown-ts-mode-hook . grip-mode))
 
 (use-package simple
   :after (markdown-ts-mode)
 
   :hook
-  ;; Enable `auto-fill-mode' in Markdown Mode buffers.
+  ;; Enable `auto-fill-mode' in `markdown-ts-mode' buffers.
   (markdown-ts-mode-hook . auto-fill-mode)
 
-  ;; Set the fill column to 80 characters locally for Markdown Mode
-  ;; buffers.
+  ;; Set the fill column to 80 characters locally for
+  ;; `markdown-ts-mode' buffers.
   (markdown-ts-mode-hook . (lambda ()
                              (setq-local fill-column 80))))
 
-;; Org
+
+
+;;
+;; Org Text
+;;
 
 (use-package simple
   :after (org-mode)
 
   :hook
-  ;; Enable `auto-fill-mode' in Org Mode buffers.
+  ;; Enable `auto-fill-mode' in `org-mode' buffers.
   (org-mode-hook . auto-fill-mode)
 
-  ;; Set the fill column to 80 characters locally for Org Mode
+  ;; Set the fill column to 80 characters locally for `org-mode'
   ;; buffers.
   (org-mode-hook . (lambda ()
                      (setq-local fill-column 80))))
@@ -1407,9 +1414,10 @@
   :after (prog-mode)
 
   :hook
-  ;; Apheleia formats code using external formatter via a non-blocking
-  ;; pipeline, typically on save, without interfering with interactive
-  ;; editing or modifying buffers outside explicit formatting events.
+  ;; `apheleia' formats code using external formatter via a
+  ;; non-blocking pipeline, typically on save, without interfering
+  ;; with interactive editing or modifying buffers outside explicit
+  ;; formatting events.
   (prog-mode-hook . apheleia-mode))
 
 (use-package cape
@@ -1431,59 +1439,59 @@
 (use-package citre
   :commands (citre-auto-enable-citre-mode)
 
-  :preface
-  (defun citre--auto-enable-citre-mode ()
-    "Load Citre and try to enable it in programming file buffers."
-    (when (derived-mode-p 'prog-mode)
-      (require 'citre-config)
-      ;; Keep this wrapper as the sole auto-enable entry point; the
-      ;; default configuration installs an unfiltered hook itself.
-      (remove-hook 'find-file-hook #'citre-auto-enable-citre-mode)
-      (citre-auto-enable-citre-mode)))
-
   :custom
-  ;; Enable our citre back-ends.
+  ;; Enable our `citre' back-ends.
   (citre-auto-enable-citre-mode-backends '(global tags))
 
-  ;; Let auto enabling citre-mode behavior to work for certain modes.
+  ;; Let auto enabling `citre-mode' behavior work for certain modes.
   (citre-auto-enable-citre-mode-modes '(prog-mode))
-
-  ;; Always use one location to create a tags file.
-  (citre-default-create-tags-file-location 'global-cache)
-
-  ;;use ctags options generated by Citre directly, rather than further
-  ;; editing them.
-  (citre-edit-ctags-options-manually nil)
 
   :bind
   ( :map ctl-c-c-map
-    ;; Jump back to the previous location in the Citre jump stack when
-    ;; press \\`C-c c J'.
-    ("J" . citre-jump-back)
-
     ;; Jump to the definition at point using the tags database when
-    ;; press \\`C-c c j'..
+    ;; press \\`C-c c j'.
     ("j" . citre-jump)
 
     ;; Peek definitions at point using an ace-style selection
     ;; interface when press \\`C-c c p', without leaving the current
     ;; buffer.
-    ("p" . citre-ace-peek)
+    ("p" . citre-ace-peek)))
 
+(use-package citre-config
+  :demand t)
+
+(use-package citre-ctags
+  :after (citre)
+
+  :custom
+  ;; Always use one location to create a tags file.
+  (citre-default-create-tags-file-location 'global-cache)
+
+  ;; Use ctags options generated by `citre' directly, rather than
+  ;; editing them further.
+  (citre-edit-ctags-options-manually nil)
+
+  :bind
+  ( :map ctl-c-c-map
     ;; Update the tags file associated with the current buffer or
     ;; project context when press \\`C-c c u'.
-    ("u" . citre-update-this-tags-file))
+    ("u" . citre-update-this-tags-file)))
 
-  :hook
-  ;; Load Citre's default configuration and try to enable `citre-mode'
-  ;; only when visiting a file whose major mode is configured.
-  (find-file-hook . citre--auto-enable-citre-mode))
+(use-package citre-ui-jump
+  :after (citre)
+
+  :bind
+  ( :map ctl-c-c-map
+    ;; Jump back to the previous location in the `citre' jump stack
+    ;; when press \\`C-c c J'.
+    ("J" . citre-jump-back)))
 
 (use-package consult-eglot-embark
   :after (eglot embark)
 
   :hook
-  ;; Enable `consult-eglot-embark-mode' for buffers managed by Eglot.
+  ;; Enable `consult-eglot-embark-mode' for buffers managed by
+  ;; `eglot'.
   (eglot-managed-mode-hook . consult-eglot-embark-mode))
 
 (use-package consult-imenu
@@ -1496,8 +1504,8 @@
 (use-package consult-info
   :bind
   ( :map global-map
-    ;; Query a text and search it in the all info manuals, instead
-    ;; of opening the index.
+    ;; Query a text and search it in the all info manuals, instead of
+    ;; opening the index.
     ([remap info] . consult-info)))
 
 (use-package corfu
@@ -1551,7 +1559,7 @@
   :commands (corfu-history-mode)
 
   :config
-  ;; Sort Corfu candidates by history.
+  ;; Sort `corfu' candidates by history.
   (corfu-history-mode +1))
 
 (use-package corfu-popupinfo
@@ -1580,7 +1588,7 @@
   :after (eglot)
 
   :hook
-  ;; Enhance Eglot communication and processing pipeline to reduce
+  ;; Enhance `eglot' communication and processing pipeline to reduce
   ;; latency and improve responsiveness, without changing LSP
   ;; semantics or server behavior.
   (eglot-managed-mode-hook . eglot-booster-mode))
@@ -1589,9 +1597,9 @@
   :after (eldoc)
 
   :hook
-  ;; Display Eldoc documentation in a child frame near point on hover,
-  ;; providing contextual information without using the echo area or
-  ;; modifying buffer content.
+  ;; Display `eldoc' documentation in a child frame near point on
+  ;; hover, providing contextual information without using the echo
+  ;; area or modifying buffer content.
   (eldoc-mode-hook . eldoc-box-hover-at-point-mode))
 
 (use-package hideshow
@@ -1604,30 +1612,26 @@
 (use-package hl-todo
   :defines (hl-todo-keyword-faces)
 
-  :preface
-  (defun hl-todo--set-keyword-faces ()
-    "Apply local keyword face overrides when `hl-todo' is loaded."
-    (when (featurep 'hl-todo)
-      (dolist (entry '(("CNCL" . warning)
-                       ("WAIT" . warning)))
-        (setf (alist-get (car entry)
-                         hl-todo-keyword-faces
-                         nil
-                         nil
-                         #'string=)
-              (cdr entry)))))
-
   :config
-  ;; Apply local keyword face overrides when `hl-todo' first loads.
-  (hl-todo--set-keyword-faces)
+  (let ((set-keyword-faces
+         (lambda ()
+           (when (featurep 'hl-todo)
+             (dolist (entry '(("CNCL" . warning)
+                              ("WAIT" . warning)))
+               (setf (alist-get (car entry)
+                                hl-todo-keyword-faces
+                                nil
+                                nil
+                                #'string=)
+                     (cdr entry)))))))
+    ;; Apply local keyword face overrides when `hl-todo' first loads.
+    (funcall set-keyword-faces)
+
+    ;; Reapply the overrides after each `modus-themes' theme load, but
+    ;; only when `hl-todo' has already been used.
+    (add-hook 'modus-themes-after-load-theme-hook set-keyword-faces))
 
   :hook
-  ;; Reapply the overrides after each Modus theme load, but only when
-  ;; `hl-todo' has already been used.
-  (modus-themes-after-load-theme-hook
-   .
-   hl-todo--set-keyword-faces)
-
   ;; Treat TODO markers as active signals during development, not
   ;; passive comments to be rediscovered later.
   (prog-mode-hook . hl-todo-mode))
@@ -1678,6 +1682,7 @@
 
 (use-package smartparens-config
   :after (smartparens)
+
   :demand t)
 
 (use-package subword
@@ -1698,7 +1703,11 @@
   ;; as part of normal editing rather than discovered later.
   (prog-mode-hook . whitespace-mode))
 
+
+
+;;
 ;; C/C++ Programs
+;;
 
 (use-package c-ts-mode
   :commands (c-ts-mode c++-ts-mode))
@@ -1707,7 +1716,7 @@
   :after (cc-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for classic C/C++
+  ;; Automatically start or reuse an `eglot' session for classic C/C++
   ;; major modes derived from `cc-mode'.
   ((c-mode-hook c++-mode-hook c-or-c++-mode-hook)
    .
@@ -1717,7 +1726,7 @@
   :after (c-ts-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Tree-sitter
+  ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; based C/C++ modes.
   ((c-ts-mode-hook c++-ts-mode-hook)
    .
@@ -1730,7 +1739,11 @@
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode) t)
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode) t))
 
-;; Common Lisp programs
+
+
+;;
+;; Common Lisp Programs
+;;
 
 (use-package corfu
   :after (lisp-mode)
@@ -1748,11 +1761,11 @@
   (inferior-lisp-program "sbcl")
 
   :init
-  ;; Load SLY contrib packages before run sly.
+  ;; Load `sly' contrib packages before running `sly'.
   (advice-add 'sly :before 'sly-setup)
 
   :config
-  ;; Register our SLY contrib packages want to use.
+  ;; Register the `sly' contrib packages we want to use.
   (dolist (feature '(sly-asdf
                      sly-macrostep
                      sly-named-readtables
@@ -1761,8 +1774,8 @@
 
 (use-package sly-completion
   :custom
-  ;; Use the standard completion UI instead of SLY's global,
-  ;; Lisp-specific symbol completion interface.
+  ;; Use the standard completion UI instead of the global,
+  ;; Lisp-specific symbol completion interface from `sly'.
   (sly-symbol-completion-mode nil))
 
 (use-package sly-mrepl
@@ -1773,14 +1786,18 @@
   (sly-mrepl-history-file-name
    (bs-path* bs-state-directory "sly/mrepl-history.el")))
 
-;; Emacs Lisp programs
+
+
+;;
+;; Emacs Lisp Programs
+;;
 
 (use-package paredit
   :after (elisp-mode)
 
   :hook
-  ;; Enable structured editing to enforcing balanced parentheses
-  ;; and S-expression integrity by `paredit'.
+  ;; Enable structured editing to enforcing balanced parentheses and
+  ;; S-expression integrity by `paredit'.
   (emacs-lisp-mode-hook . paredit-mode))
 
 (use-package pp
@@ -1799,13 +1816,17 @@
     ;; Press \\`C-x M-e' to expand macro-expression.
     ("M-e" . pp-macroexpand-last-sexp)))
 
-;; Haskell programs
+
+
+;;
+;; Haskell Programs
+;;
 
 (use-package eglot
   :after (haskell-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Haskell
+  ;; Automatically start or reuse an `eglot' session for Haskell
   ;; buffers.
   (haskell-mode-hook . eglot-ensure))
 
@@ -1813,7 +1834,7 @@
   :after (haskell-ts-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Tree-sitter
+  ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; Haskell buffers.
   (haskell-ts-mode-hook . eglot-ensure))
 
@@ -1833,7 +1854,11 @@
 (use-package haskell-ts-mode
   :commands (haskell-ts-mode))
 
-;; JavaScript programs
+
+
+;;
+;; JavaScript Programs
+;;
 
 (use-package eglot
   :after (js)
@@ -1848,7 +1873,7 @@
                  ("tsc" "--lsp" "--stdio")))
 
   :hook
-  ;; Automatically start or reuse an Eglot session for JavaScript
+  ;; Automatically start or reuse an `eglot' session for JavaScript
   ;; buffers.
   ((js-mode-hook js-ts-mode-hook)
    .
@@ -1865,20 +1890,24 @@
   ;; Associate JavaScript source files with `js-mode'.
   ("\\.\\(?:[cm]?js\\|jsx\\)\\'" . js-mode))
 
-;; JSON
+
+
+;;
+;; JSON Programs
+;;
 
 (use-package eglot
   :after (js-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for JSON buffers.
+  ;; Automatically start or reuse an `eglot' session for JSON buffers.
   (js-json-mode-hook . eglot-ensure))
 
 (use-package eglot
   :after (json-ts-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Tree-sitter
+  ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; JSON buffers.
   (json-ts-mode-hook . eglot-ensure))
 
@@ -1902,7 +1931,11 @@
 (use-package json-ts-mode
   :commands (json-ts-mode))
 
-;; Nix programs
+
+
+;;
+;; Nix Programs
+;;
 
 (use-package bs-edit-indirect
   :after (nix-mode)
@@ -1926,15 +1959,15 @@
   :after (nix-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Nix buffers.
+  ;; Automatically start or reuse an `eglot' session for Nix buffers.
   (nix-mode-hook . eglot-ensure))
 
 (use-package eglot
   :after (nix-ts-mode)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Tree-sitter Nix
-  ;; buffers.
+  ;; Automatically start or reuse an `eglot' session for Tree-sitter
+  ;; Nix buffers.
   (nix-ts-mode-hook . eglot-ensure))
 
 (use-package files
@@ -1951,13 +1984,18 @@
 (use-package nix-ts-mode
   :commands (nix-ts-mode))
 
-;; Python programs
+
+
+;;
+;; Python Programs
+;;
 
 (use-package eglot
   :after (python)
 
   :hook
-  ;; Automatically start or reuse an Eglot session for Python buffers.
+  ;; Automatically start or reuse an `eglot' session for Python
+  ;; buffers.
   (python-mode-hook . eglot-ensure)
   (python-ts-mode-hook . eglot-ensure))
 
@@ -1978,9 +2016,13 @@
   ;; files.
   ("\\.py[iw]?\\'" . python-mode))
 
-;; Scheme programs
+
 
-(use-package geiser ;; (info "(geiser) Top")
+;;
+;; Scheme Programs
+;;
+
+(use-package geiser-repl ;; (info "(geiser) Top")
   :after (bs-lib)
 
   :custom
@@ -2002,7 +2044,11 @@
   ;; Expand Scheme macros through Geiser in REPL buffers.
   (geiser-repl-mode-hook . macrostep-geiser-setup))
 
-;; TypeScript programs
+
+
+;;
+;; TypeScript Programs
+;;
 
 (use-package eglot
   :after (typescript-ts-mode)
@@ -2017,8 +2063,8 @@
                  ("tsc" "--lsp" "--stdio")))
 
   :hook
-  ;; Automatically start or reuse an Eglot session for TypeScript and
-  ;; TSX buffers.
+  ;; Automatically start or reuse an `eglot' session for TypeScript
+  ;; and TSX buffers.
   ((typescript-ts-mode-hook tsx-ts-mode-hook)
    .
    eglot-ensure))
@@ -2040,14 +2086,14 @@
 
   :bind
   ( :map flymake-mode-map
-    ;; Show flymake diagnostic when press \\`C-c !'.
+    ;; Show `flymake' diagnostics when pressing \\`C-c !'.
     ("C-c !" . consult-flymake)))
 
 (use-package flymake
   :after (prog-mode)
 
   :hook
-  ;; Enable Flymake.
+  ;; Enable `flymake'.
   (prog-mode-hook . flymake-mode))
 
 (use-package flymake-popon
@@ -2071,12 +2117,12 @@
                   t))))
 
 (use-package startup
-  :demand t
-  :no-require t
-
   :custom
   ;; Clearing the *scratch* buffer.
-  initial-scratch-message nil)
+  initial-scratch-message nil
+
+  :demand t
+  :no-require t)
 
 
 
@@ -2110,7 +2156,7 @@
   :commands (diff-hl-magit-post-refresh)
 
   :config
-  ;; Synchronize `diff-hl' after Magit's own auto-revert pass, so file
+  ;; Synchronize `diff-hl' after the `magit' auto-revert pass, so file
   ;; buffers observe the refreshed Git state.
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t))
 
@@ -2128,22 +2174,6 @@
   ;; later.
   (git-commit-mode-hook . display-fill-column-indicator-mode))
 
-(use-package ghostel-dwim
-  :after (project)
-
-  :bind
-  ( :map global-map
-    ;; Use `ghostel' to create shell based on project root.
-    ([remap project-shell] . ghostel-dwim-project)
-
-    :map ctl-c-p-map
-    ;; Switch to a Ghostel buffer associated with the current project.
-    ("C-s" . ghostel-dwim-project-switch)
-
-    ;; Reuse an idle Ghostel session for the current project or create
-    ;; one.
-    ("s" . ghostel-dwim-project)))
-
 (use-package envrc
   :after (bs-hooks)
 
@@ -2153,6 +2183,23 @@
   ;; buffers, ensuring that project-local environment variables are
   ;; applied automatically without affecting startup performance.
   (bs-first-file-hook . envrc-global-mode))
+
+(use-package ghostel-dwim
+  :after (project)
+
+  :bind
+  ( :map global-map
+    ;; Use `ghostel' to create shell based on project root.
+    ([remap project-shell] . ghostel-dwim-project)
+
+    :map ctl-c-p-map
+    ;; Switch to a `ghostel' buffer associated with the current
+    ;; project.
+    ("C-s" . ghostel-dwim-project-switch)
+
+    ;; Reuse an idle `ghostel' session for the current project or
+    ;; create one.
+    ("s" . ghostel-dwim-project)))
 
 (use-package git-commit
   :custom
@@ -2174,20 +2221,15 @@
              magit-status-setup-buffer)
 
   :custom
-  ;; Disable Magit's global key bindings.
-  (magit-define-global-key-bindings nil)
-
-  :bind
-  ( :map ctl-c-v-map
-    ;; Press \\`C-c v g' to display Magit.
-    ("g" . magit)))
+  ;; Disable the global key bindings from `magit'.
+  (magit-define-global-key-bindings nil))
 
 (use-package magit-autorevert
   :after (magit)
   :commands (magit-auto-revert-mode)
 
   :init
-  ;; Enable repository-aware auto-revert only after Magit is first
+  ;; Enable repository-aware auto-revert only after `magit' is first
   ;; loaded, keeping the integration out of the startup path.
   (magit-auto-revert-mode +1))
 
@@ -2195,13 +2237,18 @@
   :after (magit)
 
   :config
-  ;; Show Magit Status in the shared bottom side window used for
+  ;; Show `magit-status' in the shared bottom side window used for
   ;; commit message editing.
   (add-to-list 'display-buffer-alist
                '((derived-mode . magit-status-mode)
                  (display-buffer-in-side-window)
                  (side . bottom)
-                 (slot . 0))))
+                 (slot . 0)))
+
+  :bind
+  ( :map ctl-c-v-map
+    ;; Press \\`C-c v g' to display `magit'.
+    ("g" . magit)))
 
 (use-package project
   :after (bs-lib)
@@ -2313,10 +2360,6 @@
   ;; navigation.
   (treemacs-git-mode 'deferred))
 
-(use-package treemacs-magit
-  :after (magit treemacs)
-  :demand t)
-
 (use-package treemacs-git-commit-diff-mode
   :after (treemacs)
   :commands (treemacs-git-commit-diff-mode)
@@ -2327,14 +2370,19 @@
   ;; directory context rather than as an isolated list of files.
   (treemacs-git-commit-diff-mode +1))
 
+(use-package treemacs-magit
+  :after (magit treemacs)
+
+  :demand t)
+
 (use-package treemacs-project-follow-mode
   :after (treemacs)
   :commands (treemacs-project-follow-mode)
 
   :init
-  ;; Keep the active Treemacs project aligned with the project of the
-  ;; current buffer, so navigation always reflects the context being
-  ;; worked on rather than a previously selected tree.
+  ;; Keep the active `treemacs' project aligned with the project of
+  ;; the current buffer, so navigation always reflects the context
+  ;; being worked on rather than a previously selected tree.
   (treemacs-project-follow-mode +1))
 
 (use-package whitespace
@@ -2362,7 +2410,7 @@
   :custom
   ;; Favor workflows that treat file operations as transfers between
   ;; visible locations, reducing the need to manually specify targets
-  ;; when working across multiple Dired buffers.
+  ;; when working across multiple `dired' buffers.
   (dired-dwim-target t)
 
   ;; Optimize for batch-oriented file management by removing
@@ -2433,17 +2481,6 @@
 ;; The Calendar and the Diary (info "(emacs) Calendar/Diary")
 ;;
 
-(use-package calfw-org
-  :after (org)
-  :commands (calfw-org-open-calendar)
-
-  :bind
-  ( :map ctl-c-a-map
-    ;; Open a calendar view backed by the same Org files used by the
-    ;; agenda.  Press \\`v w' or \\`v m' there to switch between week
-    ;; and month views.
-    ("k" . calfw-org-open-calendar)))
-
 (use-package bs-khal
   :after (bs-ext)
   :commands (bs-khal-capture
@@ -2455,15 +2492,26 @@
   ;; when their persisted state differs from the last successful run.
   (bs-khal-import-check-interval 300))
 
+(use-package calfw-org
+  :after (org)
+  :commands (calfw-org-open-calendar)
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open a calendar view backed by the same `org' files used by the
+    ;; agenda.  Press \\`v w' or \\`v m' there to switch between week
+    ;; and month views.
+    ("k" . calfw-org-open-calendar)))
+
 (use-package khalel
   :defines (khalel-capture-key)
 
   :custom
-  ;; Use \\`c' for calendar events in the Org capture menu.
+  ;; Use \\`c' for calendar events in the `org' capture menu.
   (khalel-capture-key "c")
 
   ;; Include events up to ninety days in the future in the generated
-  ;; Org calendar mirror.
+  ;; `org' calendar mirror.
   (khalel-import-end-date "+90d")
 
   ;; Let `bs-khal' refresh the mirror asynchronously after exporting a
@@ -2478,7 +2526,8 @@
   ;; vdirsyncer process exits successfully.
   (khalel-import-events-after-vdirsyncer nil)
 
-  ;; Store the generated calendar mirror alongside the other Org data.
+  ;; Store the generated calendar mirror alongside the other `org'
+  ;; data.
   (khalel-import-org-file
    (bs-path* org-directory "calendar.org"))
 
@@ -2487,7 +2536,7 @@
   (khalel-import-org-file-confirm-overwrite nil)
 
   ;; Protect imported entries from accidental edits; changes should be
-  ;; made through Khalel or the source calendar.
+  ;; made through `khalel' or the source calendar.
   (khalel-import-org-file-read-only t)
 
   ;; Include the previous seven days so recent events remain available
@@ -2553,7 +2602,6 @@
              bs-gnus-summary-fold-toggle
              bs-gnus-summary-next
              bs-gnus-summary-previous)
-  :demand t
 
   :custom
   ;; Name NNTP sources by their configured server addresses in the
@@ -2570,26 +2618,38 @@
   ;; subjects in a stable column.
   (bs-gnus-summary-thread-count-digits 8)
 
+  :config
+  ;; Replace the native Group and Summary layouts only after `gnus'
+  ;; itself loads.
+  (bs-gnus-group-enable)
+  (bs-gnus-summary-enable)
+
   :bind
   ( :map gnus-summary-mode-map
     ;; Prepare the current article and its replies as LLM context.
-    ("t" . bs-gnus-summary-mark-subthread))
+    ("C-c m m" . bs-gnus-summary-mark-subthread))
 
-  :config
-  ;; Replace the native Group and Summary layouts only after Gnus
-  ;; itself loads.
-  (bs-gnus-group-enable)
-  (bs-gnus-summary-enable))
+  :demand t)
+
+(use-package bs-gnus
+  :after (gnus-topic)
+  :defines (gnus-topic-mode-map)
+
+  :bind
+  ( :map gnus-topic-mode-map
+    ;; Fold or expand the topic at point without changing hierarchy.
+    ("TAB" . bs-gnus-group-topic-toggle)
+    ("<tab>" . bs-gnus-group-topic-toggle)))
 
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
 
   :custom
-  ;; Store Gnus state beneath the shared Emacs state directory.
+  ;; Store `gnus' state beneath the shared Emacs state directory.
   (gnus-home-directory (bs-path bs-state-directory "gnus/"))
 
-  ;; Store drafts, scores, and other persistent Gnus data separately
+  ;; Store drafts, scores, and other persistent `gnus' data separately
   ;; from runtime state.
   (gnus-directory (bs-path bs-data-directory "gnus/"))
 
@@ -2628,8 +2688,9 @@
 
   :bind
   ( :map ctl-c-a-map
-    ;; Start Gnus explicitly; loading this init file performs no NNTP
-    ;; connection, active-file scan, or Gnus state initialization.
+    ;; Start `gnus' explicitly; loading this init file performs no
+    ;; NNTP connection, active-file scan, or `gnus' state
+    ;; initialization.
     ("n" . gnus)))
 
 (use-package gnus-agent
@@ -2656,6 +2717,10 @@
   ;; This predicate is an ordinary `defvar', so bind it before
   ;; `gnus-agent' loads instead of passing it through Custom.
   (setq gnus-agent-predicate 'false))
+
+(use-package gnus-art
+  :after (gnus)
+  :defines (gnus-article-mode-map))
 
 (use-package gnus-async
   :after (gnus)
@@ -2687,10 +2752,7 @@
   (gnus-group-sort-function 'gnus-group-sort-by-alphabet)
 
   :hook
-  ;; Highlight the current Group row without changing its contents.
-  (gnus-group-mode-hook . hl-line-mode)
-
-  ;; Use a concise mode-line name for Gnus Group buffers.
+  ;; Use a concise mode-line name for `gnus-group' buffers.
   (gnus-group-mode-hook . (lambda ()
                             (setq-local mode-name "News Groups"))))
 
@@ -2753,16 +2815,16 @@
   ;; persistent Emacs state.
   (gnus-startup-file (bs-path bs-state-directory "gnus/newsrc"))
 
-  ;; Keep all Gnus configuration in this init file instead of loading
-  ;; a separate user Gnus file.
+  ;; Keep all `gnus' configuration in this init file instead of
+  ;; loading a separate user `gnus' file.
   (gnus-init-file nil)
 
-  ;; Do not load site-wide Gnus configuration outside this controlled
-  ;; setup.
+  ;; Do not load site-wide `gnus' configuration outside this
+  ;; controlled setup.
   (gnus-site-init-file nil)
 
   ;; Discover newly created groups only on explicit request instead of
-  ;; querying every server when Gnus starts.
+  ;; querying every server when `gnus' starts.
   (gnus-check-new-newsgroups nil)
 
   ;; Read only the active data needed for subscribed and requested
@@ -2775,7 +2837,7 @@
   :functions (gnus-summary-select-article-buffer)
 
   :custom
-  ;; Display conversations as threads, matching threaded Mu4e
+  ;; Display conversations as threads, matching threaded `mu4e'
   ;; searches.
   (gnus-show-threads t)
 
@@ -2805,7 +2867,7 @@
    '(gnus-thread-sort-by-number
      gnus-thread-sort-by-date))
 
-  ;; Mark unread articles with the same lozenge used by Mu4e.
+  ;; Mark unread articles with the same lozenge used by `mu4e'.
   (gnus-unread-mark ?◊)
 
   ;; Mark articles retained for later attention with a star.
@@ -2850,19 +2912,19 @@
   ;; Mark articles suppressed as duplicates with an equals sign.
   (gnus-duplicate-mark ?=)
 
-  ;; Identify articles stored in the Gnus article cache with `C'.
+  ;; Identify articles stored in the `gnus' article cache with `C'.
   (gnus-cached-mark ?C)
 
-  ;; Mark replied articles with a left arrow, matching Mu4e.
+  ;; Mark replied articles with a left arrow, matching `mu4e'.
   (gnus-replied-mark ?←)
 
-  ;; Mark forwarded articles with a right arrow, matching Mu4e.
+  ;; Mark forwarded articles with a right arrow, matching `mu4e'.
   (gnus-forwarded-mark ?→)
 
   ;; Identify articles saved outside their group with `S'.
   (gnus-saved-mark ?S)
 
-  ;; Mark articles not previously seen by Gnus with a bullet.
+  ;; Mark articles not previously seen by `gnus' with a bullet.
   (gnus-unseen-mark ?•)
 
   ;; Identify recently arrived articles with `N'.
@@ -2935,22 +2997,9 @@
   (keymap-set gnus-summary-mode-map "<tab>" #'bs-gnus-summary-fold-toggle)
 
   :hook
-  ;; Highlight the Summary row at point independently of the article
-  ;; displayed in the Article buffer.
-  (gnus-summary-mode-hook . hl-line-mode)
-
-  ;; Use a concise mode-line name for Gnus Summary buffers.
+  ;; Use a concise mode-line name for `gnus-sum' buffers.
   (gnus-summary-mode-hook . (lambda ()
                               (setq-local mode-name "News"))))
-
-(use-package gnus-art
-  :after (gnus)
-  :defines (gnus-article-mode-map)
-
-  :bind
-  ( :map gnus-article-mode-map
-    ;; Delete the Article window without exiting its Summary group.
-    ("q" . delete-window)))
 
 (use-package gnus-topic
   :after (gnus)
@@ -2969,10 +3018,6 @@
 
   :bind
   ( :map gnus-topic-mode-map
-    ;; Fold or expand the topic at point without changing hierarchy.
-    ("TAB" . bs-gnus-group-topic-toggle)
-    ("<tab>" . bs-gnus-group-topic-toggle)
-
     ;; Keep hierarchy changes behind explicit topic-prefix keys.
     ("T >" . gnus-topic-indent)
     ("T <" . gnus-topic-unindent)
@@ -2980,16 +3025,48 @@
 
   :hook
   ;; Organize subscribed groups into collapsible topics in the normal
-  ;; Gnus Group buffer.
+  ;; `gnus-group' buffer.
   (gnus-group-mode-hook . gnus-topic-mode))
 
 (use-package gnus-win
   :after (gnus)
 
   :custom
-  ;; Preserve unrelated windows and confine Gnus layouts to the window
-  ;; from which Gnus was entered.
+  ;; Preserve unrelated windows and confine `gnus' layouts to the
+  ;; window from which `gnus' was entered.
   (gnus-use-full-window nil))
+
+(use-package gptel-transient
+  :after (gnus-sum)
+
+  :bind
+  ( :map gnus-summary-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)))
+
+(use-package hl-line
+  :after (gnus-group)
+
+  :hook
+  ;; Highlight the current Group row without changing its contents.
+  (gnus-group-mode-hook . hl-line-mode))
+
+(use-package hl-line
+  :after (gnus-sum)
+
+  :hook
+  ;; Highlight the Summary row at point independently of the article
+  ;; displayed in the Article buffer.
+  (gnus-summary-mode-hook . hl-line-mode))
+
+(use-package window
+  :after (gnus-art)
+  :defines (gnus-article-mode-map)
+
+  :bind
+  ( :map gnus-article-mode-map
+    ;; Delete the Article window without exiting its Summary group.
+    ("q" . delete-window)))
 
 
 
@@ -3050,8 +3127,8 @@
 
 (use-package ghostel
   :config
-  ;; Add a display buffer rule to make Ghostel buffers shown in a side
-  ;; window at the bottom of the frame.
+  ;; Add a display buffer rule to make `ghostel' buffers shown in a
+  ;; side window at the bottom of the frame.
   (add-to-list 'display-buffer-alist
                '((derived-mode . ghostel-mode)
                  (display-buffer-in-side-window)
@@ -3060,8 +3137,8 @@
                  (window-height . 0.35)))
 
   :hook
-  ;; Export environment variables so that programs launched from
-  ;; Ghostel use Emacs as their editor.
+  ;; Export environment variables so that programs launched from Let
+  ;; `ghostel' uses Emacs as its editor.
   (ghostel-pre-spawn-hook
    .
    (lambda ()
@@ -3084,17 +3161,17 @@
 (use-package ghostel-dwim
   :bind
   ( :map ctl-c-a-map
-    ;; Switch to a Ghostel buffer associated with the current
+    ;; Switch to a `ghostel' buffer associated with the current
     ;; directory.
     ("C-s" . ghostel-dwim-switch)
 
-    ;; Reuse an idle Ghostel session for the current directory or
+    ;; Reuse an idle `ghostel' session for the current directory or
     ;; create one.
     ("s" . ghostel-dwim)))
 
 (use-package shell-maker
   :custom
-  ;; Keep shell-maker state beneath the shared Emacs state directory
+  ;; Keep `shell-maker' state beneath the shared Emacs state directory
   ;; instead of scattering generated files into project trees.
   (shell-maker-root-path (bs-path* bs-state-directory)))
 
@@ -3132,7 +3209,7 @@
 ;; Using Emacs as a Server (info "(emacs) Emacs Server")
 ;;
 
-(use-package bs-lib
+(use-package bs-ext
   :after (bs-hooks)
 
   :hook
@@ -3185,8 +3262,6 @@
 
 (use-package startup
   :after (bs-lib)
-  :demand t
-  :no-require t
 
   :custom
   ;; Emacs maintains auto-save-list files to track existing auto-save
@@ -3198,7 +3273,10 @@
   ;; metadata is stored alongside other state files.
   (auto-save-list-file-prefix (concat (bs-path* bs-state-directory
                                                 "auto-save-list/")
-                                      "saves-")))
+                                      "saves-"))
+
+  :demand t
+  :no-require t)
 
 
 
@@ -3250,7 +3328,7 @@
   :init
   ;; Treat the password store as the authoritative source for secrets,
   ;; so credentials are encrypted at rest and shared consistently
-  ;; across tools that rely on `auth-source`.
+  ;; across tools that rely on `auth-source'.
   (auth-source-pass-enable))
 
 (use-package cus-edit
@@ -3339,7 +3417,7 @@
    (agent-shell-openai-make-codex-config))
 
   ;; Share a protected right side window with Codex IDE, leaving slot
-  ;; zero available for the dedicated agent-shell sidebar.
+  ;; zero available for the dedicated `agent-shell' sidebar.
   (agent-shell-display-action
    '((display-buffer-reuse-window
       display-buffer-in-side-window)
@@ -3354,8 +3432,9 @@
   (agent-shell-show-welcome-message nil)
 
   :config
-  ;; Store agent-shell cache entries under `bs-cache-directory' while
-  ;; preserving the package helper's component-based path interface.
+  ;; Store `agent-shell' cache entries under `bs-cache-directory'
+  ;; while preserving the package helper's component-based path
+  ;; interface.
   (advice-add 'agent-shell--cache-dir
               :override
               #'(lambda (&rest components)
@@ -3425,7 +3504,7 @@
 
   :bind
   ( :map ctl-c-x-map
-    ;; Toggle the agent-shell manager from the custom agent prefix
+    ;; Toggle the `agent-shell' manager from the custom agent prefix
     ;; map.
     ("C-b" . agent-shell-manager-toggle)))
 
@@ -3446,7 +3525,7 @@
   :commands (agent-shell-tramp-mode)
 
   :config
-  ;; Enable TRAMP integration so agent shells can operate on remote
+  ;; Enable `tramp' integration so agent shells can operate on remote
   ;; buffers and paths.
   (agent-shell-tramp-mode +1))
 
@@ -3457,9 +3536,9 @@
   (codex-ide-request-timeout 60)
 
   :config
-  ;; Share the protected right side window used by regular agent-shell
-  ;; sessions, while retaining each conversation buffer for later
-  ;; reuse.
+  ;; Share the protected right side window used by regular
+  ;; `agent-shell' sessions, while retaining each conversation buffer
+  ;; for later reuse.
   (add-to-list 'display-buffer-alist
                '((derived-mode . codex-ide-session-mode)
                  (display-buffer-reuse-window
@@ -3468,32 +3547,41 @@
                  (side . right)
                  (slot . 1)
                  (window-parameters . ((no-delete-other-windows . t)))
-                 (window-width . 0.5)))
+                 (window-width . 0.5))))
 
+(use-package codex-ide-session
   :bind
   ( :map ctl-c-x-map
     ;; Start Codex IDE from the custom agent prefix map.
-    ("c" . codex-ide)
-
-    ;; Open the Codex IDE menu from the custom agent prefix map.
-    ("C-c" . codex-ide-menu)))
+    ("c" . codex-ide)))
 
 (use-package codex-ide-session-mode
   :bind
   ( :map codex-ide-session-mode-map
-    ;; Submit Codex prompts with the same key used by shell-maker
-    ;; buffers.
-    ("C-c C-c" . codex-ide-submit)
-
     ;; Leave \\`C-c RET' unbound so prompt submission has a single
     ;; mnemonic binding in Codex sessions.
     ("C-c RET" . nil)))
+
+(use-package codex-ide-transcript
+  :defines (codex-ide-session-mode-map)
+
+  :bind
+  ( :map codex-ide-session-mode-map
+    ;; Submit Codex prompts with the same key used by `shell-maker'
+    ;; buffers.
+    ("C-c C-c" . codex-ide-submit)))
+
+(use-package codex-ide-transient
+  :bind
+  ( :map ctl-c-x-map
+    ;; Open the Codex IDE menu from the custom agent prefix map.
+    ("C-c" . codex-ide-menu)))
 
 (use-package corfu
   :after (codex-ide-session-mode)
 
   :hook
-  ;; Enable Corfu in Codex sessions so automatic slash command
+  ;; Enable `corfu' in `codex-ide' sessions so automatic slash command
   ;; completion uses the popup frontend instead of `*Completions*'.
   (codex-ide-session-mode-hook . corfu-mode))
 
@@ -3508,15 +3596,16 @@
               gptel-make-preset)
 
   :custom
-  ;; Use Org Mode for dedicated chats so conversations can use Org's
+  ;; Use `org-mode' for dedicated chats so conversations can use `org'
   ;; native structure without enabling branching context globally.
   (gptel-default-mode 'org-mode)
 
   ;; Keep backend, model, and request status visible above each chat.
   (gptel-use-header-line t)
 
-  ;; Share a protected right side window with regular agent-shell and
-  ;; Codex IDE sessions, leaving slot zero to agent-shell-sidebar.
+  ;; Share a protected right side window with regular `agent-shell'
+  ;; and `codex-ide' sessions, leaving slot zero to
+  ;; agent-shell-sidebar.
   (gptel-display-buffer-action
    '((display-buffer-reuse-window
       display-buffer-in-side-window)
@@ -3623,9 +3712,27 @@
     "source language. Preserve meaning, tone, structure, "
     "formatting, and code exactly unless asked otherwise."))
 
+  :bind
+  ( :map ctl-c-x-map
+    ;; Create or switch to a dedicated `gptel' chat.
+    ("g" . gptel)
+
+    ;; Send the active region or buffer text from any buffer.
+    ("RET" . gptel-send)
+
+    :map gptel-mode-map
+    ;; Submit prompts with the same mnemonic used by `agent-shell' and
+    ;; `codex-ide'; a prefix argument opens the `gptel' menu.
+    ("C-c C-c" . gptel-send)
+
+    ;; Keep one unambiguous prompt-submission binding in `gptel'
+    ;; chats.
+    ("C-c RET" . nil))
+
   :hook
   ;; Render read-only fallback responses as Markdown without starting
-  ;; the Grip preview normally enabled by `markdown-ts-mode-hook'.
+  ;; the `grip-mode' preview normally enabled by
+  ;; `markdown-ts-mode-hook'.
   (gptel-pre-response-hook
    . (lambda ()
        (when (string= (buffer-name) "*LLM response*")
@@ -3638,63 +3745,43 @@
 
   ;; Distinguish model output from prompts without changing response
   ;; text or moving point while a response is streaming.
-  (gptel-mode-hook . gptel-highlight-mode)
-
-  :bind
-  ( :map ctl-c-x-map
-    ;; Create or switch to a dedicated gptel chat.
-    ("g" . gptel)
-
-    ;; Send the active region or buffer text from any buffer.
-    ("RET" . gptel-send)
-
-    :map gptel-mode-map
-    ;; Submit prompts with the same mnemonic used by agent-shell and
-    ;; Codex IDE; a prefix argument opens the gptel menu.
-    ("C-c C-c" . gptel-send)
-
-    ;; Retain access to Org's context-sensitive command after taking
-    ;; over its usual binding for prompt submission.
-    ("C-c C-M-c" . org-ctrl-c-ctrl-c)
-
-    ;; Keep one unambiguous prompt-submission binding in gptel chats.
-    ("C-c RET" . nil)))
-
-(use-package gptel-transient
-  :commands (gptel-menu)
-  :functions (transient-append-suffix
-               transient-get-suffix)
-
-  :config
-  ;; Treat the GUI Return event like `RET' in the gptel transient.
-  ;; Gnus binds `<return>' directly, preventing its usual translation
-  ;; to `RET' before Transient sees it.
-  (unless (ignore-errors
-            (transient-get-suffix 'gptel-menu "<return>"))
-    (transient-append-suffix
-      'gptel-menu 'gptel--suffix-send
-      '("<return>" gptel--suffix-send
-        :description "" :format "")
-      'always)))
+  (gptel-mode-hook . gptel-highlight-mode))
 
 (use-package gptel-context
   :commands (gptel-add)
-  :defines (gptel-context)
+  :defines (bs-elfeed-context-buffer-name
+            bs-gnus-context-buffer-name
+            bs-mu4e-context-buffer-name
+            gptel-context)
 
   :custom
   ;; Exclude ignored and other non-project files when a directory is
   ;; added recursively to the request context.
   (gptel-context-restrict-to-project-files t)
 
+  :bind
+  ( :map ctl-c-x-map
+    ;; Add or remove the active region or buffer from `gptel' context.
+    ("a" . gptel-add))
+
   :hook
-  ;; Give only the originating mail or news buffer access to the most
-  ;; recently prepared hidden thread context.
-  ((bs-gnus-summary-thread-context-hook
+  ;; Give only the originating feed, mail, or news buffer access to
+  ;; the most recently prepared hidden context.
+  ((bs-elfeed-search-context-hook
+    bs-gnus-summary-thread-context-hook
     bs-mu4e-headers-thread-context-hook)
    .
    (lambda ()
      (require 'gptel-context)
-     (when-let* ((context (get-buffer "*Thread Context*"))
+     (when-let* ((context-name
+                  (cond
+                   ((derived-mode-p 'elfeed-search-mode)
+                    bs-elfeed-context-buffer-name)
+                   ((derived-mode-p 'gnus-summary-mode)
+                    bs-gnus-context-buffer-name)
+                   ((derived-mode-p 'mu4e-headers-mode)
+                    bs-mu4e-context-buffer-name)))
+                 (context (get-buffer context-name))
                  (source (current-buffer)))
        (dolist (buffer (buffer-list))
          (with-current-buffer buffer
@@ -3705,27 +3792,30 @@
          (unless (local-variable-p 'gptel-context)
            (setq-local gptel-context
                        (copy-sequence gptel-context)))
-         (cl-pushnew context gptel-context :test #'eq)))))
-
-  :bind
-  ( :map ctl-c-x-map
-    ;; Add or remove the active region or buffer from gptel context.
-    ("a" . gptel-add)))
+         (cl-pushnew context gptel-context :test #'eq))
+       (when (derived-mode-p 'elfeed-search-mode)
+         (gptel-send '(4)))))))
 
 (use-package gptel-openai-oauth
   :after (bs-lib gptel)
-  :demand t
   :defines (gptel--openai-oauth-token-file)
 
   :config
   ;; Keep the refresh token with other persistent Emacs state instead
   ;; of placing it below `user-emacs-directory'.
   (setq gptel--openai-oauth-token-file
-        (bs-path bs-state-directory "gptel/openai-oauth-token")))
+        (bs-path bs-state-directory "gptel/openai-oauth-token"))
+
+  :demand t)
+
+(use-package gptel-org
+  :custom
+  ;; Keep conversations linear unless branching is enabled for a
+  ;; specific workflow at run time.
+  (gptel-org-branching-context nil))
 
 (use-package gptel-request
   :after (gptel-openai-oauth)
-  :demand t
   :functions (gptel-make-openai-oauth)
 
   :custom
@@ -3743,15 +3833,11 @@
   ;; editing and window navigation under explicit user control.
   (gptel-stream t)
 
-  ;; Follow supported Org links so chats can send linked text, images,
-  ;; and other media to capable models.
-  (gptel-track-media t))
+  ;; Follow supported `org' links so chats can send linked text,
+  ;; images, and other media to capable models.
+  (gptel-track-media t)
 
-(use-package gptel-org
-  :custom
-  ;; Keep conversations linear unless branching is enabled for a
-  ;; specific workflow at run time.
-  (gptel-org-branching-context nil))
+  :demand t)
 
 (use-package gptel-rewrite
   :commands (gptel-rewrite)
@@ -3762,8 +3848,25 @@
 
   :bind
   ( :map ctl-c-x-map
-    ;; Rewrite the active region with gptel.
+    ;; Rewrite the active region with `gptel'.
     ("e" . gptel-rewrite)))
+
+(use-package gptel-transient
+  :commands (gptel-menu)
+  :functions (transient-append-suffix
+               transient-get-suffix)
+
+  :config
+  ;; Treat the GUI Return event like \\`RET' in the `gptel' transient.
+  ;; `gnus' binds \\`<return>' directly, preventing its usual
+  ;; translation to \\`RET' before `transient' sees it.
+  (unless (ignore-errors
+            (transient-get-suffix 'gptel-menu "<return>"))
+    (transient-append-suffix
+      'gptel-menu 'gptel--suffix-send
+      '("<return>" gptel--suffix-send
+        :description "" :format "")
+      'always)))
 
 (use-package mcp-server
   :custom
@@ -3779,13 +3882,14 @@
 
 (use-package openspec
   :custom
-  ;; Disable OpenSpec's default global binding; expose the status
-  ;; command under the custom agent prefix map instead.
+  ;; Disable the default global binding from `openspec'; expose the
+  ;; status command under the custom agent prefix map instead.
   (openspec-status-key nil)
 
   :config
-  ;; Show OpenSpec status buffers in a bottom side window so reviewing
-  ;; proposals and tasks does not replace the current editing window.
+  ;; Show `openspec' status buffers in a bottom side window so
+  ;; reviewing proposals and tasks does not replace the current
+  ;; editing window.
   (add-to-list 'display-buffer-alist
                '((derived-mode . openspec-mode)
                  (display-buffer-in-side-window)
@@ -3794,16 +3898,26 @@
 
   :bind
   ( :map ctl-c-x-map
-    ;; Open the OpenSpec project status from the custom agent prefix
+    ;; Open the `openspec' project status from the custom agent prefix
     ;; map.
     ("o" . openspec-status)))
+
+(use-package org
+  :after (gptel)
+  :defines (gptel-mode-map)
+
+  :bind
+  ( :map gptel-mode-map
+    ;; Retain access to `org-ctrl-c-ctrl-c' after taking over its
+    ;; usual binding for prompt submission.
+    ("C-c C-M-c" . org-ctrl-c-ctrl-c)))
 
 (use-package shell-maker
   :after (agent-shell)
 
   :bind
   ( :map agent-shell-mode-map
-    ;; Submit the current shell-maker input without leaving insert
+    ;; Submit the current `shell-maker' input without leaving insert
     ;; flow.
     ("C-c C-c" . shell-maker-submit)))
 
@@ -3812,7 +3926,7 @@
 
   :bind
   ( :map agent-shell-mode-map
-    ;; Keep RET as a plain newline inside agent-shell buffers;
+    ;; Keep \\`RET' as a plain newline inside `agent-shell' buffers;
     ;; explicit submission remains on \\`C-c C-c'.
     ("RET" . newline)))
 
@@ -3827,18 +3941,19 @@
 
   :bind
   ( :map ctl-c-n-map
-    ;; Search and select Denote notes using `consult', providing
+    ;; Search and select `denote' notes using `consult', providing
     ;; narrowing, preview, and live filtering over note filenames.
     ("f" . consult-denote-find)
 
-    ;; Perform full-text search across Denote notes using `consult' as
-    ;; the front-end, enabling interactive narrowing of grep results.
+    ;; Perform full-text search across `denote' notes using `consult'
+    ;; as the front-end, enabling interactive narrowing of grep
+    ;; results.
     ("g" . consult-denote-grep))
 
   :hook
   ;; Enable `consult-denote-mode' early after startup.  This activates
-  ;; integration between Consult and Denote, ensuring that
-  ;; Consult-based commands are aware of Denote notes without
+  ;; integration between `consult' and `denote', ensuring that
+  ;; `consult'-based commands are aware of `denote' notes without
   ;; requiring manual activation per buffer.
   (bs-after-startup-late-hook . consult-denote-mode))
 
@@ -3847,19 +3962,19 @@
   :commands (denote-rename-buffer-mode)
 
   :custom
-  ;; Use Org date reader when prompting for dates, enabling calendar
-  ;; navigation and flexible date input.
+  ;; Use the `org' date reader when prompting for dates, enabling
+  ;; calendar navigation and flexible date input.
   (denote-date-prompt-use-org-read-date t)
 
-  ;; Set the root directory for Denote notes.  All notes are stored
+  ;; Set the root directory for `denote' notes.  All notes are stored
   ;; beneath this path.
   (denote-directory (bs-path* "~/org" "notes"))
 
   ;; Do not exclude any subdirectories under `denote-directory'.
   (denote-excluded-directories-regexp nil)
 
-  ;; Infer keywords automatically from note content and context
-  ;; when creating or renaming notes.
+  ;; Infer keywords automatically from note content and context when
+  ;; creating or renaming notes.
   (denote-infer-keywords t)
 
   ;; Do not exclude any keywords from the inference process.
@@ -3877,48 +3992,47 @@
   (denote-rename-confirmations
    '(rewrite-front-matter modify-file-name))
 
-  ;; Do not automatically save buffers during Denote operations.
+  ;; Do not automatically save buffers during `denote' operations.
   (denote-save-buffers nil)
 
-  ;; Sort keywords alphabetically when writing them to front
-  ;; matter.
+  ;; Sort keywords alphabetically when writing them to front matter.
   (denote-sort-keywords t)
 
   :config
   ;; Enable automatic buffer renaming to keep buffer names in sync
-  ;; with Denote file names.
+  ;; with `denote' file names.
   (denote-rename-buffer-mode +1)
 
   :bind
   ( :map ctl-c-n-map
-    ;; Insert links to existing Denote notes, with interactive
+    ;; Insert links to existing `denote' notes, with interactive
     ;; selection and completion.
     ("L" . denote-add-links)
 
-    ;; Rename the current note using its front matter as the source
-    ;; of truth for title and keywords.
+    ;; Rename the current note using its front matter as the source of
+    ;; truth for title and keywords.
     ("R" . denote-rename-file-using-front-matter)
 
     ;; Display back-links for the current note, showing which notes
     ;; reference it.
     ("b" . denote-backlinks)
 
-    ;; Open a Dired buffer rooted at the Denote notes directory.
+    ;; Open a `dired' buffer rooted at the `denote' notes directory.
     ("d" . denote-dired)
 
-    ;; Insert a link to another Denote note.
+    ;; Insert a link to another `denote' note.
     ("l" . denote-link)
 
-    ;; Create a new Denote note.
+    ;; Create a new `denote' note.
     ("n" . denote)
 
-    ;; Insert a link generated from a content-based Denote query.
+    ;; Insert a link generated from a content-based `denote' query.
     ("q c" . denote-query-contents-link)
 
-    ;; Insert a link generated from a filename-based Denote query.
+    ;; Insert a link generated from a filename-based `denote' query.
     ("q f" . denote-query-filenames-link)
 
-    ;; Rename the current Denote file interactively.
+    ;; Rename the current `denote' file interactively.
     ("r" . denote-rename-file)))
 
 (use-package denote
@@ -3937,23 +4051,23 @@
 
   :bind
   ( :map dired-mode-map
-    ;;  Rename marked Denote files using their front matter.
+    ;; Rename marked `denote' files using their front matter.
     ("C-c C-d C-R"
      .
      denote-dired-rename-marked-files-using-front-matter)
 
-    ;; Insert links to all marked Denote notes.
+    ;; Insert links to all marked `denote' notes.
     ("C-c C-d C-i" . denote-dired-link-marked-notes)
 
-    ;; Rename marked Denote files by modifying their keyword sets.
+    ;; Rename marked `denote' files by modifying their keyword sets.
     ("C-c C-d C-k" . denote-dired-rename-marked-files-with-keywords)
 
-    ;; Rename marked Denote files interactively.
+    ;; Rename marked `denote' files interactively.
     ("C-c C-d C-r" . denote-dired-rename-files))
 
   :hook
-  ;; Enable `denote-dired-mode' in Dired buffers.  This augments Dired
-  ;; with Denote-specific commands and metadata handling.
+  ;; Enable `denote-dired-mode' in `dired' buffers.  This augments
+  ;; `dired' with `denote'-specific commands and metadata handling.
   (dired-mode-hook . denote-dired-mode))
 
 (use-package denote-journal
@@ -3965,7 +4079,7 @@
   (denote-journal-interval 'daily)
 
   ;; Mark every journal entry with `journal' so it can be identified
-  ;; and retrieved independently of ordinary Denote notes.
+  ;; and retrieved independently of ordinary `denote' notes.
   (denote-journal-keyword "journal")
 
   :bind
@@ -3983,11 +4097,6 @@
 (use-package epa-file
   :custom
   ;; Set the default recipient(s) for file encryption.  When saving an
-  ;; encrypted file without specifying recipients explicitly,
-  ;; `user-mail-address' key will be used by default.
-  (epa-file-encrypt-to `(,user-mail-address))
-
-  ;; Set the default recipient(s) for file encryption.  When saving an
   ;; encrypted file without specifying recipients explicitly, these
   ;; keys will be used by default.
   (epa-file-select-keys 'silent))
@@ -4000,18 +4109,25 @@
   ;; Silencing all messages during `epa-file-enable' executing.
   (advice-add 'epa-file-enable :around 'bs-silence-message)
 
-  ;; Enable epa-file so that Emacs can automatically recognize and
+  ;; Enable `epa-file' so that Emacs can automatically recognize and
   ;; transparently handle *.gpg files.  When opening an encrypted
   ;; file, it is automatically decrypted; when saving, it is
   ;; automatically encrypted again.
   (epa-file-enable))
 
+(use-package epa-hook
+  :custom
+  ;; Set the default recipient(s) for file encryption.  When saving an
+  ;; encrypted file without specifying recipients explicitly,
+  ;; `user-mail-address' key will be used by default.
+  (epa-file-encrypt-to `(,user-mail-address)))
+
 (use-package epg-config
   :custom
-  ;; Configure EasyPG to use loop-back pinentry mode, so that Emacs
-  ;; handles passphrase prompts internally instead of spawning an
-  ;; external pinentry program.  This allows password input directly
-  ;; in the mini-buffer.
+  ;; Configure `epg-config' to use loop-back pinentry mode, so that
+  ;; Emacs handles passphrase prompts internally instead of spawning
+  ;; an external pinentry program.  This allows password input
+  ;; directly in the mini-buffer.
   (epg-pinentry-mode 'loopback))
 
 
@@ -4050,8 +4166,8 @@
    '(;; Amazon SES envelope sender addresses.
      "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
 
-     ;; Atlassian bounce domains whose pre-organization label
-     ;; contains "bounces".
+     ;; Atlassian bounce domains whose pre-organization label contains
+     ;; "bounces".
      "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*bounces[^@.]*\\.atlassian\\.[^@]+\\'"
 
      ;; Stripe's dedicated bounce domain.
@@ -4060,8 +4176,8 @@
      ;; Linux Foundation encoded-recipient envelope addresses.
      "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+linuxfoundation\\.org\\'"
 
-     ;; Mailing-list rewritten senders, preserving normal list
-     ;; posting addresses without an equals sign.
+     ;; Mailing-list rewritten senders, preserving normal list posting
+     ;; addresses without an equals sign.
      "\\`[^@=]+=.+@lists\\.[^@]+\\'"
 
      ;; KDE Invent generated incoming addresses.
@@ -4124,8 +4240,8 @@
      "\\`12306@rails\\.com\\.cn\\'"))
 
   :init
-  ;; Normalize mu4e's compose completion candidates so display names
-  ;; stay readable and automated senders are hidden.
+  ;; Normalize the `mu4e' compose completion candidates so display
+  ;; names stay readable and automated senders are hidden.
   (bs-mu4e-compose-completion-enable)
 
   :config
@@ -4145,22 +4261,32 @@
   :commands (bs-mu4e-headers-enable)
   :defines (mu4e-headers-mode-map)
 
-  :bind
-  ( :map mu4e-headers-mode-map
-    ;; Prepare the current message and its replies as LLM context.
-    ("t" . bs-mu4e-headers-mark-subthread))
-
   :init
   ;; Render header `:from' fields with cleaned contact display names
   ;; instead of exposing embedded email addresses in names.
-  (bs-mu4e-headers-enable))
+  (bs-mu4e-headers-enable)
+
+  :bind
+  ( :map mu4e-headers-mode-map
+    ;; Prepare the current message and its replies as LLM context.
+    ("C-c m m" . bs-mu4e-headers-mark-subthread)))
+
+(use-package bs-mu4e
+  :after (mu4e-view)
+  :commands (bs-mu4e-view-xwidget-enable)
+
+  :init
+  ;; Open an HTML alternative in Xwidget when WebKit support is
+  ;; available, both after initial rendering and after toggling from
+  ;; plain text to HTML.
+  (bs-mu4e-view-xwidget-enable))
 
 (use-package consult-mu
   :functions (consult-mu--view-action)
 
   :custom
-  ;; Use the async mu4e-backed search by default so selected
-  ;; candidates keep the normal mu4e header and message actions.
+  ;; Use the async `mu4e'-backed search by default so selected
+  ;; candidates keep the normal `mu4e' header and message actions.
   (consult-mu-default-command 'consult-mu-async)
 
   ;; Keep enough matches available for broad mailbox searches without
@@ -4183,8 +4309,9 @@
   ;; search results.
   (consult-mu-mark-viewed-as-read t)
 
-  ;; Open the selected message in the regular mu4e view buffer instead
-  ;; of using reply, forward, or a custom action as the default.
+  ;; Open the selected message in the regular `mu4e' view buffer
+  ;; instead of using reply, forward, or a custom action as the
+  ;; default.
   (consult-mu-action 'consult-mu--view-action)
 
   :bind
@@ -4194,15 +4321,24 @@
 
 (use-package consult-mu-embark
   :after (embark consult-mu)
+
   :demand t)
 
 (use-package corfu
   :after (mu4e-compose)
 
   :hook
-  ;; Enable Corfu in compose buffers so CAPF-based recipient
+  ;; Enable `corfu' in compose buffers so CAPF-based recipient
   ;; completion uses the configured popup UI.
   (mu4e-compose-mode-hook . corfu-mode))
+
+(use-package gptel-transient
+  :after (mu4e-headers)
+
+  :bind
+  ( :map mu4e-headers-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)))
 
 (use-package mu4e
   :bind
@@ -4211,14 +4347,15 @@
     ("m" . mu4e)))
 
 (use-package mu4e-alert
+  :when (eq system-type 'gnu/linux)
   :after (mu4e)
-  :demand t
-  :when (eq system-type 'gnu/linux))
+
+  :demand t)
 
 (use-package mu4e-alert
+  :when (eq system-type 'gnu/linux)
   :commands (mu4e-alert-enable-notifications)
   :functions (mu4e-alert-set-default-style)
-  :when (eq system-type 'gnu/linux)
 
   :config
   ;; Use the desktop notification backend for new-message alerts, then
@@ -4228,7 +4365,7 @@
 
 (use-package mu4e-compose
   :hook
-  ;; Keep the major-mode label compact in Mu4e compose buffers.
+  ;; Keep the major-mode label compact in `mu4e-compose' buffers.
   (mu4e-compose-mode-hook . (lambda ()
                               (setq-local mode-name "Mail"))))
 
@@ -4258,11 +4395,6 @@
             mu4e-headers-thread-single-orphan-prefix)
 
   :custom
-  ;; Select the fancy side of mark pairs.  Every configured glyph
-  ;; below is provided by most fonts, which keeps the header layout
-  ;; strictly monospaced without font fallback.
-  (mu4e-use-fancy-chars t)
-
   ;; `:human-date' uses `mu4e-headers-time-format' for today's mail
   ;; and `mu4e-headers-date-format' for older mail, so keep them
   ;; identical.
@@ -4328,18 +4460,23 @@
         mu4e-headers-thread-duplicate-prefix '("═ " . "═ "))
 
   :hook
-  ;; Keep the major-mode label compact in Mu4e headers buffers.
+  ;; Keep the major-mode label compact in `mu4e-headers' buffers.
   (mu4e-headers-mode-hook . (lambda ()
                               (setq-local mode-name "Mail"))))
 
 (use-package mu4e-helpers
   :custom
+  ;; Select the fancy side of mark pairs.  Every configured glyph
+  ;; below is provided by most fonts, which keeps the header layout
+  ;; strictly monospaced without font fallback.
+  (mu4e-use-fancy-chars t)
+
   ;; Route `mu4e-read-option' through the configured completion
-  ;; function instead of mu4e's built-in option reader.
+  ;; function instead of the built-in `mu4e' option reader.
   (mu4e-read-option-use-builtin nil)
 
   ;; Use the standard completion entry point so the active minibuffer
-  ;; completion UI handles mu4e's option prompts.
+  ;; completion UI handles the `mu4e' option prompts.
   (mu4e-completing-read-function 'completing-read))
 
 (use-package mu4e-knockknock
@@ -4347,8 +4484,8 @@
   :commands (mu4e-knockknock-mode)
 
   :config
-  ;; Enable Knock Knock's mu4e integration once the mail interface is
-  ;; available.
+  ;; Enable the `knockknock' integration with `mu4e' once the mail
+  ;; interface is available.
   (mu4e-knockknock-mode +1))
 
 (use-package mu4e-main
@@ -4358,7 +4495,8 @@
                  (display-buffer-same-window)))
 
   :hook
-  ;; Keep the major-mode label compact in Mu4e main and info buffers.
+  ;; Keep the major-mode label compact in `mu4e-main' and info
+  ;; buffers.
   ((mu4e-main-mode-hook mu4e-org-mode-hook)
    .
    (lambda ()
@@ -4366,13 +4504,13 @@
 
 (use-package mu4e-modeline
   :custom
-  ;; Disable mu4e's global modeline indicators while keeping
-  ;; buffer-specific mu4e modeline information available.
+  ;; Disable the global `mu4e' modeline indicators while keeping
+  ;; buffer-specific `mu4e' modeline information available.
   (mu4e-modeline-show-global nil))
 
 (use-package mu4e-org
   :hook
-  ;; Keep the major-mode label compact in Mu4e Org link buffers.
+  ;; Keep the major-mode label compact in `mu4e-org' link buffers.
   (mu4e-org-agenda-links-mode-hook
    .
    (lambda ()
@@ -4381,20 +4519,21 @@
 (use-package mu4e-search
   :custom
   ;; Return complete search results so inbox threads retain related
-  ;; sent replies after the number of direct matches exceeds Mu4e's
-  ;; default result limit.
+  ;; sent replies after the number of direct matches exceeds the
+  ;; `mu4e' default result limit.
   (mu4e-search-full t))
 
 (use-package mu4e-thread
   :bind
   ( :map mu4e-thread-mode-map
-    ;; Leave `C-<tab>' available outside mu4e-thread by removing this
-    ;; mode-specific binding.
+    ;; Leave \\`C-<tab>' available outside `mu4e-thread' by removing
+    ;; this mode-specific binding.
     ("C-<tab>" . nil)))
 
 (use-package mu4e-update
   :custom
-  ;; Hide annoying "mu4e Retrieving mail..." msg in mini buffer:
+  ;; Hide the annoying "mu4e Retrieving mail..." message in the
+  ;; minibuffer.
   (mu4e-hide-index-messages t)
 
   ;; Retrieving and indexing messages every 5 minutes.
@@ -4409,18 +4548,19 @@
                  (allow-no-window . t)))
 
   :hook
-  ;; Keep the major-mode label compact in Mu4e update buffers.
+  ;; Keep the major-mode label compact in `mu4e-update' buffers.
   (mu4e--update-mail-mode-hook . (lambda ()
                                    (setq-local mode-name "Mail"))))
 
 (use-package mu4e-view
-  ;; Declare the Gnus MIME preference used below without loading its
+  ;; Declare the `gnus' MIME preference used below without loading its
   ;; implementation during initialization.
   :defines (mm-discouraged-alternatives)
 
   :hook
-  ;; Prefer a usable plain-text alternative in Mu4e views, while
-  ;; retaining HTML as the fallback when plain text is absent or empty.
+  ;; Prefer a usable plain-text alternative in `mu4e-view', while
+  ;; retaining HTML as the fallback when plain text is absent or
+  ;; empty.
   (mu4e-view-mode-hook
    .
    (lambda ()
@@ -4432,20 +4572,10 @@
    (lambda ()
      (setq-local mode-name "Mail"))))
 
-(use-package bs-mu4e
-  :after (mu4e-view)
-  :commands (bs-mu4e-view-xwidget-enable)
-
-  :init
-  ;; Open an HTML alternative in Xwidget when WebKit support is
-  ;; available, both after initial rendering and after toggling from
-  ;; plain text to HTML.
-  (bs-mu4e-view-xwidget-enable))
-
 (use-package simple
   :custom
   ;; Route generic Emacs mail entry points, such as `compose-mail', to
-  ;; mu4e's compose interface.
+  ;; the `mu4e' compose interface.
   (mail-user-agent 'mu4e-user-agent))
 
 
@@ -4457,7 +4587,7 @@
 (use-package ol
   :custom
   ;; Display links using their description text instead of their raw
-  ;; Org syntax.
+  ;; `org' syntax.
   (org-link-descriptive t))
 
 (use-package org
@@ -4465,18 +4595,18 @@
   :commands (org-set-tags-command)
 
   :custom
-  ;; Directory beneath org files.
+  ;; Directory beneath `org' files.
   (org-directory (bs-path* "~/org"))
 
   ;; Restrict agenda discovery to the GTD subtree so agenda commands
-  ;; operate on the curated task set instead of every Org file under
+  ;; operate on the curated task set instead of every `org' file under
   ;; `org-directory'.
   (org-agenda-files (list (bs-path* org-directory "gtd/")
                           (bs-path org-directory "calendar.org")))
 
   ;; Set the string displayed at folded outline boundaries.  Setting
   ;; this to nil disables the display of a custom ellipsis and lets
-  ;; Org fallback to the default three dots.
+  ;; `org' fallback to the default three dots.
   (org-ellipsis nil)
 
   ;; Enable direct TODO state selection for \\`C-c C-t' when shortcut
@@ -4486,7 +4616,7 @@
 
   ;; Hide the surrounding markup characters for bold, italic,
   ;; verbatim, and similar constructs (e.g. *bold* → bold).  This
-  ;; affects only the on-screen representation; the underlying Org
+  ;; affects only the on-screen representation; the underlying `org'
   ;; syntax remains unchanged in the buffer.
   (org-hide-emphasis-markers t)
 
@@ -4494,7 +4624,7 @@
   ;; possible, such as Greek letters, math symbols, and arrows.
   (org-pretty-entities t)
 
-  ;; Enable indentation-based virtual structure when opening Org
+  ;; Enable indentation-based virtual structure when opening `org'
   ;; buffers.  This affects only visual presentation and does not
   ;; modify file content.
   (org-startup-indented t)
@@ -4563,7 +4693,7 @@
   :after (org)
 
   :hook
-  ;; Enable `org-appear-mode' whenever entering Org mode.  This mode
+  ;; Enable `org-appear-mode' whenever entering `org-mode'.  This mode
   ;; reveals hidden formatting markers (such as emphasis markers,
   ;; subscript/superscript markers, and link brackets) only when the
   ;; cursor moves onto them.
@@ -4577,14 +4707,14 @@
   :commands (org-edna-mode)
 
   :hook
-  ;; Enable Org Edna in Org buffers so TODO-state dependencies and
+  ;; Enable `org-edna' in `org' buffers so TODO-state dependencies and
   ;; trigger properties are enforced when tasks change state.
   (org-mode-hook . (lambda ()
                      (org-edna-mode +1))))
 
 (use-package org-gtd
   :preface
-  ;; Acknowledge the required Org GTD 4.x upgrade steps up front so
+  ;; Acknowledge the required `org-gtd' 4.x upgrade steps up front so
   ;; the package does not emit its one-time migration warning on load.
   (setq org-gtd-update-ack "4.0.0"))
 
@@ -4593,7 +4723,7 @@
 
   :bind
   ( :map org-agenda-mode-map
-    ;; Open the Org GTD action menu for the agenda item at point,
+    ;; Open the `org-gtd' action menu for the agenda item at point,
     ;; including state, time, clocking, and clarification operations.
     ("C-c ." . org-gtd-agenda-transient)))
 
@@ -4625,7 +4755,8 @@
   :hook
   ;; Apply the account-derived calendar settings and start
   ;; change-aware background imports shortly after startup, then make
-  ;; the registered event template available through Org GTD capture.
+  ;; the registered event template available through `org-gtd'
+  ;; capture.
   (bs-after-startup-early-hook
    .
    (lambda ()
@@ -4640,19 +4771,19 @@
 
   :bind
   ( :map ctl-c-a-map
-    ;; Open the central Org GTD menu for capture, engagement, system
+    ;; Open the central `org-gtd' menu for capture, engagement, system
     ;; review, reflection, and archival commands.
     ("g" . org-gtd-command-center)))
 
 (use-package org-gtd-core
   :custom
-  ;; Store Org GTD's inbox, archive, and supporting files inside the
-  ;; GTD subtree already included in `org-agenda-files'.
+  ;; Store the `org-gtd' inbox, archive, and supporting files inside
+  ;; the GTD subtree already included in `org-agenda-files'.
   (org-gtd-directory (bs-path* org-directory "gtd/"))
 
-  ;; Bind Org GTD's semantic states to the workflow keywords defined
-  ;; above so capture and processing commands follow the same naming,
-  ;; including the local `CNCL' spelling for canceled tasks.
+  ;; Bind the `org-gtd' semantic states to the workflow keywords
+  ;; defined above so capture and processing commands follow the same
+  ;; naming, including the local `CNCL' spelling for canceled tasks.
   (org-gtd-keyword-mapping '((todo . "TODO")
                              (next . "NEXT")
                              (wait . "WAIT")
@@ -4664,7 +4795,7 @@
 
   :bind
   ( :map ctl-c-a-map
-    ;; Open the org-gtd agenda view focused on actionable work and
+    ;; Open the `org-gtd' agenda view focused on actionable work and
     ;; other GTD-specific reviews.
     ("a" . org-gtd-engage)))
 
@@ -4672,7 +4803,7 @@
   :after (bs-hooks)
 
   :hook
-  ;; Enable global Org GTD integration shortly after startup,
+  ;; Enable global `org-gtd' integration shortly after startup,
   ;; including inbox counts, dependency handling, and TODO-state
   ;; maintenance.
   (bs-after-startup-early-hook . org-gtd-mode))
@@ -4712,27 +4843,35 @@
 
   :bind
   ( :map ctl-c-a-map
-    ;; Process inbox items sequentially through Org GTD's clarify
+    ;; Process inbox items sequentially through the `org-gtd' clarify
     ;; workflow until the configured inbox files are exhausted.
     ("i" . org-gtd-process-inbox)))
 
 (use-package org-gtd-wip
   :after (org-gtd-mode)
+
   :demand t)
+
+(use-package org-id
+  :custom
+  ;; Keep `org-id' location cache next to the configured `org' files
+  ;; instead of using the default file in the user Emacs directory.
+  (org-id-locations-file (bs-path org-directory ".id-locations")))
 
 (use-package org-modern
   :after (org)
+
   :hook
-  ;; Activate `org-modern-mode' when entering Org mode.  This adjusts
-  ;; the visual presentation of headings, lists, blocks, and tags to
-  ;; provide a cleaner and more consistent UI layer.
+  ;; Activate `org-modern-mode' when entering `org-mode'.  This
+  ;; adjusts the visual presentation of headings, lists, blocks, and
+  ;; tags to provide a cleaner and more consistent UI layer.
   (org-mode-hook . org-modern-mode))
 
 (use-package org-modern
   :after (org-agenda)
 
   :hook
-  ;; Enable modern rendering for Org Agenda buffers.  The hook runs
+  ;; Enable modern rendering for `org-agenda' buffers.  The hook runs
   ;; after the agenda is fully generated, ensuring that all agenda
   ;; lines are replaced with their modern visual counterparts.
   (org-agenda-finalize-hook . org-modern-agenda))
@@ -4742,15 +4881,9 @@
 
   :hook
   ;; Add indentation support for `org-modern', aligning visual
-  ;; elements with the structural indentation defined by Org.  This
-  ;; improves readability without altering underlying Org syntax.
+  ;; elements with the structural indentation defined by `org'.  This
+  ;; improves readability without altering underlying `org' syntax.
   (org-mode-hook . org-modern-indent-mode))
-
-(use-package org-id
-  :custom
-  ;; Keep `org-id' location cache next to the configured Org files
-  ;; instead of using the default file in the user Emacs directory.
-  (org-id-locations-file (bs-path org-directory ".id-locations")))
 
 
 
@@ -4762,8 +4895,8 @@
   :after (bs-lib)
 
   :custom
-  ;; Automatically save remote files to our local directory, of
-  ;; course using our data directory.
+  ;; Automatically save remote files to our local directory, of course
+  ;; using our data directory.
   (tramp-auto-save-directory (bs-path bs-data-directory
                                       "tramp/auto-save/"))
 
@@ -4790,8 +4923,8 @@
   :after (bs-lib)
 
   :custom
-  ;; Centralizing the storage of `transient' data files to a
-  ;; directory under `bs-state-directory'.
+  ;; Centralizing the storage of `transient' data files to a directory
+  ;; under `bs-state-directory'.
   (transient-history-file (bs-path bs-state-directory
                                    "transient"
                                    "history.el"))
@@ -4807,6 +4940,15 @@
 ;;
 ;; Web Feed Reader
 ;;
+
+(use-package bs-elfeed
+  :after (elfeed-search)
+  :commands (bs-elfeed-search-prepare-context)
+
+  :bind
+  ( :map elfeed-search-mode-map
+    ;; Prepare selected entries as `gptel' context and open its menu.
+    ("C-c m g" . bs-elfeed-search-prepare-context)))
 
 (use-package elfeed
   :after (bs-lib)
@@ -4828,36 +4970,13 @@
               elfeed-update)
 
   :custom
-  ;; Keep feed contents, metadata, and related state below the shared
-  ;; Emacs data directory.
-  (elfeed-db-directory (bs-path bs-data-directory "elfeed/"))
-
   ;; Enter through the tag and feed hierarchy instead of opening an
   ;; undifferentiated search immediately.
   (elfeed-entry-point 'elfeed-tree)
 
-  ;; Show unread entries by default without imposing a time cutoff.
-  (elfeed-search-filter "+unread")
-
-  ;; Cycle with `o' between reverse chronological and score order,
-  ;; retaining time order as the initial view.
-  (elfeed-search-sort-function '(nil elfeed-score-sort))
-
-  ;; Keep point on the entry displayed in the adjacent article window.
-  (elfeed-search-remain-on-entry '(show))
-
-  ;; Display articles in another window while retaining focus in the
-  ;; Search buffer for continuous navigation.
-  (elfeed-show-entry-switch
-   (lambda (buffer)
-     (display-buffer
-      buffer
-      '((display-buffer-reuse-window
-         display-buffer-pop-up-window)))))
-
   :init
   (defvar elfeed--update-timer nil
-    "Timer used to update Elfeed after it has first been entered.")
+    "Timer used to update `elfeed' after it has first been entered.")
 
   :config
   ;; After the first complete update, treat the imported backlog as
@@ -4912,6 +5031,94 @@
        (when (zerop (elfeed-queue-count-total))
          (elfeed-update))))))
 
+(use-package elfeed-db
+  :after (bs-lib)
+
+  :custom
+  ;; Keep feed contents, metadata, and related state below the shared
+  ;; Emacs data directory.
+  (elfeed-db-directory (bs-path bs-data-directory "elfeed/")))
+
+(use-package elfeed-link
+  :after (elfeed ol)
+
+  :demand t)
+
+(use-package elfeed-org
+  :after (elfeed)
+  :functions (elfeed-org)
+
+  :custom
+  ;; Maintain subscriptions and inherited tags in a dedicated `org'
+  ;; file outside `org-agenda-files'.
+  (rmh-elfeed-org-files '("~/org/feeds.org"))
+
+  :config
+  (elfeed-org)
+
+  :demand t)
+
+(use-package elfeed-score
+  :after (elfeed)
+  :defines (elfeed-score-map)
+  :functions (elfeed-score-enable
+              elfeed-score-print-entry)
+
+  :config
+  ;; Enable automatic scoring without replacing chronological sorting,
+  ;; then install only the numeric score display column.
+  (elfeed-score-enable t)
+  (setq elfeed-search-print-entry-function
+        #'elfeed-score-print-entry)
+  (keymap-set elfeed-search-mode-map "=" elfeed-score-map)
+
+  :demand t)
+
+(use-package elfeed-score-rule-stats
+  :after (elfeed-score)
+
+  :custom
+  ;; Persist rule hit statistics separately from the rules themselves.
+  (elfeed-score-rule-stats-file
+   (bs-path elfeed-db-directory "score-stats.el")))
+
+(use-package elfeed-score-serde
+  :after (elfeed-score)
+
+  :custom
+  ;; Store editable scoring rules beside the `elfeed' database.
+  (elfeed-score-serde-score-file
+   (bs-path elfeed-db-directory "score.el")))
+
+(use-package elfeed-search
+  :custom
+  ;; Show unread entries by default without imposing a time cutoff.
+  (elfeed-search-filter "+unread")
+
+  ;; Cycle with \\`o' between reverse chronological and score order,
+  ;; retaining time order as the initial view.
+  (elfeed-search-sort-function '(nil elfeed-score-sort))
+
+  ;; Keep point on the entry displayed in the adjacent article window.
+  (elfeed-search-remain-on-entry '(show))
+
+  :bind
+  ( :map elfeed-search-mode-map
+    ;; Mark the current entry using the native `elfeed' selection
+    ;; state.
+    ("C-c m m" . elfeed-search-mark)))
+
+(use-package elfeed-show
+  :custom
+  ;; Display articles in another window while retaining focus in the
+  ;; Search buffer for continuous navigation.
+  (elfeed-show-entry-switch
+   (lambda (buffer)
+     (display-buffer
+      buffer
+      '((display-buffer-reuse-window
+         display-buffer-pop-up-window))))))
+
 (use-package elfeed-tree
   :after (elfeed)
   :functions (elfeed-tree--print@default-empty-title-width)
@@ -4930,88 +5137,24 @@
     (setf (nth 2 arguments) (or (nth 2 arguments) 0))
     arguments))
 
-(use-package elfeed-org
-  :after (elfeed)
-  :demand t
-  :functions (elfeed-org)
-
-  :custom
-  ;; Maintain subscriptions and inherited tags in a dedicated Org
-  ;; file outside `org-agenda-files'.
-  (rmh-elfeed-org-files '("~/org/feeds.org"))
-
-  :config
-  (elfeed-org))
-
-(use-package elfeed-score
-  :after (elfeed)
-  :demand t
-  :defines (elfeed-score-map
-            elfeed-score-rule-stats-file
-            elfeed-score-serde-score-file)
-  :functions (elfeed-score-enable
-              elfeed-score-print-entry)
-
-  :custom
-  ;; Store editable scoring rules beside the Elfeed database.
-  (elfeed-score-serde-score-file
-   (bs-path elfeed-db-directory "score.el"))
-
-  ;; Persist rule hit statistics separately from the rules themselves.
-  (elfeed-score-rule-stats-file
-   (bs-path elfeed-db-directory "score-stats.el"))
-
-  :config
-  ;; Enable automatic scoring without replacing chronological sorting,
-  ;; then install only the numeric score display column.
-  (elfeed-score-enable t)
-  (setq elfeed-search-print-entry-function
-        #'elfeed-score-print-entry)
-  (keymap-set elfeed-search-mode-map "=" elfeed-score-map))
-
-(use-package elfeed-ai
-  :after (elfeed gptel)
-  :defines (elfeed-ai-mode-map)
-
-  :bind
-  ( :map elfeed-ai-mode-map
-    ;; Mark and unmark articles selected for an asynchronous summary.
-    ("m" . elfeed-ai-mark)
-    ("M" . elfeed-ai-unmark)
-
-    ;; Open the batch summarization menu without replacing the native
-    ;; Search filter binding on `S'.
-    ("A" . elfeed-ai-menu)
-    ("S" . nil)
-
-    ;; Preserve Elfeed's native unread commands on `u' and `U'.
-    ("u" . nil)
-    ("U" . nil))
-
-  :hook
-  ;; Add asynchronous gptel summaries to every Elfeed Search buffer.
-  (elfeed-search-mode-hook . elfeed-ai-mode))
-
-(use-package elfeed-link
-  :after (elfeed ol)
-  :demand t)
-
 (use-package elfeed-webkit
   :if (featurep 'xwidget-internal)
   :after (elfeed-show)
-  :demand t
   :defines (elfeed-show-mode-map)
   :functions (elfeed-webkit-enable)
 
   :config
   ;; Prefer embedded WebKit rendering when this Emacs has xwidget
-  ;; support; the ordinary SHR renderer remains the fallback otherwise.
+  ;; support; the ordinary SHR renderer remains the fallback
+  ;; otherwise.
   (elfeed-webkit-enable)
 
   :bind
   ( :map elfeed-show-mode-map
-    ;; Toggle an individual reading session between WebKit and SHR.
-    ("%" . elfeed-webkit-toggle)))
+    ;; Toggle an individual reading session between WebKit and `shr'.
+    ("%" . elfeed-webkit-toggle))
+
+  :demand t)
 
 ;;; init.el ends here
 ;; Local Variables:
