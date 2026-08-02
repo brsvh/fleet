@@ -3496,9 +3496,11 @@
 (use-package gptel
   :commands (gptel
              gptel-send)
-  :defines (gptel-mode-map
+  :defines (gptel-display-buffer-action
+            gptel-mode-map
             markdown-ts-mode-hook)
-  :functions (gptel-make-preset)
+  :functions (gptel-fsm-info
+              gptel-make-preset)
 
   :custom
   ;; Use Org Mode for dedicated chats so conversations can use Org's
@@ -3521,6 +3523,52 @@
      (window-width . 0.5)))
 
   :config
+  ;; Display fallback output as soon as a request from a read-only
+  ;; target starts, rather than waiting for its first response chunk.
+  (define-advice gptel--handle-wait
+      (:around (function fsm) bs-display-read-only-response)
+    "Call FUNCTION with FSM, then display its read-only response target."
+    (prog1 (funcall function fsm)
+      (let* ((info (gptel-fsm-info fsm))
+             (position (plist-get info :position))
+             (target
+              (and (markerp position)
+                   (marker-buffer position)))
+             (callback (plist-get info :callback)))
+        (when (and target
+                   (memq callback
+                         '(gptel--insert-response
+                           gptel-curl--stream-insert-response))
+                   (with-current-buffer target
+                     (or buffer-read-only
+                         (get-char-property position 'read-only))))
+          (let* ((response
+                  (get-buffer-create "*LLM response*"))
+                 (clear-status
+                  (or
+                   (plist-get info :bs-gptel-clear-response-status)
+                   (lambda (_info)
+                     (when (buffer-live-p response)
+                       (with-current-buffer response
+                         (setq-local header-line-format nil)))))))
+            (with-current-buffer response
+              (visual-line-mode 1)
+              (setq-local
+               header-line-format
+               (propertize " Waiting for LLM response..."
+                           'face 'warning)))
+            (unless (plist-get info :bs-gptel-clear-response-status)
+              (plist-put info :bs-gptel-clear-response-status
+                         clear-status)
+              (plist-put
+               info :post
+               (cons clear-status (plist-get info :post))))
+            (display-buffer
+             response
+             '((display-buffer-reuse-window
+                display-buffer-pop-up-window)
+               (reusable-frames . visible))))))))
+
   ;; Guide implementation and review without changing the selected
   ;; backend or model.
   (gptel-make-preset
@@ -3575,12 +3623,13 @@
   ;; the Grip preview normally enabled by `markdown-ts-mode-hook'.
   (gptel-pre-response-hook
    . (lambda ()
-       (when (and (string= (buffer-name) "*LLM response*")
-                  (not (eq major-mode 'markdown-ts-mode)))
-         (require 'markdown-ts-mode)
-         (cl-letf (((symbol-value 'markdown-ts-mode-hook)
-                    (remq #'grip-mode markdown-ts-mode-hook)))
-           (markdown-ts-mode)))))
+       (when (string= (buffer-name) "*LLM response*")
+         (setq-local header-line-format nil)
+         (unless (eq major-mode 'markdown-ts-mode)
+           (require 'markdown-ts-mode)
+           (cl-letf (((symbol-value 'markdown-ts-mode-hook)
+                      (remq #'grip-mode markdown-ts-mode-hook)))
+             (markdown-ts-mode))))))
 
   ;; Distinguish model output from prompts without changing response
   ;; text or moving point while a response is streaming.
