@@ -10,7 +10,11 @@
   ((eval
     .
     (progn
-      (setq-local apheleia-formatter 'lisp-indent)))))
+      (setq-local apheleia-formatters
+                  (copy-tree apheleia-formatters))
+      (setf (alist-get 'elisp-format apheleia-formatters)
+            '("elisp-format" inplace))
+      (setq-local apheleia-formatter 'elisp-format)))))
 
  (markdown-ts-mode
   .
