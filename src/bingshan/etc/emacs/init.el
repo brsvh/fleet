@@ -4944,6 +4944,7 @@
 (use-package bs-elfeed
   :after (elfeed-search)
   :commands (bs-elfeed-search-prepare-context)
+  :defines (elfeed-search-mode-map)
 
   :bind
   ( :map elfeed-search-mode-map
