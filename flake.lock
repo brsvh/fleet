@@ -96,11 +96,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781627888,
-        "narHash": "sha256-5yHuAh9k7rT7rtf3uRaXkiUyYvQE9oaCgzhprLm2mr8=",
+        "lastModified": 1785518313,
+        "narHash": "sha256-anlq3YQDCsNrkNlu3HTg4dEIpRugwnyAVUxoPcBmA/U=",
         "ref": "master",
-        "rev": "6d3087eedff75a715b40c0e124ba15d2dd7bec28",
-        "revCount": 363,
+        "rev": "b974715a27b49fadbf3bf6d85e26bcb3109daa6d",
+        "revCount": 371,
         "type": "git",
         "url": "https://github.com/serokell/deploy-rs.git"
       },
@@ -216,11 +216,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784863074,
-        "narHash": "sha256-Oy+uMLFK4EQ1bLyn6U82Lpz5yMgouFGMMCQ6JFXduxQ=",
+        "lastModified": 1785692859,
+        "narHash": "sha256-jeGkGUvm0Ad4NFoAjZGGK53IIs+uW686uJHnBwUdcwo=",
         "ref": "master",
-        "rev": "b2865e251c6ca6230cae22f5628c48a7a4c8c7a1",
-        "revCount": 19424,
+        "rev": "5440d1678bdd1910f2a5fb49924ae45eabb1929f",
+        "revCount": 19522,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -278,11 +278,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782949081,
-        "narHash": "sha256-vp6Y/Grm98ESt6ceOkWiHWyZRDV3J1RID4w+6NWK9yA=",
+        "lastModified": 1785627969,
+        "narHash": "sha256-4dtXQk/NMePegK/nWp5NSeuZKLATItOq61lpEvmXqGw=",
         "ref": "main",
-        "rev": "17c9d6cdfc60c64f4ee8d306f9bc0b4ccb51481e",
-        "revCount": 480,
+        "rev": "427bf4bd9435fdf21321c8cc628c24efc14c0f7a",
+        "revCount": 483,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -313,40 +313,6 @@
         "url": "https://github.com/numtide/flake-utils.git"
       }
     },
-    "hermes-agent": {
-      "inputs": {
-        "flake-parts": [
-          "flake-parts"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "npm-lockfile-fix": "npm-lockfile-fix",
-        "pyproject-build-systems": [
-          "pyproject-overlay"
-        ],
-        "pyproject-nix": [
-          "pyproject"
-        ],
-        "uv2nix": [
-          "uv"
-        ]
-      },
-      "locked": {
-        "lastModified": 1778925537,
-        "narHash": "sha256-d9qhrTy45Q5UsmjapqMHOVi9e+gR9zE8Nq9Z0wObLmc=",
-        "ref": "refs/tags/v2026.5.16",
-        "rev": "a91a57fa5a13d516c38b07a141a9ce8a3daabeb0",
-        "revCount": 8485,
-        "type": "git",
-        "url": "https://github.com/NousResearch/hermes-agent.git"
-      },
-      "original": {
-        "ref": "refs/tags/v2026.5.16",
-        "type": "git",
-        "url": "https://github.com/NousResearch/hermes-agent.git"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -354,11 +320,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784877405,
-        "narHash": "sha256-W649GocILahx7Vb/JMx834217+OLKBrq014VmC/8+NM=",
+        "lastModified": 1785531816,
+        "narHash": "sha256-vkMnV0JIyw+g/NmcfoajlGaAO+9a0ezia+FZohQJrik=",
         "ref": "master",
-        "rev": "32de400b6ac9f43042bca706f4a64f6ad08117e8",
-        "revCount": 7084,
+        "rev": "bf9ce9fec78f95f374e8dd3b503863a3ec128ebe",
+        "revCount": 7123,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -454,11 +420,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784877872,
-        "narHash": "sha256-Y270/EgraTJpT4uI84YJKpcqOcVFJwDBZpHYT4Ydtpw=",
+        "lastModified": 1785708077,
+        "narHash": "sha256-xrjwFAxKkplFzpvi9vj8uwSTureUNh1OF0wXFZxIzn8=",
         "ref": "main",
-        "rev": "f9a30d16da12fcf83886b66d3df9b1b8c168a3f7",
-        "revCount": 13679,
+        "rev": "fa479dca6da4110d37796c3cc5e1e65e73c831a8",
+        "revCount": 14388,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -484,11 +450,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784545776,
-        "narHash": "sha256-aU4ftMXSp6Y4Q5iKzSoJdUQcVP5UA4aDQp2DalAJNJE=",
+        "lastModified": 1785702596,
+        "narHash": "sha256-PnJsHRZyM3iA+0BeEikWm2piQCuwtGU4xxjsWOMRvTU=",
         "ref": "main",
-        "rev": "a0e427dd77c7d985394bab609c1bc0bbd4d6dd1f",
-        "revCount": 1062,
+        "rev": "531aa78a9f03f3831aa45566630ab52f6483159b",
+        "revCount": 1072,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -528,11 +494,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784811128,
-        "narHash": "sha256-jZ6YOb5L7FShPUcq63qDKT3W83mVzAaM2y1V4CLcdq8=",
+        "lastModified": 1784925540,
+        "narHash": "sha256-11IOL5tyJbB3vMQzzhIULuPtoHJpkLFz4BaKApm6t0Q=",
         "ref": "main",
-        "rev": "3168acfa75907680a627bc933526bad458046425",
-        "revCount": 681,
+        "rev": "b3d16367c54621fd073aa8c1dd510042f771f624",
+        "revCount": 685,
         "type": "git",
         "url": "https://github.com/nix-community/nix-unit.git"
       },
@@ -544,11 +510,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1784796856,
-        "narHash": "sha256-wWFrV5/Qbm+lyt5x20E/bSbfJiGKMo4RCxZV8cl/WZI=",
+        "lastModified": 1785571196,
+        "narHash": "sha256-KoTsyMQqnXQZq8deCEnu4QkyldkwH/bpMMhUcfMdGIw=",
         "ref": "nixos-unstable",
-        "rev": "e2587caef70cea85dd97d7daab492899902dbf5d",
-        "revCount": 1040357,
+        "rev": "148bab9c1c3c53136ecb44a6ea356a0ed5b39b06",
+        "revCount": 1045728,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -556,27 +522,6 @@
         "ref": "nixos-unstable",
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
-      }
-    },
-    "npm-lockfile-fix": {
-      "inputs": {
-        "nixpkgs": [
-          "hermes-agent",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775903712,
-        "narHash": "sha256-2GV79U6iVH4gKAPWYrxUReB0S41ty/Y3dBLquU8AlaA=",
-        "owner": "jeslie0",
-        "repo": "npm-lockfile-fix",
-        "rev": "c6093acb0c0548e0f9b8b3d82918823721930fe8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jeslie0",
-        "repo": "npm-lockfile-fix",
-        "type": "github"
       }
     },
     "plasma-manager": {
@@ -603,54 +548,6 @@
         "url": "https://github.com/nix-community/plasma-manager.git"
       }
     },
-    "pyproject": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1784591072,
-        "narHash": "sha256-zP/WaDxrRu8GANZM61+V2LT/7ycEEdoyLWn7M6WzU7M=",
-        "ref": "master",
-        "rev": "e3b599ca2e7fcf93d4edf65d7f19bbf6491724f3",
-        "revCount": 558,
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/pyproject.nix.git"
-      },
-      "original": {
-        "ref": "master",
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/pyproject.nix.git"
-      }
-    },
-    "pyproject-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "pyproject-nix": [
-          "pyproject"
-        ],
-        "uv2nix": [
-          "uv"
-        ]
-      },
-      "locked": {
-        "lastModified": 1784580899,
-        "narHash": "sha256-65qjoshs2FUkt+3NzaVutCWjydUpiHElXLo+0SGuvPk=",
-        "ref": "master",
-        "rev": "5c4cc964cfb1e3cab9134dabe2d86bc4858f3867",
-        "revCount": 79,
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/build-system-pkgs.git"
-      },
-      "original": {
-        "ref": "master",
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/build-system-pkgs.git"
-      }
-    },
     "root": {
       "inputs": {
         "blank": "blank",
@@ -667,7 +564,6 @@
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
-        "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "infix": "infix",
@@ -681,14 +577,11 @@
           "nixos"
         ],
         "plasma-manager": "plasma-manager",
-        "pyproject": "pyproject",
-        "pyproject-overlay": "pyproject-overlay",
         "rust-overlay": "rust-overlay",
         "sops": "sops",
         "steam": "steam",
         "systems": "systems",
-        "treefmt": "treefmt",
-        "uv": "uv"
+        "treefmt": "treefmt"
       }
     },
     "rust-overlay": {
@@ -698,11 +591,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784870759,
-        "narHash": "sha256-ZaS89rj5u6pygXKDRfCzPMGm7isJxLsSeIAR5EaSyu8=",
+        "lastModified": 1785648791,
+        "narHash": "sha256-4wZa7NDOxbcm9pTNNcg88nvvPb9uVcWsJ+Ncil8eB1I=",
         "ref": "master",
-        "rev": "471286a5fadc690e2408ad854eb32325f5e74da7",
-        "revCount": 2249,
+        "rev": "32346a8154e65fa10bac36f7b476a5294cb8b150",
+        "revCount": 2258,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -746,11 +639,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784628692,
-        "narHash": "sha256-N8ccJ1g3YoJXdNtTwPT6olwN0VervTSPe6J+hUCa0hA=",
+        "lastModified": 1785301342,
+        "narHash": "sha256-9Q1tvDlPxZ5PisLrhqddXWIlTT4ZfqCmKi6Xct+LkR8=",
         "ref": "master",
-        "rev": "0ff179e83623eb730fc37ce7fda293e202e53fac",
-        "revCount": 142,
+        "rev": "36c3dc1cfa60a5ce4032bcd801b094e770d8b871",
+        "revCount": 147,
         "type": "git",
         "url": "https://github.com/different-name/steam-config-nix.git"
       },
@@ -783,11 +676,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784369104,
-        "narHash": "sha256-47cxbcZODibHv3rELFQ9vZly0vUNkND/atn/U7HLeb0=",
+        "lastModified": 1785360170,
+        "narHash": "sha256-XE1lKgQ3eIO3E7zWryqcRsax+mYXod/5RHBn4YaR9YE=",
         "ref": "main",
-        "rev": "df3c0640565d04a0261253cdd89fce78ec50168a",
-        "revCount": 553,
+        "rev": "d1187f8bc71fb8aab02395869ec3f5c1920f75c0",
+        "revCount": 554,
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
       },
@@ -795,30 +688,6 @@
         "ref": "main",
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
-      }
-    },
-    "uv": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "pyproject-nix": [
-          "pyproject"
-        ]
-      },
-      "locked": {
-        "lastModified": 1784582828,
-        "narHash": "sha256-uPeuFNSYO429IEiud3iJKWIpN/xrH2CANj1uYNiDxqc=",
-        "ref": "master",
-        "rev": "49dac8d206c42175b069b7c6050ba27060a21106",
-        "revCount": 485,
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/uv2nix.git"
-      },
-      "original": {
-        "ref": "master",
-        "type": "git",
-        "url": "https://github.com/pyproject-nix/uv2nix.git"
       }
     }
   },

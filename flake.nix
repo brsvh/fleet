@@ -169,32 +169,6 @@
       url = "git+https://github.com/numtide/flake-utils.git?ref=main";
     };
 
-    hermes-agent = {
-      inputs = {
-        flake-parts = {
-          follows = "flake-parts";
-        };
-
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-
-        pyproject-nix = {
-          follows = "pyproject";
-        };
-
-        pyproject-build-systems = {
-          follows = "pyproject-overlay";
-        };
-
-        uv2nix = {
-          follows = "uv";
-        };
-      };
-
-      url = "git+https://github.com/NousResearch/hermes-agent.git?ref=refs/tags/v2026.5.16";
-    };
-
     home-manager = {
       inputs = {
         nixpkgs = {
@@ -334,34 +308,6 @@
       url = "git+https://github.com/nix-community/plasma-manager.git?ref=trunk";
     };
 
-    pyproject = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
-
-      url = "git+https://github.com/pyproject-nix/pyproject.nix.git?ref=master";
-    };
-
-    pyproject-overlay = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-
-        pyproject-nix = {
-          follows = "pyproject";
-        };
-
-        uv2nix = {
-          follows = "uv";
-        };
-      };
-
-      url = "git+https://github.com/pyproject-nix/build-system-pkgs.git?ref=master";
-    };
-
     rust-overlay = {
       inputs = {
         nixpkgs = {
@@ -412,20 +358,6 @@
       };
 
       url = "git+https://github.com/numtide/treefmt-nix.git?ref=main";
-    };
-
-    uv = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-
-        pyproject-nix = {
-          follows = "pyproject";
-        };
-      };
-
-      url = "git+https://github.com/pyproject-nix/uv2nix.git?ref=master";
     };
   };
 
