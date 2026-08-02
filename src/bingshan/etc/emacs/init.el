@@ -2771,6 +2771,10 @@
   ;; searches.
   (gnus-show-threads t)
 
+  ;; Use only `hl-line' to highlight the current Summary row; do not
+  ;; retain a second highlight for the displayed article.
+  (gnus-summary-selected-face nil)
+
   ;; Extend a limited Summary on demand when article movement reaches
   ;; beyond its current boundary.
   (gnus-auto-extend-newsgroup t)
@@ -2923,6 +2927,10 @@
   (keymap-set gnus-summary-mode-map "<tab>" #'bs-gnus-summary-fold-toggle)
 
   :hook
+  ;; Highlight the Summary row at point independently of the article
+  ;; displayed in the Article buffer.
+  (gnus-summary-mode-hook . hl-line-mode)
+
   ;; Use a concise mode-line name for Gnus Summary buffers.
   (gnus-summary-mode-hook . (lambda ()
                               (setq-local mode-name "News"))))
