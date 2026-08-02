@@ -26,7 +26,9 @@
 (require 'bs-ext)
 (require 'bs-lib)
 (require 'seq)
-(require 'use-package)
+
+(eval-when-compile
+  (require 'use-package))
 
 
 
@@ -34,28 +36,27 @@
 ;; use-package (info "(use-package) Top")
 ;;
 
-(use-package use-package-core
-  :custom
+(eval-and-compile
   ;; Defer loading of all packages by default.  Each package declared
   ;; with `use-package' will be loaded lazily unless explicitly marked
   ;; otherwise, reducing startup time and making load order explicit.
-  (use-package-always-defer t)
-
-  ;; Collect and compute loading statistics for `use-package'
-  ;; declarations.  This enables post-startup analysis of package load
-  ;; times and deferred execution behavior.
-  (use-package-compute-statistics t)
-
-  ;; Disable automatic package installation via `use-package'.
-  ;; Setting the ensure function to `ignore' prevents `use-package'
-  ;; from invoking any package manager, making package availability an
-  ;; explicit responsibility of the surrounding system configuration.
-  (use-package-ensure-function 'ignore)
-
-  ;; Do not append a suffix to automatically generated hook variable
-  ;; names.  This preserves the original hook names without
-  ;; modification and avoids implicit renaming.
-  (use-package-hook-name-suffix nil))
+  (setq use-package-always-defer t
+        ;; Keep runtime expansions small.  Build-time byte compilation
+        ;; reports configuration errors before activation.
+        use-package-expand-minimally t
+        ;; Avoid loading `use-package' at startup solely to collect
+        ;; diagnostic statistics.
+        use-package-compute-statistics nil
+        ;; Disable automatic package installation via `use-package'.
+        ;; Setting the ensure function to `ignore' prevents
+        ;; `use-package' from invoking any package manager, making
+        ;; package availability an explicit responsibility of the
+        ;; surrounding system configuration.
+        use-package-ensure-function #'ignore
+        ;; Do not append a suffix to automatically generated hook
+        ;; variable names.  This preserves the original hook names
+        ;; without modification and avoids implicit renaming.
+        use-package-hook-name-suffix nil))
 
 
 

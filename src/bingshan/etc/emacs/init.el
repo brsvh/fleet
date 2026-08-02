@@ -26,9 +26,11 @@
 (require 'bs-ext)
 (require 'bs-hooks)
 (require 'bs-lib)
-(require 'cl-lib)
-(require 'orderless)
-(require 'use-package)
+
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'orderless)
+  (require 'use-package))
 
 
 
@@ -36,28 +38,27 @@
 ;; use-package (info "(use-package) Top")
 ;;
 
-(use-package use-package-core
-  :custom
+(eval-and-compile
   ;; Defer loading of all packages by default.  Each package declared
   ;; with `use-package' will be loaded lazily unless explicitly marked
   ;; otherwise, reducing startup time and making load order explicit.
-  (use-package-always-defer t)
-
-  ;; Collect and compute loading statistics for `use-package'
-  ;; declarations.  This enables post-startup analysis of package load
-  ;; times and deferred execution behavior.
-  (use-package-compute-statistics t)
-
-  ;; Disable automatic package installation via `use-package'.
-  ;; Setting the ensure function to `ignore' prevents `use-package'
-  ;; from invoking any package manager, making package availability an
-  ;; explicit responsibility of the surrounding system configuration.
-  (use-package-ensure-function 'ignore)
-
-  ;; Do not append a suffix to automatically generated hook variable
-  ;; names.  This preserves the original hook names without
-  ;; modification and avoids implicit renaming.
-  (use-package-hook-name-suffix nil))
+  (setq use-package-always-defer t
+        ;; Keep runtime expansions small.  Build-time byte compilation
+        ;; reports configuration errors before activation.
+        use-package-expand-minimally t
+        ;; Avoid loading `use-package' at startup solely to collect
+        ;; diagnostic statistics.
+        use-package-compute-statistics nil
+        ;; Disable automatic package installation via `use-package'.
+        ;; Setting the ensure function to `ignore' prevents
+        ;; `use-package' from invoking any package manager, making
+        ;; package availability an explicit responsibility of the
+        ;; surrounding system configuration.
+        use-package-ensure-function #'ignore
+        ;; Do not append a suffix to automatically generated hook
+        ;; variable names.  This preserves the original hook names
+        ;; without modification and avoids implicit renaming.
+        use-package-hook-name-suffix nil))
 
 
 
@@ -1213,9 +1214,11 @@
 (use-package tab-bar
   :after (bs-hooks)
 
-  :custom
-  ;; Only show Tab Bar when have one more tabs.
-  (tab-bar-show 1)
+  :init
+  ;; Only show the Tab Bar when more than one tab exists.  Set the
+  ;; value directly because its Custom setter enables `tab-bar-mode'
+  ;; immediately, before `bs-first-ui-hook' runs.
+  (setq tab-bar-show 1)
 
   :hook
   ;; Enable `tab-bar-mode'.
@@ -2234,8 +2237,6 @@
   (magit-auto-revert-mode +1))
 
 (use-package magit-status
-  :after (magit)
-
   :config
   ;; Show `magit-status' in the shared bottom side window used for
   ;; commit message editing.
@@ -3325,7 +3326,7 @@
   ;; NNTP backend query by host before knowing the login name.
   (auth-source-pass-extra-query-keywords t)
 
-  :init
+  :config
   ;; Treat the password store as the authoritative source for secrets,
   ;; so credentials are encrypted at rest and shared consistently
   ;; across tools that rely on `auth-source'.
