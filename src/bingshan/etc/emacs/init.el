@@ -4802,6 +4802,207 @@
                                    "transient"
                                    "values.el")))
 
+
+
+;;
+;; Web Feed Reader
+;;
+
+(use-package elfeed
+  :after (bs-lib)
+  :commands (elfeed)
+  :defines (elfeed-db-directory
+            elfeed-entry-point
+            elfeed-search-filter
+            elfeed-search-mode-map
+            elfeed-search-print-entry-function
+            elfeed-search-remain-on-entry
+            elfeed-search-sort-function
+            elfeed-show-entry-switch)
+  :functions (elfeed-db-save
+              elfeed-queue-count-total
+              elfeed-search-entries
+              elfeed-search-show-entry
+              elfeed-tree-update
+              elfeed-untag
+              elfeed-update)
+
+  :custom
+  ;; Keep feed contents, metadata, and related state below the shared
+  ;; Emacs data directory.
+  (elfeed-db-directory (bs-path bs-data-directory "elfeed/"))
+
+  ;; Enter through the tag and feed hierarchy instead of opening an
+  ;; undifferentiated search immediately.
+  (elfeed-entry-point 'elfeed-tree)
+
+  ;; Show unread entries by default without imposing a time cutoff.
+  (elfeed-search-filter "+unread")
+
+  ;; Cycle with `o' between reverse chronological and score order,
+  ;; retaining time order as the initial view.
+  (elfeed-search-sort-function '(nil elfeed-score-sort))
+
+  ;; Keep point on the entry displayed in the adjacent article window.
+  (elfeed-search-remain-on-entry '(show))
+
+  ;; Display articles in another window while retaining focus in the
+  ;; Search buffer for continuous navigation.
+  (elfeed-show-entry-switch
+   (lambda (buffer)
+     (display-buffer
+      buffer
+      '((display-buffer-reuse-window
+         display-buffer-pop-up-window)))))
+
+  :init
+  (defvar elfeed--update-timer nil
+    "Timer used to update Elfeed after it has first been entered.")
+
+  :config
+  ;; After the first complete update, treat the imported backlog as
+  ;; read and record that this one-time migration has finished.
+  (add-hook
+   'elfeed-update-hook
+   (lambda (_url)
+     (let ((complete
+            (bs-path elfeed-db-directory
+                     "initial-update-complete")))
+       (when (and (not (file-exists-p complete))
+                  (zerop (elfeed-queue-count-total)))
+         (let ((unread (elfeed-search-entries "+unread")))
+           (when unread
+             (elfeed-untag unread 'unread)))
+         (elfeed-db-save)
+         (with-temp-file complete)
+         (elfeed-tree-update :force)))))
+
+  ;; Follow Search movement only when an article window already
+  ;; exists; simple navigation never creates that window on its own.
+  (keymap-set
+   elfeed-search-mode-map "n"
+   (lambda (count)
+     "Move COUNT entries forward and follow a visible article."
+     (interactive "p")
+     (forward-line count)
+     (when (get-buffer-window "*elfeed-entry*")
+       (call-interactively #'elfeed-search-show-entry))))
+  (keymap-set
+   elfeed-search-mode-map "p"
+   (lambda (count)
+     "Move COUNT entries backward and follow a visible article."
+     (interactive "p")
+     (forward-line (- count))
+     (when (get-buffer-window "*elfeed-entry*")
+       (call-interactively #'elfeed-search-show-entry))))
+
+  :hook
+  ;; Start one immediate asynchronous update on first entry, then
+  ;; refresh every thirty minutes for the remainder of the session.
+  ((elfeed-search-mode-hook elfeed-tree-mode-hook)
+   .
+   (lambda ()
+     (unless (timerp elfeed--update-timer)
+       (setq elfeed--update-timer
+             (run-at-time
+              (* 30 60) (* 30 60)
+              (lambda ()
+                (when (zerop (elfeed-queue-count-total))
+                  (elfeed-update)))))
+       (when (zerop (elfeed-queue-count-total))
+         (elfeed-update))))))
+
+(use-package elfeed-tree
+  :after (elfeed)
+
+  :custom
+  ;; Build tree counts and searches from unread entries, matching the
+  ;; default Search filter.
+  (elfeed-tree-filter "+unread"))
+
+(use-package elfeed-org
+  :after (elfeed)
+  :demand t
+  :functions (elfeed-org)
+
+  :custom
+  ;; Maintain subscriptions and inherited tags in a dedicated Org
+  ;; file outside `org-agenda-files'.
+  (rmh-elfeed-org-files '("~/org/feeds.org"))
+
+  :config
+  (elfeed-org))
+
+(use-package elfeed-score
+  :after (elfeed)
+  :demand t
+  :defines (elfeed-score-map
+            elfeed-score-rule-stats-file
+            elfeed-score-serde-score-file)
+  :functions (elfeed-score-enable
+              elfeed-score-print-entry)
+
+  :custom
+  ;; Store editable scoring rules beside the Elfeed database.
+  (elfeed-score-serde-score-file
+   (bs-path elfeed-db-directory "score.el"))
+
+  ;; Persist rule hit statistics separately from the rules themselves.
+  (elfeed-score-rule-stats-file
+   (bs-path elfeed-db-directory "score-stats.el"))
+
+  :config
+  ;; Enable automatic scoring without replacing chronological sorting,
+  ;; then install only the numeric score display column.
+  (elfeed-score-enable t)
+  (setq elfeed-search-print-entry-function
+        #'elfeed-score-print-entry)
+  (keymap-set elfeed-search-mode-map "=" elfeed-score-map))
+
+(use-package elfeed-ai
+  :after (elfeed gptel)
+  :defines (elfeed-ai-mode-map)
+
+  :bind
+  ( :map elfeed-ai-mode-map
+    ;; Mark and unmark articles selected for an asynchronous summary.
+    ("m" . elfeed-ai-mark)
+    ("M" . elfeed-ai-unmark)
+
+    ;; Open the batch summarization menu without replacing the native
+    ;; Search filter binding on `S'.
+    ("A" . elfeed-ai-menu)
+    ("S" . nil)
+
+    ;; Preserve Elfeed's native unread commands on `u' and `U'.
+    ("u" . nil)
+    ("U" . nil))
+
+  :hook
+  ;; Add asynchronous gptel summaries to every Elfeed Search buffer.
+  (elfeed-search-mode-hook . elfeed-ai-mode))
+
+(use-package elfeed-link
+  :after (elfeed ol)
+  :demand t)
+
+(use-package elfeed-webkit
+  :if (featurep 'xwidget-internal)
+  :after (elfeed-show)
+  :demand t
+  :defines (elfeed-show-mode-map)
+  :functions (elfeed-webkit-enable)
+
+  :config
+  ;; Prefer embedded WebKit rendering when this Emacs has xwidget
+  ;; support; the ordinary SHR renderer remains the fallback otherwise.
+  (elfeed-webkit-enable)
+
+  :bind
+  ( :map elfeed-show-mode-map
+    ;; Toggle an individual reading session between WebKit and SHR.
+    ("%" . elfeed-webkit-toggle)))
+
 ;;; init.el ends here
 ;; Local Variables:
 ;; fill-column: 70

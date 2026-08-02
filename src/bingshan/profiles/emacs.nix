@@ -505,6 +505,11 @@ in
           eglot-booster
           eldoc-box
           eldoc-mouse
+          elfeed
+          elfeed-ai
+          elfeed-org
+          elfeed-score
+          elfeed-webkit
           emacs-gc-stats
           embark
           embark-consult
