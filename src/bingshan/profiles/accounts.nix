@@ -202,6 +202,14 @@
 
             address = userName;
 
+            folders = {
+              drafts = "Drafts";
+              inbox = "INBOX";
+              junk = "Junk";
+              sent = "Sent";
+              trash = "Trash";
+            };
+
             gpg = {
               key = "D6E9ED4504C41AD2DA16F39631E62A2FC33802BA";
               signByDefault = true;
@@ -279,6 +287,14 @@
               "steam@brsvh.org"
             ];
 
+            folders = {
+              drafts = "Drafts";
+              inbox = "INBOX";
+              junk = "Junk";
+              sent = "Sent";
+              trash = "Trash";
+            };
+
             gpg = {
               key = "7B740DB9F2AC6D3B226BC53078D74502D92E0218";
               signByDefault = true;
@@ -325,6 +341,14 @@
               ;
 
             address = userName;
+
+            folders = {
+              drafts = "Drafts";
+              inbox = "INBOX";
+              junk = "Junk E-mail";
+              sent = "Sent Items";
+              trash = "Trash";
+            };
 
             gpg = {
               key = "F178C7173550EA893D32DD07324AE98654C0D86C";
