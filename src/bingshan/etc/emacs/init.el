@@ -2595,6 +2595,16 @@
 ;; Email and Usenet News with Gnus (info "(emacs) Gnus")
 ;;
 
+(use-package auth-source-pass
+  :after (gnus)
+  :commands (auth-source-pass-enable)
+
+  :init
+  ;; Activate the password-store backend as soon as `gnus' loads, so
+  ;; the first interactive `gnus' command can resolve NNTP
+  ;; credentials.
+  (auth-source-pass-enable))
+
 (use-package bs-gnus
   :after (gnus)
   :commands (bs-gnus-group-enable
@@ -3331,10 +3341,9 @@
   ;; NNTP backend query by host before knowing the login name.
   (auth-source-pass-extra-query-keywords t)
 
-  :config
-  ;; Treat the password store as the authoritative source for secrets,
-  ;; so credentials are encrypted at rest and shared consistently
-  ;; across tools that rely on `auth-source'.
+  :init
+  ;; Enable the password-store backend for any `auth-source' consumer,
+  ;; even when `gnus' is never opened in the current Emacs session.
   (auth-source-pass-enable))
 
 (use-package cus-edit
@@ -3545,6 +3554,12 @@
   ;; buffers and paths.
   (agent-shell-tramp-mode +1))
 
+(use-package codex-ide-session
+  :bind
+  ( :map ctl-c-x-map
+    ;; Start Codex IDE from the custom agent prefix map.
+    ("c" . codex-ide)))
+
 (use-package codex-ide
   :custom
   ;; Sit and relax, patiently waiting for the app-server thread to be
@@ -3577,11 +3592,12 @@
                            alist)))))
                  (window-parameters . ((no-delete-other-windows . t))))))
 
-(use-package codex-ide-session
-  :bind
-  ( :map ctl-c-x-map
-    ;; Start Codex IDE from the custom agent prefix map.
-    ("c" . codex-ide)))
+(use-package codex-ide
+  :after (codex-ide-session)
+
+  ;; Load the complete package entrypoint after the session module, so
+  ;; approval and event-loop handlers are ready for the first session.
+  :demand t)
 
 (use-package codex-ide-session-mode
   :bind
