@@ -2606,10 +2606,11 @@
   (auth-source-pass-enable))
 
 (use-package bs-gnus
-  :after (gnus)
+  :after (gnus gnus-notifications gravatar)
   :commands (bs-gnus-group-enable
              bs-gnus-group-posting-status
              bs-gnus-group-topic-toggle
+             bs-gnus-notifications-enable
              bs-gnus-summary-enable
              bs-gnus-summary-fold-toggle
              bs-gnus-summary-next
@@ -2632,12 +2633,19 @@
   ;; subjects in a stable column.
   (bs-gnus-summary-thread-count-digits 8)
 
+  ;; Keep worker-fetched notification avatars across sessions while
+  ;; treating them as stale after 90 days.
+  (bs-gnus-notifications-avatar-cache-directory
+   (bs-path bs-cache-directory "gnus/notification-avatars/"))
+  (bs-gnus-notifications-avatar-cache-expiry (* 90 24 60 60))
+
   :config
   ;; Replace the native Group and Summary layouts only after `gnus'
   ;; itself loads, and keep remote updates outside the main Emacs
   ;; process.
   (bs-gnus-group-enable)
   (bs-gnus-summary-enable)
+  (bs-gnus-notifications-enable)
   (bs-gnus-update-enable)
 
   :bind
@@ -2822,6 +2830,21 @@
                      `((To . ,(match-string 1 list-post)))))
                message-wide-reply-to-function)))
        (apply function arguments)))))
+
+(use-package gnus-notifications
+  :after (gnus)
+
+  :custom
+  ;; Notify articles from every subscribed group while leaving
+  ;; notification lifetime to the desktop server.
+  (gnus-notifications-minimum-level 5)
+  (gnus-notifications-timeout nil)
+
+  ;; Resolve sender images through Gravatar only.
+  (gnus-notifications-use-google-contacts nil)
+  (gnus-notifications-use-gravatar t)
+
+  :demand t)
 
 (use-package gnus-start
   :after (gnus)
@@ -3059,6 +3082,19 @@
   ( :map gnus-summary-mode-map
     ;; Open the `gptel' send menu for the prepared context.
     ("C-c m g" . gptel-menu)))
+
+(use-package gravatar
+  :after (gnus-notifications)
+
+  :custom
+  ;; Treat an address without a Gravatar as having no image instead
+  ;; of generating a fallback avatar.
+  (gravatar-default-image "404")
+
+  ;; Request compact images suitable for desktop notifications.
+  (gravatar-size 32)
+
+  :demand t)
 
 (use-package hl-line
   :after (gnus-group)
