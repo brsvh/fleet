@@ -2614,6 +2614,10 @@
    '(("news.eternal-september.org" . "Eternal September")
      ("news.gmane.io" . "Gmane")))
 
+  ;; Check for new articles every five minutes so each background
+  ;; update produces a smaller burst of desktop notifications.
+  (bs-gnus-update-interval (* 5 60))
+
   ;; Follow Summary navigation in an already visible Article window
   ;; without opening one solely for movement.
   (bs-gnus-summary-follow-visible-article t)
