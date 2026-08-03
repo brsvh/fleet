@@ -3547,7 +3547,7 @@
   ;; ready.
   (codex-ide-request-timeout 60)
 
-  :config
+  :init
   ;; Share the adaptive protected side window used by regular
   ;; `agent-shell' sessions, while retaining each conversation buffer
   ;; for later reuse.
