@@ -318,6 +318,28 @@ in
           };
         };
       };
+
+      email = {
+        accounts = mkOption {
+          type = types.attrsOf (
+            types.submodule {
+              options = {
+                folders = {
+                  junk = mkOption {
+                    default = "Junk";
+
+                    description = ''
+                      Name of the maildir used for junk messages.
+                    '';
+
+                    type = with types; nullOr str;
+                  };
+                };
+              };
+            }
+          );
+        };
+      };
     };
   };
 
