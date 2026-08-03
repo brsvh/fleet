@@ -9,11 +9,14 @@
 let
   inherit (lib)
     attrValues
+    concatMapStringsSep
     concatStringsSep
     filter
     findFirst
     head
     mapAttrsToList
+    replaceStrings
+    sort
     toJSON
     toSentenceCase
     ;
@@ -42,6 +45,37 @@ let
       mails;
 
   maildir = mail.account.maildir.absPath;
+
+  mailAddresses =
+    mail:
+    [ mail.account.address ] ++ mail.account.aliases;
+
+  sameMaildir =
+    candidate:
+    candidate.account.maildir.path
+    == mail.account.maildir.path;
+
+  sharedMails = filter (
+    candidate:
+    !candidate.account.primary
+    && sameMaildir candidate
+  ) mails;
+
+  sharedMaildirAddresses = builtins.concatLists (
+    map mailAddresses sharedMails
+  );
+
+  prepareMail =
+    candidate:
+    candidate
+    // {
+      inherit sharedMaildirAddresses;
+
+      addresses = mailAddresses candidate;
+      sharesPrimaryMaildir = sameMaildir candidate;
+    };
+
+  primaryMail = prepareMail mail;
 
   el = rec {
     cjkFont = toJSON "Zhuque Fangsong (technical preview)";
@@ -113,8 +147,167 @@ let
       );
 
     genMailFolder =
-      account: folder:
-      "/${account.maildir.path}/${folder}";
+      account: role:
+      "/${account.maildir.path}/${account.folders.${role}}";
+
+    genMaildirQuery =
+      account: role:
+      ''maildir:"${genMailFolder account role}"'';
+
+    genContactQuery =
+      addresses:
+      "("
+      + concatMapStringsSep " OR " (
+        address:
+        "(from:${address} OR to:${address} OR cc:${address} OR bcc:${address})"
+      ) addresses
+      + ")";
+
+    genContextQuery =
+      mail:
+      let
+        root = ''maildir:"/${mail.account.maildir.path}/"'';
+      in
+      if mail.account.primary then
+        if mail.sharedMaildirAddresses == [ ] then
+          root
+        else
+          "(${root}) AND NOT (${genContactQuery mail.sharedMaildirAddresses})"
+      else if mail.sharesPrimaryMaildir then
+        "(${root}) AND (${genContactQuery mail.addresses})"
+      else
+        root;
+
+    genScopedQuery =
+      mail: query:
+      "(${genContextQuery mail}) AND (${query})";
+
+    genMu4eBookmark = mail: name: query: key: ''
+      ( :name ${toJSON name}
+        :query ${toJSON (genScopedQuery mail query)}
+        :key ?${key}
+        :source ${toJSON mail.name})
+    '';
+
+    genMu4eBookmarks =
+      mail:
+      let
+        accountName = toSentenceCase mail.name;
+        account = mail.account;
+      in
+      concatStringsSep "\n" [
+        (genMu4eBookmark mail "${accountName} inbox"
+          (genMaildirQuery account "inbox")
+          "i"
+        )
+        (genMu4eBookmark mail "${accountName} drafts"
+          (genMaildirQuery account "drafts")
+          "d"
+        )
+        (genMu4eBookmark mail "Unread messages"
+          "flag:unread AND NOT flag:trashed"
+          "u"
+        )
+        (genMu4eBookmark mail "Today's messages"
+          "date:today..now"
+          "t"
+        )
+        (genMu4eBookmark mail "Last 3 days" "date:3d..now"
+          "3"
+        )
+        (genMu4eBookmark mail "Last 7 days" "date:7d..now"
+          "7"
+        )
+        (genMu4eBookmark mail
+          "${accountName} sent messages"
+          (genMaildirQuery account "sent")
+          "s"
+        )
+        (genMu4eBookmark mail
+          "${accountName} junk messages"
+          (genMaildirQuery account "junk")
+          "j"
+        )
+        ''
+          ( :name "Context summary"
+            :query ${toJSON (genContextQuery mail)}
+            :source ${toJSON mail.name}
+            :bs-hidden t
+            :bs-context-summary t)
+        ''
+        (genMu4eMaildirQueries mail)
+      ];
+
+    mu4eMaildirRoles = [
+      {
+        key = "d";
+        role = "drafts";
+      }
+      {
+        key = "i";
+        role = "inbox";
+      }
+      {
+        key = "j";
+        role = "junk";
+      }
+      {
+        key = "s";
+        role = "sent";
+      }
+      {
+        key = "t";
+        role = "trash";
+      }
+    ];
+
+    genMu4eMaildir =
+      mail: folder:
+      let
+        path = genMailFolder mail.account folder.role;
+        name = replaceStrings [ "/" ] [ " " ] (
+          builtins.substring 1 (
+            builtins.stringLength path - 1
+          ) path
+        );
+      in
+      {
+        inherit (folder) key;
+        inherit name path;
+
+        query = genScopedQuery mail (
+          genMaildirQuery mail.account folder.role
+        );
+      };
+
+    genMu4eMaildirs =
+      mail:
+      sort (left: right: left.name < right.name) (
+        map (genMu4eMaildir mail) mu4eMaildirRoles
+      );
+
+    genMu4eMaildirQueries =
+      mail:
+      concatStringsSep "\n" (
+        map (folder: ''
+          ( :name ${toJSON folder.name}
+            :query ${toJSON folder.query}
+            :source ${toJSON mail.name}
+            :bs-hidden t
+            :bs-maildir t
+            :bs-maildir-key ?${folder.key}
+            :maildir ${toJSON folder.path})
+        '') (genMu4eMaildirs mail)
+      );
+
+    genMu4eMaildirShortcuts =
+      mail:
+      concatStringsSep "\n" (
+        map (folder: ''
+          ( :maildir ${toJSON folder.path}
+            :key ?${folder.key})
+        '') (genMu4eMaildirs mail)
+      );
 
     genMu4eContext =
       mail:
@@ -132,7 +325,7 @@ let
         certdirAbsPath = toJSON "${account.maildir.absPath}/certs/";
 
         genMailFolder' =
-          folder: toJSON (genMailFolder account folder);
+          role: toJSON (genMailFolder account role);
 
         isPrimary = account.primary;
 
@@ -141,6 +334,12 @@ let
         maildirAbsPath = toJSON account.maildir.absPath;
 
         realName = toJSON account.realName;
+
+        contextQuery = toJSON (genContextQuery mail);
+
+        addresses' = concatStringsSep " " (
+          map toJSON mail.addresses
+        );
 
         sharedMaildirAddresses' = concatStringsSep " " (
           map toJSON sharedMaildirAddresses
@@ -179,7 +378,7 @@ let
                    (mu4e-message-contact-field-matches
                     msg
                     '( :from :to :cc :bcc)
-                    (regexp-quote ${address}))
+                    (mapcar #'regexp-quote '(${addresses'})))
                  ''
              }))
          :vars
@@ -189,9 +388,13 @@ let
            (message-directory . ${maildirAbsPath})
            (message-signature . ${signature})
            (mml-secure-openpgp-signers . (${signkey}))
-           (mu4e-sent-folder . ${genMailFolder' "Sent"})
-           (mu4e-drafts-folder . ${genMailFolder' "Drafts"})
-           (mu4e-trash-folder . ${genMailFolder' "Trash"})
+           (mu4e-sent-folder . ${genMailFolder' "sent"})
+           (mu4e-drafts-folder . ${genMailFolder' "drafts"})
+           (mu4e-trash-folder . ${genMailFolder' "trash"})
+           (mu4e-bookmarks . (${genMu4eBookmarks mail}))
+           (mu4e-maildir-shortcuts . (${genMu4eMaildirShortcuts mail}))
+           (bs-mu4e-context-name . ${name})
+           (bs-mu4e-context-query . ${contextQuery})
            (smime-certificate-directory . ${certdirAbsPath})))
       '';
 
@@ -202,36 +405,16 @@ let
 
   mu4eContexts =
     let
-      sameMaildir =
-        candidate:
-        candidate.account.maildir.path
-        == mail.account.maildir.path;
-
-      shared = filter (
-        mail: !mail.account.primary && sameMaildir mail
-      ) mails;
-
-      addresses = map (
-        mail: mail.account.address
-      ) shared;
-
-      gen =
-        mail:
-        el.genMu4eContext (
-          mail
-          // {
-            sharedMaildirAddresses = addresses;
-
-            sharesPrimaryMaildir = sameMaildir mail;
-          }
-        );
+      gen = mail: el.genMu4eContext (prepareMail mail);
     in
     concatStringsSep "\n" (
       map gen (
         [ mail ]
-        ++ shared
+        ++ sharedMails
         ++ filter (
-          mail: !mail.account.primary && !sameMaildir mail
+          candidate:
+          !candidate.account.primary
+          && !sameMaildir candidate
         ) mails
       )
     );
@@ -353,31 +536,7 @@ in
 
           (use-package mu4e-bookmarks
             :custom
-            (mu4e-bookmarks
-             '(( :name "${toSentenceCase mail.name} inbox"
-                 :query "maildir:${genMailFolder mail.account "INBOX"}"
-                 :key ?i)
-               ( :name "${toSentenceCase mail.name} drafts"
-                 :query "maildir:${genMailFolder mail.account "Drafts"}"
-                 :key ?d)
-               ( :name "Unread messages"
-                 :query "flag:unread AND NOT flag:trashed"
-                 :key ?u)
-               ( :name "Today's messages"
-                 :query "date:today..now"
-                 :key ?t)
-               ( :name "Last 3 days"
-                 :query "date:3d..now"
-                 :key ?3)
-               ( :name "Last 7 days"
-                 :query "date:7d..now"
-                 :key ?7)
-               ( :name "${toSentenceCase mail.name} sent messages"
-                 :query "maildir:${genMailFolder mail.account "Sent"}"
-                 :key ?s)
-               ( :name "${toSentenceCase mail.name} junk messages"
-                 :query "maildir:${genMailFolder mail.account "Junk"}"
-                 :key ?j)))
+            (mu4e-bookmarks '(${genMu4eBookmarks primaryMail}))
 
             :defer t)
 
@@ -398,9 +557,10 @@ in
 
           (use-package mu4e-folders
             :custom
-            (mu4e-sent-folder "${genMailFolder mail.account "Sent"}")
-            (mu4e-drafts-folder "${genMailFolder mail.account "Drafts"}")
-            (mu4e-trash-folder "${genMailFolder mail.account "Trash"}")
+            (mu4e-sent-folder "${genMailFolder mail.account "sent"}")
+            (mu4e-drafts-folder "${genMailFolder mail.account "drafts"}")
+            (mu4e-trash-folder "${genMailFolder mail.account "trash"}")
+            (mu4e-maildir-shortcuts '(${genMu4eMaildirShortcuts primaryMail}))
 
             :defer t)
 

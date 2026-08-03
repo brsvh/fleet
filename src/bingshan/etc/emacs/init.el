@@ -2603,7 +2603,9 @@
              bs-gnus-summary-enable
              bs-gnus-summary-fold-toggle
              bs-gnus-summary-next
-             bs-gnus-summary-previous)
+             bs-gnus-summary-previous
+             bs-gnus-update
+             bs-gnus-update-enable)
 
   :custom
   ;; Name NNTP sources by their configured server addresses in the
@@ -2622,9 +2624,11 @@
 
   :config
   ;; Replace the native Group and Summary layouts only after `gnus'
-  ;; itself loads.
+  ;; itself loads, and keep remote updates outside the main Emacs
+  ;; process.
   (bs-gnus-group-enable)
   (bs-gnus-summary-enable)
+  (bs-gnus-update-enable)
 
   :bind
   ( :map gnus-summary-mode-map
@@ -2858,19 +2862,19 @@
   ;; incomplete threads.
   (gnus-build-sparse-threads 'some)
 
-  ;; Order threads by the date of their newest article, with the most
-  ;; recently active conversation first.
+  ;; Order threads by their root article dates so month separators
+  ;; form contiguous chronological sections.
   (gnus-thread-sort-functions
    '(gnus-thread-sort-by-number
-     gnus-thread-sort-by-most-recent-date))
+     (not gnus-thread-sort-by-date)))
 
   ;; Keep articles within each thread in chronological order.
   (gnus-subthread-sort-functions
    '(gnus-thread-sort-by-number
      gnus-thread-sort-by-date))
 
-  ;; Mark unread articles with the same lozenge used by `mu4e'.
-  (gnus-unread-mark ?◊)
+  ;; Mark unread articles with the same bullet used by Elfeed Search.
+  (gnus-unread-mark ?•)
 
   ;; Mark articles retained for later attention with a star.
   (gnus-ticked-mark ?★)
@@ -2926,8 +2930,8 @@
   ;; Identify articles saved outside their group with `S'.
   (gnus-saved-mark ?S)
 
-  ;; Mark articles not previously seen by `gnus' with a bullet.
-  (gnus-unseen-mark ?•)
+  ;; Mark articles not previously seen by `gnus' with a hollow diamond.
+  (gnus-unseen-mark ?◊)
 
   ;; Identify recently arrived articles with `N'.
   (gnus-recent-mark ?N)
@@ -4536,6 +4540,15 @@
    (lambda ()
      (setq-local mode-name "Mail"))))
 
+(use-package bs-mu4e
+  :after (mu4e-main)
+  :commands (bs-mu4e-main-enable)
+
+  :init
+  ;; Present the main mail dashboard with the same visual hierarchy,
+  ;; aligned counts, and context-aware status used by Gnus and Elfeed.
+  (bs-mu4e-main-enable))
+
 (use-package mu4e-modeline
   :custom
   ;; Disable the global `mu4e' modeline indicators while keeping
@@ -4977,7 +4990,11 @@
 
 (use-package bs-elfeed
   :after (elfeed-search)
-  :commands (bs-elfeed-search-prepare-context)
+  :commands (bs-elfeed-search-disable
+             bs-elfeed-search-enable
+             bs-elfeed-search-prepare-context
+             bs-elfeed-tree-disable
+             bs-elfeed-tree-enable)
   :defines (elfeed-search-mode-map)
 
   :bind
@@ -4992,7 +5009,6 @@
             elfeed-entry-point
             elfeed-search-filter
             elfeed-search-mode-map
-            elfeed-search-print-entry-function
             elfeed-search-remain-on-entry
             elfeed-search-sort-function
             elfeed-show-entry-switch)
@@ -5008,10 +5024,6 @@
   ;; Enter through the tag and feed hierarchy instead of opening an
   ;; undifferentiated search immediately.
   (elfeed-entry-point 'elfeed-tree)
-
-  :init
-  (defvar elfeed--update-timer nil
-    "Timer used to update `elfeed' after it has first been entered.")
 
   :config
   ;; After the first complete update, treat the imported backlog as
@@ -5048,23 +5060,7 @@
      (interactive "p")
      (forward-line (- count))
      (when (get-buffer-window "*elfeed-entry*")
-       (call-interactively #'elfeed-search-show-entry))))
-
-  :hook
-  ;; Start one immediate asynchronous update on first entry, then
-  ;; refresh every thirty minutes for the remainder of the session.
-  ((elfeed-search-mode-hook elfeed-tree-mode-hook)
-   .
-   (lambda ()
-     (unless (timerp elfeed--update-timer)
-       (setq elfeed--update-timer
-             (run-at-time
-              (* 30 60) (* 30 60)
-              (lambda ()
-                (when (zerop (elfeed-queue-count-total))
-                  (elfeed-update)))))
-       (when (zerop (elfeed-queue-count-total))
-         (elfeed-update))))))
+       (call-interactively #'elfeed-search-show-entry)))))
 
 (use-package elfeed-db
   :after (bs-lib)
@@ -5096,15 +5092,13 @@
 (use-package elfeed-score
   :after (elfeed)
   :defines (elfeed-score-map)
-  :functions (elfeed-score-enable
-              elfeed-score-print-entry)
+  :functions (elfeed-score-enable)
 
   :config
   ;; Enable automatic scoring without replacing chronological sorting,
-  ;; then install only the numeric score display column.
+  ;; then install the Gnus-inspired one-line Search renderer.
   (elfeed-score-enable t)
-  (setq elfeed-search-print-entry-function
-        #'elfeed-score-print-entry)
+  (bs-elfeed-search-enable)
   (keymap-set elfeed-search-mode-map "=" elfeed-score-map)
 
   :demand t)
@@ -5156,7 +5150,6 @@
 
 (use-package elfeed-tree
   :after (elfeed)
-  :functions (elfeed-tree--print@default-empty-title-width)
 
   :custom
   ;; Build tree counts and searches from unread entries, matching the
@@ -5164,13 +5157,9 @@
   (elfeed-tree-filter "+unread")
 
   :config
-  ;; Treat an empty feed database as having a zero-width title column
-  ;; until the first asynchronous update has imported entries.
-  (define-advice elfeed-tree--print
-      (:filter-args (arguments) default-empty-title-width)
-    "Default the title width in ARGUMENTS when the database is empty."
-    (setf (nth 2 arguments) (or (nth 2 arguments) 0))
-    arguments))
+  ;; Render one synthetic, fully expanded tag hierarchy with the same
+  ;; visual hierarchy as the Gnus Group/Topic buffer.
+  (bs-elfeed-tree-enable))
 
 (use-package elfeed-webkit
   :if (featurep 'xwidget-internal)
