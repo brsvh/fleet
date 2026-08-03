@@ -1193,17 +1193,6 @@
   :demand t
   :no-require t)
 
-(use-package knockknock
-  :custom
-  ;; Place notification popups at the top center of the frame so they
-  ;; stay visible without covering the minibuffer or mode line.
-  (knockknock-poshandler 'posframe-poshandler-frame-top-center)
-
-  :hook
-  ;; Load the notification backend after early startup work completes,
-  ;; when frame geometry and `posframe' integration are available.
-  (bs-after-startup-early-hook . (lambda () (require 'knockknock))))
-
 (use-package scroll-bar
   :after (bs-hooks)
   :commands (scroll-bar-mode)
@@ -3514,13 +3503,6 @@
     ;; buffer.
     ("C-c C-k" . agent-shell-interrupt)))
 
-(use-package agent-shell-knockknock
-  :after (agent-shell knockknock)
-
-  :hook
-  ;; Enable desktop notifications for each interactive agent shell.
-  (agent-shell-mode-hook . agent-shell-knockknock-mode))
-
 (use-package agent-shell-manager
   :custom
   ;; Let `display-buffer-alist' choose the regular window placement,
@@ -4371,6 +4353,25 @@
   ;; plain text to HTML.
   (bs-mu4e-view-xwidget-enable))
 
+(use-package bs-mu4e
+  :after (mu4e-alert)
+  :commands (bs-mu4e-notifications-enable)
+
+  :custom
+  ;; Persist sender avatars separately from other Mu4e state so they
+  ;; can be expired without invalidating searches or contacts.
+  (bs-mu4e-notifications-avatar-cache-directory
+   (bs-path bs-cache-directory "mu4e/notification-avatars/"))
+
+  ;; Refresh avatars after 90 days while retaining them across Emacs
+  ;; sessions and notification checks.
+  (bs-mu4e-notifications-avatar-cache-expiry (* 90 24 60 60))
+
+  :config
+  ;; Replace grouped `mu4e-alert' delivery with one actionable desktop
+  ;; notification for each unread message.
+  (bs-mu4e-notifications-enable))
+
 (use-package consult-mu
   :functions (consult-mu--view-action)
 
@@ -4439,19 +4440,21 @@
 (use-package mu4e-alert
   :when (eq system-type 'gnu/linux)
   :after (mu4e)
-
-  :demand t)
-
-(use-package mu4e-alert
-  :when (eq system-type 'gnu/linux)
   :commands (mu4e-alert-enable-notifications)
   :functions (mu4e-alert-set-default-style)
+
+  :custom
+  ;; Query individual messages so `bs-mu4e' can attach actions to the
+  ;; exact message represented by each notification.
+  (mu4e-alert-email-notification-types '(subjects))
 
   :config
   ;; Use the desktop notification backend for new-message alerts, then
   ;; enable notification delivery once the backend is selected.
   (mu4e-alert-set-default-style 'notifications)
-  (mu4e-alert-enable-notifications))
+  (mu4e-alert-enable-notifications)
+
+  :demand t)
 
 (use-package mu4e-compose
   :hook
@@ -4568,15 +4571,6 @@
   ;; Use the standard completion entry point so the active minibuffer
   ;; completion UI handles the `mu4e' option prompts.
   (mu4e-completing-read-function 'completing-read))
-
-(use-package mu4e-knockknock
-  :after (mu4e)
-  :commands (mu4e-knockknock-mode)
-
-  :config
-  ;; Enable the `knockknock' integration with `mu4e' once the mail
-  ;; interface is available.
-  (mu4e-knockknock-mode +1))
 
 (use-package mu4e-main
   :config
