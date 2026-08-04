@@ -845,15 +845,12 @@
   ;; auto‐save files during big refactors.
   (auto-save-include-big-deletions nil)
 
-  :config
-  ;; By default backups go alongside the original files, but to keep
-  ;; things tidy we redirect all backups into our data directory’s
-  ;; "backup/" sub-folder.  This centralizes backup files (rather than
-  ;; littering each project directory) without losing the safety of
-  ;; Emacs’ backups.
-  (add-to-list 'backup-directory-alist
-               `("." . ,(bs-path* bs-data-directory "backup/")))
+  ;; Keep backup files in a single data directory instead of beside
+  ;; the files they protect.
+  (backup-directory-alist
+   `(("." . ,(bs-path* bs-data-directory "backup/"))))
 
+  :config
   ;; Redirects all auto-save files into a dedicated auto-save/ folder
   ;; under our data directory.
   (add-to-list 'auto-save-file-name-transforms
@@ -1633,11 +1630,11 @@
   :after (corfu)
   :commands (nerd-icons-corfu-formatter)
 
-  :init
+  :custom
   ;; Support faster completion decisions by encoding semantic hints
   ;; visually, so candidate type recognition does not rely solely on
   ;; reading text.
-  (add-to-list 'corfu-margin-formatters 'nerd-icons-corfu-formatter))
+  (corfu-margin-formatters '(nerd-icons-corfu-formatter)))
 
 (use-package newcomment
   :after (prog-mode)
@@ -3154,10 +3151,9 @@
 ;;
 
 (use-package files
-  :config
-  ;; Extend the 'trusted-content' option by appending the user's home
-  ;; directory.
-  (add-to-list 'trusted-content "~/" t))
+  :custom
+  ;; Trust content beneath the user's home directory.
+  (trusted-content '("~/")))
 
 
 
@@ -4983,23 +4979,18 @@
 
 (use-package org-gtd-organize-core
   :after (org)
+  :functions (org-gtd-organize-type-member-p)
 
-  :config
+  :custom
   ;; Replace the package default, which prompts for tags on every
-  ;; item, with type-aware metadata hooks defined below.
-  (setq-default org-gtd-organize-hooks nil)
-
-  ;; Prompt for optional execution-context tags only on standalone and
-  ;; project actions, calendar items, and habits.
-  (add-to-list 'org-gtd-organize-hooks
-               #'(lambda ()
-                   (when (org-gtd-organize-type-member-p
-                          '(next-action calendar habit project-task))
-                     (org-set-tags-command))))
-
-  ;; Assign the applicable items to a continuing Area of Focus after
-  ;; any execution-context tags have been selected.
-  (add-to-list 'org-gtd-organize-hooks 'org-gtd-set-area-of-focus t))
+  ;; item, with type-aware context and Area of Focus metadata hooks.
+  (org-gtd-organize-hooks
+   (list
+    (lambda ()
+      (when (org-gtd-organize-type-member-p
+             '(next-action calendar habit project-task))
+        (org-set-tags-command)))
+    #'org-gtd-set-area-of-focus)))
 
 (use-package org-gtd-process
   :after (bs-ext)
