@@ -2659,7 +2659,7 @@
     ("C-c m t" . bs-gnus-prepare-today-context)
 
     ;; Prepare the current article and its replies as LLM context.
-    ("C-c m m" . bs-gnus-summary-mark-subthread))
+    ("C-c m m" . bs-gnus-summary-prepare-subthread-context))
 
   :demand t)
 
@@ -2687,14 +2687,67 @@
 
   ;; Limit the initial Summary for NNTP groups, download short Eternal
   ;; September articles on explicit Agent requests, and require
-  ;; explicit download marks for Gmane articles.
+  ;; explicit download marks for Gmane articles.  Treat subscribed
+  ;; Gmane archives as mailing lists: `to-list' routes ordinary
+  ;; followups through SMTP without discarding the author or Cc
+  ;; recipients, while new messages go to the authoritative list
+  ;; address.
   (gnus-parameters
-   '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
-      (display . 100))
-     ("\\`comp\\."
-      (agent-predicate . short))
-     ("\\`nntp\\+gmane:"
-      (agent-predicate . false))))
+   (append
+    '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
+       (display . 100))
+      ("\\`comp\\."
+       (agent-predicate . short))
+      ("\\`nntp\\+gmane:"
+       (agent-predicate . false)))
+    (mapcar
+     (lambda (entry)
+       (list
+        (concat
+         "\\`nntp\\+gmane:"
+         (regexp-quote (car entry))
+         "\\'")
+        (cons 'to-list (cdr entry))
+        '(subscribed . t)))
+     '(("gmane.comp.gcc.devel"
+        .
+        "gcc@gcc.gnu.org")
+       ("gmane.comp.gdb.devel"
+        .
+        "gdb@sourceware.org")
+       ("gmane.comp.gnu.binutils"
+        .
+        "binutils@sourceware.org")
+       ("gmane.comp.hardware.riscv.isa.devel"
+        .
+        "isa-dev@groups.riscv.org")
+       ("gmane.comp.hardware.riscv.opensbi.devel"
+        .
+        "opensbi@lists.infradead.org")
+       ("gmane.comp.lib.glibc.alpha"
+        .
+        "libc-alpha@sourceware.org")
+       ("gmane.emacs.devel"
+        .
+        "emacs-devel@gnu.org")
+       ("gmane.emacs.help"
+        .
+        "help-gnu-emacs@gnu.org")
+       ("gmane.linux.ports.riscv"
+        .
+        "linux-riscv@lists.infradead.org")
+       ("gmane.lisp.guile.devel"
+        .
+        "guile-devel@gnu.org")
+       ("gmane.lisp.guile.user"
+        .
+        "guile-user@gnu.org")
+       ("gmane.lisp.scheme.chez"
+        .
+        "chez-scheme@googlegroups.com")
+       ("gmane.lisp.scheme.mit-scheme.devel"
+        .
+        "mit-scheme-devel@gnu.org")))))
 
   ;; Keep the Gmane mailing-list archive available as a secondary NNTP
   ;; source, upgrading its standard connection with STARTTLS.
@@ -2790,54 +2843,12 @@
 
 (use-package gnus-msg
   :after (gnus)
-  :defines (gnus-mailing-list-groups
-            gnus-newsgroup-name
-            message-wide-reply-to-function)
 
-  :config
-  ;; Follow Gmane's LIST ACTIVE posting policy for ordinary replies:
-  ;; post `y' groups through NNTP, ask before using SMTP for `m'
-  ;; groups, and use SMTP automatically for `n' groups.  Explicit
-  ;; force-news commands retain their native override.
-  (advice-add
-   'gnus-post-news
-   :around
-   (lambda (function &rest arguments)
-     (let* ((post (nth 0 arguments))
-            (group (or (nth 1 arguments) gnus-newsgroup-name ""))
-            (force-news (nth 6 arguments))
-            (gmane-reply-p
-             (and (null post)
-                  (null force-news)
-                  (string-match-p "\\`nntp\\+gmane:" group)))
-            (route
-             (when gmane-reply-p
-               (pcase (bs-gnus-group-posting-status group)
-                 (?y 'nntp)
-                 (?n 'smtp)
-                 (?m
-                  (if (y-or-n-p
-                       (format
-                        "%s is moderated; use SMTP instead of NNTP? "
-                        (gnus-group-real-name group)))
-                      'smtp
-                    'nntp)))))
-            (gnus-mailing-list-groups
-             (pcase route
-               ('nntp nil)
-               ('smtp "\\`nntp\\+gmane:")
-               (_ gnus-mailing-list-groups)))
-            (message-wide-reply-to-function
-             (if (eq route 'smtp)
-                 (lambda ()
-                   (when-let*
-                       ((list-post
-                         (message-fetch-field "list-post"))
-                        ((string-match
-                          "<mailto:\\([^>?]+\\)" list-post)))
-                     `((To . ,(match-string 1 list-post)))))
-               message-wide-reply-to-function)))
-       (apply function arguments)))))
+  :custom
+  ;; Generate Mail-Followup-To from the Gmane groups explicitly
+  ;; marked as subscribed above.
+  (message-subscribed-address-functions
+   '(gnus-find-subscribed-addresses)))
 
 (use-package gnus-notifications
   :after (gnus)
@@ -3793,6 +3804,9 @@
    'summary
    :description
    "Summarize conclusions, facts, actions, and open questions."
+   ;; Make prepared feed, mail, and news context the required user
+   ;; input instead of folding it into the system instructions.
+   :use-context 'user
    :system
    (concat
     "Summarize in Simplified Chinese unless the user "
@@ -4373,7 +4387,7 @@
     ("C-c m t" . bs-mu4e-prepare-today-context)
 
     ;; Prepare the current message and its replies as LLM context.
-    ("C-c m m" . bs-mu4e-headers-mark-subthread)))
+    ("C-c m m" . bs-mu4e-headers-prepare-subthread-context)))
 
 (use-package bs-mu4e
   :after (mu4e-view)
@@ -5273,9 +5287,9 @@
 
   :bind
   ( :map elfeed-search-mode-map
-    ;; Mark the current entry using the native `elfeed' selection
-    ;; state.
-    ("C-c m m" . elfeed-search-mark)))
+    ;; Prepare entries selected by native marks, the active region, or
+    ;; point as LLM context.  Plain `m' remains the native mark command.
+    ("C-c m m" . bs-elfeed-search-prepare-context)))
 
 (use-package elfeed-show
   :custom
@@ -5293,6 +5307,9 @@
 
   :bind
   ( :map elfeed-tree-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)
+
     ;; Prepare today's locally stored entries as LLM context.
     ("C-c m t" . bs-elfeed-prepare-today-context))
 
