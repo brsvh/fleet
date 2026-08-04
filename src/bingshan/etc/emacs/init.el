@@ -3273,6 +3273,13 @@
 ;; Editing Binary Files (info "(emacs) Editing Binary Files")
 ;;
 
+(use-package hexl
+  :bind
+  ( :map ctl-c-f-map
+    ;; Visit a file without character-code conversion and edit its raw
+    ;; bytes in hexadecimal form.
+    ("h" . hexl-find-file)))
+
 
 
 ;;
