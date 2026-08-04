@@ -3340,6 +3340,36 @@
 ;; Emacs Lisp Packages (info "(emacs) Packages")
 ;;
 
+(use-package package
+  :custom
+  ;; `package-user-dir' is where Emacs downloads and installs
+  ;; packages, default is the elpa subdirectory under
+  ;; `user-emacs-directory'.  We override it to live under our data
+  ;; directory, name-spaced by `emacs-version', so that each Emacs
+  ;; version keeps its own isolated set of packages.
+  (package-user-dir (bs-path bs-data-directory emacs-version))
+
+  ;; Ensure verification data is also version-specific.
+  (package-gnupghome-dir (bs-path package-user-dir "gnupg/"))
+
+  ;; Emacs writes optimized autoloads into `package-quickstart-file',
+  ;; we want that autoload file to live alongside our installed
+  ;; packages.
+  (package-quickstart-file (bs-path package-user-dir "autoloads.el"))
+  (package-quickstart t)
+
+  ;; Keep the built-in package manager available as an optional
+  ;; supplement to packages managed declaratively by Nix.
+  (package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                      ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                      ("melpa" . "https://melpa.org/packages/")))
+
+  ;; Prefer curated official archives when a package is available
+  ;; from more than one source, while retaining MELPA as a fallback.
+  (package-archive-priorities '(("gnu" . 30)
+                                ("nongnu" . 20)
+                                ("melpa" . 10))))
+
 
 
 ;;
