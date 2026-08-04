@@ -2604,6 +2604,8 @@
              bs-gnus-summary-previous
              bs-gnus-update
              bs-gnus-update-enable)
+  :functions (bs-gnus--group-display-name
+              bs-gnus--group-display-name@shorten-gmane-prefix)
 
   :custom
   ;; Name NNTP sources by their configured server addresses in the
@@ -2637,6 +2639,12 @@
    #'bs-call-in-new-frame)
 
   :config
+  ;; Omit the redundant Gmane namespace from visible group names.
+  (define-advice bs-gnus--group-display-name
+      (:filter-return (name) shorten-gmane-prefix)
+    "Omit the leading Gmane namespace from visible group NAME."
+    (string-remove-prefix "gmane." name))
+
   ;; Replace the native Group and Summary layouts only after `gnus'
   ;; itself loads, and keep remote updates outside the main Emacs
   ;; process.
