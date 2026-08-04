@@ -2610,7 +2610,8 @@
   ;; Group buffer.
   (bs-gnus-group-source-names
    '(("news.eternal-september.org" . "Eternal September")
-     ("news.gmane.io" . "Gmane")))
+     ("news.gmane.io" . "Gmane")
+     ("news.solani.org" . "Solani")))
 
   ;; Check for new articles every five minutes so each background
   ;; update produces a smaller burst of desktop notifications.
@@ -2753,7 +2754,12 @@
            (nntp-address "news.gmane.io")
            (nntp-port-number 119)
            (nntp-open-connection-function
-            nntp-open-network-stream))))
+            nntp-open-network-stream))
+     (nntp "solani"
+           (nntp-address "news.solani.org")
+           (nntp-port-number 563)
+           (nntp-open-connection-function nntp-open-tls-stream)
+           (nntp-authinfo-force t))))
 
   ;; Mark articles selected for later batch processing with a hash.
   (gnus-process-mark ?#)
@@ -2830,8 +2836,8 @@
   ;; articles.
   (gnus-permanently-visible-groups ".*")
 
-  ;; Keep groups alphabetical within each topic.
-  (gnus-group-sort-function 'gnus-group-sort-by-alphabet)
+  ;; Keep groups alphabetical by their displayed, backend-unprefixed names.
+  (gnus-group-sort-function 'gnus-group-sort-by-real-name)
 
   :hook
   ;; Use a concise mode-line name for `gnus-group' buffers.
