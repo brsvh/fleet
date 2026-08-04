@@ -1285,6 +1285,25 @@
 ;; Commands for Human Languages (info "(emacs) Text")
 ;;
 
+(use-package abbrev
+  :after (text-mode)
+
+  :hook
+  ;; Expand defined abbreviations while editing human-language text.
+  (text-mode-hook . abbrev-mode))
+
+(use-package cape
+  :after (text-mode)
+  :commands (cape-abbrev)
+
+  :hook
+  (text-mode-hook
+   .
+   (lambda ()
+     ;; Offer defined abbreviations through
+     ;; `completion-at-point-functions'.
+     (add-hook 'completion-at-point-functions 'cape-abbrev 10 t))))
+
 (use-package emacs
   :custom
   ;; Set the global default value of `fill-column' to 70 characters.
@@ -1405,6 +1424,13 @@
 ;; Editing Programs (info "(emacs) Programs")
 ;;
 
+(use-package abbrev
+  :after (prog-mode)
+
+  :hook
+  ;; Expand mode-specific abbreviations while editing programs.
+  (prog-mode-hook . abbrev-mode))
+
 (use-package apheleia
   :after (prog-mode)
 
@@ -1417,13 +1443,18 @@
 
 (use-package cape
   :after (prog-mode)
-  :commands (cape-dabbrev
+  :commands (cape-abbrev
+             cape-dabbrev
              cape-file)
 
   :hook
   (prog-mode-hook
    .
    (lambda ()
+     ;; Offer explicitly defined abbreviations before loosely matched
+     ;; words from the current buffer.
+     (add-hook 'completion-at-point-functions 'cape-abbrev 10 t)
+
      ;; Make symbols that already exist in the current buffer
      ;; immediately reusable during editing.
      (add-hook 'completion-at-point-functions 'cape-dabbrev 20 t)
@@ -2392,6 +2423,16 @@
 ;;
 ;; Abbrevs (info "(emacs) Abbrevs")
 ;;
+
+(use-package abbrev
+  :after (bs-lib)
+
+  :custom
+  ;; Store user-defined abbreviations as persistent data.
+  (abbrev-file-name (bs-path bs-data-directory "abbrevs.el"))
+
+  ;; Save changed abbreviations without prompting when Emacs exits.
+  (save-abbrevs 'silently))
 
 
 
