@@ -2604,6 +2604,8 @@
              bs-gnus-summary-previous
              bs-gnus-update
              bs-gnus-update-enable)
+  :defines (gnus-group-mode-map
+            gnus-summary-mode-map)
   :functions (bs-gnus--group-display-name
               bs-gnus--group-display-name@shorten-gmane-prefix)
 
@@ -2682,6 +2684,7 @@
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
+  :defines (gnus-select-method)
 
   :custom
   ;; Store `gnus' state beneath the shared Emacs state directory.
@@ -2805,6 +2808,7 @@
 
 (use-package gnus-agent
   :after (gnus)
+  :defines (gnus-agent-predicate)
 
   :custom
   ;; Cache NNTP data separately from persistent read and subscription
@@ -4511,6 +4515,7 @@
 
 (use-package gptel-transient
   :after (mu4e-main)
+  :defines (mu4e-main-mode-map)
 
   :bind
   ( :map mu4e-main-mode-map
