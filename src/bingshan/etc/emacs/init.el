@@ -2597,6 +2597,7 @@
 (use-package bs-gnus
   :after (gnus gnus-notifications gravatar)
   :commands (bs-gnus-group-enable
+             bs-gnus-prepare-today-context
              bs-gnus-group-posting-status
              bs-gnus-group-topic-toggle
              bs-gnus-notifications-enable
@@ -2632,6 +2633,11 @@
    (bs-path bs-cache-directory "gnus/notification-avatars/"))
   (bs-gnus-notifications-avatar-cache-expiry (* 90 24 60 60))
 
+  ;; Open each notification Read action in a new frame belonging to
+  ;; the current Emacs session.
+  (bs-gnus-notifications-read-display-function
+   #'bs-call-in-new-frame)
+
   :config
   ;; Replace the native Group and Summary layouts only after `gnus'
   ;; itself loads, and keep remote updates outside the main Emacs
@@ -2642,7 +2648,16 @@
   (bs-gnus-update-enable)
 
   :bind
-  ( :map gnus-summary-mode-map
+  ( :map gnus-group-mode-map
+    ;; Prepare today's locally cached articles from all subscribed
+    ;; groups as LLM context.
+    ("C-c m t" . bs-gnus-prepare-today-context)
+
+    :map gnus-summary-mode-map
+    ;; Prepare today's locally cached articles from all subscribed
+    ;; groups as LLM context.
+    ("C-c m t" . bs-gnus-prepare-today-context)
+
     ;; Prepare the current article and its replies as LLM context.
     ("C-c m m" . bs-gnus-summary-mark-subthread))
 
@@ -2828,10 +2843,10 @@
   :after (gnus)
 
   :custom
-  ;; Notify articles from every subscribed group while leaving
-  ;; notification lifetime to the desktop server.
+  ;; Notify articles from every subscribed group and leave each
+  ;; actionable notification visible for fifteen seconds.
   (gnus-notifications-minimum-level 5)
-  (gnus-notifications-timeout nil)
+  (gnus-notifications-timeout (* 15 1000))
 
   ;; Resolve sender images through Gravatar only.
   (gnus-notifications-use-google-contacts nil)
@@ -3042,8 +3057,8 @@
   ;; `bs-gnus' supplies fold indicators and unread counts.
   (gnus-topic-line-format "%i%n\n")
 
-  ;; Preserve the configured hierarchy even when a topic is empty.
-  (gnus-topic-display-empty-topics t)
+  ;; Hide configured topics that contain no visible groups.
+  (gnus-topic-display-empty-topics nil)
 
   ;; Indent each topic hierarchy level by two columns.
   (gnus-topic-indent-level 2)
@@ -3067,6 +3082,14 @@
   ;; Preserve unrelated windows and confine `gnus' layouts to the
   ;; window from which `gnus' was entered.
   (gnus-use-full-window nil))
+
+(use-package gptel-transient
+  :after (gnus-group)
+
+  :bind
+  ( :map gnus-group-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)))
 
 (use-package gptel-transient
   :after (gnus-sum)
@@ -3851,11 +3874,14 @@
      (require 'gptel-context)
      (when-let* ((context-name
                   (cond
-                   ((derived-mode-p 'elfeed-search-mode)
+                   ((derived-mode-p 'elfeed-search-mode
+                                    'elfeed-tree-mode)
                     bs-elfeed-context-buffer-name)
-                   ((derived-mode-p 'gnus-summary-mode)
+                   ((derived-mode-p 'gnus-summary-mode
+                                    'gnus-group-mode)
                     bs-gnus-context-buffer-name)
-                   ((derived-mode-p 'mu4e-headers-mode)
+                   ((derived-mode-p 'mu4e-headers-mode
+                                    'mu4e-main-mode)
                     bs-mu4e-context-buffer-name)))
                  (context (get-buffer context-name))
                  (source (current-buffer)))
@@ -3868,9 +3894,7 @@
          (unless (local-variable-p 'gptel-context)
            (setq-local gptel-context
                        (copy-sequence gptel-context)))
-         (cl-pushnew context gptel-context :test #'eq))
-       (when (derived-mode-p 'elfeed-search-mode)
-         (gptel-send '(4)))))))
+         (cl-pushnew context gptel-context :test #'eq))))))
 
 (use-package gptel-openai-oauth
   :after (bs-lib gptel)
@@ -4344,6 +4368,10 @@
 
   :bind
   ( :map mu4e-headers-mode-map
+    ;; Prepare today's local messages from the active account as LLM
+    ;; context.
+    ("C-c m t" . bs-mu4e-prepare-today-context)
+
     ;; Prepare the current message and its replies as LLM context.
     ("C-c m m" . bs-mu4e-headers-mark-subthread)))
 
@@ -4370,6 +4398,14 @@
   ;; Refresh avatars after 90 days while retaining them across Emacs
   ;; sessions and notification checks.
   (bs-mu4e-notifications-avatar-cache-expiry (* 90 24 60 60))
+
+  ;; Leave each actionable notification visible for fifteen seconds.
+  (bs-mu4e-notifications-timeout (* 15 1000))
+
+  ;; Open each notification Read action in a new frame belonging to
+  ;; the current Emacs session.
+  (bs-mu4e-notifications-read-display-function
+   #'bs-call-in-new-frame)
 
   :config
   ;; Replace grouped `mu4e-alert' delivery with one actionable desktop
@@ -4432,6 +4468,14 @@
 
   :bind
   ( :map mu4e-headers-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)))
+
+(use-package gptel-transient
+  :after (mu4e-main)
+
+  :bind
+  ( :map mu4e-main-mode-map
     ;; Open the `gptel' send menu for the prepared context.
     ("C-c m g" . gptel-menu)))
 
@@ -4592,12 +4636,20 @@
 
 (use-package bs-mu4e
   :after (mu4e-main)
-  :commands (bs-mu4e-main-enable)
+  :commands (bs-mu4e-main-enable
+             bs-mu4e-prepare-today-context)
+  :defines (mu4e-main-mode-map)
 
   :init
   ;; Present the main mail dashboard with the same visual hierarchy,
   ;; aligned counts, and context-aware status used by Gnus and Elfeed.
-  (bs-mu4e-main-enable))
+  (bs-mu4e-main-enable)
+
+  :bind
+  ( :map mu4e-main-mode-map
+    ;; Prepare today's local messages from the active account as LLM
+    ;; context.
+    ("C-c m t" . bs-mu4e-prepare-today-context)))
 
 (use-package mu4e-modeline
   :custom
@@ -5038,19 +5090,49 @@
 ;; Web Feed Reader
 ;;
 
+(use-package gptel-transient
+  :after (elfeed-search)
+  :defines (elfeed-search-mode-map)
+
+  :bind
+  ( :map elfeed-search-mode-map
+    ;; Open the `gptel' send menu for the prepared context.
+    ("C-c m g" . gptel-menu)))
+
 (use-package bs-elfeed
   :after (elfeed-search)
   :commands (bs-elfeed-search-disable
              bs-elfeed-search-enable
              bs-elfeed-search-prepare-context
+             bs-elfeed-prepare-today-context
+             bs-elfeed-notifications-disable
+             bs-elfeed-notifications-enable
              bs-elfeed-tree-disable
              bs-elfeed-tree-enable)
   :defines (elfeed-search-mode-map)
 
+  :custom
+  ;; Reuse site favicons for desktop notifications for three months.
+  (bs-elfeed-notifications-favicon-cache-directory
+   (bs-path bs-cache-directory
+            "elfeed/notification-favicons/"))
+  (bs-elfeed-notifications-favicon-cache-expiry (* 90 24 60 60))
+
+  ;; Leave each actionable notification visible for fifteen seconds.
+  (bs-elfeed-notifications-timeout (* 15 1000))
+
+  ;; Open each notification Read action in a new frame belonging to
+  ;; the current Emacs session.
+  (bs-elfeed-notifications-read-display-function
+   #'bs-call-in-new-frame)
+
+  ;; Check all subscribed feeds every fifteen minutes.
+  (bs-elfeed-update-interval (* 15 60))
+
   :bind
   ( :map elfeed-search-mode-map
-    ;; Prepare selected entries as `gptel' context and open its menu.
-    ("C-c m g" . bs-elfeed-search-prepare-context)))
+    ;; Prepare today's locally stored entries as LLM context.
+    ("C-c m t" . bs-elfeed-prepare-today-context)))
 
 (use-package elfeed
   :after (bs-lib)
@@ -5110,7 +5192,13 @@
      (interactive "p")
      (forward-line (- count))
      (when (get-buffer-window "*elfeed-entry*")
-       (call-interactively #'elfeed-search-show-entry)))))
+       (call-interactively #'elfeed-search-show-entry))))
+
+  :bind
+  ( :map ctl-c-a-map
+    ;; Open the Elfeed tag and feed hierarchy from the custom
+    ;; application map.
+    ("f" . elfeed)))
 
 (use-package elfeed-db
   :after (bs-lib)
@@ -5146,9 +5234,11 @@
 
   :config
   ;; Enable automatic scoring without replacing chronological sorting,
-  ;; then install the Gnus-inspired one-line Search renderer.
+  ;; then install the renderer and notifications after all new-entry
+  ;; taggers are active.
   (elfeed-score-enable t)
   (bs-elfeed-search-enable)
+  (bs-elfeed-notifications-enable)
   (keymap-set elfeed-search-mode-map "=" elfeed-score-map)
 
   :demand t)
@@ -5200,6 +5290,11 @@
 
 (use-package elfeed-tree
   :after (elfeed)
+
+  :bind
+  ( :map elfeed-tree-mode-map
+    ;; Prepare today's locally stored entries as LLM context.
+    ("C-c m t" . bs-elfeed-prepare-today-context))
 
   :custom
   ;; Build tree counts and searches from unread entries, matching the
