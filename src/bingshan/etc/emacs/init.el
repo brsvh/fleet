@@ -189,6 +189,11 @@
 ;; Exiting Emacs (info "(emacs) Exiting")
 ;;
 
+(use-package files
+  :custom
+  ;; Require explicit confirmation before terminating Emacs.
+  (confirm-kill-emacs #'yes-or-no-p))
+
 
 
 ;;
