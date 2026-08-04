@@ -5137,8 +5137,8 @@
   (bs-elfeed-notifications-read-display-function
    #'bs-call-in-new-frame)
 
-  ;; Check all subscribed feeds every fifteen minutes.
-  (bs-elfeed-update-interval (* 15 60))
+  ;; Check all subscribed feeds every five minutes.
+  (bs-elfeed-update-interval (* 5 60))
 
   :bind
   ( :map elfeed-search-mode-map
