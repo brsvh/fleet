@@ -87,6 +87,19 @@ in
     nginx = {
       virtualHosts = mtaStsVirtualHosts;
     };
+
+    postfix = {
+      settings = {
+        master = {
+          smtp = {
+            args = [
+              "-o"
+              "inet_protocols=ipv4"
+            ];
+          };
+        };
+      };
+    };
   };
 
   sops = {
