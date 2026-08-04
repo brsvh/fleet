@@ -76,10 +76,12 @@
           (bs-path bs-cache-directory "eln-cache/")))
 
 (use-package emacs
-  :custom
-  ;; Temporarily increase GC threshold during startup.
-  (gc-cons-threshold most-positive-fixnum)
+  :init
+  ;; Use a finite startup threshold so a failed startup hook cannot
+  ;; disable garbage collection indefinitely.
+  (set-default-toplevel-value 'gc-cons-threshold (* 256 1024 1024))
 
+  :custom
   ;; Don't use precious startup time to check mtimes on elisp
   ;; bytecode. Although stale byte-code will heavily impact startup
   ;; times, performance is unimportant when Emacs is in an error
@@ -90,9 +92,10 @@
   (emacs-startup-hook
    .
    (lambda ()
-     ;; Restore to normal value after startup (e.g. 100MiB)
-     (let ((threshold (* 100 1024 1024)))
-       (set-default-toplevel-value 'gc-cons-threshold threshold))))
+     ;; Restore the normal threshold after startup and collect objects
+     ;; retained by initialization.
+     (set-default-toplevel-value 'gc-cons-threshold (* 100 1024 1024))
+     (garbage-collect)))
 
   :demand t
   :no-require t)
