@@ -45,6 +45,7 @@
            "comp.lang.lisp"
            "comp.lang.scheme"
            "nntp+solani:comp.programming"
+           "nntp+gmane:gmane.lisp.asdf.devel"
            "nntp+gmane:gmane.lisp.guile.devel"
            "nntp+gmane:gmane.lisp.guile.user"
            "nntp+gmane:gmane.lisp.scheme.chez"

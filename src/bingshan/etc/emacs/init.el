@@ -2745,6 +2745,9 @@
        ("gmane.linux.ports.riscv"
         .
         "linux-riscv@lists.infradead.org")
+       ("gmane.lisp.asdf.devel"
+        .
+        "asdf-devel@lists.common-lisp.net")
        ("gmane.lisp.guile.devel"
         .
         "guile-devel@gnu.org")
