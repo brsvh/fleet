@@ -93,7 +93,6 @@
   (doom-modeline-remove-segment 'bar 'all))
 
 (use-package menu-bar
-  :after (bs-hooks)
   :commands (menu-bar-mode)
 
   :hook
@@ -101,7 +100,6 @@
   (bs-first-ui-hook . (lambda () (menu-bar-mode -1))))
 
 (use-package spacious-padding
-  :after (bs-hooks)
   :commands (spacious-padding-mode)
 
   :custom
@@ -157,7 +155,6 @@
                               :tab-width 4)))
 
 (use-package tool-bar
-  :after (bs-hooks)
   :commands (tool-bar-mode)
 
   :hook
@@ -233,8 +230,6 @@
     ([remap move-end-of-line] . mwim-end-of-code-or-line)))
 
 (use-package simple
-  :after (bs-hooks)
-
   :hook
   ;; Display the current Column number.
   (bs-first-buffer-hook . column-number-mode)
@@ -337,8 +332,6 @@
     ("B" . embark-bindings)))
 
 (use-package marginalia
-  :after (bs-hooks)
-
   :custom
   ;; Display `marginalia' at right.
   (marginalia-align 'right)
@@ -397,8 +390,6 @@
                '(:mode embark-collect-mode)))
 
 (use-package vertico
-  :after (bs-hooks)
-
   :custom
   ;; Resize the `vertico' buffer size when the number of candidates
   ;; changed.
@@ -435,8 +426,6 @@
   (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
 
 (use-package vertico-mouse
-  :after (vertico)
-
   :hook
   ;; Enable mouse support for `vertico-mode'.
   (vertico-mode-hook . vertico-mouse-mode))
@@ -505,8 +494,6 @@
 ;;
 
 (use-package delsel
-  :after (bs-hooks)
-
   :hook
   ;; When typing with a selected region, replace it directly.
   (bs-first-buffer-hook . delete-selection-mode))
@@ -572,15 +559,11 @@
 ;;
 
 (use-package display-fill-column-indicator
-  :after (prog-mode)
-
   :hook
   ;; Display an indication of the `fill-column' position.
   (prog-mode-hook . display-fill-column-indicator-mode))
 
 (use-package display-line-numbers
-  :after (prog-mode)
-
   :hook
   ;; Show line numbers.
   (prog-mode-hook . display-line-numbers-mode))
@@ -632,14 +615,11 @@
        (form-feed-mode +1)))))
 
 (use-package hl-line
-  :after (prog-mode)
-
   :hook
   ;; Highlight the current line.
   (prog-mode-hook . hl-line-mode))
 
 (use-package modus-themes
-  :after (bs-hooks)
   :commands (modus-themes-select)
 
   :custom
@@ -725,8 +705,6 @@
 ;;
 
 (use-package anzu
-  :after (bs-hooks)
-
   :hook
   ;; Get real-time match counts and context search by `anzu-mode'.
   (bs-first-file-hook . global-anzu-mode))
@@ -789,8 +767,6 @@
 ;;
 
 (use-package autorevert
-  :after (bs-hooks)
-
   :custom
   ;; Suppress verbose revert messages for a quiet editing experience.
   (auto-revert-verbose nil)
@@ -807,8 +783,6 @@
     ([remap recentf-open] . consult-recent-file)))
 
 (use-package editorconfig
-  :after (bs-hooks)
-
   :hook
   ;; Enable `editorconfig-mode' after early startup work completes so
   ;; files opened during normal editing apply project coding style
@@ -876,7 +850,7 @@
        (add-hook 'before-save-hook 'bs/untabify nil t)))))
 
 (use-package recentf
-  :after (bs-hooks bs-lib)
+  :after (bs-lib)
 
   :custom
   ;; Store recent files list in our state directory.
@@ -1049,7 +1023,6 @@
     ([remap list-buffers] . ibuffer)))
 
 (use-package ibuffer-project
-  :after (ibuffer)
   :commands (ibuffer-do-sort-by-project-file-relative
              ibuffer-project-generate-filter-groups)
 
@@ -1075,8 +1048,6 @@
        (ibuffer-do-sort-by-project-file-relative)))))
 
 (use-package nerd-icons-ibuffer
-  :after (ibuffer)
-
   :hook
   ;; Use visual cues to speed up buffer triage, not to decorate the
   ;; buffer list.
@@ -1125,8 +1096,6 @@
     ([remap split-window-right] . switch-window-then-split-right)))
 
 (use-package winner
-  :after (bs-hooks)
-
   :hook
   ;; Allow undo or redo of windows layout.
   (bs-first-ui-hook . winner-mode))
@@ -1196,7 +1165,6 @@
   :no-require t)
 
 (use-package scroll-bar
-  :after (bs-hooks)
   :commands (scroll-bar-mode)
 
   :hook
@@ -1204,8 +1172,6 @@
   (bs-first-ui-hook . (lambda () (scroll-bar-mode -1))))
 
 (use-package tab-bar
-  :after (bs-hooks)
-
   :init
   ;; Only show the Tab Bar when more than one tab exists.  Set the
   ;; value directly because its Custom setter enables `tab-bar-mode'
@@ -1265,8 +1231,6 @@
   (add-to-list 'electric-indent-chars ?\^? t))
 
 (use-package electric
-  :after prog-mode
-
   :hook
   ;; Auto re-indentation when programming.
   (prog-mode-hook . electric-indent-local-mode))
@@ -1286,14 +1250,11 @@
 ;;
 
 (use-package abbrev
-  :after (text-mode)
-
   :hook
   ;; Expand defined abbreviations while editing human-language text.
   (text-mode-hook . abbrev-mode))
 
 (use-package cape
-  :after (text-mode)
   :commands (cape-abbrev)
 
   :hook
@@ -1334,8 +1295,6 @@
   :no-require t)
 
 (use-package simple
-  :after (text-mode)
-
   :hook
   ;; Enable `auto-fill-mode' in Text Mode buffers.
   (text-mode-hook . auto-fill-mode)
@@ -1378,8 +1337,6 @@
                t))
 
 (use-package grip-mode
-  :after (markdown-ts-mode)
-
   :custom
   ;; Prefer an embedded WebKit preview when Emacs supports xwidgets.
   (grip-preview-in-webkit t)
@@ -1389,8 +1346,6 @@
   (markdown-ts-mode-hook . grip-mode))
 
 (use-package simple
-  :after (markdown-ts-mode)
-
   :hook
   ;; Enable `auto-fill-mode' in `markdown-ts-mode' buffers.
   (markdown-ts-mode-hook . auto-fill-mode)
@@ -1407,8 +1362,6 @@
 ;;
 
 (use-package simple
-  :after (org-mode)
-
   :hook
   ;; Enable `auto-fill-mode' in `org-mode' buffers.
   (org-mode-hook . auto-fill-mode)
@@ -1425,15 +1378,11 @@
 ;;
 
 (use-package abbrev
-  :after (prog-mode)
-
   :hook
   ;; Expand mode-specific abbreviations while editing programs.
   (prog-mode-hook . abbrev-mode))
 
 (use-package apheleia
-  :after (prog-mode)
-
   :hook
   ;; `apheleia' formats code using external formatter via a
   ;; non-blocking pipeline, typically on save, without interfering
@@ -1442,7 +1391,6 @@
   (prog-mode-hook . apheleia-mode))
 
 (use-package cape
-  :after (prog-mode)
   :commands (cape-abbrev
              cape-dabbrev
              cape-file)
@@ -1560,8 +1508,6 @@
   (corfu-quit-no-match nil))
 
 (use-package corfu
-  :after (prog-mode)
-
   :hook
   ;; Support incremental code writing by keeping completion available
   ;; as part of the normal editing flow, so identifiers can be refined
@@ -1611,8 +1557,6 @@
               :around 'cape-wrap-nonexclusive))
 
 (use-package eglot-booster
-  :after (eglot)
-
   :hook
   ;; Enhance `eglot' communication and processing pipeline to reduce
   ;; latency and improve responsiveness, without changing LSP
@@ -1620,8 +1564,6 @@
   (eglot-managed-mode-hook . eglot-booster-mode))
 
 (use-package eldoc-box
-  :after (eldoc)
-
   :hook
   ;; Display `eldoc' documentation in a child frame near point on
   ;; hover, providing contextual information without using the echo
@@ -1629,8 +1571,6 @@
   (eldoc-mode-hook . eldoc-box-hover-at-point-mode))
 
 (use-package hideshow
-  :after (prog-mode)
-
   :hook
   ;; Allow folding and unfolding of code blocks.
   (prog-mode-hook . hs-minor-mode))
@@ -1673,8 +1613,6 @@
   (corfu-margin-formatters '(nerd-icons-corfu-formatter)))
 
 (use-package newcomment
-  :after (prog-mode)
-
   :hook
   ;; Restrict auto-fill behavior to comments only in programming
   ;; buffers.  When non-nil, `comment-auto-fill-only-comments' ensures
@@ -1686,22 +1624,16 @@
      (setq-local comment-auto-fill-only-comments t))))
 
 (use-package rainbow-delimiters
-  :after (prog-mode)
-
   :hook
   ;; Colorful parentheses.
   (prog-mode-hook . rainbow-delimiters-mode))
 
 (use-package simple
-  :after (prog-mode)
-
   :hook
   ;; Enable `auto-fill-mode' in Prog Mode buffers.
   (prog-mode-hook . auto-fill-mode))
 
 (use-package smartparens
-  :after (prog-mode)
-
   :hook
   ;; Automatic parentheses operating.
   (prog-mode-hook . smartparens-mode))
@@ -1712,8 +1644,6 @@
   :demand t)
 
 (use-package subword
-  :after (prog-mode)
-
   :hook
   ;; Improve cursor movement by treating Camel-case sub-words as
   ;; separate units.
@@ -1739,8 +1669,6 @@
   :commands (c-ts-mode c++-ts-mode))
 
 (use-package eglot
-  :after (cc-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for classic C/C++
   ;; major modes derived from `cc-mode'.
@@ -1749,8 +1677,6 @@
    eglot-ensure))
 
 (use-package eglot
-  :after (c-ts-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; based C/C++ modes.
@@ -1772,8 +1698,6 @@
 ;;
 
 (use-package corfu
-  :after (lisp-mode)
-
   :hook
   ;; Favor incremental construction of Lisp forms by keeping symbol
   ;; completion available during expression-oriented editing.
@@ -1819,8 +1743,6 @@
 ;;
 
 (use-package paredit
-  :after (elisp-mode)
-
   :hook
   ;; Enable structured editing to enforcing balanced parentheses and
   ;; S-expression integrity by `paredit'.
@@ -1849,16 +1771,12 @@
 ;;
 
 (use-package eglot
-  :after (haskell-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Haskell
   ;; buffers.
   (haskell-mode-hook . eglot-ensure))
 
 (use-package eglot
-  :after (haskell-ts-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; Haskell buffers.
@@ -1923,15 +1841,11 @@
 ;;
 
 (use-package eglot
-  :after (js-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for JSON buffers.
   (js-json-mode-hook . eglot-ensure))
 
 (use-package eglot
-  :after (json-ts-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; JSON buffers.
@@ -1982,15 +1896,11 @@
     ("C-c '" . bs-edit-indirect-nix-literal-string)))
 
 (use-package eglot
-  :after (nix-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Nix buffers.
   (nix-mode-hook . eglot-ensure))
 
 (use-package eglot
-  :after (nix-ts-mode)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Tree-sitter
   ;; Nix buffers.
@@ -2017,8 +1927,6 @@
 ;;
 
 (use-package eglot
-  :after (python)
-
   :hook
   ;; Automatically start or reuse an `eglot' session for Python
   ;; buffers.
@@ -2057,15 +1965,11 @@
                                          "geiser_history")))
 
 (use-package macrostep-geiser
-  :after (geiser-mode)
-
   :hook
   ;; Expand Scheme macros through Geiser in source buffers.
   (geiser-mode-hook . macrostep-geiser-setup))
 
 (use-package macrostep-geiser
-  :after (geiser-repl)
-
   :hook
   ;; Expand Scheme macros through Geiser in REPL buffers.
   (geiser-repl-mode-hook . macrostep-geiser-setup))
@@ -2116,15 +2020,11 @@
     ("C-c !" . consult-flymake)))
 
 (use-package flymake
-  :after (prog-mode)
-
   :hook
   ;; Enable `flymake'.
   (prog-mode-hook . flymake-mode))
 
 (use-package flymake-popon
-  :after (flymake)
-
   :hook
   ;; Enable `flymake-popon-mode' whenever `flymake-mode' is active.
   ;; Diagnostic messages are displayed in a child frame (posframe)
@@ -2192,8 +2092,6 @@
   (diff-hl-mode-hook . diff-hl-flydiff-mode))
 
 (use-package display-fill-column-indicator
-  :after (git-commit)
-
   :hook
   ;; Treat commit messages as constrained prose that benefits from
   ;; immediate visual guidance, not as free-form text to be fixed
@@ -2201,8 +2099,6 @@
   (git-commit-mode-hook . display-fill-column-indicator-mode))
 
 (use-package envrc
-  :after (bs-hooks)
-
   :hook
   ;; Enable `envrc-global-mode' when the first file is visited.  This
   ;; activates direnv-based environment loading for all subsequent
@@ -2410,8 +2306,6 @@
   (treemacs-project-follow-mode +1))
 
 (use-package whitespace
-  :after (magit-diff)
-
   :hook
   ;; Make whitespace-only changes visible when reviewing diffs, so
   ;; formatting modifications are evaluated explicitly instead of
@@ -2476,8 +2370,6 @@
        (display-fill-column-indicator-mode -1)))))
 
 (use-package dired-x
-  :after (dired)
-
   :custom
   ;; Keep omission behavior quiet and unobtrusive, so directory views
   ;; stay focused on relevant entries without drawing attention to
@@ -2491,8 +2383,6 @@
   (dired-mode-hook . dired-omit-mode))
 
 (use-package diredfl
-  :after (dired)
-
   :hook
   ;; Emphasize structural differences in directory listings through
   ;; visual distinction, making it easier to separate files,
@@ -2501,8 +2391,6 @@
   (dired-mode-hook . diredfl-mode))
 
 (use-package nerd-icons-dired
-  :after (dired)
-
   :hook
   ;; Support faster visual parsing of directory listings by using
   ;; icons as pre-attentive cues, helping identify file types and
@@ -3202,15 +3090,11 @@
   :demand t)
 
 (use-package hl-line
-  :after (gnus-group)
-
   :hook
   ;; Highlight the current Group row without changing its contents.
   (gnus-group-mode-hook . hl-line-mode))
 
 (use-package hl-line
-  :after (gnus-sum)
-
   :hook
   ;; Highlight the Summary row at point independently of the article
   ;; displayed in the Article buffer.
@@ -3274,8 +3158,6 @@
               :around 'cape-wrap-nonexclusive))
 
 (use-package corfu
-  :after (comint)
-
   :hook
   ;; Treat completion as part of interactive exploration rather than a
   ;; separate lookup step in command-driven buffers.
@@ -3339,22 +3221,16 @@
     ([remap shell-command] . with-editor-shell-command)))
 
 (use-package with-editor
-  :after (esh-mode)
-
   :hook
   ;; Export $EDITOR/$VISUAL for Eshell sessions.
   (eshell-mode-hook . with-editor-export-editor))
 
 (use-package with-editor
-  :after (shell)
-
   :hook
   ;; Export $EDITOR/$VISUAL for `shell-mode' buffers.
   (shell-mode-hook . with-editor-export-editor))
 
 (use-package with-editor
-  :after (term)
-
   :hook
   ;; Export $EDITOR/$VISUAL for `term-mode' sessions.
   (term-mode-hook . with-editor-export-editor))
@@ -3366,8 +3242,6 @@
 ;;
 
 (use-package bs-ext
-  :after (bs-hooks)
-
   :hook
   ;; Start the Emacs server after early startup initialization has
   ;; completed.  This ensures that the server is launched only once
@@ -3406,7 +3280,7 @@
 ;;
 
 (use-package saveplace
-  :after (bs-hooks bs-lib)
+  :after (bs-lib)
 
   :custom
   ;; Store persistent data in our state directory.
@@ -3755,8 +3629,6 @@
     ("C-c" . codex-ide-menu)))
 
 (use-package corfu
-  :after (codex-ide-session-mode)
-
   :hook
   ;; Enable `corfu' in `codex-ide' sessions so automatic slash command
   ;; completion uses the popup frontend instead of `*Completions*'.
@@ -4128,8 +4000,6 @@
 ;;
 
 (use-package consult-denote
-  :after (bs-hooks)
-
   :bind
   ( :map ctl-c-n-map
     ;; Search and select `denote' notes using `consult', providing
@@ -4547,8 +4417,6 @@
   :demand t)
 
 (use-package corfu
-  :after (mu4e-compose)
-
   :hook
   ;; Enable `corfu' in compose buffers so CAPF-based recipient
   ;; completion uses the configured popup UI.
@@ -4931,8 +4799,6 @@
                  (window-height . fit-window-to-buffer))))
 
 (use-package org-appear
-  :after (org)
-
   :hook
   ;; Enable `org-appear-mode' whenever entering `org-mode'.  This mode
   ;; reveals hidden formatting markers (such as emphasis markers,
@@ -4944,7 +4810,6 @@
   :defines (org-capture-templates))
 
 (use-package org-edna
-  :after (org)
   :commands (org-edna-mode)
 
   :hook
@@ -5041,8 +4906,6 @@
     ("a" . org-gtd-engage)))
 
 (use-package org-gtd-mode
-  :after (bs-hooks)
-
   :hook
   ;; Enable global `org-gtd' integration shortly after startup,
   ;; including inbox counts, dependency handling, and TODO-state
@@ -5095,8 +4958,6 @@
   (org-id-locations-file (bs-path org-directory ".id-locations")))
 
 (use-package org-modern
-  :after (org)
-
   :hook
   ;; Activate `org-modern-mode' when entering `org-mode'.  This
   ;; adjusts the visual presentation of headings, lists, blocks, and
@@ -5104,8 +4965,6 @@
   (org-mode-hook . org-modern-mode))
 
 (use-package org-modern
-  :after (org-agenda)
-
   :hook
   ;; Enable modern rendering for `org-agenda' buffers.  The hook runs
   ;; after the agenda is fully generated, ensuring that all agenda
@@ -5113,8 +4972,6 @@
   (org-agenda-finalize-hook . org-modern-agenda))
 
 (use-package org-modern-indent
-  :after (org)
-
   :hook
   ;; Add indentation support for `org-modern', aligning visual
   ;; elements with the structural indentation defined by `org'.  This
