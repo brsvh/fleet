@@ -2773,6 +2773,20 @@
   (gnus-process-mark ?#)
 
   :config
+  ;; Load the declarative subscription and topic state after `gnus'
+  ;; has restored its machine-local newsrc state, then retire this
+  ;; one-shot hook for the rest of the Emacs session.
+  (let (load-config)
+    (setq load-config
+          (lambda ()
+            (let ((config
+                   (bs-path bs-config-directory "gnus.el")))
+              (when (file-exists-p config)
+                (load config nil t t)
+                (remove-hook 'gnus-setup-news-hook
+                             load-config)))))
+    (add-hook 'gnus-setup-news-hook load-config))
+
   ;; Use authenticated, encrypted Eternal September access for normal
   ;; Usenet reading and posting.
   (setq gnus-select-method

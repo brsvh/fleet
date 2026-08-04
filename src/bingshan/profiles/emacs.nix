@@ -755,4 +755,12 @@ in
       ];
     };
   };
+
+  xdg = {
+    configFile = {
+      "emacs/gnus.el" = {
+        source = bingshan.etc.emacs.gnus;
+      };
+    };
+  };
 }
