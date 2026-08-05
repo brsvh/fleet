@@ -313,7 +313,7 @@
             };
 
             primary = false;
-            realName = "Burgess Chang";
+            realName = "Bingshan 'Burgess' Chang";
 
             signature = {
               text = ''
