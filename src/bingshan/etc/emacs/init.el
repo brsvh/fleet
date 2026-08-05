@@ -2667,6 +2667,9 @@
        ("gmane.comp.hardware.riscv.opensbi.devel"
         .
         "opensbi@lists.infradead.org")
+       ("gmane.comp.kde.devel.general"
+        .
+        "kde-devel@kde.org")
        ("gmane.comp.lib.glibc.alpha"
         .
         "libc-alpha@sourceware.org")

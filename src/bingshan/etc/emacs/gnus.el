@@ -12,6 +12,7 @@
 (require 'gnus)
 (require 'gnus-group)
 (require 'gnus-start)
+(require 'gnus-sum)
 (require 'gnus-topic)
 (require 'gnus-util)
 (require 'subr-x)
@@ -51,6 +52,7 @@
            "nntp+gmane:gmane.lisp.scheme.chez"
            "nntp+gmane:gmane.lisp.scheme.mit-scheme.devel")
           ("Linux"
+           "nntp+gmane:gmane.comp.kde.devel.general"
            "nntp+solani:comp.os.linux.misc"
            "comp.os.linux.networking")
           ("Local"
@@ -81,6 +83,8 @@
            "nntp+gmane:gmane.comp.lib.glibc.alpha")
           ("Unix"
            "nntp+solani:comp.unix.programmer")))
+       (initial-catchup-groups
+        '("nntp+gmane:gmane.comp.kde.devel.general"))
        (assigned-groups
         (delete-dups
          (apply #'append
@@ -93,8 +97,11 @@
                 (gnus-get-info group))
       (condition-case err
           (if (gnus-activate-group group)
-              (gnus-group-set-subscription
-               group gnus-level-default-subscribed t)
+              (progn
+                (gnus-group-set-subscription
+                 group gnus-level-default-subscribed t)
+                (when (member group initial-catchup-groups)
+                  (gnus-group-catchup group 'all)))
             (display-warning
              'gnus-config
              (format "Could not activate Gnus group %s" group)))
