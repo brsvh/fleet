@@ -8,7 +8,6 @@ let
   inherit (lib)
     all
     concatLists
-    concatMapStringsSep
     concatStringsSep
     elem
     escapeShellArg
@@ -27,60 +26,47 @@ let
 
   cfg = config.services.inn;
 
-  upstreamType = types.submodule (
-    { name, ... }:
-    {
-      options = {
-        agentDirectory = mkOption {
-          default = name;
+  upstreamType = types.submodule {
+    options = {
+      endpoint = mkOption {
+        description = ''
+          Upstream endpoint in pullnews host, port, and TLS-mode syntax.
+        '';
 
-          description = ''
-            Directory name used for this upstream in the Gnus Agent cache.
-          '';
-
-          type = types.str;
-        };
-
-        endpoint = mkOption {
-          description = ''
-            Upstream endpoint in pullnews host, port, and TLS-mode syntax.
-          '';
-
-          type = types.str;
-        };
-
-        groups = mkOption {
-          default = [ ];
-
-          description = ''
-            Newsgroups mirrored from this upstream.
-          '';
-
-          type = with types; listOf str;
-        };
-
-        passwordCredential = mkOption {
-          default = null;
-
-          description = ''
-            systemd credential filename containing the upstream password.
-          '';
-
-          type = with types; nullOr str;
-        };
-
-        username = mkOption {
-          default = null;
-
-          description = ''
-            Username used to authenticate to this upstream.
-          '';
-
-          type = with types; nullOr str;
-        };
+        type = types.str;
       };
-    }
-  );
+
+      groups = mkOption {
+        default = [ ];
+
+        description = ''
+          Newsgroups mirrored from this upstream.
+        '';
+
+        type = with types; listOf str;
+      };
+
+      passwordCredential = mkOption {
+        default = null;
+
+        description = ''
+          systemd credential filename containing the upstream password.
+        '';
+
+        type = with types; nullOr str;
+      };
+
+      username = mkOption {
+        default = null;
+
+        description = ''
+          Username used to authenticate to this upstream.
+        '';
+
+        type = with types; nullOr str;
+      };
+    };
+  };
 
   subscribedGroups = concatLists (
     mapAttrsToList (_: upstream: upstream.groups) (
@@ -159,95 +145,11 @@ let
     + "\n"
   );
 
-  groupMap = pkgs.writeText "inn-agent-groups.tsv" (
-    concatMapStringsSep ""
-      (
-        upstream:
-        concatMapStringsSep "" (
-          group: "${upstream.agentDirectory}\t${group}\n"
-        ) upstream.groups
-      )
-      (
-        mapAttrsToList (
-          _: upstream: upstream
-        ) cfg.upstreams
-      )
-  );
-
   perlWithTls =
     pkgs.perl.withPackages
       (perlPackages: [
         perlPackages.IOSocketSSL
       ]);
-
-  agentBatch = pkgs.writeScript "inn-agent-batch" ''
-    #!${pkgs.perl}/bin/perl
-
-    use strict;
-    use warnings;
-
-    use File::Spec;
-
-    my ($agent_root, $group_map) = @ARGV;
-    die "usage: $0 AGENT_ROOT GROUP_MAP\n"
-      if !defined $agent_root || !defined $group_map;
-
-    open my $map_handle, '<', $group_map
-      or die "cannot open group map $group_map: $!\n";
-
-    binmode STDOUT;
-
-    my $articles = 0;
-    while (my $mapping = <$map_handle>) {
-        chomp $mapping;
-        next if !length $mapping;
-
-        my ($source, $group) = split /\t/, $mapping, 2;
-        die "invalid group mapping: $mapping\n"
-          if !defined $source || !defined $group;
-
-        my $directory = File::Spec->catdir(
-            $agent_root,
-            'nntp',
-            $source,
-            split(/\./, $group),
-        );
-        next if !-d $directory;
-
-        opendir my $directory_handle, $directory
-          or die "cannot open $directory: $!\n";
-        my @article_numbers = sort { $a <=> $b }
-          grep { /\A[0-9]+\z/ && -f File::Spec->catfile($directory, $_) }
-          readdir $directory_handle;
-        closedir $directory_handle
-          or die "cannot close $directory: $!\n";
-
-        for my $article_number (@article_numbers) {
-            my $path = File::Spec->catfile($directory, $article_number);
-            open my $article_handle, '<:raw', $path
-              or die "cannot open $path: $!\n";
-            local $/;
-            my $article = <$article_handle>;
-            close $article_handle
-              or die "cannot close $path: $!\n";
-
-            die "missing Message-ID header in $path\n"
-              if $article !~ /^Message-ID:/mi;
-            die "missing Newsgroups header in $path\n"
-              if $article !~ /^Newsgroups:/mi;
-
-            $article .= "\n" if $article !~ /\n\z/;
-            print '#! rnews ', length($article), "\n", $article;
-
-            ++$articles;
-            warn "prepared $articles Agent articles\n"
-              if $articles % 10000 == 0;
-        }
-    }
-
-    close $map_handle or die "cannot close $group_map: $!\n";
-    warn "prepared $articles Agent articles in total\n";
-  '';
 
   pullnewsStatus = pkgs.writeScript "inn-pullnews-status" ''
     #!${perlWithTls}/bin/perl
@@ -257,9 +159,8 @@ let
 
     use Net::NNTP;
 
-    my ($marks_path, $agent_marker) = @ARGV;
-    die "usage: $0 MARKS_PATH AGENT_MARKER\n"
-      if !defined $marks_path || !defined $agent_marker;
+    my ($marks_path) = @ARGV;
+    die "usage: $0 MARKS_PATH\n" if !defined $marks_path;
 
     sub resolve_password {
         my ($password) = @_;
@@ -321,8 +222,7 @@ let
 
     close $marks_handle or die "cannot close $marks_path: $!\n";
 
-    my $failed = !-e $agent_marker;
-    warn "Agent import is incomplete: $agent_marker is absent\n" if $failed;
+    my $failed = 0;
 
     for my $entry (@servers) {
         my ($host, $port, $tls_mode) =
@@ -391,7 +291,6 @@ let
 
   stateDirectory = cfg.stateDirectory;
   databaseDirectory = "${stateDirectory}/db";
-  importDirectory = "${stateDirectory}/import";
   spoolDirectory = "${stateDirectory}/spool";
 
   innConf = pkgs.writeText "inn.conf" ''
@@ -491,7 +390,6 @@ let
     set -euo pipefail
 
     ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg databaseDirectory}
-    ${pkgs.coreutils}/bin/install -d -m 0770 ${escapeShellArg importDirectory}
     ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/archive"}
     ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/articles"}
     ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/incoming"}
@@ -519,36 +417,12 @@ let
     ${cfg.package}/bin/innconfval -C
   '';
 
-  agentImport = pkgs.writeShellScript "inn-agent-import" ''
-    set -euo pipefail
-
-    ${agentBatch} \
-      ${escapeShellArg cfg.agentDirectory} \
-      ${groupMap} \
-      | ${cfg.package}/bin/rnews \
-        -N \
-        -r ${escapeShellArg cfg.bindAddress} \
-        -P ${toString cfg.port}
-    ${pkgs.coreutils}/bin/install -m 0644 \
-      /dev/null \
-      ${escapeShellArg "${importDirectory}/agent-complete"}
-  '';
 in
 {
   options = {
     services = {
       inn = {
         enable = mkEnableOption "a private user-level INN archive";
-
-        agentDirectory = mkOption {
-          default = "${config.xdg.cacheHome}/emacs/gnus/agent";
-
-          description = ''
-            Existing Gnus Agent root imported by the manual import service.
-          '';
-
-          type = types.str;
-        };
 
         bindAddress = mkOption {
           default = "127.0.0.1";
@@ -778,36 +652,12 @@ in
             };
           };
 
-          inn-agent-import = {
-            Service = {
-              Environment = innEnvironment;
-              ExecStart = "${agentImport}";
-              IOSchedulingClass = "idle";
-              Nice = 10;
-              TimeoutStartSec = "infinity";
-              Type = "oneshot";
-              UMask = "0027";
-            };
-
-            Unit = {
-              After = [
-                "inn.service"
-              ];
-              ConditionPathExists = "!${importDirectory}/agent-complete";
-              Description = "Import the retained Gnus Agent cache into INN";
-              Requires = [
-                "inn.service"
-              ];
-            };
-          };
-
           inn-bootstrap-check = {
             Service = {
               Environment = innEnvironment;
               ExecStart = concatStringsSep " " [
                 "${pullnewsStatus}"
                 "${stateDirectory}/pullnews.marks"
-                "${importDirectory}/agent-complete"
               ];
               LoadCredential = credentials;
               Nice = 10;
@@ -820,7 +670,7 @@ in
                 "inn.service"
               ]
               ++ credentialUnits;
-              Description = "Check INN upstream and Agent bootstrap completion";
+              Description = "Check INN upstream bootstrap completion";
               Requires = [
                 "inn.service"
               ]

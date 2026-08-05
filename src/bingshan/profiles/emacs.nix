@@ -20,7 +20,6 @@ let
     mapAttrs
     mapAttrsToList
     optionalAttrs
-    optionalString
     replaceStrings
     sort
     toJSON
@@ -41,15 +40,8 @@ let
 
   news = {
     eternal-september = {
-      address = "news.eternal-september.org";
-      agentDirectory = "eternal-september";
-      authinfoForce = true;
-      connectionFunction = "nntp-open-tls-stream";
       endpoint = "news.eternal-september.org:563_TLS";
-      label = "Eternal September";
       passwordCredential = "eternal-september";
-      port = 563;
-      primary = true;
       username = "bingshan";
 
       groups = {
@@ -102,13 +94,7 @@ let
     };
 
     gmane = {
-      address = "news.gmane.io";
-      agentDirectory = "gmane";
-      connectionFunction = "nntp-open-network-stream";
       endpoint = "news.gmane.io:119_STARTTLS";
-      label = "Gmane";
-      port = 119;
-      primary = false;
 
       groups = {
         Emacs = [
@@ -185,13 +171,7 @@ let
     };
 
     olduse = {
-      address = "olduse.net";
-      agentDirectory = "olduse";
-      connectionFunction = "nntp-open-network-stream";
       endpoint = "olduse.net:11940";
-      label = "Usenet Replay";
-      port = 11940;
-      primary = false;
 
       groups = {
         Architecture = [
@@ -255,15 +235,8 @@ let
     };
 
     solani = {
-      address = "news.solani.org";
-      agentDirectory = "solani";
-      authinfoForce = true;
-      connectionFunction = "nntp-open-tls-stream";
       endpoint = "news.solani.org:563_TLS";
-      label = "Solani";
       passwordCredential = "solani";
-      port = 563;
-      primary = false;
       username = "bingshan";
 
       groups = {
@@ -370,28 +343,12 @@ let
         ) mailingLists
       );
 
-    genGnusMethod =
-      entry:
-      let
-        source = entry.source;
-
-        authinfo =
-          optionalString (source.authinfoForce or false)
-            ''
-
-              (nntp-authinfo-force t)'';
-      in
-      ''
-        (nntp ${toJSON entry.name}
-              (nntp-address ${toJSON source.address})
-              (nntp-port-number ${toString source.port})
-              (nntp-open-connection-function
-               ${source.connectionFunction})${authinfo})
-      '';
-
-    genGnusMethods =
-      entries:
-      concatStringsSep "\n" (map genGnusMethod entries);
+    genGnusMethod = ''
+      (nntp "local"
+            (nntp-address ${toJSON config.services.inn.bindAddress})
+            (nntp-port-number ${toString config.services.inn.port})
+            (nntp-open-connection-function nntp-open-network-stream))
+    '';
 
     genGnusPreset = topics: initialCatchupGroups: ''
       (let (apply-preset)
@@ -488,14 +445,9 @@ let
         (add-hook 'gnus-setup-news-hook apply-preset))
     '';
 
-    genGnusSourceNames =
-      sources:
-      concatStringsSep "\n" (
-        mapAttrsToList (
-          _: source:
-          "(${toJSON source.address} . ${toJSON source.label})"
-        ) sources
-      );
+    genGnusSourceNames = ''
+      (${toJSON config.services.inn.bindAddress} . "Local")
+    '';
 
     genGnusStrings =
       strings:
@@ -919,26 +871,8 @@ in
               )
             );
 
-          newsSources = filterAttrs (
-            _: source: source ? endpoint
-          ) news;
-
-          newsGroupName =
-            sourceName: source: group:
-            if
-              !(source ? endpoint) || (source.primary or false)
-            then
-              group
-            else
-              "nntp+${sourceName}:${group}";
-
           newsGroups = zipAttrsWith (_: concatLists) (
-            mapAttrsToList (
-              sourceName: source:
-              mapAttrs (
-                _: map (newsGroupName sourceName source)
-              ) source.groups
-            ) news
+            mapAttrsToList (_: source: source.groups) news
           );
 
           newsTopics = mapAttrsToList (name: groups: {
@@ -948,41 +882,22 @@ in
               ;
           }) newsGroups;
 
-          newsSourceEntries = mapAttrsToList (
-            name: source: {
-              inherit
-                name
-                source
-                ;
-            }) newsSources;
-
-          primaryNewsSource =
-            findFirst (entry: entry.source.primary)
-              (throw "Gnus requires one primary news source")
-              newsSourceEntries;
-
-          secondaryNewsSources = filter (
-            entry: !entry.source.primary
-          ) newsSourceEntries;
-
           newsInitialCatchupGroups = concatLists (
             mapAttrsToList (
-              sourceName: source:
-              map (newsGroupName sourceName source) (
-                source.initialCatchupGroups or [ ]
-              )
-            ) newsSources
+              _: source: source.initialCatchupGroups or [ ]
+            ) news
           );
 
           newsMailingLists = concatLists (
             mapAttrsToList (
-              sourceName: source:
+              _: source:
               mapAttrsToList (group: address: {
-                inherit address;
-
-                group = newsGroupName sourceName source group;
+                inherit
+                  address
+                  group
+                  ;
               }) (source.mailingLists or { })
-            ) newsSources
+            ) news
           );
         in
         with el;
@@ -1004,7 +919,7 @@ in
 
           (use-package bs-gnus
             :custom
-            (bs-gnus-group-source-names '(${genGnusSourceNames newsSources}))
+            (bs-gnus-group-source-names '(${genGnusSourceNames}))
 
             :defer t)
 
@@ -1087,11 +1002,10 @@ in
                   '(subscribed . t)))
                '(${genGnusMailingLists newsMailingLists}))))
 
-            (gnus-secondary-select-methods '(${genGnusMethods secondaryNewsSources}))
+            (gnus-secondary-select-methods nil)
 
             :config
-            (setq gnus-select-method
-                  '${genGnusMethod primaryNewsSource})
+            (setq gnus-select-method '${genGnusMethod})
 
             ${genGnusPreset newsTopics newsInitialCatchupGroups}
 
@@ -1337,7 +1251,6 @@ in
             _: source:
             {
               inherit (source)
-                agentDirectory
                 endpoint
                 ;
 
