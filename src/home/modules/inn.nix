@@ -621,6 +621,18 @@ in
         };
 
         package = mkOption {
+          apply =
+            package:
+            package.overrideAttrs (
+              _: previousAttrs: {
+                configureFlags =
+                  (previousAttrs.configureFlags or [ ])
+                  ++ [
+                    "--with-news-user=${cfg.user}"
+                    "--with-news-group=${cfg.group}"
+                  ];
+              }
+            );
           default = pkgs.inn;
           defaultText = "pkgs.inn";
 
