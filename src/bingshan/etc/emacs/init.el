@@ -5263,14 +5263,16 @@
 
 (use-package elfeed-show
   :custom
-  ;; Display articles in another window while retaining focus in the
-  ;; Search buffer for continuous navigation.
+  ;; Keep search results above the article, matching the horizontal
+  ;; summary/article layouts used by `gnus' and `mu4e', while retaining
+  ;; focus in the Search buffer for continuous navigation.
   (elfeed-show-entry-switch
    (lambda (buffer)
      (display-buffer
       buffer
       '((display-buffer-reuse-window
-         display-buffer-pop-up-window))))))
+         display-buffer-below-selected)
+        (window-height . 0.75))))))
 
 (use-package elfeed-tree
   :after (elfeed)
