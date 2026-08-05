@@ -5299,13 +5299,27 @@
   :if (featurep 'xwidget-internal)
   :after (elfeed-show)
   :defines (elfeed-show-mode-map)
-  :functions (elfeed-webkit-enable)
+  :functions (elfeed-webkit-enable
+              elfeed-webkit-refresh--webkit
+              elfeed-webkit-refresh--webkit@fit-to-entry-window
+              xwidget-at
+              xwidget-webkit-adjust-size-to-window)
 
   :config
   ;; Prefer embedded WebKit rendering when this Emacs has xwidget
   ;; support; the ordinary SHR renderer remains the fallback
   ;; otherwise.
   (elfeed-webkit-enable)
+
+  ;; `elfeed-webkit' sizes its widget using the selected Search
+  ;; window.  Refit it to the displayed entry window after rendering
+  ;; instead.
+  (define-advice elfeed-webkit-refresh--webkit
+      (:after () fit-to-entry-window)
+    "Resize the WebKit widget to the displayed Elfeed entry window."
+    (when-let* ((window (get-buffer-window (current-buffer)))
+                (xwidget (xwidget-at (point-min))))
+      (xwidget-webkit-adjust-size-to-window xwidget window)))
 
   :bind
   ( :map elfeed-show-mode-map
