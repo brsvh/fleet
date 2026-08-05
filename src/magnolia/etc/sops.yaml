@@ -11,7 +11,7 @@ sops:
             5CLvRN0hi6QdAEFyty0KP5WS7YwumDWxR7OxZjrTikH2Wkpn4t/UmQ==
             -----END AGE ENCRYPTED FILE-----
           recipient: age10eqf23zmmhrdhlcxtk47as2e582e7kws35478rwu466ygjzgm56sd9c4at
-    lastmodified: "2026-08-02T13:48:48Z"
-    mac: ENC[AES256_GCM,data:KJYcSCf0SzfOGF5SrUrbQZddKajsE+qMh7pAn+YpxlNI7dojTdVlJit7feC3C4GY4mfstNQpjlwP5tZ/teRB/f5vFSw8nyuHbWjews+pdGSu3gy43NfDePYije91R2kjzGABu3/M7wjKstaulyTHwJ6HAjCCIviJM1gFr7l6zpM=,iv:jCCr7KolVYYg2hsanLxWbbZpWzGUeCrxT5kMt0474tA=,tag:4QKJvjNl/GyXm2uonSwnrA==,type:str]
+    lastmodified: "2026-08-05T16:21:43Z"
+    mac: ENC[AES256_GCM,data:Zdw/SCMuByq67u5QnunmwhbvuNiSpwoEHVEaQmu5ljhVg+0Xa0Cr1bfu0hSFv/5ydfhSbO89YCZ5dqKVPk02uJMcArOf6lRtmE9GIdyFdKfEQb93QjyQ6WjzdN1JD9SEt8MElPJL2/TEAhdPqoIaFohPiQxJcMH5AZ+J5/WNWn4=,iv:AuShq25VoBLSIudQKiFw4aow0a+NoBrxd43pdgAnc9M=,tag:lGNneKbJEtJWRk7lULh0GA==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.2
