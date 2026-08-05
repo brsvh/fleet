@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785858226,
-        "narHash": "sha256-j3fufBWTBofj2JyP6zDH82qB5eMRieKgMWX4K04+JSo=",
+        "lastModified": 1785940561,
+        "narHash": "sha256-Iv2kgWJut3fW+lA7fYNrgUQAjcN4Ixi2ydpuvzRqQgk=",
         "ref": "main",
-        "rev": "4cf7a6c8f42f5e4fedebc8dad032c17b231e977b",
-        "revCount": 140,
+        "rev": "7c36f4d6141fdec9441b446673d997510e899e9a",
+        "revCount": 141,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-bs.git"
       },
@@ -357,11 +357,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785713766,
-        "narHash": "sha256-ondMbi/745XK9CCc8dmJ+LD8B5UlxP32dCsN/DC84VM=",
+        "lastModified": 1785945928,
+        "narHash": "sha256-4dLAgs76p3oKmEcns0qpLlaD7wtKccZSSMFUM1PbCaA=",
         "ref": "main",
-        "rev": "3738511bf639ad40802480b859f22d22f954cfb4",
-        "revCount": 144,
+        "rev": "08548b51d9ae6582bea634eecbd4090317c2ff84",
+        "revCount": 145,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
