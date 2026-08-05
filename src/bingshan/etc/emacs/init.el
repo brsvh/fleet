@@ -2544,14 +2544,6 @@
               bs-gnus--group-display-name@shorten-gmane-prefix)
 
   :custom
-  ;; Name NNTP sources by their configured server addresses in the
-  ;; Group buffer.
-  (bs-gnus-group-source-names
-   '(("news.eternal-september.org" . "Eternal September")
-     ("news.gmane.io" . "Gmane")
-     ("olduse.net" . "Usenet Replay")
-     ("news.solani.org" . "Solani")))
-
   ;; Check for new articles every five minutes so each background
   ;; update produces a smaller burst of desktop notifications.
   (bs-gnus-update-interval (* 5 60))
@@ -2629,125 +2621,8 @@
   ;; from runtime state.
   (gnus-directory (bs-path bs-data-directory "gnus/"))
 
-  ;; Limit the initial Summary for NNTP groups, download short Eternal
-  ;; September articles on explicit Agent requests, and require
-  ;; explicit download marks for Gmane articles.  Treat subscribed
-  ;; Gmane archives as mailing lists: `to-list' routes ordinary
-  ;; followups through SMTP without discarding the author or Cc
-  ;; recipients, while new messages go to the authoritative list
-  ;; address.
-  (gnus-parameters
-   (append
-    '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
-       (display . 100))
-      ("\\`comp\\."
-       (agent-predicate . short))
-      ("\\`nntp\\+gmane:"
-       (agent-predicate . false))
-      ("\\`nntp\\+olduse:"
-       (agent-predicate . true)))
-    (mapcar
-     (lambda (entry)
-       (list
-        (concat
-         "\\`nntp\\+gmane:"
-         (regexp-quote (car entry))
-         "\\'")
-        (cons 'to-list (cdr entry))
-        '(subscribed . t)))
-     '(("gmane.comp.gcc.devel"
-        .
-        "gcc@gcc.gnu.org")
-       ("gmane.comp.gdb.devel"
-        .
-        "gdb@sourceware.org")
-       ("gmane.comp.gnu.binutils"
-        .
-        "binutils@sourceware.org")
-       ("gmane.comp.hardware.riscv.isa.devel"
-        .
-        "isa-dev@groups.riscv.org")
-       ("gmane.comp.hardware.riscv.opensbi.devel"
-        .
-        "opensbi@lists.infradead.org")
-       ("gmane.comp.kde.devel.general"
-        .
-        "kde-devel@kde.org")
-       ("gmane.comp.lib.glibc.alpha"
-        .
-        "libc-alpha@sourceware.org")
-       ("gmane.emacs.devel"
-        .
-        "emacs-devel@gnu.org")
-       ("gmane.emacs.help"
-        .
-        "help-gnu-emacs@gnu.org")
-       ("gmane.linux.ports.riscv"
-        .
-        "linux-riscv@lists.infradead.org")
-       ("gmane.lisp.asdf.devel"
-        .
-        "asdf-devel@lists.common-lisp.net")
-       ("gmane.lisp.guile.devel"
-        .
-        "guile-devel@gnu.org")
-       ("gmane.lisp.guile.user"
-        .
-        "guile-user@gnu.org")
-       ("gmane.lisp.scheme.chez"
-        .
-        "chez-scheme@googlegroups.com")
-       ("gmane.lisp.scheme.mit-scheme.devel"
-        .
-        "mit-scheme-devel@gnu.org")))))
-
-  ;; Keep the Gmane, Olduse, and Solani archives available as
-  ;; secondary NNTP sources.  Gmane upgrades its standard connection
-  ;; with STARTTLS, while Olduse provides a read-only historical
-  ;; replay over its year-specific port.
-  (gnus-secondary-select-methods
-   '((nntp "gmane"
-           (nntp-address "news.gmane.io")
-           (nntp-port-number 119)
-           (nntp-open-connection-function
-            nntp-open-network-stream))
-     (nntp "olduse"
-           (nntp-address "olduse.net")
-           (nntp-port-number 11940)
-           (nntp-open-connection-function
-            nntp-open-network-stream))
-     (nntp "solani"
-           (nntp-address "news.solani.org")
-           (nntp-port-number 563)
-           (nntp-open-connection-function nntp-open-tls-stream)
-           (nntp-authinfo-force t))))
-
   ;; Mark articles selected for later batch processing with a hash.
   (gnus-process-mark ?#)
-
-  :config
-  ;; Load the declarative subscription and topic state after `gnus'
-  ;; has restored its machine-local newsrc state, then retire this
-  ;; one-shot hook for the rest of the Emacs session.
-  (let (load-config)
-    (setq load-config
-          (lambda ()
-            (let ((config
-                   (bs-path bs-config-directory "gnus.el")))
-              (when (file-exists-p config)
-                (load config nil t t)
-                (remove-hook 'gnus-setup-news-hook
-                             load-config)))))
-    (add-hook 'gnus-setup-news-hook load-config))
-
-  ;; Use authenticated, encrypted Eternal September access for normal
-  ;; Usenet reading and posting.
-  (setq gnus-select-method
-        '(nntp "eternal-september"
-               (nntp-address "news.eternal-september.org")
-               (nntp-port-number 563)
-               (nntp-open-connection-function nntp-open-tls-stream)
-               (nntp-authinfo-force t)))
 
   :bind
   ( :map ctl-c-a-map

@@ -9,73 +9,318 @@
 let
   inherit (lib)
     attrValues
+    concatLists
     concatMapStringsSep
     concatStringsSep
     filter
+    filterAttrs
     findFirst
     head
+    length
+    mapAttrs
     mapAttrsToList
+    optionalAttrs
+    optionalString
     replaceStrings
     sort
     toJSON
     toSentenceCase
+    zipAttrsWith
     ;
 
-  calendars = filter (
-    calendar: calendar.khal.enable
-  ) (attrValues config.accounts.calendar.accounts);
+  calendars = attrValues config.accounts.calendar.accounts;
 
-  contact = config.accounts.contact.emacs;
+  contacts = config.accounts.contact.emacs;
 
-  maildirBase =
-    config.accounts.email.maildirBasePath;
+  mails = mapAttrsToList (name: account: {
+    inherit
+      account
+      name
+      ;
+  }) config.accounts.email.accounts;
 
-  mails = filter (mail: mail.account.enable) (
-    mapAttrsToList (name: account: {
-      inherit
-        account
-        name
-        ;
-    }) config.accounts.email.accounts
-  );
+  news = {
+    eternal-september = {
+      address = "news.eternal-september.org";
+      agentDirectory = "eternal-september";
+      authinfoForce = true;
+      connectionFunction = "nntp-open-tls-stream";
+      endpoint = "news.eternal-september.org:563_TLS";
+      label = "Eternal September";
+      passwordCredential = "eternal-september";
+      port = 563;
+      primary = true;
+      username = "bingshan";
 
-  mail =
-    findFirst (mail: mail.account.primary)
-      (throw "Emacs requires an enabled primary email account")
-      mails;
+      groups = {
+        Architecture = [
+          "comp.arch.fpga"
+        ];
 
-  maildir = mail.account.maildir.absPath;
+        Conversation = [
+          "alt.folklore.computers"
+          "alt.peeves"
+        ];
 
-  mailAddresses =
-    mail:
-    [ mail.account.address ] ++ mail.account.aliases;
+        Emacs = [
+          "comp.emacs"
+        ];
 
-  sameMaildir =
-    candidate:
-    candidate.account.maildir.path
-    == mail.account.maildir.path;
+        Food = [
+          "rec.food.drink.tea"
+        ];
 
-  sharedMails = filter (
-    candidate:
-    !candidate.account.primary
-    && sameMaildir candidate
-  ) mails;
+        Games = [
+          "rec.games.video.classic"
+        ];
 
-  sharedMaildirAddresses = builtins.concatLists (
-    map mailAddresses sharedMails
-  );
+        Languages = [
+          "alt.comp.lang.rust"
+          "comp.lang.c"
+          "comp.lang.c++"
+          "comp.lang.haskell"
+          "comp.lang.lisp"
+          "comp.lang.scheme"
+        ];
 
-  prepareMail =
-    candidate:
-    candidate
-    // {
-      inherit sharedMaildirAddresses;
+        Linux = [
+          "comp.os.linux.networking"
+        ];
 
-      addresses = mailAddresses candidate;
-      sharesPrimaryMaildir = sameMaildir candidate;
+        Music = [
+          "rec.music.makers.synth"
+        ];
+
+        Reading = [
+          "rec.arts.books"
+        ];
+
+        Security = [
+          "comp.security.ssh"
+        ];
+      };
     };
 
-  primaryMail = prepareMail mail;
+    gmane = {
+      address = "news.gmane.io";
+      agentDirectory = "gmane";
+      connectionFunction = "nntp-open-network-stream";
+      endpoint = "news.gmane.io:119_STARTTLS";
+      label = "Gmane";
+      port = 119;
+      primary = false;
+
+      groups = {
+        Emacs = [
+          "gmane.emacs.devel"
+          "gmane.emacs.help"
+        ];
+
+        Languages = [
+          "gmane.lisp.asdf.devel"
+          "gmane.lisp.guile.devel"
+          "gmane.lisp.guile.user"
+          "gmane.lisp.scheme.chez"
+          "gmane.lisp.scheme.mit-scheme.devel"
+        ];
+
+        Linux = [
+          "gmane.comp.kde.devel.general"
+        ];
+
+        "RISC-V" = [
+          "gmane.comp.hardware.riscv.isa.devel"
+          "gmane.comp.hardware.riscv.opensbi.devel"
+          "gmane.linux.ports.riscv"
+        ];
+
+        Toolchain = [
+          "gmane.comp.gcc.devel"
+          "gmane.comp.gdb.devel"
+          "gmane.comp.gnu.binutils"
+          "gmane.comp.lib.glibc.alpha"
+        ];
+      };
+
+      initialCatchupGroups = [
+        "gmane.comp.kde.devel.general"
+      ];
+
+      mailingLists = {
+        "gmane.comp.gcc.devel" = "gcc@gcc.gnu.org";
+        "gmane.comp.gdb.devel" = "gdb@sourceware.org";
+        "gmane.comp.gnu.binutils" =
+          "binutils@sourceware.org";
+        "gmane.comp.hardware.riscv.isa.devel" =
+          "isa-dev@groups.riscv.org";
+        "gmane.comp.hardware.riscv.opensbi.devel" =
+          "opensbi@lists.infradead.org";
+        "gmane.comp.kde.devel.general" =
+          "kde-devel@kde.org";
+        "gmane.comp.lib.glibc.alpha" =
+          "libc-alpha@sourceware.org";
+        "gmane.emacs.devel" = "emacs-devel@gnu.org";
+        "gmane.emacs.help" = "help-gnu-emacs@gnu.org";
+        "gmane.linux.ports.riscv" =
+          "linux-riscv@lists.infradead.org";
+        "gmane.lisp.asdf.devel" =
+          "asdf-devel@lists.common-lisp.net";
+        "gmane.lisp.guile.devel" = "guile-devel@gnu.org";
+        "gmane.lisp.guile.user" = "guile-user@gnu.org";
+        "gmane.lisp.scheme.chez" =
+          "chez-scheme@googlegroups.com";
+        "gmane.lisp.scheme.mit-scheme.devel" =
+          "mit-scheme-devel@gnu.org";
+      };
+    };
+
+    local = {
+      groups = {
+        Local = [
+          "nndraft:delayed"
+          "nndraft:drafts"
+          "nndraft:queue"
+        ];
+      };
+    };
+
+    olduse = {
+      address = "olduse.net";
+      agentDirectory = "olduse";
+      connectionFunction = "nntp-open-network-stream";
+      endpoint = "olduse.net:11940";
+      label = "Usenet Replay";
+      port = 11940;
+      primary = false;
+
+      groups = {
+        Architecture = [
+          "net.arch"
+        ];
+
+        Conversation = [
+          "net.general"
+        ];
+
+        Emacs = [
+          "net.emacs"
+        ];
+
+        Film = [
+          "net.movies"
+        ];
+
+        Games = [
+          "net.games.trivia"
+          "net.games.video"
+        ];
+
+        Languages = [
+          "net.lang.c"
+          "net.lang.c++"
+          "net.lang.forth"
+          "net.lang.lisp"
+        ];
+
+        Music = [
+          "net.music.classical"
+          "net.music.synth"
+        ];
+
+        Reading = [
+          "net.books"
+          "net.sf-lovers"
+        ];
+
+        Science = [
+          "net.astro"
+          "net.space"
+        ];
+
+        Security = [
+          "net.crypt"
+        ];
+
+        Toolchain = [
+          "mod.compilers"
+          "mod.std.c"
+        ];
+
+        Unix = [
+          "net.unix"
+          "net.unix-wizards"
+          "net.usenix"
+        ];
+      };
+    };
+
+    solani = {
+      address = "news.solani.org";
+      agentDirectory = "solani";
+      authinfoForce = true;
+      connectionFunction = "nntp-open-tls-stream";
+      endpoint = "news.solani.org:563_TLS";
+      label = "Solani";
+      passwordCredential = "solani";
+      port = 563;
+      primary = false;
+      username = "bingshan";
+
+      groups = {
+        Architecture = [
+          "comp.arch"
+        ];
+
+        Conversation = [
+          "alt.callahans"
+        ];
+
+        Emacs = [
+          "gnu.emacs.gnus"
+        ];
+
+        Film = [
+          "rec.arts.movies.current-films"
+          "rec.arts.movies.past-films"
+        ];
+
+        Games = [
+          "rec.games.trivia"
+        ];
+
+        Languages = [
+          "comp.lang.forth"
+          "comp.programming"
+        ];
+
+        Linux = [
+          "comp.os.linux.misc"
+        ];
+
+        Music = [
+          "rec.music.classical.recordings"
+          "rec.music.misc"
+          "rec.music.rock-pop-r+b.1950s"
+        ];
+
+        Reading = [
+          "rec.arts.sf.written"
+        ];
+
+        Science = [
+          "sci.astro"
+        ];
+
+        Security = [
+          "comp.security.unix"
+        ];
+
+        Unix = [
+          "comp.unix.programmer"
+        ];
+      };
+    };
+  };
 
   el = rec {
     cjkFont = toJSON "Zhuque Fangsong (technical preview)";
@@ -115,6 +360,155 @@ let
       );
 
     genBool = value: if value then "t" else "nil";
+
+    genGnusMailingLists =
+      mailingLists:
+      concatStringsSep "\n" (
+        map (
+          entry:
+          "(${toJSON entry.group} . ${toJSON entry.address})"
+        ) mailingLists
+      );
+
+    genGnusMethod =
+      entry:
+      let
+        source = entry.source;
+
+        authinfo =
+          optionalString (source.authinfoForce or false)
+            ''
+
+              (nntp-authinfo-force t)'';
+      in
+      ''
+        (nntp ${toJSON entry.name}
+              (nntp-address ${toJSON source.address})
+              (nntp-port-number ${toString source.port})
+              (nntp-open-connection-function
+               ${source.connectionFunction})${authinfo})
+      '';
+
+    genGnusMethods =
+      entries:
+      concatStringsSep "\n" (map genGnusMethod entries);
+
+    genGnusPreset = topics: initialCatchupGroups: ''
+      (let (apply-preset)
+        (setq apply-preset
+              (lambda ()
+                (require 'gnus-group)
+                (require 'gnus-start)
+                (require 'gnus-sum)
+                (require 'gnus-topic)
+                (require 'gnus-util)
+                (require 'subr-x)
+                (let* ((topics
+                        '(${genGnusTopics topics}))
+                       (initial-catchup-groups
+                        '(${genGnusStrings initialCatchupGroups}))
+                       (assigned-groups
+                        (delete-dups
+                         (apply #'append
+                                (mapcar
+                                 (lambda (topic)
+                                   (copy-sequence (cdr topic)))
+                                 gnus-topic-alist)))))
+                  (dolist (group
+                           (apply #'append
+                                  (mapcar #'cdr topics)))
+                    (unless (or (string-prefix-p "nndraft:" group)
+                                (gnus-get-info group))
+                      (condition-case err
+                          (if (gnus-activate-group group)
+                              (progn
+                                (gnus-group-set-subscription
+                                 group
+                                 gnus-level-default-subscribed
+                                 t)
+                                (when (member
+                                       group
+                                       initial-catchup-groups)
+                                  (gnus-group-catchup group 'all)))
+                            (display-warning
+                             'gnus-config
+                             (format
+                              "Could not activate Gnus group %s"
+                              group)))
+                        (error
+                         (display-warning
+                          'gnus-config
+                          (format
+                           "Could not subscribe to Gnus group %s: %s"
+                           group
+                           (error-message-string err)))))))
+                  (unless gnus-topic-topology
+                    (setq gnus-topic-topology
+                          '(("Gnus" visible nil nil))))
+                  (unless (assoc "Gnus" gnus-topic-alist)
+                    (push '("Gnus") gnus-topic-alist))
+                  (dolist (topic topics)
+                    (let* ((name (car topic))
+                           (entry
+                            (or (assoc name gnus-topic-alist)
+                                (let ((entry (list name)))
+                                  (setq gnus-topic-alist
+                                        (append gnus-topic-alist
+                                                (list entry)))
+                                  entry))))
+                      (dolist (group (cdr topic))
+                        (unless (member group assigned-groups)
+                          (setcdr entry
+                                  (append (cdr entry) (list group)))
+                          (push group assigned-groups)))
+                      (setcdr
+                       entry
+                       (sort
+                        (delete-dups (cdr entry))
+                        (lambda (left right)
+                          (string-lessp
+                           (string-remove-prefix
+                            "gmane."
+                            (gnus-group-real-name left))
+                           (string-remove-prefix
+                            "gmane."
+                            (gnus-group-real-name right))))))
+                      (unless (gnus-topic-find-topology name)
+                        (setcdr
+                         gnus-topic-topology
+                         (append
+                          (cdr gnus-topic-topology)
+                          (list
+                           (list
+                            (list name 'visible nil nil))))))))
+                  (gnus-topic-sort-topics-1
+                   gnus-topic-topology nil))
+                (remove-hook 'gnus-setup-news-hook
+                             apply-preset)))
+        (add-hook 'gnus-setup-news-hook apply-preset))
+    '';
+
+    genGnusSourceNames =
+      sources:
+      concatStringsSep "\n" (
+        mapAttrsToList (
+          _: source:
+          "(${toJSON source.address} . ${toJSON source.label})"
+        ) sources
+      );
+
+    genGnusStrings =
+      strings:
+      concatStringsSep "\n" (map toJSON strings);
+
+    genGnusTopics =
+      topics:
+      concatStringsSep "\n" (
+        map (topic: ''
+          (${toJSON topic.name}
+           ${concatStringsSep "\n" (map toJSON topic.groups)})
+        '') topics
+      );
 
     genCalendarDirectories =
       calendars:
@@ -403,21 +797,6 @@ let
       concatStringsSep " " (map toJSON collections);
   };
 
-  mu4eContexts =
-    let
-      gen = mail: el.genMu4eContext (prepareMail mail);
-    in
-    concatStringsSep "\n" (
-      map gen (
-        [ mail ]
-        ++ sharedMails
-        ++ filter (
-          candidate:
-          !candidate.account.primary
-          && !sameMaildir candidate
-        ) mails
-      )
-    );
 in
 {
   imports = [
@@ -466,51 +845,189 @@ in
 
       extraConfig =
         let
-          inherit (contact)
-            addressbooks
-            defaultAddressbook
-            syncCollections
-            ;
+          contactAddressbooks = contacts.addressbooks;
+
+          contactDefaultAddressbook =
+            contacts.defaultAddressbook;
+
+          contactSyncCollections = contacts.syncCollections;
+
+          enabledCalendars = filter (
+            calendar: calendar.khal.enable
+          ) calendars;
+
+          enabledMails = filter (
+            mail: mail.account.enable
+          ) mails;
+
+          primaryMailEntry =
+            findFirst (mail: mail.account.primary)
+              (throw "Emacs requires an enabled primary email account")
+              enabledMails;
+
+          primaryMaildir =
+            primaryMailEntry.account.maildir.absPath;
+
+          maildirBase =
+            config.accounts.email.maildirBasePath;
+
+          mailAddresses =
+            mail:
+            [ mail.account.address ] ++ mail.account.aliases;
+
+          sharesPrimaryMaildir =
+            candidate:
+            candidate.account.maildir.path
+            == primaryMailEntry.account.maildir.path;
+
+          sharedMails = filter (
+            candidate:
+            !candidate.account.primary
+            && sharesPrimaryMaildir candidate
+          ) enabledMails;
+
+          sharedMaildirAddresses = concatLists (
+            map mailAddresses sharedMails
+          );
+
+          prepareMail =
+            candidate:
+            candidate
+            // {
+              inherit sharedMaildirAddresses;
+
+              addresses = mailAddresses candidate;
+              sharesPrimaryMaildir = sharesPrimaryMaildir candidate;
+            };
+
+          primaryMail = prepareMail primaryMailEntry;
+
+          mu4eContexts =
+            let
+              genMailContext =
+                account: el.genMu4eContext (prepareMail account);
+            in
+            concatStringsSep "\n" (
+              map genMailContext (
+                [ primaryMailEntry ]
+                ++ sharedMails
+                ++ filter (
+                  candidate:
+                  !candidate.account.primary
+                  && !sharesPrimaryMaildir candidate
+                ) enabledMails
+              )
+            );
+
+          newsSources = filterAttrs (
+            _: source: source ? endpoint
+          ) news;
+
+          newsGroupName =
+            sourceName: source: group:
+            if
+              !(source ? endpoint) || (source.primary or false)
+            then
+              group
+            else
+              "nntp+${sourceName}:${group}";
+
+          newsGroups = zipAttrsWith (_: concatLists) (
+            mapAttrsToList (
+              sourceName: source:
+              mapAttrs (
+                _: map (newsGroupName sourceName source)
+              ) source.groups
+            ) news
+          );
+
+          newsTopics = mapAttrsToList (name: groups: {
+            inherit
+              groups
+              name
+              ;
+          }) newsGroups;
+
+          newsSourceEntries = mapAttrsToList (
+            name: source: {
+              inherit
+                name
+                source
+                ;
+            }) newsSources;
+
+          primaryNewsSource =
+            findFirst (entry: entry.source.primary)
+              (throw "Gnus requires one primary news source")
+              newsSourceEntries;
+
+          secondaryNewsSources = filter (
+            entry: !entry.source.primary
+          ) newsSourceEntries;
+
+          newsInitialCatchupGroups = concatLists (
+            mapAttrsToList (
+              sourceName: source:
+              map (newsGroupName sourceName source) (
+                source.initialCatchupGroups or [ ]
+              )
+            ) newsSources
+          );
+
+          newsMailingLists = concatLists (
+            mapAttrsToList (
+              sourceName: source:
+              mapAttrsToList (group: address: {
+                inherit address;
+
+                group = newsGroupName sourceName source group;
+              }) (source.mailingLists or { })
+            ) newsSources
+          );
         in
         with el;
         ''
           (use-package bs-contacts
             :custom
-            (bs-contacts-addressbooks '(${genAddressbooks addressbooks}))
-
-            (bs-contacts-default-addressbook '${genDefaultAddressbook defaultAddressbook})
-
-            (bs-contacts-sync-collections '(${genSyncCollections syncCollections}))
+            (bs-contacts-addressbooks '(${genAddressbooks contactAddressbooks}))
+            (bs-contacts-default-addressbook '${genDefaultAddressbook contactDefaultAddressbook})
+            (bs-contacts-sync-collections '(${genSyncCollections contactSyncCollections}))
 
             :defer t)
 
           (use-package bs-khal
             :custom
-            (bs-khal-calendar-directories '(${genCalendarDirectories calendars}))
+            (bs-khal-calendar-directories '(${genCalendarDirectories enabledCalendars}))
+            (bs-khal-default-calendar ${genDefaultCalendarName enabledCalendars})
 
-            (bs-khal-default-calendar ${genDefaultCalendarName calendars})
+            :defer t)
+
+          (use-package bs-gnus
+            :custom
+            (bs-gnus-group-source-names '(${genGnusSourceNames newsSources}))
 
             :defer t)
 
           (use-package emacs
-            :demand t
-            :no-require t
-
             :custom
-            (user-full-name "${mail.account.realName}"))
+            (user-full-name "${primaryMail.account.realName}")
+
+            :demand t
+            :no-require t)
 
           (use-package emacs
-            :demand t
-            :no-require t
             :when (display-graphic-p)
 
             :config
             (set-fontset-font t 'cjk-misc (font-spec :family ${cjkFont}))
-            (set-fontset-font t 'han (font-spec :family ${cjkFont})))
+            (set-fontset-font t 'han (font-spec :family ${cjkFont}))
+
+            :demand t
+            :no-require t)
 
           (use-package epa-hook
             :config
-            (add-to-list 'epa-file-encrypt-to "${mail.account.gpg.key}")
+            (add-to-list 'epa-file-encrypt-to "${primaryMail.account.gpg.key}")
 
             :defer t)
 
@@ -522,15 +1039,61 @@ in
 
           (use-package mail-source
             :custom
-            (mail-source-directory "${maildir}")
+            (mail-source-directory "${primaryMaildir}")
 
             :defer t)
 
           (use-package message
             :custom
-            (message-directory "${maildir}")
+            (message-directory "${primaryMaildir}")
             (message-sendmail-envelope-from 'header)
-            (message-signature "${mail.account.signature.text}")
+            (message-signature "${primaryMail.account.signature.text}")
+
+            :defer t)
+
+          (use-package gnus
+            :defines (gnus-level-default-subscribed
+                      gnus-select-method
+                      gnus-setup-news-hook
+                      gnus-topic-alist
+                      gnus-topic-topology)
+            :functions (gnus-activate-group
+                        gnus-get-info
+                        gnus-group-catchup
+                        gnus-group-real-name
+                        gnus-group-set-subscription
+                        gnus-topic-find-topology
+                        gnus-topic-sort-topics-1)
+
+            :custom
+            (gnus-parameters
+             (append
+              '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
+                 (display . 100))
+                ("\\`comp\\."
+                 (agent-predicate . short))
+                ("\\`nntp\\+gmane:"
+                 (agent-predicate . false))
+                ("\\`nntp\\+olduse:"
+                 (agent-predicate . true)))
+              (mapcar
+               (lambda (entry)
+                 (list
+                  (concat
+                   "\\`"
+                   (regexp-quote (car entry))
+                   "\\'")
+                  (cons 'to-list (cdr entry))
+                  '(subscribed . t)))
+               '(${genGnusMailingLists newsMailingLists}))))
+
+            (gnus-secondary-select-methods '(${genGnusMethods secondaryNewsSources}))
+
+            :config
+            (setq gnus-select-method
+                  '${genGnusMethod primaryNewsSource})
+
+            ${genGnusPreset newsTopics newsInitialCatchupGroups}
 
             :defer t)
 
@@ -557,9 +1120,9 @@ in
 
           (use-package mu4e-folders
             :custom
-            (mu4e-sent-folder "${genMailFolder mail.account "sent"}")
-            (mu4e-drafts-folder "${genMailFolder mail.account "drafts"}")
-            (mu4e-trash-folder "${genMailFolder mail.account "trash"}")
+            (mu4e-sent-folder "${genMailFolder primaryMail.account "sent"}")
+            (mu4e-drafts-folder "${genMailFolder primaryMail.account "drafts"}")
+            (mu4e-trash-folder "${genMailFolder primaryMail.account "trash"}")
             (mu4e-maildir-shortcuts '(${genMu4eMaildirShortcuts primaryMail}))
 
             :defer t)
@@ -587,7 +1150,7 @@ in
 
           (use-package smime
             :custom
-            (smime-certificate-directory "${maildir}/certs/")
+            (smime-certificate-directory "${primaryMaildir}/certs/")
 
             :defer t)
 
@@ -602,7 +1165,7 @@ in
             :no-require t
 
             :custom
-            (user-mail-address "${mail.account.address}"))
+            (user-mail-address "${primaryMail.account.address}"))
         '';
 
       extraEarlyConfig =
@@ -756,11 +1319,38 @@ in
     };
   };
 
-  xdg = {
-    configFile = {
-      "emacs/gnus.el" = {
-        source = bingshan.etc.emacs.gnus;
-      };
+  services = {
+    inn = {
+      expectedGroupCount = length (
+        concatLists (
+          mapAttrsToList
+            (
+              _: source: concatLists (attrValues source.groups)
+            )
+            (filterAttrs (_: source: source ? endpoint) news)
+        )
+      );
+
+      upstreams =
+        mapAttrs
+          (
+            _: source:
+            {
+              inherit (source)
+                agentDirectory
+                endpoint
+                ;
+
+              groups = concatLists (attrValues source.groups);
+            }
+            // optionalAttrs (source ? passwordCredential) {
+              inherit (source)
+                passwordCredential
+                username
+                ;
+            }
+          )
+          (filterAttrs (_: source: source ? endpoint) news);
     };
   };
 }
