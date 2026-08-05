@@ -39,6 +39,7 @@
            "nntp+solani:rec.games.trivia"
            "rec.games.video.classic")
           ("Languages"
+           "alt.comp.lang.rust"
            "comp.lang.c"
            "comp.lang.c++"
            "nntp+solani:comp.lang.forth"
