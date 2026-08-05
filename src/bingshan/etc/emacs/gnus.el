@@ -19,29 +19,39 @@
 
 (let* ((topics
         '(("Architecture"
+           "nntp+olduse:net.arch"
            "nntp+solani:comp.arch"
            "comp.arch.fpga")
           ("Conversation"
            "nntp+solani:alt.callahans"
            "alt.folklore.computers"
-           "alt.peeves")
+           "alt.peeves"
+           "nntp+olduse:net.general")
           ("Emacs"
            "comp.emacs"
            "nntp+gmane:gmane.emacs.devel"
            "nntp+gmane:gmane.emacs.help"
+           "nntp+olduse:net.emacs"
            "nntp+solani:gnu.emacs.gnus")
           ("Film"
+           "nntp+olduse:net.movies"
            "nntp+solani:rec.arts.movies.current-films"
            "nntp+solani:rec.arts.movies.past-films")
           ("Food"
            "rec.food.drink.tea")
           ("Games"
+           "nntp+olduse:net.games.trivia"
+           "nntp+olduse:net.games.video"
            "nntp+solani:rec.games.trivia"
            "rec.games.video.classic")
           ("Languages"
            "alt.comp.lang.rust"
            "comp.lang.c"
            "comp.lang.c++"
+           "nntp+olduse:net.lang.c"
+           "nntp+olduse:net.lang.c++"
+           "nntp+olduse:net.lang.forth"
+           "nntp+olduse:net.lang.lisp"
            "nntp+solani:comp.lang.forth"
            "comp.lang.haskell"
            "comp.lang.lisp"
@@ -61,6 +71,8 @@
            "nndraft:drafts"
            "nndraft:queue")
           ("Music"
+           "nntp+olduse:net.music.classical"
+           "nntp+olduse:net.music.synth"
            "nntp+solani:rec.music.classical.recordings"
            "rec.music.makers.synth"
            "nntp+solani:rec.music.misc"
@@ -70,19 +82,29 @@
            "nntp+gmane:gmane.comp.hardware.riscv.opensbi.devel"
            "nntp+gmane:gmane.linux.ports.riscv")
           ("Reading"
+           "nntp+olduse:net.books"
+           "nntp+olduse:net.sf-lovers"
            "rec.arts.books"
            "nntp+solani:rec.arts.sf.written")
           ("Science"
+           "nntp+olduse:net.astro"
+           "nntp+olduse:net.space"
            "nntp+solani:sci.astro")
           ("Security"
            "comp.security.ssh"
+           "nntp+olduse:net.crypt"
            "nntp+solani:comp.security.unix")
           ("Toolchain"
            "nntp+gmane:gmane.comp.gcc.devel"
            "nntp+gmane:gmane.comp.gdb.devel"
            "nntp+gmane:gmane.comp.gnu.binutils"
-           "nntp+gmane:gmane.comp.lib.glibc.alpha")
+           "nntp+gmane:gmane.comp.lib.glibc.alpha"
+           "nntp+olduse:mod.compilers"
+           "nntp+olduse:mod.std.c")
           ("Unix"
+           "nntp+olduse:net.unix"
+           "nntp+olduse:net.unix-wizards"
+           "nntp+olduse:net.usenix"
            "nntp+solani:comp.unix.programmer")))
        (initial-catchup-groups
         '("nntp+gmane:gmane.comp.kde.devel.general"))

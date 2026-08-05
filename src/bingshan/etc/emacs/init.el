@@ -2549,6 +2549,7 @@
   (bs-gnus-group-source-names
    '(("news.eternal-september.org" . "Eternal September")
      ("news.gmane.io" . "Gmane")
+     ("olduse.net" . "Usenet Replay")
      ("news.solani.org" . "Solani")))
 
   ;; Check for new articles every five minutes so each background
@@ -2642,7 +2643,9 @@
       ("\\`comp\\."
        (agent-predicate . short))
       ("\\`nntp\\+gmane:"
-       (agent-predicate . false)))
+       (agent-predicate . false))
+      ("\\`nntp\\+olduse:"
+       (agent-predicate . true)))
     (mapcar
      (lambda (entry)
        (list
@@ -2698,12 +2701,19 @@
         .
         "mit-scheme-devel@gnu.org")))))
 
-  ;; Keep the Gmane mailing-list archive available as a secondary NNTP
-  ;; source, upgrading its standard connection with STARTTLS.
+  ;; Keep the Gmane, Olduse, and Solani archives available as
+  ;; secondary NNTP sources.  Gmane upgrades its standard connection
+  ;; with STARTTLS, while Olduse provides a read-only historical
+  ;; replay over its year-specific port.
   (gnus-secondary-select-methods
    '((nntp "gmane"
            (nntp-address "news.gmane.io")
            (nntp-port-number 119)
+           (nntp-open-connection-function
+            nntp-open-network-stream))
+     (nntp "olduse"
+           (nntp-address "olduse.net")
+           (nntp-port-number 11940)
            (nntp-open-connection-function
             nntp-open-network-stream))
      (nntp "solani"
