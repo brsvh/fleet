@@ -351,98 +351,94 @@ let
     '';
 
     genGnusPreset = topics: initialCatchupGroups: ''
-      (let (apply-preset)
-        (setq apply-preset
-              (lambda ()
-                (require 'gnus-group)
-                (require 'gnus-start)
-                (require 'gnus-sum)
-                (require 'gnus-topic)
-                (require 'gnus-util)
-                (require 'subr-x)
-                (let* ((topics
-                        '(${genGnusTopics topics}))
-                       (initial-catchup-groups
-                        '(${genGnusStrings initialCatchupGroups}))
-                       (assigned-groups
-                        (delete-dups
-                         (apply #'append
-                                (mapcar
-                                 (lambda (topic)
-                                   (copy-sequence (cdr topic)))
-                                 gnus-topic-alist)))))
-                  (dolist (group
-                           (apply #'append
-                                  (mapcar #'cdr topics)))
-                    (unless (or (string-prefix-p "nndraft:" group)
-                                (gnus-get-info group))
-                      (condition-case err
-                          (if (gnus-activate-group group)
-                              (progn
-                                (gnus-group-set-subscription
-                                 group
-                                 gnus-level-default-subscribed
-                                 t)
-                                (when (member
-                                       group
-                                       initial-catchup-groups)
-                                  (gnus-group-catchup group 'all)))
-                            (display-warning
-                             'gnus-config
-                             (format
-                              "Could not activate Gnus group %s"
-                              group)))
-                        (error
-                         (display-warning
-                          'gnus-config
-                          (format
-                           "Could not subscribe to Gnus group %s: %s"
-                           group
-                           (error-message-string err)))))))
-                  (unless gnus-topic-topology
-                    (setq gnus-topic-topology
-                          '(("Gnus" visible nil nil))))
-                  (unless (assoc "Gnus" gnus-topic-alist)
-                    (push '("Gnus") gnus-topic-alist))
-                  (dolist (topic topics)
-                    (let* ((name (car topic))
-                           (entry
-                            (or (assoc name gnus-topic-alist)
-                                (let ((entry (list name)))
-                                  (setq gnus-topic-alist
-                                        (append gnus-topic-alist
-                                                (list entry)))
-                                  entry))))
-                      (dolist (group (cdr topic))
-                        (unless (member group assigned-groups)
-                          (setcdr entry
-                                  (append (cdr entry) (list group)))
-                          (push group assigned-groups)))
-                      (setcdr
-                       entry
-                       (sort
-                        (delete-dups (cdr entry))
-                        (lambda (left right)
-                          (string-lessp
-                           (string-remove-prefix
-                            "gmane."
-                            (gnus-group-real-name left))
-                           (string-remove-prefix
-                            "gmane."
-                            (gnus-group-real-name right))))))
-                      (unless (gnus-topic-find-topology name)
-                        (setcdr
-                         gnus-topic-topology
-                         (append
-                          (cdr gnus-topic-topology)
-                          (list
-                           (list
-                            (list name 'visible nil nil))))))))
-                  (gnus-topic-sort-topics-1
-                   gnus-topic-topology nil))
-                (remove-hook 'gnus-setup-news-hook
-                             apply-preset)))
-        (add-hook 'gnus-setup-news-hook apply-preset))
+      (defun gnus--preset-setup ()
+        "Apply the generated Gnus topic and subscription preset once."
+        (require 'gnus-group)
+        (require 'gnus-start)
+        (require 'gnus-sum)
+        (require 'gnus-topic)
+        (require 'gnus-util)
+        (require 'subr-x)
+        (let* ((topics
+                '(${genGnusTopics topics}))
+               (initial-catchup-groups
+                '(${genGnusStrings initialCatchupGroups}))
+               (assigned-groups
+                (delete-dups
+                 (apply #'append
+                        (mapcar
+                         (lambda (topic)
+                           (copy-sequence (cdr topic)))
+                         gnus-topic-alist)))))
+          (dolist (group
+                   (apply #'append
+                          (mapcar #'cdr topics)))
+            (unless (or (string-prefix-p "nndraft:" group)
+                        (gnus-get-info group))
+              (condition-case err
+                  (if (gnus-activate-group group)
+                      (progn
+                        (gnus-group-set-subscription
+                         group
+                         gnus-level-default-subscribed
+                         t)
+                        (when (member
+                               group
+                               initial-catchup-groups)
+                          (gnus-group-catchup group 'all)))
+                    (display-warning
+                     'gnus-config
+                     (format
+                      "Could not activate Gnus group %s"
+                      group)))
+                (error
+                 (display-warning
+                  'gnus-config
+                  (format
+                   "Could not subscribe to Gnus group %s: %s"
+                   group
+                   (error-message-string err)))))))
+          (unless gnus-topic-topology
+            (setq gnus-topic-topology
+                  '(("Gnus" visible nil nil))))
+          (unless (assoc "Gnus" gnus-topic-alist)
+            (push '("Gnus") gnus-topic-alist))
+          (dolist (topic topics)
+            (let* ((name (car topic))
+                   (entry
+                    (or (assoc name gnus-topic-alist)
+                        (let ((entry (list name)))
+                          (setq gnus-topic-alist
+                                (append gnus-topic-alist
+                                        (list entry)))
+                          entry))))
+              (dolist (group (cdr topic))
+                (unless (member group assigned-groups)
+                  (setcdr entry
+                          (append (cdr entry) (list group)))
+                  (push group assigned-groups)))
+              (setcdr
+               entry
+               (sort
+                (delete-dups (cdr entry))
+                (lambda (left right)
+                  (string-lessp
+                   (string-remove-prefix
+                    "gmane."
+                    (gnus-group-real-name left))
+                   (string-remove-prefix
+                    "gmane."
+                    (gnus-group-real-name right))))))
+              (unless (gnus-topic-find-topology name)
+                (setcdr
+                 gnus-topic-topology
+                 (append
+                  (cdr gnus-topic-topology)
+                  (list
+                   (list
+                    (list name 'visible nil nil))))))))
+          (gnus-topic-sort-topics-1 gnus-topic-topology nil))
+        (remove-hook 'gnus-setup-news-hook #'gnus--preset-setup))
     '';
 
     genGnusSourceNames = ''
@@ -980,6 +976,9 @@ in
                         gnus-topic-find-topology
                         gnus-topic-sort-topics-1)
 
+            :init
+            ${genGnusPreset newsTopics newsInitialCatchupGroups}
+
             :custom
             (gnus-parameters
              (append
@@ -1004,10 +1003,11 @@ in
 
             (gnus-secondary-select-methods nil)
 
+            :hook
+            (gnus-setup-news-hook . gnus--preset-setup)
+
             :config
             (setq gnus-select-method '${genGnusMethod})
-
-            ${genGnusPreset newsTopics newsInitialCatchupGroups}
 
             :defer t)
 

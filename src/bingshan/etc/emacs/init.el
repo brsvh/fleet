@@ -559,6 +559,15 @@
 ;;
 
 (use-package display-fill-column-indicator
+  :config
+  (let ((color (face-foreground 'fill-column-indicator nil t)))
+    ;; Draw the indicator with a one-pixel-wide background so it stays
+    ;; continuous across lines whose text uses different font sizes.
+    (set-face-attribute 'fill-column-indicator nil
+                        :background color
+                        :foreground color
+                        :height 1))
+
   :hook
   ;; Display an indication of the `fill-column' position.
   (prog-mode-hook . display-fill-column-indicator-mode))
