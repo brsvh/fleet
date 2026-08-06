@@ -14,8 +14,11 @@
     inn = {
       credentialService = "sops-nix.service";
       domain = "bingshan.org";
+      maxArticlesPerGroup = 500;
+      maxRunSeconds = 600;
       organization = "Bingshan's local news archive";
       pathHost = "news.bingshan.org";
+      syncInterval = "30m";
 
       credentials = {
         "eternal-september" =

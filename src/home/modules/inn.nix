@@ -484,6 +484,26 @@ in
           type = types.str;
         };
 
+        maxArticlesPerGroup = mkOption {
+          default = null;
+
+          description = ''
+            Maximum number of article numbers processed per group in one pullnews run.
+          '';
+
+          type = with types; nullOr ints.positive;
+        };
+
+        maxRunSeconds = mkOption {
+          default = null;
+
+          description = ''
+            Maximum duration in seconds of one pullnews run.
+          '';
+
+          type = with types; nullOr ints.positive;
+        };
+
         organization = mkOption {
           default = "${config.home.username}'s local news archive";
 
@@ -682,18 +702,30 @@ in
             Service = {
               CPUWeight = 20;
               Environment = innEnvironment;
-              ExecStart = concatStringsSep " " [
-                "${cfg.package}/bin/pullnews"
-                "-b 1"
-                "-k 500"
-                "-N 60"
-                "-O"
-                "-q"
-                "-s ${cfg.bindAddress}:${toString cfg.port}"
-                "-t 2"
-                "-T 30"
-                "-c ${stateDirectory}/pullnews.marks"
-              ];
+              ExecStart = concatStringsSep " " (
+                [
+                  "${cfg.package}/bin/pullnews"
+                  "-b 1"
+                  "-k 500"
+                ]
+                ++ optional (
+                  cfg.maxArticlesPerGroup != null
+                ) "-M ${toString cfg.maxArticlesPerGroup}"
+                ++ [
+                  "-N 60"
+                  "-O"
+                  "-q"
+                  "-s ${cfg.bindAddress}:${toString cfg.port}"
+                ]
+                ++ optional (
+                  cfg.maxRunSeconds != null
+                ) "-S ${toString cfg.maxRunSeconds}"
+                ++ [
+                  "-t 2"
+                  "-T 30"
+                  "-c ${stateDirectory}/pullnews.marks"
+                ]
+              );
               IOWeight = 20;
               LoadCredential = credentials;
               Nice = 10;
