@@ -358,21 +358,20 @@ let
         (require 'gnus-sum)
         (require 'gnus-topic)
         (require 'gnus-util)
+        (require 'seq)
         (require 'subr-x)
         (let* ((topics
                 '(${genGnusTopics topics}))
                (initial-catchup-groups
                 '(${genGnusStrings initialCatchupGroups}))
-               (assigned-groups
+               (desired-groups
                 (delete-dups
                  (apply #'append
                         (mapcar
                          (lambda (topic)
                            (copy-sequence (cdr topic)))
-                         gnus-topic-alist)))))
-          (dolist (group
-                   (apply #'append
-                          (mapcar #'cdr topics)))
+                         topics)))))
+          (dolist (group desired-groups)
             (unless (or (string-prefix-p "nndraft:" group)
                         (gnus-get-info group))
               (condition-case err
@@ -403,6 +402,14 @@ let
                   '(("Gnus" visible nil nil))))
           (unless (assoc "Gnus" gnus-topic-alist)
             (push '("Gnus") gnus-topic-alist))
+          ;; Rebuild the configured local group assignments.
+          (dolist (entry gnus-topic-alist)
+            (setcdr
+             entry
+             (seq-remove
+              (lambda (group)
+                (member group desired-groups))
+              (cdr entry))))
           (dolist (topic topics)
             (let* ((name (car topic))
                    (entry
@@ -413,10 +420,8 @@ let
                                         (list entry)))
                           entry))))
               (dolist (group (cdr topic))
-                (unless (member group assigned-groups)
-                  (setcdr entry
-                          (append (cdr entry) (list group)))
-                  (push group assigned-groups)))
+                (setcdr entry
+                        (append (cdr entry) (list group))))
               (setcdr
                entry
                (sort
@@ -982,14 +987,10 @@ in
             :custom
             (gnus-parameters
              (append
-              '(("\\`\\(?:comp\\.\\|nntp\\+gmane:\\)"
+              '(("\\`\\(?:comp\\.\\|gmane\\.\\)"
                  (display . 100))
                 ("\\`comp\\."
-                 (agent-predicate . short))
-                ("\\`nntp\\+gmane:"
-                 (agent-predicate . false))
-                ("\\`nntp\\+olduse:"
-                 (agent-predicate . true)))
+                 (agent-predicate . short)))
               (mapcar
                (lambda (entry)
                  (list

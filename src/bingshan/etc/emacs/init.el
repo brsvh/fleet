@@ -2557,6 +2557,11 @@
   ;; update produces a smaller burst of desktop notifications.
   (bs-gnus-update-interval (* 5 60))
 
+  ;; INN already keeps every article body locally, so let Gnus fetch
+  ;; bodies from it on demand instead of duplicating all unread bodies
+  ;; in the Agent during each background update.
+  (bs-gnus-update-download-bodies nil)
+
   ;; Follow Summary navigation in an already visible Article window
   ;; without opening one solely for movement.
   (bs-gnus-summary-follow-visible-article t)
@@ -2570,6 +2575,11 @@
   (bs-gnus-notifications-avatar-cache-directory
    (bs-path bs-cache-directory "gnus/notification-avatars/"))
   (bs-gnus-notifications-avatar-cache-expiry (* 90 24 60 60))
+
+  ;; Notify only articles discovered after the current Gnus state was
+  ;; established instead of replaying the complete unread archive at
+  ;; the beginning of each Emacs session.
+  (bs-gnus-notifications-include-existing-unread nil)
 
   ;; Open each notification Read action in a new frame belonging to
   ;; the current Emacs session.
