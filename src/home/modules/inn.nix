@@ -129,6 +129,10 @@ let
     )
   );
 
+  backfillGroups = writeText "inn-backfill-groups" (
+    concatStringsSep "\n" groups + "\n"
+  );
+
   active = writeText "active" (
     concatStringsSep "\n" (
       map (
@@ -163,6 +167,7 @@ let
     pkgs.perl.withPackages
       (perlPackages: [
         perlPackages.IOSocketSSL
+        perlPackages.TimeDate
       ]);
 
   pullnewsStatus = writeScript "inn-pullnews-status" ''
@@ -303,12 +308,208 @@ let
     exit($failed ? 1 : 0);
   '';
 
+  recentMarksInitializer = writeScript "inn-recent-marks-initialize" ''
+    #!${perlWithTls}/bin/perl
+
+    use strict;
+    use warnings;
+
+    use Date::Parse qw(str2time);
+    use Net::NNTP;
+
+    my ($source_path, $destination_path, $lookback_days) = @ARGV;
+    die "usage: $0 SOURCE DESTINATION LOOKBACK_DAYS\n"
+      if !defined $lookback_days;
+    die "LOOKBACK_DAYS must be a positive integer\n"
+      if $lookback_days !~ /^[1-9][0-9]*$/;
+
+    my $cutoff = time - $lookback_days * 24 * 60 * 60;
+    my $block_size = 1000;
+
+    sub resolve_password {
+        my ($password) = @_;
+
+        return substr($password, 1) if $password =~ /^@@/;
+        return $password if $password !~ /^@(.*)$/;
+
+        my $path = $1;
+        if ($path =~ /^credential:(.+)$/) {
+            my $credential = $1;
+            my $directory = $ENV{'CREDENTIALS_DIRECTORY'};
+            die "CREDENTIALS_DIRECTORY is unset\n"
+              if !defined $directory || !length $directory;
+            die "invalid credential name\n"
+              if $credential =~ m{/} || $credential eq '.' || $credential eq '..';
+            $path = "$directory/$credential";
+        }
+
+        open my $password_handle, '<', $path
+          or die "cannot open password file $path: $!\n";
+        my $password_value = <$password_handle>;
+        close $password_handle
+          or die "cannot close password file $path: $!\n";
+        die "password file $path is empty\n" if !defined $password_value;
+        chomp $password_value;
+        die "password file $path contains more than one line\n"
+          if $password_value =~ /[\r\n]/;
+        return $password_value;
+    }
+
+    open my $source_handle, '<', $source_path
+      or die "cannot open marks template $source_path: $!\n";
+
+    my @servers;
+    my $server;
+    while (my $line = <$source_handle>) {
+        next if $line =~ /^\s*(?:#|$)/;
+
+        if ($line !~ /^\s/) {
+            chomp $line;
+            my ($endpoint, $username, $password) = split /\s+/, $line, 3;
+            $server = {
+                config_line => $line,
+                endpoint => $endpoint,
+                groups => [],
+                username => $username,
+                password => defined $password ? resolve_password($password) : undef,
+            };
+            push @servers, $server;
+            next;
+        }
+
+        die "group appears before a server in $source_path\n"
+          if !defined $server;
+        my ($group) = split /\s+/, $line =~ s/^\s+//r;
+        push @{$server->{groups}}, {
+            group => $group,
+        };
+    }
+
+    close $source_handle or die "cannot close $source_path: $!\n";
+
+    for my $entry (@servers) {
+        my ($host, $port, $tls_mode) =
+          $entry->{endpoint} =~ /\A([^:]+)(?::([0-9]+))?(?:_(TLS|STARTTLS))?\z/;
+        die "invalid upstream endpoint $entry->{endpoint}\n"
+          if !defined $host;
+
+        $port //= $tls_mode && $tls_mode eq 'TLS' ? 563 : 119;
+        my %arguments = (
+            Port => $port,
+            Timeout => 60,
+        );
+        $arguments{SSL} = 1 if $tls_mode && $tls_mode eq 'TLS';
+
+        my $nntp = Net::NNTP->new($host, %arguments)
+          or die "cannot connect to $host:$port\n";
+
+        if ($tls_mode && $tls_mode eq 'STARTTLS' && !$nntp->starttls()) {
+            die "STARTTLS failed for $host:$port\n";
+        }
+
+        if (defined $entry->{username}
+            && !$nntp->authinfo($entry->{username}, $entry->{password})) {
+            die "authentication failed for $host:$port\n";
+        }
+
+        for my $group_entry (@{$entry->{groups}}) {
+            my ($count, $first, $last) = $nntp->group($group_entry->{group});
+            die "$host: group $group_entry->{group} is unavailable\n"
+              if !defined $last;
+
+            if ($count == 0) {
+                $group_entry->{high} = $last;
+                next;
+            }
+
+            my $upper = $last;
+            my $oldest_recent;
+            my $parsed_any = 0;
+
+            while ($upper >= $first) {
+                my $lower = $upper - $block_size + 1;
+                $lower = $first if $lower < $first;
+
+                my $dates = $nntp->xhdr('Date', $lower, $upper);
+                if (!defined $dates) {
+                    my $overview = $nntp->xover($lower, $upper);
+                    die "$host: cannot read dates for $group_entry->{group}\n"
+                      if !defined $overview;
+                    $dates = {
+                        map {
+                            $_ => $overview->{$_}[2]
+                        } keys %{$overview}
+                    };
+                }
+
+                my $block_parsed = 0;
+                my $block_recent = 0;
+                for my $number (keys %{$dates}) {
+                    my $timestamp = str2time($dates->{$number});
+                    next if !defined $timestamp;
+                    $block_parsed = 1;
+                    $parsed_any = 1;
+                    next if $timestamp < $cutoff;
+                    $block_recent = 1;
+                    $oldest_recent = $number
+                      if !defined $oldest_recent || $number < $oldest_recent;
+                }
+
+                if ($block_parsed && !$block_recent) {
+                    last;
+                }
+
+                $upper = $lower - 1;
+            }
+
+            die "$host: no parseable dates for $group_entry->{group}\n"
+              if !$parsed_any;
+
+            my $high = defined $oldest_recent ? $oldest_recent - 1 : $last;
+            $high = 0 if $high < 0;
+            $group_entry->{high} = $high;
+        }
+
+        $nntp->quit();
+    }
+
+    my $temporary_path = "$destination_path.new.$$";
+    open my $destination_handle, '>', $temporary_path
+      or die "cannot create $temporary_path: $!\n";
+    chmod 0600, $temporary_path
+      or die "cannot chmod $temporary_path: $!\n";
+
+    print {$destination_handle} "# Format: (date is epoch seconds)\n";
+    print {$destination_handle} "# hostname[:port][_tlsmode] [username password]\n";
+    print {$destination_handle} "#     group date high\n";
+    my $checked = time;
+    for my $entry (@servers) {
+        print {$destination_handle} "$entry->{config_line}\n";
+        for my $group_entry (@{$entry->{groups}}) {
+            print {$destination_handle} join(
+                ' ',
+                '   ',
+                $group_entry->{group},
+                $checked,
+                $group_entry->{high},
+            ), "\n";
+        }
+    }
+
+    close $destination_handle
+      or die "cannot close $temporary_path: $!\n";
+    rename $temporary_path, $destination_path
+      or die "cannot replace $destination_path: $!\n";
+  '';
+
   stateDirectory = cfg.stateDirectory;
   databaseDirectory = "${stateDirectory}/db";
   spoolDirectory = "${stateDirectory}/spool";
-  historyMarksPath = "${stateDirectory}/pullnews.marks";
-  liveMarksPath = "${stateDirectory}/pullnews-live.marks";
-  liveBootstrapMarksPath = "${liveMarksPath}.bootstrap";
+  backfillCursorPath = "${stateDirectory}/pullnews-backfill.cursor";
+  backfillMarksPath = "${stateDirectory}/pullnews-backfill.marks";
+  legacyBackfillMarksPath = "${stateDirectory}/pullnews.marks";
+  recentMarksPath = "${stateDirectory}/pullnews-recent.marks";
+  recentBootstrapMarksPath = "${recentMarksPath}.bootstrap";
   pullnewsLockPath = "${stateDirectory}/pullnews.lock";
 
   innConf = writeText "inn.conf" ''
@@ -409,7 +610,6 @@ let
       marksPath,
       maxArticlesPerGroup,
       maxRunSeconds,
-      watermark ? null,
     }:
     escapeShellArgs (
       [
@@ -441,58 +641,99 @@ let
         "-T"
         "30"
       ]
-      ++ optionals (watermark != null) [
-        "-w"
-        watermark
-      ]
       ++ [
         "-c"
         marksPath
       ]
     );
 
-  historyPullnewsCommand = makePullnewsCommand {
-    inherit (cfg)
+  backfillPullnewsCommand = makePullnewsCommand {
+    inherit (cfg.backfill)
+      maxArticlesPerGroup
+      ;
+
+    marksPath = backfillMarksPath;
+    maxRunSeconds = null;
+  };
+
+  recentPullnewsCommand = makePullnewsCommand {
+    inherit (cfg.recent)
       maxArticlesPerGroup
       maxRunSeconds
       ;
 
-    marksPath = historyMarksPath;
+    marksPath = recentMarksPath;
   };
 
-  liveBootstrapPullnewsCommand =
-    makePullnewsCommand
-      {
-        marksPath = liveBootstrapMarksPath;
-        maxArticlesPerGroup = null;
-        maxRunSeconds = null;
-        watermark = "-0";
-      };
-
-  livePullnewsCommand = makePullnewsCommand {
-    inherit (cfg.live)
-      maxArticlesPerGroup
-      maxRunSeconds
-      ;
-
-    marksPath = liveMarksPath;
-  };
-
-  historyPullnews = writeShellScript "inn-pullnews-history" ''
+  backfillPullnews = writeShellScript "inn-news-backfill" ''
     set -euo pipefail
+
+    trap 'exit 0' INT
 
     exec 9>${escapeShellArg pullnewsLockPath}
     ${util-linux}/bin/flock 9
-    exec ${historyPullnewsCommand}
+
+    if ! test -e ${escapeShellArg backfillMarksPath}; then
+      if test -e ${escapeShellArg legacyBackfillMarksPath}; then
+        ${coreutils}/bin/install -m 0600 \
+          ${escapeShellArg legacyBackfillMarksPath} \
+          ${escapeShellArg backfillMarksPath}
+      else
+        ${coreutils}/bin/install -m 0600 \
+          ${marks} \
+          ${escapeShellArg backfillMarksPath}
+      fi
+    fi
+
+    mapfile -t backfill_groups < ${backfillGroups}
+    group_count="''${#backfill_groups[@]}"
+    cursor=0
+
+    if (( group_count == 0 )); then
+      exit 0
+    fi
+
+    if test -r ${escapeShellArg backfillCursorPath}; then
+      read -r cursor < ${escapeShellArg backfillCursorPath} || cursor=0
+    fi
+
+    case "$cursor" in
+      ""|*[!0-9]*) cursor=0 ;;
+    esac
+    cursor=$((cursor % group_count))
+
+    started=$SECONDS
+    visited=0
+    while (( visited < group_count )); do
+      elapsed=$((SECONDS - started))
+      remaining=$((${toString cfg.backfill.maxRunSeconds} - elapsed))
+      if (( remaining <= 0 )); then
+        break
+      fi
+
+      group="''${backfill_groups[$cursor]}"
+      cursor=$(((cursor + 1) % group_count))
+      ${coreutils}/bin/printf '%s\n' "$cursor" \
+        > ${escapeShellArg "${backfillCursorPath}.new"}
+      ${coreutils}/bin/mv \
+        ${escapeShellArg "${backfillCursorPath}.new"} \
+        ${escapeShellArg backfillCursorPath}
+
+      ${backfillPullnewsCommand} \
+        -g "$group" \
+        -S "$remaining"
+      visited=$((visited + 1))
+    done
   '';
 
-  livePullnews = writeShellScript "inn-pullnews-live" ''
+  recentPullnews = writeShellScript "inn-news-recent" ''
     set -euo pipefail
 
     cleanup_bootstrap() {
       ${coreutils}/bin/rm -f -- \
-        ${escapeShellArg liveBootstrapMarksPath} \
-        ${escapeShellArg "${liveBootstrapMarksPath}.pid"}
+        ${escapeShellArg recentBootstrapMarksPath} \
+        ${escapeShellArg "${recentBootstrapMarksPath}.new"}.* \
+        ${escapeShellArg "${recentBootstrapMarksPath}.pid"}
     }
 
     exec 9>${escapeShellArg pullnewsLockPath}
@@ -500,36 +741,36 @@ let
       ${systemd}/bin/systemctl --user kill \
         --kill-whom=all \
         --signal=SIGINT \
-        inn-pullnews.service \
+        inn-news-backfill.service \
         2>/dev/null || true
       ${util-linux}/bin/flock 9
     fi
 
-    if ! test -e ${escapeShellArg liveMarksPath}; then
+    if ! test -e ${escapeShellArg recentMarksPath}; then
       cleanup_bootstrap
       trap cleanup_bootstrap EXIT
 
-      ${coreutils}/bin/install -m 0600 \
+      ${recentMarksInitializer} \
         ${marks} \
-        ${escapeShellArg liveBootstrapMarksPath}
-      ${liveBootstrapPullnewsCommand}
+        ${escapeShellArg recentBootstrapMarksPath} \
+        ${toString cfg.recent.lookbackDays}
 
       if ! ${gawk}/bin/awk '
         /^[[:space:]]+[^#[:space:]]/ && $2 == 0 { failed = 1 }
         END { exit failed }
-      ' ${escapeShellArg liveBootstrapMarksPath}; then
-        echo "live pullnews marks initialization did not check every group" >&2
+      ' ${escapeShellArg recentBootstrapMarksPath}; then
+        echo "recent marks initialization did not check every group" >&2
         exit 1
       fi
 
       ${coreutils}/bin/mv \
-        ${escapeShellArg liveBootstrapMarksPath} \
-        ${escapeShellArg liveMarksPath}
+        ${escapeShellArg recentBootstrapMarksPath} \
+        ${escapeShellArg recentMarksPath}
       trap - EXIT
       cleanup_bootstrap
     fi
 
-    exec ${livePullnewsCommand}
+    exec ${recentPullnewsCommand}
   '';
 
   makePullnewsService =
@@ -544,6 +785,7 @@ let
         Environment = innEnvironment;
         ExecStart = execStart;
         IOWeight = 20;
+        KillSignal = "SIGINT";
         LoadCredential = credentials;
         Nice = 10;
         TimeoutStartSec = "30m";
@@ -617,8 +859,16 @@ let
       ${cfg.package}/bin/makedbz -i -o -s 6000000
     fi
 
-    if ! test -e ${escapeShellArg historyMarksPath}; then
-      ${coreutils}/bin/install -m 0600 ${marks} ${escapeShellArg historyMarksPath}
+    if ! test -e ${escapeShellArg backfillMarksPath}; then
+      if test -e ${escapeShellArg legacyBackfillMarksPath}; then
+        ${coreutils}/bin/install -m 0600 \
+          ${escapeShellArg legacyBackfillMarksPath} \
+          ${escapeShellArg backfillMarksPath}
+      else
+        ${coreutils}/bin/install -m 0600 \
+          ${marks} \
+          ${escapeShellArg backfillMarksPath}
+      fi
     fi
 
     ${cfg.package}/bin/innconfval -C
@@ -691,17 +941,59 @@ in
           type = types.str;
         };
 
-        live = {
+        backfill = {
+          maxArticlesPerGroup = mkOption {
+            default = 1000;
+
+            description = ''
+              Maximum number of article numbers processed before rotating to the next backfill group.
+            '';
+
+            type = types.ints.positive;
+          };
+
+          maxRunSeconds = mkOption {
+            default = 600;
+
+            description = ''
+              Maximum duration in seconds of one rotating backfill pass.
+            '';
+
+            type = types.ints.positive;
+          };
+
+          syncInterval = mkOption {
+            default = "15m";
+
+            description = ''
+              Delay between completed rotating backfill passes.
+            '';
+
+            type = types.str;
+          };
+        };
+
+        recent = {
           enable = mkEnableOption "a recent-news pull channel";
 
+          lookbackDays = mkOption {
+            default = 7;
+
+            description = ''
+              Number of days included when the recent-news marks are initialized.
+            '';
+
+            type = types.ints.positive;
+          };
+
           maxArticlesPerGroup = mkOption {
-            default = null;
+            default = 1000;
 
             description = ''
               Maximum number of article numbers processed per group in one recent-news pull.
             '';
 
-            type = with types; nullOr ints.positive;
+            type = types.ints.positive;
           };
 
           maxRunSeconds = mkOption {
@@ -715,7 +1007,7 @@ in
           };
 
           syncInterval = mkOption {
-            default = "15m";
+            default = "5m";
 
             description = ''
               Delay between completed recent-news pulls.
@@ -723,26 +1015,6 @@ in
 
             type = types.str;
           };
-        };
-
-        maxArticlesPerGroup = mkOption {
-          default = null;
-
-          description = ''
-            Maximum number of article numbers processed per group in one historical pull.
-          '';
-
-          type = with types; nullOr ints.positive;
-        };
-
-        maxRunSeconds = mkOption {
-          default = null;
-
-          description = ''
-            Maximum duration in seconds of one historical pull.
-          '';
-
-          type = with types; nullOr ints.positive;
         };
 
         organization = mkOption {
@@ -803,16 +1075,6 @@ in
 
           description = ''
             Persistent directory containing articles, overview, and marks.
-          '';
-
-          type = types.str;
-        };
-
-        syncInterval = mkOption {
-          default = "5m";
-
-          description = ''
-            Delay between completed historical pulls.
           '';
 
           type = types.str;
@@ -913,12 +1175,12 @@ in
             };
           };
 
-          inn-bootstrap-check = {
+          inn-news-backfill-check = {
             Service = {
               Environment = innEnvironment;
               ExecStart = concatStringsSep " " [
                 "${pullnewsStatus}"
-                historyMarksPath
+                backfillMarksPath
               ];
               LoadCredential = credentials;
               Nice = 10;
@@ -931,7 +1193,7 @@ in
                 "inn.service"
               ]
               ++ credentialUnits;
-              Description = "Check INN upstream bootstrap completion";
+              Description = "Check INN backfill completion";
               Requires = [
                 "inn.service"
               ]
@@ -939,35 +1201,35 @@ in
             };
           };
 
-          inn-pullnews = makePullnewsService {
-            description = "Backfill historical news into private INN";
-            execStart = historyPullnews;
-            extraAfter = optional cfg.live.enable "inn-pullnews-live.service";
+          inn-news-backfill = makePullnewsService {
+            description = "Rotate through private INN backfill groups";
+            execStart = backfillPullnews;
+            extraAfter = optional cfg.recent.enable "inn-news-recent.service";
           };
         }
-        // optionalAttrs cfg.live.enable {
-          inn-pullnews-live = makePullnewsService {
-            description = "Pull recent news into private INN";
-            execStart = livePullnews;
+        // optionalAttrs cfg.recent.enable {
+          inn-news-recent = makePullnewsService {
+            description = "Pull recent private INN news";
+            execStart = recentPullnews;
           };
         };
 
         timers = {
-          inn-pullnews = makePullnewsTimer {
-            description = "Periodically backfill the private INN archive";
+          inn-news-backfill = makePullnewsTimer {
+            description = "Periodically rotate private INN backfill groups";
             onBootSec = "10m";
-            inherit (cfg) syncInterval;
+            inherit (cfg.backfill) syncInterval;
 
-            unit = "inn-pullnews.service";
+            unit = "inn-news-backfill.service";
           };
         }
-        // optionalAttrs cfg.live.enable {
-          inn-pullnews-live = makePullnewsTimer {
+        // optionalAttrs cfg.recent.enable {
+          inn-news-recent = makePullnewsTimer {
             description = "Periodically update recent private INN news";
             onBootSec = "2m";
-            inherit (cfg.live) syncInterval;
+            inherit (cfg.recent) syncInterval;
 
-            unit = "inn-pullnews-live.service";
+            unit = "inn-news-recent.service";
           };
         };
       };

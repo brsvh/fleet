@@ -15,17 +15,21 @@
       credentialService = "sops-nix.service";
       domain = "bingshan.org";
 
-      live = {
-        enable = true;
-        maxArticlesPerGroup = 100;
-        syncInterval = "5m";
+      backfill = {
+        maxArticlesPerGroup = 1000;
+        maxRunSeconds = 600;
+        syncInterval = "15m";
       };
 
-      maxArticlesPerGroup = 500;
-      maxRunSeconds = 600;
       organization = "Bingshan's local news archive";
       pathHost = "news.bingshan.org";
-      syncInterval = "15m";
+
+      recent = {
+        enable = true;
+        lookbackDays = 7;
+        maxArticlesPerGroup = 1000;
+        syncInterval = "5m";
+      };
 
       credentials = {
         "eternal-september" =
