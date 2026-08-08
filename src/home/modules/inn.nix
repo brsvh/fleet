@@ -27,6 +27,17 @@ let
     unique
     ;
 
+  inherit (pkgs)
+    coreutils
+    gawk
+    runCommand
+    systemd
+    util-linux
+    writeScript
+    writeShellScript
+    writeText
+    ;
+
   cfg = config.services.inn;
 
   upstreamType = types.submodule {
@@ -112,13 +123,13 @@ let
       )}
     '';
 
-  marks = pkgs.writeText "pullnews.marks" (
+  marks = writeText "pullnews.marks" (
     concatStringsSep "\n" (
       mapAttrsToList (_: makeMarks) cfg.upstreams
     )
   );
 
-  active = pkgs.writeText "active" (
+  active = writeText "active" (
     concatStringsSep "\n" (
       map (
         group:
@@ -130,7 +141,7 @@ let
     + "\n"
   );
 
-  newsgroups = pkgs.writeText "newsgroups" (
+  newsgroups = writeText "newsgroups" (
     concatStringsSep "\n" (
       map (
         group: "${group}\tLocal pullnews mirror"
@@ -139,7 +150,7 @@ let
     + "\n"
   );
 
-  activeTimes = pkgs.writeText "active.times" (
+  activeTimes = writeText "active.times" (
     concatStringsSep "\n" (
       map (group: "${group} 0 ${cfg.user}") (
         activeGroups
@@ -154,7 +165,7 @@ let
         perlPackages.IOSocketSSL
       ]);
 
-  pullnewsStatus = pkgs.writeScript "inn-pullnews-status" ''
+  pullnewsStatus = writeScript "inn-pullnews-status" ''
     #!${perlWithTls}/bin/perl
 
     use strict;
@@ -300,8 +311,8 @@ let
   liveBootstrapMarksPath = "${liveMarksPath}.bootstrap";
   pullnewsLockPath = "${stateDirectory}/pullnews.lock";
 
-  innConf = pkgs.writeText "inn.conf" ''
-    mta:                         "${pkgs.coreutils}/bin/false -oi -oem %s"
+  innConf = writeText "inn.conf" ''
+    mta:                         "${coreutils}/bin/false -oi -oem %s"
     organization:                "${cfg.organization}"
     ovmethod:                    tradindexed
     hismethod:                   hisv6
@@ -338,14 +349,14 @@ let
   '';
 
   configuration =
-    pkgs.runCommand "inn-user-configuration" { }
+    runCommand "inn-user-configuration" { }
       ''
         cp -r ${cfg.package}/etc $out
         chmod -R u+w $out
         cp ${innConf} $out/inn.conf
         substituteInPlace $out/inn.conf \
           --replace-fail '@CONFIGURATION@' "$out"
-        cp ${pkgs.writeText "incoming.conf" ''
+        cp ${writeText "incoming.conf" ''
           streaming: true
           max-connections: 2
 
@@ -354,7 +365,7 @@ let
               patterns: "*"
           }
         ''} $out/incoming.conf
-        cp ${pkgs.writeText "readers.conf" ''
+        cp ${writeText "readers.conf" ''
           auth "localhost" {
               hosts: "localhost, ${cfg.bindAddress}"
               default: "<localhost>"
@@ -366,16 +377,16 @@ let
               post: "!*"
           }
         ''} $out/readers.conf
-        cp ${pkgs.writeText "newsfeeds" ''
+        cp ${writeText "newsfeeds" ''
           ME:::
         ''} $out/newsfeeds
-        cp ${pkgs.writeText "storage.conf" ''
+        cp ${writeText "storage.conf" ''
           method tradspool {
               newsgroups: *
               class: 0
           }
         ''} $out/storage.conf
-        cp ${pkgs.writeText "expire.ctl" ''
+        cp ${writeText "expire.ctl" ''
           /remember/:never
           *:A:never:never:never
         ''} $out/expire.ctl
@@ -467,36 +478,43 @@ let
     marksPath = liveMarksPath;
   };
 
-  historyPullnews = pkgs.writeShellScript "inn-pullnews-history" ''
+  historyPullnews = writeShellScript "inn-pullnews-history" ''
     set -euo pipefail
 
     exec 9>${escapeShellArg pullnewsLockPath}
-    ${pkgs.util-linux}/bin/flock 9
+    ${util-linux}/bin/flock 9
     exec ${historyPullnewsCommand}
   '';
 
-  livePullnews = pkgs.writeShellScript "inn-pullnews-live" ''
+  livePullnews = writeShellScript "inn-pullnews-live" ''
     set -euo pipefail
 
     cleanup_bootstrap() {
-      ${pkgs.coreutils}/bin/rm -f -- \
+      ${coreutils}/bin/rm -f -- \
         ${escapeShellArg liveBootstrapMarksPath} \
         ${escapeShellArg "${liveBootstrapMarksPath}.pid"}
     }
 
     exec 9>${escapeShellArg pullnewsLockPath}
-    ${pkgs.util-linux}/bin/flock 9
+    if ! ${util-linux}/bin/flock --nonblock 9; then
+      ${systemd}/bin/systemctl --user kill \
+        --kill-whom=all \
+        --signal=SIGINT \
+        inn-pullnews.service \
+        2>/dev/null || true
+      ${util-linux}/bin/flock 9
+    fi
 
     if ! test -e ${escapeShellArg liveMarksPath}; then
       cleanup_bootstrap
       trap cleanup_bootstrap EXIT
 
-      ${pkgs.coreutils}/bin/install -m 0600 \
+      ${coreutils}/bin/install -m 0600 \
         ${marks} \
         ${escapeShellArg liveBootstrapMarksPath}
       ${liveBootstrapPullnewsCommand}
 
-      if ! ${pkgs.gawk}/bin/awk '
+      if ! ${gawk}/bin/awk '
         /^[[:space:]]+[^#[:space:]]/ && $2 == 0 { failed = 1 }
         END { exit failed }
       ' ${escapeShellArg liveBootstrapMarksPath}; then
@@ -504,7 +522,7 @@ let
         exit 1
       fi
 
-      ${pkgs.coreutils}/bin/mv \
+      ${coreutils}/bin/mv \
         ${escapeShellArg liveBootstrapMarksPath} \
         ${escapeShellArg liveMarksPath}
       trap - EXIT
@@ -575,32 +593,32 @@ let
       };
     };
 
-  preStart = pkgs.writeShellScript "inn-pre-start" ''
+  preStart = writeShellScript "inn-pre-start" ''
     set -euo pipefail
 
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg databaseDirectory}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/archive"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/articles"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/incoming"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/outgoing"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/overview"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/log"}
-    ${pkgs.coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/run"}
-    ${pkgs.coreutils}/bin/install -d -m 0770 ${escapeShellArg "${stateDirectory}/tmp"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg databaseDirectory}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/archive"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/articles"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/incoming"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/outgoing"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${spoolDirectory}/overview"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/log"}
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/run"}
+    ${coreutils}/bin/install -d -m 0770 ${escapeShellArg "${stateDirectory}/tmp"}
 
     if ! test -e ${escapeShellArg "${databaseDirectory}/active"}; then
-      ${pkgs.coreutils}/bin/install -m 0644 ${active} ${escapeShellArg "${databaseDirectory}/active"}
-      ${pkgs.coreutils}/bin/install -m 0644 ${activeTimes} ${escapeShellArg "${databaseDirectory}/active.times"}
-      ${pkgs.coreutils}/bin/install -m 0644 ${newsgroups} ${escapeShellArg "${databaseDirectory}/newsgroups"}
+      ${coreutils}/bin/install -m 0644 ${active} ${escapeShellArg "${databaseDirectory}/active"}
+      ${coreutils}/bin/install -m 0644 ${activeTimes} ${escapeShellArg "${databaseDirectory}/active.times"}
+      ${coreutils}/bin/install -m 0644 ${newsgroups} ${escapeShellArg "${databaseDirectory}/newsgroups"}
     fi
 
     if ! test -e ${escapeShellArg "${databaseDirectory}/history"}; then
-      ${pkgs.coreutils}/bin/install -m 0644 /dev/null ${escapeShellArg "${databaseDirectory}/history"}
+      ${coreutils}/bin/install -m 0644 /dev/null ${escapeShellArg "${databaseDirectory}/history"}
       ${cfg.package}/bin/makedbz -i -o -s 6000000
     fi
 
     if ! test -e ${escapeShellArg historyMarksPath}; then
-      ${pkgs.coreutils}/bin/install -m 0600 ${marks} ${escapeShellArg historyMarksPath}
+      ${coreutils}/bin/install -m 0600 ${marks} ${escapeShellArg historyMarksPath}
     fi
 
     ${cfg.package}/bin/innconfval -C
