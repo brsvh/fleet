@@ -11,6 +11,7 @@ let
     concatStringsSep
     elem
     escapeShellArg
+    escapeShellArgs
     filter
     hasAttr
     length
@@ -19,7 +20,9 @@ let
     mkIf
     mkOption
     optional
+    optionalAttrs
     optionalString
+    optionals
     types
     unique
     ;
@@ -292,6 +295,10 @@ let
   stateDirectory = cfg.stateDirectory;
   databaseDirectory = "${stateDirectory}/db";
   spoolDirectory = "${stateDirectory}/spool";
+  historyMarksPath = "${stateDirectory}/pullnews.marks";
+  liveMarksPath = "${stateDirectory}/pullnews-live.marks";
+  liveBootstrapMarksPath = "${liveMarksPath}.bootstrap";
+  pullnewsLockPath = "${stateDirectory}/pullnews.lock";
 
   innConf = pkgs.writeText "inn.conf" ''
     mta:                         "${pkgs.coreutils}/bin/false -oi -oem %s"
@@ -386,6 +393,188 @@ let
     cfg.credentialService != null
   ) cfg.credentialService;
 
+  makePullnewsCommand =
+    {
+      marksPath,
+      maxArticlesPerGroup,
+      maxRunSeconds,
+      watermark ? null,
+    }:
+    escapeShellArgs (
+      [
+        "${cfg.package}/bin/pullnews"
+        "-b"
+        "1"
+        "-k"
+        "500"
+      ]
+      ++ optionals (maxArticlesPerGroup != null) [
+        "-M"
+        (toString maxArticlesPerGroup)
+      ]
+      ++ [
+        "-N"
+        "60"
+        "-O"
+        "-q"
+        "-s"
+        "${cfg.bindAddress}:${toString cfg.port}"
+      ]
+      ++ optionals (maxRunSeconds != null) [
+        "-S"
+        (toString maxRunSeconds)
+      ]
+      ++ [
+        "-t"
+        "2"
+        "-T"
+        "30"
+      ]
+      ++ optionals (watermark != null) [
+        "-w"
+        watermark
+      ]
+      ++ [
+        "-c"
+        marksPath
+      ]
+    );
+
+  historyPullnewsCommand = makePullnewsCommand {
+    inherit (cfg)
+      maxArticlesPerGroup
+      maxRunSeconds
+      ;
+
+    marksPath = historyMarksPath;
+  };
+
+  liveBootstrapPullnewsCommand =
+    makePullnewsCommand
+      {
+        marksPath = liveBootstrapMarksPath;
+        maxArticlesPerGroup = null;
+        maxRunSeconds = null;
+        watermark = "-0";
+      };
+
+  livePullnewsCommand = makePullnewsCommand {
+    inherit (cfg.live)
+      maxArticlesPerGroup
+      maxRunSeconds
+      ;
+
+    marksPath = liveMarksPath;
+  };
+
+  historyPullnews = pkgs.writeShellScript "inn-pullnews-history" ''
+    set -euo pipefail
+
+    exec 9>${escapeShellArg pullnewsLockPath}
+    ${pkgs.util-linux}/bin/flock 9
+    exec ${historyPullnewsCommand}
+  '';
+
+  livePullnews = pkgs.writeShellScript "inn-pullnews-live" ''
+    set -euo pipefail
+
+    cleanup_bootstrap() {
+      ${pkgs.coreutils}/bin/rm -f -- \
+        ${escapeShellArg liveBootstrapMarksPath} \
+        ${escapeShellArg "${liveBootstrapMarksPath}.pid"}
+    }
+
+    exec 9>${escapeShellArg pullnewsLockPath}
+    ${pkgs.util-linux}/bin/flock 9
+
+    if ! test -e ${escapeShellArg liveMarksPath}; then
+      cleanup_bootstrap
+      trap cleanup_bootstrap EXIT
+
+      ${pkgs.coreutils}/bin/install -m 0600 \
+        ${marks} \
+        ${escapeShellArg liveBootstrapMarksPath}
+      ${liveBootstrapPullnewsCommand}
+
+      if ! ${pkgs.gawk}/bin/awk '
+        /^[[:space:]]+[^#[:space:]]/ && $2 == 0 { failed = 1 }
+        END { exit failed }
+      ' ${escapeShellArg liveBootstrapMarksPath}; then
+        echo "live pullnews marks initialization did not check every group" >&2
+        exit 1
+      fi
+
+      ${pkgs.coreutils}/bin/mv \
+        ${escapeShellArg liveBootstrapMarksPath} \
+        ${escapeShellArg liveMarksPath}
+      trap - EXIT
+      cleanup_bootstrap
+    fi
+
+    exec ${livePullnewsCommand}
+  '';
+
+  makePullnewsService =
+    {
+      description,
+      execStart,
+      extraAfter ? [ ],
+    }:
+    {
+      Service = {
+        CPUWeight = 20;
+        Environment = innEnvironment;
+        ExecStart = execStart;
+        IOWeight = 20;
+        LoadCredential = credentials;
+        Nice = 10;
+        TimeoutStartSec = "30m";
+        Type = "oneshot";
+        UMask = "0077";
+      };
+
+      Unit = {
+        After = [
+          "inn.service"
+          "network.target"
+        ]
+        ++ extraAfter
+        ++ credentialUnits;
+        Description = description;
+        Requires = [
+          "inn.service"
+        ]
+        ++ credentialUnits;
+      };
+    };
+
+  makePullnewsTimer =
+    {
+      description,
+      onBootSec,
+      syncInterval,
+      unit,
+    }:
+    {
+      Install = {
+        WantedBy = [
+          "timers.target"
+        ];
+      };
+
+      Timer = {
+        AccuracySec = "30s";
+        OnBootSec = onBootSec;
+        OnUnitInactiveSec = syncInterval;
+        Persistent = true;
+        Unit = unit;
+      };
+
+      Unit = {
+        Description = description;
+      };
+    };
+
   preStart = pkgs.writeShellScript "inn-pre-start" ''
     set -euo pipefail
 
@@ -410,8 +599,8 @@ let
       ${cfg.package}/bin/makedbz -i -o -s 6000000
     fi
 
-    if ! test -e ${escapeShellArg "${stateDirectory}/pullnews.marks"}; then
-      ${pkgs.coreutils}/bin/install -m 0600 ${marks} ${escapeShellArg "${stateDirectory}/pullnews.marks"}
+    if ! test -e ${escapeShellArg historyMarksPath}; then
+      ${pkgs.coreutils}/bin/install -m 0600 ${marks} ${escapeShellArg historyMarksPath}
     fi
 
     ${cfg.package}/bin/innconfval -C
@@ -484,11 +673,45 @@ in
           type = types.str;
         };
 
+        live = {
+          enable = mkEnableOption "a recent-news pull channel";
+
+          maxArticlesPerGroup = mkOption {
+            default = null;
+
+            description = ''
+              Maximum number of article numbers processed per group in one recent-news pull.
+            '';
+
+            type = with types; nullOr ints.positive;
+          };
+
+          maxRunSeconds = mkOption {
+            default = null;
+
+            description = ''
+              Maximum duration in seconds of one recent-news pull.
+            '';
+
+            type = with types; nullOr ints.positive;
+          };
+
+          syncInterval = mkOption {
+            default = "15m";
+
+            description = ''
+              Delay between completed recent-news pulls.
+            '';
+
+            type = types.str;
+          };
+        };
+
         maxArticlesPerGroup = mkOption {
           default = null;
 
           description = ''
-            Maximum number of article numbers processed per group in one pullnews run.
+            Maximum number of article numbers processed per group in one historical pull.
           '';
 
           type = with types; nullOr ints.positive;
@@ -498,7 +721,7 @@ in
           default = null;
 
           description = ''
-            Maximum duration in seconds of one pullnews run.
+            Maximum duration in seconds of one historical pull.
           '';
 
           type = with types; nullOr ints.positive;
@@ -571,7 +794,7 @@ in
           default = "5m";
 
           description = ''
-            Delay between completed pullnews runs.
+            Delay between completed historical pulls.
           '';
 
           type = types.str;
@@ -677,7 +900,7 @@ in
               Environment = innEnvironment;
               ExecStart = concatStringsSep " " [
                 "${pullnewsStatus}"
-                "${stateDirectory}/pullnews.marks"
+                historyMarksPath
               ];
               LoadCredential = credentials;
               Nice = 10;
@@ -698,76 +921,35 @@ in
             };
           };
 
-          inn-pullnews = {
-            Service = {
-              CPUWeight = 20;
-              Environment = innEnvironment;
-              ExecStart = concatStringsSep " " (
-                [
-                  "${cfg.package}/bin/pullnews"
-                  "-b 1"
-                  "-k 500"
-                ]
-                ++ optional (
-                  cfg.maxArticlesPerGroup != null
-                ) "-M ${toString cfg.maxArticlesPerGroup}"
-                ++ [
-                  "-N 60"
-                  "-O"
-                  "-q"
-                  "-s ${cfg.bindAddress}:${toString cfg.port}"
-                ]
-                ++ optional (
-                  cfg.maxRunSeconds != null
-                ) "-S ${toString cfg.maxRunSeconds}"
-                ++ [
-                  "-t 2"
-                  "-T 30"
-                  "-c ${stateDirectory}/pullnews.marks"
-                ]
-              );
-              IOWeight = 20;
-              LoadCredential = credentials;
-              Nice = 10;
-              TimeoutStartSec = "infinity";
-              Type = "oneshot";
-              UMask = "0077";
-            };
-
-            Unit = {
-              After = [
-                "inn.service"
-                "network.target"
-              ]
-              ++ credentialUnits;
-              Description = "Pull subscribed news groups into private INN";
-              Requires = [
-                "inn.service"
-              ]
-              ++ credentialUnits;
-            };
+          inn-pullnews = makePullnewsService {
+            description = "Backfill historical news into private INN";
+            execStart = historyPullnews;
+            extraAfter = optional cfg.live.enable "inn-pullnews-live.service";
+          };
+        }
+        // optionalAttrs cfg.live.enable {
+          inn-pullnews-live = makePullnewsService {
+            description = "Pull recent news into private INN";
+            execStart = livePullnews;
           };
         };
 
         timers = {
-          inn-pullnews = {
-            Install = {
-              WantedBy = [
-                "timers.target"
-              ];
-            };
+          inn-pullnews = makePullnewsTimer {
+            description = "Periodically backfill the private INN archive";
+            onBootSec = "10m";
+            inherit (cfg) syncInterval;
 
-            Timer = {
-              AccuracySec = "30s";
-              OnBootSec = "5m";
-              OnUnitInactiveSec = cfg.syncInterval;
-              Persistent = true;
-              Unit = "inn-pullnews.service";
-            };
+            unit = "inn-pullnews.service";
+          };
+        }
+        // optionalAttrs cfg.live.enable {
+          inn-pullnews-live = makePullnewsTimer {
+            description = "Periodically update recent private INN news";
+            onBootSec = "2m";
+            inherit (cfg.live) syncInterval;
 
-            Unit = {
-              Description = "Periodically update the private INN archive";
-            };
+            unit = "inn-pullnews-live.service";
           };
         };
       };
