@@ -17,6 +17,20 @@
     };
   };
 
+  systemd = {
+    services = {
+      dae = {
+        after = [
+          "network-online.target"
+        ];
+
+        wants = [
+          "network-online.target"
+        ];
+      };
+    };
+  };
+
   sops = {
     secrets = {
       "config.dae" = {
