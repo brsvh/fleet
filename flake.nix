@@ -343,7 +343,7 @@
         };
       };
 
-      url = "git+https://github.com/different-name/steam-config-nix.git?ref=master";
+      url = "git+https://github.com/different-name/steam-config-nix.git?ref=main";
     };
 
     systems = {
