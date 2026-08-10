@@ -1,0 +1,19 @@
+{
+  "tagOwners": {
+    "tag:managed": [],
+    "tag:phone": []
+  },
+
+  "grants": [
+    {
+      "src": ["tag:managed"],
+      "dst": ["tag:managed"],
+      "ip": ["*"]
+    },
+    {
+      "src": ["tag:phone"],
+      "dst": ["tag:managed"],
+      "ip": ["*"]
+    }
+  ]
+}
