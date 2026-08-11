@@ -26,15 +26,15 @@
   services = {
     mihomo = {
       configFile =
-        config.sops.secrets."mihomo.yaml".path;
+        config.sops.secrets."tagss.yaml".path;
 
-      tunMode = true;
+      tunMode = false;
     };
   };
 
   sops = {
     secrets = {
-      "mihomo.yaml" = {
+      "tagss.yaml" = {
         restartUnits = [
           "mihomo.service"
         ];
