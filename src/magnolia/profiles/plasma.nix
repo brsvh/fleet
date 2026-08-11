@@ -1,10 +1,12 @@
 {
+  magnolia,
   pkgs,
   system,
   ...
 }:
 {
   imports = [
+    magnolia.profiles.firewall
     system.profiles.plasma
   ];
 
@@ -12,6 +14,14 @@
     plasma6 = {
       excludePackages = with pkgs.kdePackages; [
         kate
+      ];
+    };
+  };
+
+  networking = {
+    firewall = {
+      allowedTCPPorts = [
+        3389
       ];
     };
   };
