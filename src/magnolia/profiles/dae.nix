@@ -12,8 +12,7 @@
 
   services = {
     dae = {
-      configFile =
-        config.sops.secrets."config.dae".path;
+      configFile = config.sops.secrets."tagss.dae".path;
     };
   };
 
@@ -33,7 +32,7 @@
 
   sops = {
     secrets = {
-      "config.dae" = {
+      "tagss.dae" = {
         restartUnits = [
           "dae.service"
         ];
