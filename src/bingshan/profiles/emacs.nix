@@ -1222,6 +1222,15 @@ in
 
       initFile = bingshan.etc.emacs.init;
 
+      overrides = _final: prev: {
+        ghostel = prev.ghostel.overrideAttrs (prevAttrs: {
+          # The dependency hash is unchanged since 0.49; reuse its cached output.
+          zigDeps = prevAttrs.zigDeps.overrideAttrs {
+            name = "ghostel-0.49.0-zig-deps";
+          };
+        });
+      };
+
       package = pkgs.emacs-git-pgtk.override {
         withXwidgets = true;
       };

@@ -17,13 +17,15 @@ in
     steam = {
       config = {
         apps = {
-          "Counter-Strike 2" = {
+          "730" = {
             id = 730;
+            name = "Counter-Strike 2";
           };
 
-          "Stellar Blade" = {
+          "3489700" = {
             compatTool = proton-ge-bin;
             id = 3489700;
+            name = "Stellar Blade";
           };
         };
       };

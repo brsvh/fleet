@@ -96,11 +96,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786220854,
-        "narHash": "sha256-/b79w+zO/+sJ1ADXUfkemP+0kBV+HPxmZVY7xlPI2ag=",
+        "lastModified": 1786361680,
+        "narHash": "sha256-IxaZkb9rCGEZ+yGndxKXONeIEcKMzoFUsvLTB5G/caw=",
         "ref": "master",
-        "rev": "4dcc87bbf8b3e63ecbe2bf3bb77d729ced7d91d8",
-        "revCount": 383,
+        "rev": "16901271e5b30b591e56f7a84f25f186fb20f3e1",
+        "revCount": 385,
         "type": "git",
         "url": "https://github.com/serokell/deploy-rs.git"
       },
@@ -216,11 +216,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786296227,
-        "narHash": "sha256-9Nlr6HGf6IVSAY5nCxu24V4fMb9WYD7pHUJFfC1qPAc=",
+        "lastModified": 1787650344,
+        "narHash": "sha256-32la5GMQSrtTmynUaP8n7vLeogQ61PmQzQCy3QEZkaQ=",
         "ref": "master",
-        "rev": "f8d9fcf736742e3dcd98754894105eee249e904d",
-        "revCount": 19586,
+        "rev": "310a9af807997c395d816ae827f7d91692eeb4f2",
+        "revCount": 19736,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -278,11 +278,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785627969,
-        "narHash": "sha256-4dtXQk/NMePegK/nWp5NSeuZKLATItOq61lpEvmXqGw=",
+        "lastModified": 1787559586,
+        "narHash": "sha256-onL0VLf9vPllmT0H/OlURIU5r5t5WIEl7t4tVNKT0Nw=",
         "ref": "main",
-        "rev": "427bf4bd9435fdf21321c8cc628c24efc14c0f7a",
-        "revCount": 483,
+        "rev": "9d0d87172c374f89da73c1cfe6d81ae62feac1f1",
+        "revCount": 489,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -320,11 +320,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786286733,
-        "narHash": "sha256-7dN93WKkEERgutPtTjK7SY3ZarO2LAU33A1+vKu+7cc=",
+        "lastModified": 1787540599,
+        "narHash": "sha256-MHwk52ty3NsLhq9a1IbIfBJZlCUJIdiUYFo52JLK9hY=",
         "ref": "master",
-        "rev": "367f7ef80856d18438953d54dda235d42a46ba31",
-        "revCount": 7139,
+        "rev": "03f4cd46bc1dd4f3a96da778d2ce9f7ce39dd450",
+        "revCount": 7182,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -420,11 +420,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786323141,
-        "narHash": "sha256-IiNvo9rlL9ncnLOp70Mo1toobC2t9xHzsZIZayEv7dg=",
+        "lastModified": 1786337855,
+        "narHash": "sha256-UG8v0D6MCJs7TCpdpAOLKus+IHktnt4MlV19kFLZQ2w=",
         "ref": "main",
-        "rev": "76f2e1f07e0435873d08e7f8a07dbe18f237ec5c",
-        "revCount": 14949,
+        "rev": "33656317a15ef8171dc2efbbdefd5f7b092b57b9",
+        "revCount": 14965,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -450,11 +450,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785702596,
-        "narHash": "sha256-PnJsHRZyM3iA+0BeEikWm2piQCuwtGU4xxjsWOMRvTU=",
+        "lastModified": 1786567397,
+        "narHash": "sha256-H713vbgy+n1asVNn/0kBwbFgroNgC1dnx8pEMKcFdgk=",
         "ref": "main",
-        "rev": "531aa78a9f03f3831aa45566630ab52f6483159b",
-        "revCount": 1072,
+        "rev": "e668474df221aeef1ebd374d0364aa07f1d4f827",
+        "revCount": 1074,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -510,11 +510,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1786106723,
-        "narHash": "sha256-zDSUbpoeo/9ZmD2+wXnzxoo1+uhL8vxc0b8yuYMKYq0=",
+        "lastModified": 1787498568,
+        "narHash": "sha256-9i/VTdusq/+NM/tz+J1Re+ojkMB8MBf0QshnYfzHz30=",
         "ref": "nixos-unstable",
-        "rev": "f13ff45afd1bb73e640eaa08a7066dbed07e3238",
-        "revCount": 1049422,
+        "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
+        "revCount": 1060451,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -591,11 +591,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786247265,
-        "narHash": "sha256-cVTcTqAhzSNMOVddtBhFpuv+Vx6/SgrhgZWJiI61H24=",
+        "lastModified": 1787627053,
+        "narHash": "sha256-QdVaU2WSCKsxZ0sBDIRnaaukp6Z5IMUE0gDEDoSRJd0=",
         "ref": "master",
-        "rev": "6df7076ea0f5697e3242719a4c71211f00411cf5",
-        "revCount": 2265,
+        "rev": "132a10336af9ae819bdf640c0dd1c789b12d7107",
+        "revCount": 2283,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -612,11 +612,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783174389,
-        "narHash": "sha256-aCWC8ngycU7OdJrU2+Je3qf+1a2ykuBvpPhZT/9tXMc=",
+        "lastModified": 1786629091,
+        "narHash": "sha256-gkig4nPi1CWc4Z50GBsjE4ygSE7hMpl/TwID2an2Cck=",
         "ref": "master",
-        "rev": "f1406619a3884cd5c47992a70b8b35c9c0fcb4c9",
-        "revCount": 1226,
+        "rev": "a8627b21b9107c5711c96b84f32a9a4b3d45295f",
+        "revCount": 1236,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -639,11 +639,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786190480,
-        "narHash": "sha256-3UUUgX86avrPlcit3OuEupbilu1YWrN3xlEW3drZpnM=",
+        "lastModified": 1787568509,
+        "narHash": "sha256-Ad1q/OuCeEdBBeK5yttG4SqOAmhRoNYf0J381sHV2w0=",
         "ref": "main",
-        "rev": "7fe7a34d45d15962e9180ecb4bb4c979b9a062b7",
-        "revCount": 174,
+        "rev": "e8c99d8e4aacf7e1854aa0196358b1b1c3b55067",
+        "revCount": 207,
         "type": "git",
         "url": "https://github.com/different-name/steam-config-nix.git"
       },
@@ -676,11 +676,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785945821,
-        "narHash": "sha256-NLSyTCW4K4ofhNBllt3omPasm6QpralXH1DBZOc91Dw=",
+        "lastModified": 1786901030,
+        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
         "ref": "main",
-        "rev": "ae7910970dddc408fe6ab1c8e4b277bb21d72dc0",
-        "revCount": 555,
+        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
+        "revCount": 557,
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
       },
