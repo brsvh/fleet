@@ -61,11 +61,13 @@ in
             deploy.lib.${camellia.config.nixpkgs.hostPlatform.system};
 
           erythron = self.nixosConfigurations.erythron;
+
+          magnolia = self.nixosConfigurations.magnolia;
         in
         {
           azaleoid = {
             fastConnection = true;
-            hostname = "azaleoid";
+            hostname = "azaleoid.tail.bingshan.org";
 
             profiles = {
               system = {
@@ -92,11 +94,25 @@ in
 
           erythron = {
             fastConnection = true;
-            hostname = "erythron";
+            hostname = "erythron.tail.bingshan.org";
 
             profiles = {
               system = {
                 path = deploy-lib.activate.nixos erythron;
+                user = "root";
+              };
+            };
+
+            sshUser = "root";
+          };
+
+          magnolia = {
+            fastConnection = true;
+            hostname = "magnolia.tail.bingshan.org";
+
+            profiles = {
+              system = {
+                path = deploy-lib.activate.nixos azaleoid;
                 user = "root";
               };
             };
