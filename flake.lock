@@ -420,11 +420,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788126251,
-        "narHash": "sha256-XWa7++jRhXl52KVtR4UkZWcjy8oyrckCDvD+3DhKftI=",
+        "lastModified": 1788492540,
+        "narHash": "sha256-Me6B4hiG+S0/LH1GxR7+im5EaFvzAnZVAb2PdzNfEmo=",
         "ref": "main",
-        "rev": "461871c22df47477c78ae7ea6bf2f5bcf004beb5",
-        "revCount": 16697,
+        "rev": "ee1adf126673e4fd378bbe6caff452b67c81efed",
+        "revCount": 17144,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
