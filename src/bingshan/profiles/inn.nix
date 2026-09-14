@@ -31,6 +31,13 @@
         syncInterval = "5m";
       };
 
+      upstreams = {
+        olduse = {
+          normalizeDuplicatePath = true;
+          normalizeLegacyDate = true;
+        };
+      };
+
       credentials = {
         "eternal-september" =
           config.sops.secrets."eternal-september".path;
