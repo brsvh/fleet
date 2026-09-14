@@ -240,6 +240,18 @@ in
               key_groups = [
                 {
                   age = [
+                    "age1hhgresnj5gv5svgcudceu5m92mnn2vq9z6gpkfz309qajv4kxdsqh3e883"
+                    bingshan
+                  ];
+                }
+              ];
+
+              path_regex = "^src/magnolia/etc/inn\\.sops\\.yaml$";
+            }
+            {
+              key_groups = [
+                {
+                  age = [
                     azaleoid
                   ];
                 }
