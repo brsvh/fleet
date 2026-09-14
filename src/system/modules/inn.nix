@@ -7,7 +7,11 @@
 let
   inherit (lib)
     all
+    attrNames
+    attrValues
+    boolToString
     concatLists
+    concatMapStringsSep
     concatStringsSep
     elem
     escapeShellArg
@@ -18,11 +22,12 @@ let
     mapAttrsToList
     mkEnableOption
     mkIf
+    mkMerge
     mkOption
     optional
-    optionalAttrs
     optionalString
     optionals
+    pipe
     types
     unique
     ;
@@ -105,13 +110,13 @@ let
     };
   };
 
-  subscribedGroups = concatLists (
-    mapAttrsToList (_: upstream: upstream.groups) (
-      cfg.upstreams
-    )
-  );
+  subscribedGroups = pipe cfg.upstreams [
+    (mapAttrsToList (_: upstream: upstream.groups))
+    concatLists
+  ];
 
-  groups = unique subscribedGroups;
+  groups = unique cfg.groups;
+  primary = cfg.role == "primary";
 
   internalGroups = [
     "control"
@@ -124,13 +129,12 @@ let
 
   activeGroups = internalGroups ++ groups;
 
-  passwordCredentials =
-    filter (credential: credential != null)
-      (
-        mapAttrsToList (
-          _: upstream: upstream.passwordCredential
-        ) cfg.upstreams
-      );
+  passwordCredentials = pipe cfg.upstreams [
+    (mapAttrsToList (
+      _: upstream: upstream.passwordCredential
+    ))
+    (filter (credential: credential != null))
+  ];
 
   makeMarks =
     upstream:
@@ -141,15 +145,17 @@ let
     in
     ''
       ${upstream.endpoint}${authentication}
-      ${concatStringsSep "\n" (
-        map (group: "    ${group}") upstream.groups
-      )}
+      ${pipe upstream.groups [
+        (map (group: "    ${group}"))
+        (concatStringsSep "\n")
+      ]}
     '';
 
   marks = writeText "pullnews.marks" (
-    concatStringsSep "\n" (
-      mapAttrsToList (_: makeMarks) cfg.upstreams
-    )
+    pipe cfg.upstreams [
+      (mapAttrsToList (_: makeMarks))
+      (concatStringsSep "\n")
+    ]
   );
 
   backfillGroups = writeText "inn-backfill-groups" (
@@ -157,51 +163,57 @@ let
   );
 
   active = writeText "active" (
-    concatStringsSep "\n" (
-      map (
+    pipe activeGroups [
+      (map (
         group:
         "${group} 0000000000 0000000001 ${
           if elem group groups then "y" else "n"
         }"
-      ) activeGroups
-    )
+      ))
+      (concatStringsSep "\n")
+    ]
     + "\n"
   );
 
   newsgroups = writeText "newsgroups" (
-    concatStringsSep "\n" (
-      map (
-        group: "${group}\tLocal pullnews mirror"
-      ) activeGroups
-    )
+    pipe activeGroups [
+      (map (group: "${group}\tLocal pullnews mirror"))
+      (concatStringsSep "\n")
+    ]
     + "\n"
   );
 
   activeTimes = writeText "active.times" (
-    concatStringsSep "\n" (
-      map (group: "${group} 0 ${cfg.user}") (
-        activeGroups
-      )
-    )
+    pipe activeGroups [
+      (map (group: "${group} 0 ${cfg.user}"))
+      (concatStringsSep "\n")
+    ]
     + "\n"
   );
 
-  perlWithTls =
-    pkgs.perl.withPackages
-      (perlPackages: [
-        perlPackages.IOSocketSSL
-        perlPackages.TimeDate
-      ]);
+  perlWithTls = pkgs.perl.withPackages (
+    perlPackages: with perlPackages; [
+      IOSocketSSL
+      TimeDate
+    ]
+  );
 
   archiveConfiguration =
     (pkgs.formats.json { }).generate
       "inn-archive.json"
       {
-        localEndpoint = "${cfg.bindAddress}:${toString cfg.port}";
-        stateDirectory = cfg.stateDirectory;
-        upstreams = mapAttrsToList (
-          _: upstream: upstream
-        ) cfg.upstreams;
+        inherit (cfg)
+          bootstrapPort
+          groups
+          peers
+          primaryAddress
+          primaryHost
+          role
+          stateDirectory
+          ;
+
+        localEndpoint = "127.0.0.1:${toString cfg.port}";
+        upstreams = attrValues cfg.upstreams;
       };
 
   archiveTool = pkgs.writeShellScriptBin "inn-archive" ''
@@ -1009,12 +1021,170 @@ let
               yield
 
 
+      def check_server(endpoint, groups):
+          with NNTP(endpoint) as server:
+              result = {}
+              for group in groups:
+                  count, first, last = server.group(group)
+                  if count:
+                      server.expect(server.command("STAT " + str(last)), (223,))
+                  result[group] = {"count_estimate": count, "first": first, "last": last}
+              return result
+
+
+      def ready(config):
+          marker = json.loads((Path(config["stateDirectory"]) / ".initialized").read_text())
+          if marker["primary"] != config["primaryHost"] or marker["role"] != config["role"]:
+              raise ValueError("archive role or primary identity changed; explicit migration required")
+          for attempt in range(20):
+              try:
+                  check_server(config["localEndpoint"], config["groups"])
+                  Path("/run/inn/ready").write_text(json.dumps(marker) + "\n")
+                  return 0
+              except (OSError, ProtocolError):
+                  if attempt == 19:
+                      raise
+                  time.sleep(1)
+
+
+      def seed_manifest(config, directory):
+          root = Path(directory)
+          files = 0
+          size = 0
+          for base, directories, names in os.walk(root):
+              if any((Path(base) / name).is_symlink() for name in directories):
+                  raise ValueError("bootstrap image must not contain directory symlinks")
+              for name in names:
+                  if Path(base) == root and name in ("seed.json", ".initialized"):
+                      continue
+                  path = Path(base) / name
+                  if path.is_symlink():
+                      raise ValueError("bootstrap image must not contain symlinks")
+                  files += 1
+                  size += path.stat().st_size
+          marker = json.loads((Path(config["stateDirectory"]) / ".initialized").read_text())
+          marker.update({
+              "groups": sorted(config["groups"]),
+              "created": time.time(),
+              "files": files,
+              "bytes": size,
+              "active_sha256": hashlib.sha256((root / "db/active").read_bytes()).hexdigest(),
+          })
+          (root / "seed.json").write_text(json.dumps(marker, indent=2) + "\n")
+
+
+      def validate_seed(config, directory, complete):
+          root = Path(directory)
+          seed = json.loads((root / "seed.json").read_text())
+          if seed["primary"] != config["primaryHost"] or seed["role"] != "primary":
+              raise ValueError("bootstrap image belongs to a different primary")
+          if seed["groups"] != sorted(config["groups"]):
+              raise ValueError("bootstrap group configuration differs from this replica")
+          if not complete:
+              # Conservatively use apparent size and preserve 2 GiB for the system.
+              free = os.statvfs(root).f_bavail * os.statvfs(root).f_frsize
+              present = sum(p.stat().st_size for p in root.rglob("*") if p.is_file())
+              if free < max(0, seed["bytes"] - present) + 2 * 1024 ** 3:
+                  raise ValueError("insufficient space for bootstrap image plus 2 GiB reserve")
+              return
+          active = root / "db/active"
+          if hashlib.sha256(active.read_bytes()).hexdigest() != seed["active_sha256"]:
+              raise ValueError("bootstrap active file checksum mismatch")
+          if not (root / "db/history").exists() or not (root / "spool/articles").is_dir():
+              raise ValueError("incomplete bootstrap image")
+          files = 0
+          size = 0
+          for base, directories, names in os.walk(root):
+              for name in directories + names:
+                  if (Path(base) / name).is_symlink():
+                      raise ValueError("bootstrap image must not contain symlinks")
+              for name in names:
+                  if Path(base) == root and name in ("seed.json", ".initialized"):
+                      continue
+                  files += 1
+                  size += (Path(base) / name).stat().st_size
+          if files != seed["files"] or size != seed["bytes"]:
+              raise ValueError("bootstrap file count or size mismatch")
+          seed["role"] = "replica"
+          (root / ".initialized").write_text(json.dumps(seed) + "\n")
+
+
+      def replication_status(config, full):
+          local = check_server(config["localEndpoint"], config["groups"])
+          report = {"role": config["role"], "sampled_at": time.time(), "local": local, "peers": {}}
+          targets = config["peers"] if config["role"] == "primary" else {
+              "primary": {"host": config["primaryHost"]}
+          }
+          port = config["localEndpoint"].rsplit(":", 1)[1]
+          failed = False
+          for name, peer in targets.items():
+              entry = {}
+              report["peers"][name] = entry
+              try:
+                  endpoint = peer["host"] + ":" + port
+                  entry["groups"] = check_server(endpoint, config["groups"])
+                  entry["available"] = True
+                  authoritative, replica = (local, entry["groups"]) if config["role"] == "primary" else (entry["groups"], local)
+                  entry["last_article_number_lag"] = {
+                      group: max(0, authoritative[group]["last"] - replica[group]["last"])
+                      for group in config["groups"]
+                  }
+                  if full:
+                      entry["comparison"] = {}
+                      with NNTP(config["localEndpoint"]) as left, NNTP(endpoint) as right:
+                          for group in config["groups"]:
+                              authoritative, replica = (left, right) if config["role"] == "primary" else (right, left)
+                              primary_range = authoritative.group(group)
+                              replica_range = replica.group(group)
+                              cutoff = primary_range[2]
+                              indexes = []
+                              for server, (count, first, last) in ((authoritative, primary_range), (replica, replica_range)):
+                                  # Ignore new arrivals beyond the primary's sampled high-water mark.
+                                  last = min(last, cutoff)
+                                  index = {}
+                                  for start in range(first, last + 1, 10000) if count else []:
+                                      index.update(server.ids(start, min(start + 9999, last)))
+                                  indexes.append(index)
+                              authoritative, replica = indexes
+                              missing = authoritative.keys() - replica.keys()
+                              extra = replica.keys() - authoritative.keys()
+                              conflicts = sum(authoritative[n] != replica[n] for n in authoritative.keys() & replica.keys())
+                              entry["comparison"][group] = {
+                                  "through_article_number": cutoff,
+                                  "missing_numbers": len(missing), "extra_numbers": len(extra),
+                                  "number_conflicts": conflicts,
+                              }
+                              failed |= bool(missing or extra or conflicts)
+              except (OSError, ProtocolError) as error:
+                  entry.update({"available": False, "error": str(error)})
+                  failed = True
+          if config["role"] == "primary":
+              feed = Path(config["stateDirectory"]) / "feed"
+              report["backlog_files"] = {
+                  p.name: p.stat().st_size for p in feed.glob("*") if p.is_file()
+              }
+              status_file = Path(config["stateDirectory"]) / "log/innfeed.status"
+              report["feed_status"] = {"path": str(status_file)}
+              try:
+                  report["feed_status"].update({
+                      "updated_at": status_file.stat().st_mtime,
+                      "text": status_file.read_text(),
+                  })
+              except FileNotFoundError:
+                  report["feed_status"]["text"] = None
+          report["full_number_comparison"] = full
+          print(json.dumps(report, indent=2))
+          return int(failed)
+
+
       def main():
           parser = argparse.ArgumentParser(description=__doc__)
           parser.add_argument("--config", required=True)
           parser.add_argument(
-              "operation", choices=("sync", "audit", "retry", "progress", "status")
+              "operation", choices=("sync", "audit", "retry", "progress", "status", "ready", "primary-ready", "seed-manifest", "validate-seed", "replication-status")
           )
+          parser.add_argument("--directory")
+          parser.add_argument("--full", action="store_true")
           parser.add_argument("--marks")
           parser.add_argument("--group")
           parser.add_argument("--max-articles", type=int)
@@ -1033,6 +1203,23 @@ let
           args.marks = args.marks or str(
               Path(config["stateDirectory"]) / "pullnews-backfill.marks"
           )
+          if args.operation == "ready":
+              return ready(config)
+          if args.operation == "primary-ready":
+              check_server(config["primaryHost"] + ":" + config["localEndpoint"].rsplit(":", 1)[1], config["groups"])
+              return 0
+          if args.operation in ("seed-manifest", "validate-seed"):
+              if not args.directory:
+                  parser.error("--directory is required")
+              if args.operation == "seed-manifest":
+                  seed_manifest(config, args.directory)
+              else:
+                  validate_seed(config, args.directory, args.full)
+              return 0
+          if args.operation == "replication-status":
+              return replication_status(config, args.full)
+          if config["role"] != "primary":
+              parser.error("external archive operations are only available on the primary")
           if args.operation == "progress":
               return progress(config, args)
           if args.operation == "status":
@@ -1284,13 +1471,20 @@ let
     pathnews:                    ${stateDirectory}
     runasuser:                   ${cfg.user}
     runasgroup:                  ${cfg.group}
-    server:                      ${cfg.bindAddress}
+    server:                      127.0.0.1
     artcutoff:                   0
     bindaddress:                 ${cfg.bindAddress}
     docancels:                   none
     maxartsize:                  0
     pgpverify:                   false
     port:                        ${toString cfg.port}
+    xrefslave:                   ${boolToString (!primary)}
+    ${optionalString (
+      !primary
+    ) "nnrpdposthost: ${cfg.primaryHost}"}
+    ${optionalString (
+      !primary
+    ) "nnrpdpostport: ${toString cfg.port}"}
     remembertrash:               false
     doinnwatch:                  false
     htmlstatus:                  false
@@ -1313,7 +1507,7 @@ let
   '';
 
   configuration =
-    runCommand "inn-user-configuration" { }
+    runCommand "inn-system-configuration" { }
       ''
         cp -r ${cfg.package}/etc $out
         chmod -R u+w $out
@@ -1322,28 +1516,86 @@ let
           --replace-fail '@CONFIGURATION@' "$out"
         cp ${writeText "incoming.conf" ''
           streaming: true
-          max-connections: 2
-
-          peer pullnews {
-              hostname: "localhost, ${cfg.bindAddress}"
+          max-connections: 4
+          peer archive {
+              hostname: "${
+                if primary then
+                  "127.0.0.1"
+                else
+                  cfg.primaryAddress
+              }"
               patterns: "*"
           }
         ''} $out/incoming.conf
         cp ${writeText "readers.conf" ''
-          auth "localhost" {
-              hosts: "localhost, ${cfg.bindAddress}"
-              default: "<localhost>"
+          auth "fleet" {
+              hosts: "${
+                pipe
+                  (
+                    [
+                      "127.0.0.1"
+                      cfg.primaryAddress
+                    ]
+                    ++ mapAttrsToList (
+                      _: peer: peer.address
+                    ) cfg.peers
+                  )
+                  [
+                    unique
+                    (concatStringsSep ", ")
+                  ]
+              }"
+              default: "<reader>"
           }
-
-          access "localhost" {
-              users: "<localhost>"
-              read: "*,!control,!control.*,!junk"
+          access "fleet" {
+              users: "<reader>"
+              read: "${concatStringsSep "," groups}"
               post: "!*"
           }
         ''} $out/readers.conf
-        cp ${writeText "newsfeeds" ''
-          ME:::
-        ''} $out/newsfeeds
+        cp ${
+          writeText "newsfeeds" (
+            ''
+              ME:::
+            ''
+            + optionalString primary (
+              pipe cfg.peers [
+                attrNames
+                (concatMapStringsSep "\n" (peer: ''
+                  ${peer}/${cfg.peers.${peer}.host}:${concatStringsSep "," groups}:Tm:innfeed!
+                ''))
+              ]
+              + ''
+                innfeed!:!*:Tc,Wnm*:${feedLauncher}
+              ''
+            )
+          )
+        } $out/newsfeeds
+        cp ${writeText "innfeed.conf" ''
+          pid-file: innfeed.pid
+          backlog-directory: ${stateDirectory}/feed
+          log-file: ${stateDirectory}/log/innfeed.log
+          status-file: ${stateDirectory}/log/innfeed.status
+          streaming: true
+          initial-connections: 1
+          max-connections: 1
+          max-queue-size: 256
+          backlog-feed-first: true
+          backlog-limit: 0
+          no-backlog: false
+          drop-deferred: false
+          port-number: ${toString cfg.port}
+          ${pipe cfg.peers [
+            (mapAttrsToList (
+              name: peer: ''
+                peer ${name} {
+                  ip-name: ${peer.host}
+                }
+              ''
+            ))
+            (concatStringsSep "\n")
+          ]}
+        ''} $out/innfeed.conf
         cp ${writeText "storage.conf" ''
           method tradspool {
               newsgroups: *
@@ -1355,6 +1607,13 @@ let
           *:A:never:never:never
         ''} $out/expire.ctl
       '';
+
+  feedLauncher = writeShellScript "inn-feed-when-ready" ''
+    while ! test -e /run/inn/ready; do
+      ${coreutils}/bin/sleep 1
+    done
+    exec ${cfg.package}/bin/innfeed "$@"
+  '';
 
   innEnvironment = [
     "INNCONF=${configuration}/inn.conf"
@@ -1483,11 +1742,13 @@ let
 
     exec 9>${escapeShellArg pullnewsLockPath}
     if ! ${util-linux}/bin/flock --nonblock 9; then
-      ${systemd}/bin/systemctl --user kill \
-        --kill-whom=all \
-        --signal=SIGINT \
-        inn-news-backfill.service inn-news-retry.service \
-        2>/dev/null || true
+      for unit in inn-news-backfill.service inn-news-retry.service; do
+        pid="$(${systemd}/bin/systemctl show --property=MainPID --value "$unit")"
+        if [[ "$pid" =~ ^[1-9][0-9]*$ ]]; then
+          ${pkgs.procps}/bin/pkill -INT -P "$pid" 2>/dev/null || true
+          ${coreutils}/bin/kill -INT "$pid" 2>/dev/null || true
+        fi
+      done
       ${util-linux}/bin/flock 9
     fi
 
@@ -1534,34 +1795,45 @@ let
       description,
       execStart,
       extraAfter ? [ ],
+      successExitStatus ? [ 0 ],
     }:
     {
-      Service = {
+      inherit
+        description
+        ;
+
+      after = [
+        "inn.service"
+        "network-online.target"
+      ]
+      ++ extraAfter
+      ++ credentialUnits;
+
+      requires = [
+        "inn.service"
+      ]
+      ++ credentialUnits;
+
+      serviceConfig = {
         CPUWeight = 20;
         Environment = innEnvironment;
         ExecStart = execStart;
+        Group = cfg.group;
         IOWeight = 20;
+        KillMode = "control-group";
         KillSignal = "SIGINT";
         LoadCredential = credentials;
         Nice = 10;
+        SuccessExitStatus = successExitStatus;
         TimeoutStartSec = "30m";
         Type = "oneshot";
         UMask = "0077";
+        User = cfg.user;
       };
 
-      Unit = {
-        After = [
-          "inn.service"
-          "network.target"
-        ]
-        ++ extraAfter
-        ++ credentialUnits;
-        Description = description;
-        Requires = [
-          "inn.service"
-        ]
-        ++ credentialUnits;
-      };
+      wants = [
+        "network-online.target"
+      ];
     };
 
   makePullnewsTimer =
@@ -1572,23 +1844,20 @@ let
       unit,
     }:
     {
-      Install = {
-        WantedBy = [
-          "timers.target"
-        ];
-      };
+      inherit
+        description
+        ;
 
-      Timer = {
+      timerConfig = {
         AccuracySec = "30s";
         OnBootSec = onBootSec;
         OnUnitInactiveSec = syncInterval;
-        Persistent = true;
         Unit = unit;
       };
 
-      Unit = {
-        Description = description;
-      };
+      wantedBy = [
+        "timers.target"
+      ];
     };
 
   preStart = writeShellScript "inn-pre-start" ''
@@ -1627,6 +1896,7 @@ let
       fi
     fi
 
+    ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/feed"}
     ${cfg.package}/bin/innconfval -C
   '';
 
@@ -1635,68 +1905,6 @@ in
   options = {
     services = {
       inn = {
-        enable = mkEnableOption "a private user-level INN archive";
-
-        bindAddress = mkOption {
-          default = "127.0.0.1";
-
-          description = ''
-            Local IPv4 address on which INN listens.
-          '';
-
-          type = types.str;
-        };
-
-        credentials = mkOption {
-          default = { };
-
-          description = ''
-            systemd credential filenames mapped to password source paths.
-          '';
-
-          type = with types; attrsOf str;
-        };
-
-        credentialService = mkOption {
-          default = null;
-
-          description = ''
-            User unit that must prepare credential source files before sync.
-          '';
-
-          type = with types; nullOr str;
-        };
-
-        domain = mkOption {
-          default = "local";
-
-          description = ''
-            Domain INN uses when the local hostname is not fully qualified.
-          '';
-
-          type = types.str;
-        };
-
-        expectedGroupCount = mkOption {
-          default = null;
-
-          description = ''
-            Expected number of subscribed group entries, when checked.
-          '';
-
-          type = with types; nullOr ints.unsigned;
-        };
-
-        group = mkOption {
-          default = "users";
-
-          description = ''
-            Primary group of the user running INN.
-          '';
-
-          type = types.str;
-        };
-
         backfill = {
           maxArticlesPerGroup = mkOption {
             default = 1000;
@@ -1727,6 +1935,219 @@ in
 
             type = types.str;
           };
+        };
+
+        bindAddress = mkOption {
+          default = "0.0.0.0";
+
+          description = ''
+            Local IPv4 address on which INN listens.
+          '';
+
+          type = types.str;
+        };
+
+        bootstrapPort = mkOption {
+          default = 8873;
+
+          description = ''
+            Read-only rsync port exporting the primary's immutable bootstrap image.
+          '';
+
+          type = types.port;
+        };
+
+        credentialService = mkOption {
+          default = null;
+
+          description = ''
+            System unit that must prepare credential source files before sync.
+          '';
+
+          type = with types; nullOr str;
+        };
+
+        credentials = mkOption {
+          default = { };
+
+          description = ''
+            systemd credential filenames mapped to password source paths.
+          '';
+
+          type = with types; attrsOf str;
+        };
+
+        domain = mkOption {
+          default = config.networking.domain;
+
+          description = ''
+            Domain INN uses when the local hostname is not fully qualified.
+          '';
+
+          type = types.str;
+        };
+
+        enable = mkEnableOption "a system INN archive with numbered replicas";
+
+        expectedGroupCount = mkOption {
+          default = null;
+
+          description = ''
+            Expected number of subscribed group entries, when checked.
+          '';
+
+          type = with types; nullOr ints.unsigned;
+        };
+
+        group = mkOption {
+          default = "news";
+
+          description = ''
+            Primary group of the user running INN.
+          '';
+
+          type = types.str;
+        };
+
+        groups = mkOption {
+          default = subscribedGroups;
+
+          description = ''
+            Complete set of article groups shared by the primary and replicas.
+          '';
+
+          type = with types; listOf str;
+        };
+
+        interface = mkOption {
+          default = "tailscale0";
+
+          description = ''
+            Interface on which the firewall permits NNTP and bootstrap downloads.
+          '';
+
+          type = types.str;
+        };
+
+        legacyUser = mkOption {
+          default = null;
+
+          description = ''
+            Account whose old INN user units must be stopped before system startup.
+          '';
+
+          type = with types; nullOr str;
+        };
+
+        migrateFrom = mkOption {
+          default = null;
+
+          description = ''
+            Existing primary archive copied on first startup, retaining the source.
+            A missing or incomplete source prevents initialization.
+          '';
+
+          type = with types; nullOr str;
+        };
+
+        organization = mkOption {
+          default = "Fleet news archive";
+
+          description = ''
+            Organization header value used by INN.
+          '';
+
+          type = types.str;
+        };
+
+        package = mkOption {
+          apply =
+            package:
+            package.overrideAttrs (
+              _: previousAttrs: {
+                configureFlags =
+                  (previousAttrs.configureFlags or [ ])
+                  ++ [
+                    "--with-news-user=${cfg.user}"
+                    "--with-news-group=${cfg.group}"
+                  ];
+              }
+            );
+
+          default = pkgs.inn;
+          defaultText = "pkgs.inn";
+
+          description = ''
+            INN package used by the daemon and synchronization tools.
+          '';
+
+          type = types.package;
+        };
+
+        pathHost = mkOption {
+          default = config.networking.fqdn;
+
+          description = ''
+            Path identity inserted into accepted articles.
+          '';
+
+          type = types.str;
+        };
+
+        peers = mkOption {
+          default = { };
+
+          description = ''
+            Replica names mapped to their FQDN and tailnet IPv4 address.
+          '';
+
+          type =
+            with types;
+            attrsOf (submodule {
+              options = {
+                address = mkOption {
+                  description = ''
+                    Replica tailnet IPv4 address allowed to download its seed.
+                  '';
+
+                  type = str;
+                };
+
+                host = mkOption {
+                  description = ''
+                    Replica FQDN and INN Path identity.
+                  '';
+
+                  type = str;
+                };
+              };
+            });
+        };
+
+        port = mkOption {
+          default = 1119;
+
+          description = ''
+            Unprivileged local NNTP port used by INN.
+          '';
+
+          type = types.port;
+        };
+
+        primaryAddress = mkOption {
+          description = ''
+            Primary tailnet IPv4 address allowed to feed replicas.
+          '';
+
+          type = types.str;
+        };
+
+        primaryHost = mkOption {
+          description = ''
+            Fully qualified name of the single authoritative primary.
+          '';
+
+          type = types.str;
         };
 
         recent = {
@@ -1806,61 +2227,21 @@ in
           };
         };
 
-        organization = mkOption {
-          default = "${config.home.username}'s local news archive";
+        role = mkOption {
+          default = "primary";
 
           description = ''
-            Organization header value used by INN.
+            Primary archives pull external news; replicas retain primary Xref numbers.
           '';
 
-          type = types.str;
-        };
-
-        package = mkOption {
-          apply =
-            package:
-            package.overrideAttrs (
-              _: previousAttrs: {
-                configureFlags =
-                  (previousAttrs.configureFlags or [ ])
-                  ++ [
-                    "--with-news-user=${cfg.user}"
-                    "--with-news-group=${cfg.group}"
-                  ];
-              }
-            );
-          default = pkgs.inn;
-          defaultText = "pkgs.inn";
-
-          description = ''
-            INN package used by the daemon and synchronization tools.
-          '';
-
-          type = types.package;
-        };
-
-        pathHost = mkOption {
-          default = "${config.home.username}.localhost";
-
-          description = ''
-            Path identity inserted into accepted articles.
-          '';
-
-          type = types.str;
-        };
-
-        port = mkOption {
-          default = 1119;
-
-          description = ''
-            Unprivileged local NNTP port used by INN.
-          '';
-
-          type = types.port;
+          type = types.enum [
+            "primary"
+            "replica"
+          ];
         };
 
         stateDirectory = mkOption {
-          default = "${config.xdg.stateHome}/inn";
+          default = "/var/lib/inn";
 
           description = ''
             Persistent directory containing articles, overview, and marks.
@@ -1880,7 +2261,7 @@ in
         };
 
         user = mkOption {
-          default = config.home.username;
+          default = "news";
 
           description = ''
             User account running INN.
@@ -1892,151 +2273,202 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    assertions = [
-      {
-        assertion =
-          cfg.expectedGroupCount == null
-          ||
-            length subscribedGroups == cfg.expectedGroupCount;
-        message = "The INN mirror has an unexpected number of subscribed group entries.";
-      }
-      {
-        assertion =
-          length groups == length subscribedGroups;
-        message = "The INN mirror must not contain duplicate group entries.";
-      }
-      {
-        assertion =
-          all
-            (
+  config = mkMerge [
+    (mkIf cfg.enable {
+      assertions = [
+        {
+          assertion =
+            cfg.expectedGroupCount == null
+            || length cfg.groups == cfg.expectedGroupCount;
+          message = "The INN mirror has an unexpected number of subscribed group entries.";
+        }
+        {
+          assertion = length groups == length cfg.groups;
+          message = "The INN mirror must not contain duplicate group entries.";
+        }
+        {
+          assertion = pipe cfg.upstreams [
+            attrValues
+            (all (
               upstream:
               (upstream.username == null)
               == (upstream.passwordCredential == null)
-            )
-            (
-              mapAttrsToList (
-                _: upstream: upstream
-              ) cfg.upstreams
-            );
-        message = "Each authenticated INN upstream must define both username and passwordCredential.";
-      }
-      {
-        assertion = all (
-          credential: hasAttr credential cfg.credentials
-        ) passwordCredentials;
-        message = "Every INN upstream passwordCredential must exist in services.inn.credentials.";
-      }
-    ];
+            ))
+          ];
 
-    home = {
-      packages = [
-        archiveTool
-        cfg.package
+          message = "Each authenticated INN upstream must define both username and passwordCredential.";
+        }
+        {
+          assertion = all (
+            credential: hasAttr credential cfg.credentials
+          ) passwordCredentials;
+          message = "Every INN upstream passwordCredential must exist in services.inn.credentials.";
+        }
       ];
-    };
 
-    systemd = {
-      user = {
+      environment = {
+        etc = {
+          "inn/inn.conf" = {
+            source = "${configuration}/inn.conf";
+          };
+        };
+
+        systemPackages = [
+          archiveTool
+          cfg.package
+        ];
+      };
+
+      networking = {
+        firewall = {
+          interfaces = {
+            ${cfg.interface} = {
+              allowedTCPPorts = [
+                cfg.port
+              ]
+              ++ optional primary cfg.bootstrapPort;
+            };
+          };
+        };
+      };
+
+      systemd = {
         services = {
           inn = {
-            Install = {
-              WantedBy = [
-                "default.target"
-              ];
-            };
+            after = [
+              "network.target"
+              "inn-prepare.service"
+            ]
+            ++ optional (!primary) "inn-bootstrap.service";
 
-            Service = {
+            description = "InterNetNews ${cfg.role} archive";
+
+            requires = [
+              "inn-prepare.service"
+            ];
+
+            serviceConfig = {
               Environment = innEnvironment;
               ExecStart = "${cfg.package}/bin/innd -d -4 ${cfg.bindAddress} -P ${toString cfg.port}";
+              ExecStartPost = "${archiveTool}/bin/inn-archive ready";
               ExecStartPre = "${preStart}";
               ExecStop = "${cfg.package}/bin/ctlinnd -t 60 shutdown systemd-stop";
+              Group = cfg.group;
               Restart = "on-failure";
               RestartSec = "5s";
+              RuntimeDirectory = "inn";
+              TimeoutStartSec = "2m";
               Type = "simple";
               UMask = "0027";
+              User = cfg.user;
             };
 
-            Unit = {
-              After = [
-                "network.target"
-              ];
-              Description = "Private user InterNetNews archive";
+            unitConfig = {
+              ConditionPathExists = "${stateDirectory}/.initialized";
             };
+
+            wantedBy = [
+              "multi-user.target"
+            ];
           };
+        };
+      };
 
-          inn-news-backfill-check = {
-            Service = {
-              Environment = innEnvironment;
-              ExecStart = "${archiveTool}/bin/inn-archive audit";
-              LoadCredential = credentials;
-              Nice = 10;
-              SuccessExitStatus = [
-                0
-                1
-              ];
-              TimeoutStartSec = "30m";
-              UMask = "0077";
-              Type = "oneshot";
-            };
+      users = {
+        groups = {
+          ${cfg.group} = { };
+        };
 
-            Unit = {
-              After = [
-                "inn.service"
-              ]
-              ++ credentialUnits;
-              Description = "Inventory INN articles and queue missing history";
-              Requires = [
-                "inn.service"
-              ]
-              ++ credentialUnits;
-            };
+        users = {
+          ${cfg.user} = {
+            group = cfg.group;
+            home = stateDirectory;
+            isSystemUser = true;
           };
-
-          inn-news-retry = makePullnewsService {
-            description = "Retry failed and previously skipped INN articles";
-            execStart = retryArticles;
-          };
-
+        };
+      };
+    })
+    (mkIf (cfg.enable && primary) {
+      systemd = {
+        services = {
           inn-news-backfill = makePullnewsService {
-            description = "Rotate through private INN backfill groups";
+            description = "Rotate through external INN backfill groups";
             execStart = backfillPullnews;
             extraAfter = optional cfg.recent.enable "inn-news-recent.service";
           };
-        }
-        // optionalAttrs cfg.recent.enable {
-          inn-news-recent = makePullnewsService {
-            description = "Pull recent private INN news";
-            execStart = recentPullnews;
+
+          inn-news-backfill-check = makePullnewsService {
+            description = "Inventory INN articles and queue missing history";
+            execStart = "${archiveTool}/bin/inn-archive audit";
+
+            successExitStatus = [
+              0
+              1
+            ];
+          };
+
+          inn-news-retry = makePullnewsService {
+            description = "Retry failed INN articles";
+            execStart = retryArticles;
           };
         };
 
         timers = {
+          inn-news-backfill = makePullnewsTimer {
+            inherit (cfg.backfill)
+              syncInterval
+              ;
+
+            description = "Rotate external backfill groups";
+            onBootSec = "10m";
+            unit = "inn-news-backfill.service";
+          };
+
           inn-news-retry = makePullnewsTimer {
-            description = "Periodically retry missing INN articles";
+            description = "Retry missing external articles";
             onBootSec = "20m";
             syncInterval = cfg.retry.syncInterval;
             unit = "inn-news-retry.service";
           };
-
-          inn-news-backfill = makePullnewsTimer {
-            description = "Periodically rotate private INN backfill groups";
-            onBootSec = "10m";
-            inherit (cfg.backfill) syncInterval;
-
-            unit = "inn-news-backfill.service";
-          };
-        }
-        // optionalAttrs cfg.recent.enable {
-          inn-news-recent = makePullnewsTimer {
-            description = "Periodically update recent private INN news";
-            onBootSec = "2m";
-            inherit (cfg.recent) syncInterval;
-
-            unit = "inn-news-recent.service";
-          };
         };
       };
-    };
-  };
+    })
+    (mkIf (cfg.enable && primary && cfg.recent.enable)
+      {
+        systemd = {
+          services = {
+            inn-news-recent = makePullnewsService {
+              description = "Pull recent external INN articles";
+              execStart = recentPullnews;
+            };
+          };
+
+          timers = {
+            inn-news-recent = makePullnewsTimer {
+              inherit (cfg.recent)
+                syncInterval
+                ;
+
+              description = "Update recent external articles";
+              onBootSec = "2m";
+              unit = "inn-news-recent.service";
+            };
+          };
+        };
+      }
+    )
+    (mkIf cfg.enable (
+      import ./inn-lifecycle.nix {
+        inherit
+          archiveTool
+          cfg
+          groups
+          innEnvironment
+          lib
+          pkgs
+          preStart
+          ;
+      }
+    ))
+  ];
 }
