@@ -17,8 +17,6 @@
         solani = config.sops.secrets.inn-solani.path;
       };
 
-      migrateFrom = "/home/bingshan/.local/state/inn";
-
       peers = {
         azaleoid = {
           address = "100.64.0.3";
