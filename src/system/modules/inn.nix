@@ -1795,7 +1795,10 @@ let
       description,
       execStart,
       extraAfter ? [ ],
-      successExitStatus ? [ 0 ],
+      successExitStatus ? [
+        0
+        "SIGINT"
+      ],
     }:
     {
       inherit
@@ -1898,6 +1901,25 @@ let
 
     ${coreutils}/bin/install -d -m 0750 ${escapeShellArg "${stateDirectory}/feed"}
     ${cfg.package}/bin/innconfval -C
+
+    # Copies retain the old inode references in tradindexed's master index.
+    if test -e ${escapeShellArg "${spoolDirectory}/overview/group.index"}; then
+      overview_audit="$(${cfg.package}/bin/tdx-util -A 2>&1)"
+      if test -n "$overview_audit"; then
+        printf '%s\n' "$overview_audit" >&2
+        if printf '%s\n' "$overview_audit" | ${pkgs.gnugrep}/bin/grep -vE \
+          '^tdx-util: tradindexed: index inode mismatch for [^:]+: [0-9]+ != [0-9]+$'; then
+          echo "Overview has errors beyond copied inode references; refusing automatic repair" >&2
+          exit 1
+        fi
+        ${cfg.package}/bin/tdx-util -F
+        overview_audit="$(${cfg.package}/bin/tdx-util -A 2>&1)"
+        if test -n "$overview_audit"; then
+          printf '%s\n' "$overview_audit" >&2
+          exit 1
+        fi
+      fi
+    fi
   '';
 
 in
@@ -2410,6 +2432,7 @@ in
           inn-news-retry = makePullnewsService {
             description = "Retry failed INN articles";
             execStart = retryArticles;
+            extraAfter = optional cfg.recent.enable "inn-news-recent.service";
           };
         };
 
