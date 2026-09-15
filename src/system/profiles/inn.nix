@@ -59,7 +59,6 @@ in
             concatLists
           ];
 
-          legacyUser = "bingshan";
           organization = "Bingshan's news archive";
           primaryAddress = "100.64.0.2";
           primaryHost = "magnolia.tail.bingshan.org";

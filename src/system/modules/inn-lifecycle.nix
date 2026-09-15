@@ -16,7 +16,6 @@ let
     mapAttrsToList
     mkIf
     mkMerge
-    optional
     optionalString
     pipe
     ;
@@ -29,10 +28,8 @@ let
     with pkgs;
     [
       coreutils
-      diffutils
       findutils
       jq
-      procps
       rsync
       systemd
       util-linux
@@ -42,31 +39,6 @@ let
   prepare = pkgs.writeShellScript "inn-prepare" ''
     set -euo pipefail
     export PATH=${path}
-    ${optionalString (cfg.legacyUser != null) ''
-      legacy_user=${escapeShellArg cfg.legacyUser}
-      legacy_uid="$(id -u "$legacy_user")"
-      if systemctl is-active --quiet "user@$legacy_uid.service"; then
-        userctl() {
-          runuser -u "$legacy_user" -- env \
-            XDG_RUNTIME_DIR="/run/user/$legacy_uid" \
-            DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$legacy_uid/bus" \
-            ${pkgs.systemd}/bin/systemctl --user "$@"
-        }
-        for unit in inn-news-recent.timer inn-news-live.timer \
-          inn-news-backfill.timer inn-news-retry.timer \
-          inn-news-recent.service inn-news-live.service \
-          inn-news-backfill.service inn-news-retry.service \
-          inn-news-backfill-check.service inn.service; do
-          if [[ "$(userctl show --property=LoadState --value "$unit")" != not-found ]]; then
-            userctl stop "$unit"
-          fi
-        done
-      fi
-      if pgrep -u "$legacy_uid" -x innd >/dev/null; then
-        echo "An INN process still runs as $legacy_user; refusing migration" >&2
-        exit 1
-      fi
-    ''}
 
     state=${escapeShellArg state}
     if test -f "$state/.initialized"; then
@@ -85,31 +57,8 @@ let
               echo "Cannot initialize an active archive" >&2
               exit 1
             fi
-            stage="$state.migrating"
+            stage="$state.initializing"
             install -d -m 0750 "$stage"
-            ${optionalString (cfg.migrateFrom != null) ''
-              source=${escapeShellArg cfg.migrateFrom}
-              test -s "$source/db/active"
-              test -s "$source/db/history"
-              test -d "$source/spool/articles"
-              exec 8>"$source/pullnews.lock"
-              exec 9>"$source/inventory.lock"
-              flock -n 8
-              flock -n 9
-              shopt -s dotglob nullglob
-              for entry in "$source"/*; do
-                if [[ "$(basename "$entry")" != run ]]; then
-                  cp -a --reflink=auto "$entry" "$stage/"
-                fi
-              done
-              # Content verification happens before changing ownership or initialization.
-              differences="$(rsync -rHnci --delete --exclude=/run/ "$source/" "$stage/")"
-              if test -n "$differences"; then
-                echo "Archive copy differs from its stopped source:" >&2
-                echo "$differences" >&2
-                exit 1
-              fi
-            ''}
             jq -n --arg primary ${escapeShellArg cfg.primaryHost} \
               --arg id "$(cat /proc/sys/kernel/random/uuid)" \
               '{primary: $primary, role: "primary", archive_id: $id}' \
@@ -204,16 +153,12 @@ mkMerge [
     assertions = [
       {
         assertion = state == "/var/lib/inn";
-        message = "System INN migration and bootstrap use /var/lib/inn.";
+        message = "System INN initialization and bootstrap use /var/lib/inn.";
       }
       {
         assertion =
           primary
-          || (
-            cfg.upstreams == { }
-            && cfg.peers == { }
-            && cfg.migrateFrom == null
-          );
+          || (cfg.upstreams == { } && cfg.peers == { });
         message = "INN replicas must only receive articles from their primary.";
       }
       {
@@ -225,15 +170,11 @@ mkMerge [
     systemd = {
       services = {
         inn-prepare = {
-          after = optional (
-            cfg.legacyUser != null
-          ) "home-manager-${cfg.legacyUser}.service";
-
           before = [
             "inn.service"
           ];
 
-          description = "Prepare INN state and retire legacy user units";
+          description = "Prepare system INN state";
 
           serviceConfig = {
             ExecStart = prepare;
@@ -246,10 +187,7 @@ mkMerge [
           unitConfig = {
             RequiresMountsFor = [
               state
-            ]
-            ++ optional (
-              cfg.migrateFrom != null
-            ) cfg.migrateFrom;
+            ];
           };
 
           wantedBy = [

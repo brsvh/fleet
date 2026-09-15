@@ -2051,27 +2051,6 @@ in
           type = types.str;
         };
 
-        legacyUser = mkOption {
-          default = null;
-
-          description = ''
-            Account whose old INN user units must be stopped before system startup.
-          '';
-
-          type = with types; nullOr str;
-        };
-
-        migrateFrom = mkOption {
-          default = null;
-
-          description = ''
-            Existing primary archive copied on first startup, retaining the source.
-            A missing or incomplete source prevents initialization.
-          '';
-
-          type = with types; nullOr str;
-        };
-
         organization = mkOption {
           default = "Fleet news archive";
 
