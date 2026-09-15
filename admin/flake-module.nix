@@ -112,7 +112,7 @@ in
 
             profiles = {
               system = {
-                path = deploy-lib.activate.nixos azaleoid;
+                path = deploy-lib.activate.nixos magnolia;
                 user = "root";
               };
             };
