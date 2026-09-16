@@ -26,6 +26,55 @@
 
 (setq gnus-secondary-select-methods nil)
 
+;; Use dedicated TLS posting methods for the declared Usenet groups.
+;; Resolve credentials through `auth-source' when opening a
+;; connection.
+(setq gnus-post-method-alist
+      (mapcar
+       (lambda (entry)
+         (let ((server (car entry))
+               (groups (cdr entry)))
+           `(,(concat "\\`" (regexp-opt groups) "\\'")
+             nntp ,server
+             (nntp-address ,server)
+             (nntp-port-number 563)
+             (nntp-open-connection-function nntp-open-tls-stream)
+             (nntp-authinfo-force t))))
+       '(("news.eternal-september.org"
+          "comp.arch.fpga"
+          "alt.folklore.computers"
+          "alt.peeves"
+          "comp.emacs"
+          "rec.food.drink.tea"
+          "rec.games.video.classic"
+          "alt.comp.lang.rust"
+          "comp.lang.c"
+          "comp.lang.c++"
+          "comp.lang.haskell"
+          "comp.lang.lisp"
+          "comp.lang.scheme"
+          "comp.os.linux.networking"
+          "rec.music.makers.synth"
+          "rec.arts.books"
+          "comp.security.ssh")
+         ("news.solani.org"
+          "comp.arch"
+          "alt.callahans"
+          "gnu.emacs.gnus"
+          "rec.arts.movies.current-films"
+          "rec.arts.movies.past-films"
+          "rec.games.trivia"
+          "comp.lang.forth"
+          "comp.programming"
+          "comp.os.linux.misc"
+          "rec.music.classical.recordings"
+          "rec.music.misc"
+          "rec.music.rock-pop-r+b.1950s"
+          "rec.arts.sf.written"
+          "sci.astro"
+          "comp.security.unix"
+          "comp.unix.programmer"))))
+
 (setq gnus-parameters
       (append
        '(("\\`\\(?:comp\\.\\|gmane\\.\\)" (display . 100))
