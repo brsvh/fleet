@@ -144,6 +144,20 @@
       url = "git+https://github.com/brsvh/emacs-proofread.git?ref=main";
     };
 
+    emacs-tessera = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/emacs-tessera.git?ref=main";
+    };
+
     flake-compat = {
       flake = false;
       url = "git+https://github.com/NixOS/flake-compat.git?ref=master";

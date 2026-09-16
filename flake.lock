@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785988881,
-        "narHash": "sha256-aPZGfcgUe81xFnkDtnQTfTAjrve7Dzu7jCDecp0be3A=",
+        "lastModified": 1789467488,
+        "narHash": "sha256-eDMPKFfRIwV26fuUtz4BifLoDA5uR0IbahJNWPc9gzI=",
         "ref": "main",
-        "rev": "b5867c3fc2a9490db6df7c92aa3773159f5498bc",
-        "revCount": 142,
+        "rev": "fbdfae6025d0f72595fbcd13e4028b1dd87e16f1",
+        "revCount": 155,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-bs.git"
       },
@@ -252,6 +252,30 @@
         "ref": "main",
         "type": "git",
         "url": "https://github.com/brsvh/emacs-proofread.git"
+      }
+    },
+    "emacs-tessera": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789469105,
+        "narHash": "sha256-dyuwuAYUWJIUwm/sdGoeIwf4Is9y+xZGe3m5Nsc/yvo=",
+        "ref": "main",
+        "rev": "6d6f945ca0d8699645112b1f4cc28cae5c440d30",
+        "revCount": 67,
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-tessera.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-tessera.git"
       }
     },
     "flake-compat": {
@@ -561,6 +585,7 @@
         "emacs-jieba-rs": "emacs-jieba-rs",
         "emacs-overlay": "emacs-overlay",
         "emacs-proofread": "emacs-proofread",
+        "emacs-tessera": "emacs-tessera",
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",

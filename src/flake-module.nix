@@ -13,6 +13,7 @@ let
     emacs-jieba-rs
     emacs-overlay
     emacs-proofread
+    emacs-tessera
     infix
     llm-agents
     nixpkgs
@@ -127,6 +128,7 @@ in
             emacs-jieba-rs.overlays.default
             emacs-overlay.overlays.default
             emacs-proofread.overlays.default
+            emacs-tessera.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
             llm-agents.overlays.shared-nixpkgs
@@ -429,6 +431,7 @@ in
             emacs-jieba-rs.overlays.default
             emacs-overlay.overlays.default
             emacs-proofread.overlays.default
+            emacs-tessera.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
             llm-agents.overlays.shared-nixpkgs

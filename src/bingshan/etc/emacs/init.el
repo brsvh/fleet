@@ -2534,99 +2534,6 @@
   ;; credentials.
   (auth-source-pass-enable))
 
-(use-package bs-gnus
-  :after (gnus gnus-notifications gravatar)
-  :commands (bs-gnus-group-enable
-             bs-gnus-prepare-today-context
-             bs-gnus-group-posting-status
-             bs-gnus-group-topic-toggle
-             bs-gnus-notifications-enable
-             bs-gnus-summary-enable
-             bs-gnus-summary-fold-toggle
-             bs-gnus-summary-next
-             bs-gnus-summary-previous
-             bs-gnus-update
-             bs-gnus-update-enable)
-  :defines (gnus-group-mode-map
-            gnus-summary-mode-map)
-  :functions (bs-gnus--group-display-name
-              bs-gnus--group-display-name@shorten-gmane-prefix)
-
-  :custom
-  ;; Check for new articles every five minutes so each background
-  ;; update produces a smaller burst of desktop notifications.
-  (bs-gnus-update-interval (* 5 60))
-
-  ;; INN already keeps every article body locally, so let Gnus fetch
-  ;; bodies from it on demand instead of duplicating all unread bodies
-  ;; in the Agent during each background update.
-  (bs-gnus-update-download-bodies nil)
-
-  ;; Follow Summary navigation in an already visible Article window
-  ;; without opening one solely for movement.
-  (bs-gnus-summary-follow-visible-article t)
-
-  ;; Right-align complete thread counts through `999/999+', keeping
-  ;; subjects in a stable column.
-  (bs-gnus-summary-thread-count-digits 8)
-
-  ;; Keep worker-fetched notification avatars across sessions while
-  ;; treating them as stale after 90 days.
-  (bs-gnus-notifications-avatar-cache-directory
-   (bs-path bs-cache-directory "gnus/notification-avatars/"))
-  (bs-gnus-notifications-avatar-cache-expiry (* 90 24 60 60))
-
-  ;; Notify only articles discovered after the current Gnus state was
-  ;; established instead of replaying the complete unread archive at
-  ;; the beginning of each Emacs session.
-  (bs-gnus-notifications-include-existing-unread nil)
-
-  ;; Open each notification Read action in a new frame belonging to
-  ;; the current Emacs session.
-  (bs-gnus-notifications-read-display-function
-   #'bs-call-in-new-frame)
-
-  :config
-  ;; Omit the redundant Gmane namespace from visible group names.
-  (define-advice bs-gnus--group-display-name
-      (:filter-return (name) shorten-gmane-prefix)
-    "Omit the leading Gmane namespace from visible group NAME."
-    (string-remove-prefix "gmane." name))
-
-  ;; Replace the native Group and Summary layouts only after `gnus'
-  ;; itself loads, and keep remote updates outside the main Emacs
-  ;; process.
-  (bs-gnus-group-enable)
-  (bs-gnus-summary-enable)
-  (bs-gnus-notifications-enable)
-  (bs-gnus-update-enable)
-
-  :bind
-  ( :map gnus-group-mode-map
-    ;; Prepare today's locally cached articles from all subscribed
-    ;; groups as LLM context.
-    ("C-c m t" . bs-gnus-prepare-today-context)
-
-    :map gnus-summary-mode-map
-    ;; Prepare today's locally cached articles from all subscribed
-    ;; groups as LLM context.
-    ("C-c m t" . bs-gnus-prepare-today-context)
-
-    ;; Prepare the current article and its replies as LLM context.
-    ("C-c m m" . bs-gnus-summary-prepare-subthread-context))
-
-  :demand t)
-
-(use-package bs-gnus
-  :after (gnus-topic)
-  :defines (gnus-topic-mode-map)
-
-  :bind
-  ( :map gnus-topic-mode-map
-    ;; Fold or expand the topic at point without changing hierarchy.
-    ("TAB" . bs-gnus-group-topic-toggle)
-    ("<tab>" . bs-gnus-group-topic-toggle)))
-
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
@@ -2698,10 +2605,6 @@
   :after (gnus)
 
   :custom
-  ;; Leave only the group name in native rows; `bs-gnus' supplies the
-  ;; responsive count, status, and source fields after preparation.
-  (gnus-group-line-format "%P%g\n")
-
   ;; Keep every subscribed group visible even when it has no unread
   ;; articles.
   (gnus-permanently-visible-groups ".*")
@@ -2722,21 +2625,6 @@
   ;; marked as subscribed above.
   (message-subscribed-address-functions
    '(gnus-find-subscribed-addresses)))
-
-(use-package gnus-notifications
-  :after (gnus)
-
-  :custom
-  ;; Notify articles from every subscribed group and leave each
-  ;; actionable notification visible for fifteen seconds.
-  (gnus-notifications-minimum-level 5)
-  (gnus-notifications-timeout (* 15 1000))
-
-  ;; Resolve sender images through Gravatar only.
-  (gnus-notifications-use-google-contacts nil)
-  (gnus-notifications-use-gravatar t)
-
-  :demand t)
 
 (use-package gnus-start
   :after (gnus)
@@ -2765,7 +2653,9 @@
 (use-package gnus-sum
   :after (gnus)
   :defines (gnus-summary-mode-map)
-  :functions (gnus-summary-select-article-buffer)
+  :functions (gnus-summary-next-subject
+              gnus-summary-prev-subject
+              gnus-summary-select-article-buffer)
 
   :custom
   ;; Display conversations as threads, matching threaded `mu4e'
@@ -2787,8 +2677,7 @@
   ;; incomplete threads.
   (gnus-build-sparse-threads 'some)
 
-  ;; Order threads by their root article dates so month separators
-  ;; form contiguous chronological sections.
+  ;; Order threads by their root article dates.
   (gnus-thread-sort-functions
    '(gnus-thread-sort-by-number
      (not gnus-thread-sort-by-date)))
@@ -2917,15 +2806,14 @@
   (keymap-set gnus-summary-mode-map
               "<return>" #'gnus-summary-select-article-buffer)
 
-  ;; Move between concrete articles rather than decoration lines.
-  (keymap-set gnus-summary-mode-map "n" #'bs-gnus-summary-next)
-  (keymap-set gnus-summary-mode-map "p" #'bs-gnus-summary-previous)
-  (keymap-set gnus-summary-mode-map "M-<down>" #'bs-gnus-summary-next)
-  (keymap-set gnus-summary-mode-map "M-<up>" #'bs-gnus-summary-previous)
-
-  ;; Fold or expand replies to the current article.
-  (keymap-set gnus-summary-mode-map "TAB" #'bs-gnus-summary-fold-toggle)
-  (keymap-set gnus-summary-mode-map "<tab>" #'bs-gnus-summary-fold-toggle)
+  ;; Install navigation after the native Summary keymap is
+  ;; initialized.
+  (keymap-set gnus-summary-mode-map "n" #'gnus-summary-next-subject)
+  (keymap-set gnus-summary-mode-map "p" #'gnus-summary-prev-subject)
+  (keymap-set gnus-summary-mode-map
+              "M-<down>" #'gnus-summary-next-subject)
+  (keymap-set gnus-summary-mode-map
+              "M-<up>" #'gnus-summary-prev-subject)
 
   :hook
   ;; Use a concise mode-line name for `gnus-sum' buffers.
@@ -2937,10 +2825,6 @@
   :defines (gnus-topic-mode-map)
 
   :custom
-  ;; Leave only indentation and the topic name in native rows;
-  ;; `bs-gnus' supplies fold indicators and unread counts.
-  (gnus-topic-line-format "%i%n\n")
-
   ;; Hide configured topics that contain no visible groups.
   (gnus-topic-display-empty-topics nil)
 
@@ -2967,35 +2851,6 @@
   ;; window from which `gnus' was entered.
   (gnus-use-full-window nil))
 
-(use-package gptel-transient
-  :after (gnus-group)
-
-  :bind
-  ( :map gnus-group-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)))
-
-(use-package gptel-transient
-  :after (gnus-sum)
-
-  :bind
-  ( :map gnus-summary-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)))
-
-(use-package gravatar
-  :after (gnus-notifications)
-
-  :custom
-  ;; Treat an address without a Gravatar as having no image instead
-  ;; of generating a fallback avatar.
-  (gravatar-default-image "404")
-
-  ;; Request compact images suitable for desktop notifications.
-  (gravatar-size 32)
-
-  :demand t)
-
 (use-package hl-line
   :hook
   ;; Highlight the current Group row without changing its contents.
@@ -3006,6 +2861,15 @@
   ;; Highlight the Summary row at point independently of the article
   ;; displayed in the Article buffer.
   (gnus-summary-mode-hook . hl-line-mode))
+
+(use-package tessera-gnus
+  :after (gnus-sum)
+  :commands (tessera-gnus-mode)
+
+  :init
+  ;; Configure existing and future buffers after the native view
+  ;; loads.
+  (tessera-gnus-mode 1))
 
 (use-package window
   :after (gnus-art)
@@ -3755,10 +3619,6 @@
 
 (use-package gptel-context
   :commands (gptel-add)
-  :defines (bs-elfeed-context-buffer-name
-            bs-gnus-context-buffer-name
-            bs-mu4e-context-buffer-name
-            gptel-context)
 
   :custom
   ;; Exclude ignored and other non-project files when a directory is
@@ -3768,40 +3628,7 @@
   :bind
   ( :map ctl-c-x-map
     ;; Add or remove the active region or buffer from `gptel' context.
-    ("a" . gptel-add))
-
-  :hook
-  ;; Give only the originating feed, mail, or news buffer access to
-  ;; the most recently prepared hidden context.
-  ((bs-elfeed-search-context-hook
-    bs-gnus-summary-thread-context-hook
-    bs-mu4e-headers-thread-context-hook)
-   .
-   (lambda ()
-     (require 'gptel-context)
-     (when-let* ((context-name
-                  (cond
-                   ((derived-mode-p 'elfeed-search-mode
-                                    'elfeed-tree-mode)
-                    bs-elfeed-context-buffer-name)
-                   ((derived-mode-p 'gnus-summary-mode
-                                    'gnus-group-mode)
-                    bs-gnus-context-buffer-name)
-                   ((derived-mode-p 'mu4e-headers-mode
-                                    'mu4e-main-mode)
-                    bs-mu4e-context-buffer-name)))
-                 (context (get-buffer context-name))
-                 (source (current-buffer)))
-       (dolist (buffer (buffer-list))
-         (with-current-buffer buffer
-           (when (local-variable-p 'gptel-context)
-             (setq gptel-context
-                   (delq context gptel-context)))))
-       (with-current-buffer source
-         (unless (local-variable-p 'gptel-context)
-           (setq-local gptel-context
-                       (copy-sequence gptel-context)))
-         (cl-pushnew context gptel-context :test #'eq))))))
+    ("a" . gptel-add)))
 
 (use-package gptel-openai-oauth
   :after (bs-lib gptel)
@@ -4154,20 +3981,14 @@
 
   :defer t)
 
-
-
-;;
-;; mu4e (info "(mu4e) Top")
-;;
-
-(use-package bs-mu4e
+(use-package bs-contacts
   :after (mu4e-compose)
-  :commands (bs-mu4e-compose-completion-enable)
-  :defines (bs-mu4e-ignored-contact-display-name-regexp)
+  :commands (bs-contacts-mu4e-completion-enable)
+  :defines (bs-contacts-ignored-display-name-regexp)
 
   :custom
   ;; Ignore account-specific automated and non-person addresses.
-  (bs-mu4e-ignored-contact-email-regexps
+  (bs-contacts-ignored-email-regexps
    '(;; Amazon SES envelope sender addresses.
      "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
 
@@ -4247,75 +4068,25 @@
   :init
   ;; Normalize the `mu4e' compose completion candidates so display
   ;; names stay readable and automated senders are hidden.
-  (bs-mu4e-compose-completion-enable)
+  (bs-contacts-mu4e-completion-enable)
 
   :config
   ;; Extend the default automated display names with GitLab after
-  ;; `bs-mu4e' has initialized its customization variables.
+  ;; `bs-contacts' has initialized its customization variables.
   (unless
       (string-match-p
-       bs-mu4e-ignored-contact-display-name-regexp
+       bs-contacts-ignored-display-name-regexp
        "gitlab")
-    (setq bs-mu4e-ignored-contact-display-name-regexp
+    (setq bs-contacts-ignored-display-name-regexp
           (concat
-           bs-mu4e-ignored-contact-display-name-regexp
+           bs-contacts-ignored-display-name-regexp
            "\\|\\`gitlab\\'"))))
 
-(use-package bs-mu4e
-  :after (mu4e-headers)
-  :commands (bs-mu4e-headers-enable)
-  :defines (mu4e-headers-mode-map)
+
 
-  :init
-  ;; Render header `:from' fields with cleaned contact display names
-  ;; instead of exposing embedded email addresses in names.
-  (bs-mu4e-headers-enable)
-
-  :bind
-  ( :map mu4e-headers-mode-map
-    ;; Prepare today's local messages from the active account as LLM
-    ;; context.
-    ("C-c m t" . bs-mu4e-prepare-today-context)
-
-    ;; Prepare the current message and its replies as LLM context.
-    ("C-c m m" . bs-mu4e-headers-prepare-subthread-context)))
-
-(use-package bs-mu4e
-  :after (mu4e-view)
-  :commands (bs-mu4e-view-xwidget-enable)
-
-  :init
-  ;; Open an HTML alternative in Xwidget when WebKit support is
-  ;; available, both after initial rendering and after toggling from
-  ;; plain text to HTML.
-  (bs-mu4e-view-xwidget-enable))
-
-(use-package bs-mu4e
-  :after (mu4e-alert)
-  :commands (bs-mu4e-notifications-enable)
-
-  :custom
-  ;; Persist sender avatars separately from other Mu4e state so they
-  ;; can be expired without invalidating searches or contacts.
-  (bs-mu4e-notifications-avatar-cache-directory
-   (bs-path bs-cache-directory "mu4e/notification-avatars/"))
-
-  ;; Refresh avatars after 90 days while retaining them across Emacs
-  ;; sessions and notification checks.
-  (bs-mu4e-notifications-avatar-cache-expiry (* 90 24 60 60))
-
-  ;; Leave each actionable notification visible for fifteen seconds.
-  (bs-mu4e-notifications-timeout (* 15 1000))
-
-  ;; Open each notification Read action in a new frame belonging to
-  ;; the current Emacs session.
-  (bs-mu4e-notifications-read-display-function
-   #'bs-call-in-new-frame)
-
-  :config
-  ;; Replace grouped `mu4e-alert' delivery with one actionable desktop
-  ;; notification for each unread message.
-  (bs-mu4e-notifications-enable))
+;;
+;; mu4e (info "(mu4e) Top")
+;;
 
 (use-package consult-mu
   :functions (consult-mu--view-action)
@@ -4366,47 +4137,11 @@
   ;; completion uses the configured popup UI.
   (mu4e-compose-mode-hook . corfu-mode))
 
-(use-package gptel-transient
-  :after (mu4e-headers)
-
-  :bind
-  ( :map mu4e-headers-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)))
-
-(use-package gptel-transient
-  :after (mu4e-main)
-  :defines (mu4e-main-mode-map)
-
-  :bind
-  ( :map mu4e-main-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)))
-
 (use-package mu4e
   :bind
   ( :map ctl-c-a-map
     ;; Open the `mu4e' mail interface from the custom application map.
     ("m" . mu4e)))
-
-(use-package mu4e-alert
-  :when (eq system-type 'gnu/linux)
-  :after (mu4e)
-  :commands (mu4e-alert-enable-notifications)
-  :functions (mu4e-alert-set-default-style)
-
-  :custom
-  ;; Query individual messages so `bs-mu4e' can attach actions to the
-  ;; exact message represented by each notification.
-  (mu4e-alert-email-notification-types '(subjects))
-
-  :config
-  ;; Use the desktop notification backend for new-message alerts, then
-  ;; enable notification delivery once the backend is selected.
-  (mu4e-alert-set-default-style 'notifications)
-  (mu4e-alert-enable-notifications)
-
-  :demand t)
 
 (use-package mu4e-compose
   :hook
@@ -4538,23 +4273,6 @@
    (lambda ()
      (setq-local mode-name "Mail"))))
 
-(use-package bs-mu4e
-  :after (mu4e-main)
-  :commands (bs-mu4e-main-enable
-             bs-mu4e-prepare-today-context)
-  :defines (mu4e-main-mode-map)
-
-  :init
-  ;; Present the main mail dashboard with the same visual hierarchy,
-  ;; aligned counts, and context-aware status used by Gnus and Elfeed.
-  (bs-mu4e-main-enable)
-
-  :bind
-  ( :map mu4e-main-mode-map
-    ;; Prepare today's local messages from the active account as LLM
-    ;; context.
-    ("C-c m t" . bs-mu4e-prepare-today-context)))
-
 (use-package mu4e-modeline
   :custom
   ;; Disable the global `mu4e' modeline indicators while keeping
@@ -4630,6 +4348,15 @@
   ;; Route generic Emacs mail entry points, such as `compose-mail', to
   ;; the `mu4e' compose interface.
   (mail-user-agent 'mu4e-user-agent))
+
+(use-package tessera-mu4e
+  :after (mu4e-headers)
+  :commands (tessera-mu4e-mode)
+
+  :init
+  ;; Configure existing and future buffers after the native view
+  ;; loads.
+  (tessera-mu4e-mode 1))
 
 
 
@@ -4978,50 +4705,6 @@
 ;; Web Feed Reader
 ;;
 
-(use-package gptel-transient
-  :after (elfeed-search)
-  :defines (elfeed-search-mode-map)
-
-  :bind
-  ( :map elfeed-search-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)))
-
-(use-package bs-elfeed
-  :after (elfeed-search)
-  :commands (bs-elfeed-search-disable
-             bs-elfeed-search-enable
-             bs-elfeed-search-prepare-context
-             bs-elfeed-prepare-today-context
-             bs-elfeed-notifications-disable
-             bs-elfeed-notifications-enable
-             bs-elfeed-tree-disable
-             bs-elfeed-tree-enable)
-  :defines (elfeed-search-mode-map)
-
-  :custom
-  ;; Reuse site favicons for desktop notifications for three months.
-  (bs-elfeed-notifications-favicon-cache-directory
-   (bs-path bs-cache-directory
-            "elfeed/notification-favicons/"))
-  (bs-elfeed-notifications-favicon-cache-expiry (* 90 24 60 60))
-
-  ;; Leave each actionable notification visible for fifteen seconds.
-  (bs-elfeed-notifications-timeout (* 15 1000))
-
-  ;; Open each notification Read action in a new frame belonging to
-  ;; the current Emacs session.
-  (bs-elfeed-notifications-read-display-function
-   #'bs-call-in-new-frame)
-
-  ;; Check all subscribed feeds every five minutes.
-  (bs-elfeed-update-interval (* 5 60))
-
-  :bind
-  ( :map elfeed-search-mode-map
-    ;; Prepare today's locally stored entries as LLM context.
-    ("C-c m t" . bs-elfeed-prepare-today-context)))
-
 (use-package elfeed
   :after (bs-lib)
   :commands (elfeed)
@@ -5121,12 +4804,8 @@
   :functions (elfeed-score-enable)
 
   :config
-  ;; Enable automatic scoring without replacing chronological sorting,
-  ;; then install the renderer and notifications after all new-entry
-  ;; taggers are active.
+  ;; Enable automatic scoring while retaining chronological sorting.
   (elfeed-score-enable t)
-  (bs-elfeed-search-enable)
-  (bs-elfeed-notifications-enable)
   (keymap-set elfeed-search-mode-map "=" elfeed-score-map)
 
   :demand t)
@@ -5157,13 +4836,7 @@
   (elfeed-search-sort-function '(nil elfeed-score-sort))
 
   ;; Keep point on the entry displayed in the adjacent article window.
-  (elfeed-search-remain-on-entry '(show))
-
-  :bind
-  ( :map elfeed-search-mode-map
-    ;; Prepare entries selected by native marks, the active region, or
-    ;; point as LLM context.  Plain `m' remains the native mark command.
-    ("C-c m m" . bs-elfeed-search-prepare-context)))
+  (elfeed-search-remain-on-entry '(show)))
 
 (use-package elfeed-show
   :custom
@@ -5181,23 +4854,10 @@
 (use-package elfeed-tree
   :after (elfeed)
 
-  :bind
-  ( :map elfeed-tree-mode-map
-    ;; Open the `gptel' send menu for the prepared context.
-    ("C-c m g" . gptel-menu)
-
-    ;; Prepare today's locally stored entries as LLM context.
-    ("C-c m t" . bs-elfeed-prepare-today-context))
-
   :custom
   ;; Build tree counts and searches from unread entries, matching the
   ;; default Search filter.
-  (elfeed-tree-filter "+unread")
-
-  :config
-  ;; Render one synthetic, fully expanded tag hierarchy with the same
-  ;; visual hierarchy as the Gnus Group/Topic buffer.
-  (bs-elfeed-tree-enable))
+  (elfeed-tree-filter "+unread"))
 
 (use-package elfeed-webkit
   :if (featurep 'xwidget-internal)
@@ -5231,6 +4891,15 @@
     ("%" . elfeed-webkit-toggle))
 
   :demand t)
+
+(use-package tessera-elfeed
+  :after (elfeed-search)
+  :commands (tessera-elfeed-mode)
+
+  :init
+  ;; Configure existing and future buffers after the native view
+  ;; loads.
+  (tessera-elfeed-mode 1))
 
 ;;; init.el ends here
 ;; Local Variables:

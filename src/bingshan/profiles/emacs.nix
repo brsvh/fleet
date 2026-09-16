@@ -188,10 +188,6 @@ let
         (remove-hook 'gnus-setup-news-hook #'gnus--preset-setup))
     '';
 
-    genGnusSourceNames = ''
-      (${toJSON "127.0.0.1"} . "Local")
-    '';
-
     genGnusStrings =
       strings:
       concatStringsSep "\n" (map toJSON strings);
@@ -424,8 +420,6 @@ let
 
         realName = toJSON account.realName;
 
-        contextQuery = toJSON (genContextQuery mail);
-
         addresses' = concatStringsSep " " (
           map toJSON mail.addresses
         );
@@ -482,8 +476,6 @@ let
            (mu4e-trash-folder . ${genMailFolder' "trash"})
            (mu4e-bookmarks . (${genMu4eBookmarks mail}))
            (mu4e-maildir-shortcuts . (${genMu4eMaildirShortcuts mail}))
-           (bs-mu4e-context-name . ${name})
-           (bs-mu4e-context-query . ${contextQuery})
            (smime-certificate-directory . ${certdirAbsPath})))
       '';
 
@@ -657,12 +649,6 @@ in
             :custom
             (bs-khal-calendar-directories '(${genCalendarDirectories enabledCalendars}))
             (bs-khal-default-calendar ${genDefaultCalendarName enabledCalendars})
-
-            :defer t)
-
-          (use-package bs-gnus
-            :custom
-            (bs-gnus-group-source-names '(${genGnusSourceNames}))
 
             :defer t)
 
@@ -919,7 +905,6 @@ in
           mcp-server
           modus-themes
           mu4e
-          mu4e-alert
           mwim
           nerd-icons
           nerd-icons-corfu
@@ -951,6 +936,7 @@ in
           spacious-padding
           switch-window
           tabspaces
+          tessera
           treemacs
           treemacs-magit
           treemacs-nerd-icons
