@@ -36,9 +36,26 @@
       role = "primary";
 
       upstreams = {
+        eternal-september = {
+          endpoint = "news.eternal-september.org:563_TLS";
+          passwordCredential = "eternal-september";
+          username = "bingshan";
+        };
+
+        gmane = {
+          endpoint = "news.gmane.io:119_STARTTLS";
+        };
+
         olduse = {
+          endpoint = "olduse.net:11940";
           normalizeDuplicatePath = true;
           normalizeLegacyDate = true;
+        };
+
+        solani = {
+          endpoint = "news.solani.org:563_TLS";
+          passwordCredential = "solani";
+          username = "bingshan";
         };
       };
     };
