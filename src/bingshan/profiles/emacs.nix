@@ -15,13 +15,11 @@ let
     filter
     findFirst
     head
-    mapAttrs
     mapAttrsToList
     replaceStrings
     sort
     toJSON
     toSentenceCase
-    zipAttrsWith
     ;
 
   calendars = attrValues config.accounts.calendar.accounts;
@@ -34,8 +32,6 @@ let
       name
       ;
   }) config.accounts.email.accounts;
-
-  news = import bingshan.etc.news-sources;
 
   el = rec {
     cjkFont = toJSON "Zhuque Fangsong (technical preview)";
@@ -75,131 +71,6 @@ let
       );
 
     genBool = value: if value then "t" else "nil";
-
-    genGnusMailingLists =
-      mailingLists:
-      concatStringsSep "\n" (
-        map (
-          entry:
-          "(${toJSON entry.group} . ${toJSON entry.address})"
-        ) mailingLists
-      );
-
-    genGnusMethod = ''
-      (nntp "local"
-            (nntp-address ${toJSON "127.0.0.1"})
-            (nntp-port-number 1119)
-            (nntp-open-connection-function nntp-open-network-stream))
-    '';
-
-    genGnusPreset = topics: initialCatchupGroups: ''
-      (defun gnus--preset-setup ()
-        "Apply the generated Gnus topic and subscription preset once."
-        (require 'gnus-group)
-        (require 'gnus-start)
-        (require 'gnus-sum)
-        (require 'gnus-topic)
-        (require 'gnus-util)
-        (require 'seq)
-        (require 'subr-x)
-        (let* ((topics
-                '(${genGnusTopics topics}))
-               (initial-catchup-groups
-                '(${genGnusStrings initialCatchupGroups}))
-               (desired-groups
-                (delete-dups
-                 (apply #'append
-                        (mapcar
-                         (lambda (topic)
-                           (copy-sequence (cdr topic)))
-                         topics)))))
-          (dolist (group desired-groups)
-            (unless (or (string-prefix-p "nndraft:" group)
-                        (gnus-get-info group))
-              (condition-case err
-                  (if (gnus-activate-group group)
-                      (progn
-                        (gnus-group-set-subscription
-                         group
-                         gnus-level-default-subscribed
-                         t)
-                        (when (member
-                               group
-                               initial-catchup-groups)
-                          (gnus-group-catchup group 'all)))
-                    (display-warning
-                     'gnus-config
-                     (format
-                      "Could not activate Gnus group %s"
-                      group)))
-                (error
-                 (display-warning
-                  'gnus-config
-                  (format
-                   "Could not subscribe to Gnus group %s: %s"
-                   group
-                   (error-message-string err)))))))
-          (unless gnus-topic-topology
-            (setq gnus-topic-topology
-                  '(("Gnus" visible nil nil))))
-          (unless (assoc "Gnus" gnus-topic-alist)
-            (push '("Gnus") gnus-topic-alist))
-          ;; Rebuild the configured local group assignments.
-          (dolist (entry gnus-topic-alist)
-            (setcdr
-             entry
-             (seq-remove
-              (lambda (group)
-                (member group desired-groups))
-              (cdr entry))))
-          (dolist (topic topics)
-            (let* ((name (car topic))
-                   (entry
-                    (or (assoc name gnus-topic-alist)
-                        (let ((entry (list name)))
-                          (setq gnus-topic-alist
-                                (append gnus-topic-alist
-                                        (list entry)))
-                          entry))))
-              (dolist (group (cdr topic))
-                (setcdr entry
-                        (append (cdr entry) (list group))))
-              (setcdr
-               entry
-               (sort
-                (delete-dups (cdr entry))
-                (lambda (left right)
-                  (string-lessp
-                   (string-remove-prefix
-                    "gmane."
-                    (gnus-group-real-name left))
-                   (string-remove-prefix
-                    "gmane."
-                    (gnus-group-real-name right))))))
-              (unless (gnus-topic-find-topology name)
-                (setcdr
-                 gnus-topic-topology
-                 (append
-                  (cdr gnus-topic-topology)
-                  (list
-                   (list
-                    (list name 'visible nil nil))))))))
-          (gnus-topic-sort-topics-1 gnus-topic-topology nil))
-        (remove-hook 'gnus-setup-news-hook #'gnus--preset-setup))
-    '';
-
-    genGnusStrings =
-      strings:
-      concatStringsSep "\n" (map toJSON strings);
-
-    genGnusTopics =
-      topics:
-      concatStringsSep "\n" (
-        map (topic: ''
-          (${toJSON topic.name}
-           ${concatStringsSep "\n" (map toJSON topic.groups)})
-        '') topics
-      );
 
     genCalendarDirectories =
       calendars:
@@ -606,34 +477,6 @@ in
               )
             );
 
-          newsGroups = zipAttrsWith (_: concatLists) (
-            mapAttrsToList (_: source: source.groups) news
-          );
-
-          newsTopics = mapAttrsToList (name: groups: {
-            inherit
-              groups
-              name
-              ;
-          }) newsGroups;
-
-          newsInitialCatchupGroups = concatLists (
-            mapAttrsToList (
-              _: source: source.initialCatchupGroups or [ ]
-            ) news
-          );
-
-          newsMailingLists = concatLists (
-            mapAttrsToList (
-              _: source:
-              mapAttrsToList (group: address: {
-                inherit
-                  address
-                  group
-                  ;
-              }) (source.mailingLists or { })
-            ) news
-          );
         in
         with el;
         ''
@@ -692,51 +535,6 @@ in
             (message-directory "${primaryMaildir}")
             (message-sendmail-envelope-from 'header)
             (message-signature "${primaryMail.account.signature.text}")
-
-            :defer t)
-
-          (use-package gnus
-            :defines (gnus-level-default-subscribed
-                      gnus-select-method
-                      gnus-setup-news-hook
-                      gnus-topic-alist
-                      gnus-topic-topology)
-            :functions (gnus-activate-group
-                        gnus-get-info
-                        gnus-group-catchup
-                        gnus-group-real-name
-                        gnus-group-set-subscription
-                        gnus-topic-find-topology
-                        gnus-topic-sort-topics-1)
-
-            :init
-            ${genGnusPreset newsTopics newsInitialCatchupGroups}
-
-            :custom
-            (gnus-parameters
-             (append
-              '(("\\`\\(?:comp\\.\\|gmane\\.\\)"
-                 (display . 100))
-                ("\\`comp\\."
-                 (agent-predicate . short)))
-              (mapcar
-               (lambda (entry)
-                 (list
-                  (concat
-                   "\\`"
-                   (regexp-quote (car entry))
-                   "\\'")
-                  (cons 'to-list (cdr entry))
-                  '(subscribed . t)))
-               '(${genGnusMailingLists newsMailingLists}))))
-
-            (gnus-secondary-select-methods nil)
-
-            :hook
-            (gnus-setup-news-hook . gnus--preset-setup)
-
-            :config
-            (setq gnus-select-method '${genGnusMethod})
 
             :defer t)
 
@@ -968,6 +766,14 @@ in
       ignores = [
         "/.agent-shell"
       ];
+    };
+  };
+
+  xdg = {
+    configFile = {
+      "emacs/gnus-init.el" = {
+        source = bingshan.etc.emacs.gnus-init;
+      };
     };
   };
 }

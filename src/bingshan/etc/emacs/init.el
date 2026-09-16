@@ -2537,7 +2537,6 @@
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
-  :defines (gnus-select-method)
 
   :custom
   ;; Store `gnus' state beneath the shared Emacs state directory.
@@ -2617,15 +2616,6 @@
   (gnus-group-mode-hook . (lambda ()
                             (setq-local mode-name "News Groups"))))
 
-(use-package gnus-msg
-  :after (gnus)
-
-  :custom
-  ;; Generate Mail-Followup-To from the Gmane groups explicitly
-  ;; marked as subscribed above.
-  (message-subscribed-address-functions
-   '(gnus-find-subscribed-addresses)))
-
 (use-package gnus-start
   :after (gnus)
 
@@ -2634,9 +2624,14 @@
   ;; persistent Emacs state.
   (gnus-startup-file (bs-path bs-state-directory "gnus/newsrc"))
 
-  ;; Keep all `gnus' configuration in this init file instead of
-  ;; loading a separate user `gnus' file.
-  (gnus-init-file nil)
+  ;; Save read ranges and marks in the writable `.eld' file only.
+  ;; Apply subscriptions from the separate Gnus configuration.
+  (gnus-read-newsrc-file nil)
+  (gnus-save-newsrc-file nil)
+
+  ;; Gnus loads its configuration before opening servers on each
+  ;; start.
+  (gnus-init-file (bs-path bs-config-directory "gnus-init.el"))
 
   ;; Do not load site-wide `gnus' configuration outside this
   ;; controlled setup.
