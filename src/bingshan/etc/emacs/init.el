@@ -680,6 +680,15 @@
      (modus-themes-select (or (car modus-themes-to-toggle)
                               'modus-operandi-tinted)))))
 
+(use-package tessera
+  :custom
+  ;; Use `nerd-icons' for entry glyphs.
+  (tessera-glyph-style 'nerd-icons)
+
+  ;; Remove vertical padding between members of the same thread.
+  (tessera-thread-inner-top-padding 0)
+  (tessera-thread-inner-bottom-padding 0))
+
 (use-package whitespace
   :defines (whitespace-line-column)
 
@@ -2584,7 +2593,12 @@
 
 (use-package gnus-art
   :after (gnus)
-  :defines (gnus-article-mode-map))
+  :defines (gnus-article-mode-map)
+
+  :custom
+  ;; Match the full timestamp used by `mu4e' in article Date headers.
+  (gnus-article-time-format "%m/%d/%Y %I:%M:%S %p")
+  (gnus-article-date-headers '(user-defined)))
 
 (use-package gnus-async
   :after (gnus)
@@ -2653,6 +2667,9 @@
               gnus-summary-select-article-buffer)
 
   :custom
+  ;; Match the full timestamp used by `mu4e' for every article age.
+  (gnus-user-date-format-alist '((t . "%m/%d/%Y %I:%M:%S %p")))
+
   ;; Display conversations as threads, matching threaded `mu4e'
   ;; searches.
   (gnus-show-threads t)
@@ -2850,12 +2867,6 @@
   :hook
   ;; Highlight the current Group row without changing its contents.
   (gnus-group-mode-hook . hl-line-mode))
-
-(use-package hl-line
-  :hook
-  ;; Highlight the Summary row at point independently of the article
-  ;; displayed in the Article buffer.
-  (gnus-summary-mode-hook . hl-line-mode))
 
 (use-package tessera-gnus
   :after (gnus-sum)
@@ -3708,28 +3719,6 @@
   ;; running Emacs session available to agent clients without adding
   ;; work to the initial startup path.
   (bs-after-startup-late-hook . mcp-server-start-unix))
-
-(use-package openspec
-  :custom
-  ;; Disable the default global binding from `openspec'; expose the
-  ;; status command under the custom agent prefix map instead.
-  (openspec-status-key nil)
-
-  :config
-  ;; Show `openspec' status buffers in a bottom side window so
-  ;; reviewing proposals and tasks does not replace the current
-  ;; editing window.
-  (add-to-list 'display-buffer-alist
-               '((derived-mode . openspec-mode)
-                 (display-buffer-in-side-window)
-                 (side . bottom)
-                 (slot . 0)))
-
-  :bind
-  ( :map ctl-c-x-map
-    ;; Open the `openspec' project status from the custom agent prefix
-    ;; map.
-    ("o" . openspec-status)))
 
 (use-package org
   :after (gptel)

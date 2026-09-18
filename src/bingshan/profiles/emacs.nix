@@ -392,7 +392,6 @@ in
         claude-agent-acp
         codex
         codex-acp
-        openspec
         spec-kit
       ]);
   };
@@ -710,7 +709,6 @@ in
           nerd-icons-ibuffer
           nix-mode
           nix-ts-mode
-          openspec
           orderless
           org-appear
           org-contrib
@@ -735,6 +733,7 @@ in
           switch-window
           tabspaces
           tessera
+          tessera-x
           treemacs
           treemacs-magit
           treemacs-nerd-icons
