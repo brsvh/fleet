@@ -1,9 +1,17 @@
 {
   config,
   home,
+  pkgs,
   ...
 }:
 let
+  chromePackage =
+    config.programs.chromium.finalPackage;
+
+  chrome-devtools = pkgs.chrome-devtools.override {
+    browser = chromePackage;
+  };
+
   chromiumDesktop = "google-chrome.desktop";
 
   chromiumAssociation = {
@@ -24,6 +32,12 @@ in
     home.profiles.chromium
   ];
 
+  home = {
+    packages = [
+      chrome-devtools
+    ];
+  };
+
   programs = {
     chromium = {
       commandLineArgs = [
@@ -35,7 +49,7 @@ in
   xdg = {
     mimeApps = {
       defaultApplicationPackages = [
-        config.programs.chromium.package
+        chromePackage
       ];
 
       defaultApplications = chromiumAssociation;
