@@ -176,6 +176,7 @@ in
             inputs
             lib
             pkgs
+            projectRoot
             self
             system
             ;
