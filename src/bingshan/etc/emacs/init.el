@@ -2662,9 +2662,7 @@
 (use-package gnus-sum
   :after (gnus)
   :defines (gnus-summary-mode-map)
-  :functions (gnus-summary-next-subject
-              gnus-summary-prev-subject
-              gnus-summary-select-article-buffer)
+  :functions (gnus-summary-select-article-buffer)
 
   :custom
   ;; Match the full timestamp used by `mu4e' for every article age.
@@ -2818,15 +2816,6 @@
   (keymap-set gnus-summary-mode-map
               "<return>" #'gnus-summary-select-article-buffer)
 
-  ;; Install navigation after the native Summary keymap is
-  ;; initialized.
-  (keymap-set gnus-summary-mode-map "n" #'gnus-summary-next-subject)
-  (keymap-set gnus-summary-mode-map "p" #'gnus-summary-prev-subject)
-  (keymap-set gnus-summary-mode-map
-              "M-<down>" #'gnus-summary-next-subject)
-  (keymap-set gnus-summary-mode-map
-              "M-<up>" #'gnus-summary-prev-subject)
-
   :hook
   ;; Use a concise mode-line name for `gnus-sum' buffers.
   (gnus-summary-mode-hook . (lambda ()
@@ -2876,6 +2865,14 @@
   ;; Configure existing and future buffers after the native view
   ;; loads.
   (tessera-gnus-mode 1))
+
+(use-package tessera-gnus-summary
+  :after (tessera-gnus)
+
+  :custom
+  ;; Retain native extension and cross-group behavior when article
+  ;; navigation reaches the boundary of the current Summary buffer.
+  (tessera-gnus-summary-boundary-navigation t))
 
 (use-package window
   :after (gnus-art)
@@ -4713,6 +4710,19 @@
   (elfeed-entry-point 'elfeed-tree)
 
   :config
+  ;; Follow Search movement only when an article window already
+  ;; exists; simple navigation never creates that window on its own.
+  (add-hook
+   'elfeed-search-mode-hook
+   (lambda ()
+     (add-hook
+      'post-command-hook
+      (lambda ()
+        (when (and (memq last-command-event '(?n ?p))
+                   (get-buffer-window "*elfeed-entry*"))
+          (call-interactively #'elfeed-search-show-entry)))
+      nil t)))
+
   ;; After the first complete update, treat the imported backlog as
   ;; read and record that this one-time migration has finished.
   (add-hook
@@ -4729,25 +4739,6 @@
          (elfeed-db-save)
          (with-temp-file complete)
          (elfeed-tree-update :force)))))
-
-  ;; Follow Search movement only when an article window already
-  ;; exists; simple navigation never creates that window on its own.
-  (keymap-set
-   elfeed-search-mode-map "n"
-   (lambda (count)
-     "Move COUNT entries forward and follow a visible article."
-     (interactive "p")
-     (forward-line count)
-     (when (get-buffer-window "*elfeed-entry*")
-       (call-interactively #'elfeed-search-show-entry))))
-  (keymap-set
-   elfeed-search-mode-map "p"
-   (lambda (count)
-     "Move COUNT entries backward and follow a visible article."
-     (interactive "p")
-     (forward-line (- count))
-     (when (get-buffer-window "*elfeed-entry*")
-       (call-interactively #'elfeed-search-show-entry))))
 
   :bind
   ( :map ctl-c-a-map

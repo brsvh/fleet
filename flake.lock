@@ -264,11 +264,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789736606,
-        "narHash": "sha256-qTMaLo0aS+RtnZ8NpL83SOG6n7fbEHYkFKjd+zT3t30=",
+        "lastModified": 1790149357,
+        "narHash": "sha256-x4f2oD7N+eaF8ECP7DoVQJSBBO6D3vAao3xGeWi3CuU=",
         "ref": "main",
-        "rev": "71e41e614a89dd36200e07174d81c7c755b86b24",
-        "revCount": 144,
+        "rev": "6af16e5d823ed72ff751d4e67cab39e4a2162891",
+        "revCount": 151,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-tessera.git"
       },
