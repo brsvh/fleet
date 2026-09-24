@@ -55,6 +55,10 @@ in
 
       use-xdg-base-directories = true;
     };
+
+    sshServe = {
+      protocol = mkDefault "ssh-ng";
+    };
   };
 
   programs = {
