@@ -8,6 +8,9 @@ nextcloud:
 onlyoffice:
     jwt-secret: ENC[AES256_GCM,data:VRm+zffIXCpkEQiqVDzwA84H4t6fqDv8tmvbl8+E5O8OSQHoKwrBggOG7HDldsmH7NAhMXqrGl7RmFvccCvWKw==,iv:AA6XkXn/sq/fqx5Ln4jxUwBKppZ6tsRqm7s8OA2VKfE=,tag:KDQlhFkrt5BqOPhxQyZKZA==,type:str]
     security-nonce: ENC[AES256_GCM,data:4rIX+2eSwj3nb/P7I6VYUHlZyULJQdNkqFKpnouV1MJJqueMc8IsivgtKmrz5YdKPedjN+Gq4yDvDW2d1wb5riL7CKER9VK62Krqxpfh/G0OEg7uBQpNz4jw0EM=,iv:peazVlxql5RdkGB5zb0RnF/z/DM57q5Tvs2Kx7/pUmU=,tag:CI728MGA4Zod7SyV7IPeSQ==,type:str]
+nix-cache:
+    signing-key: ENC[AES256_GCM,data:78ZMwMdgSaw6zallXxUpF+W96iJgMsm9EEeLdGlejZsMaNs+pPxPRNlgksdqUhO5Bopwekc4fiTWPI6v6qKsLlhf3HuN2Ro5tGbkFfv2lEguLq7emTplCbCnSlg7BTY8w5NaqjqLJOMG305Lrg==,iv:hgxYxNgqxMayYJ/+kkEBV2kMR4tDlMGiob1UJSbOox0=,tag:kOgwBwlB1SOd3BOk6VXw/A==,type:str]
+    upload-htpasswd: ENC[AES256_GCM,data:GDyvSqVrC7yPn5TxgpYEYcaUEMicbhtEuuc4ySGRVJpMaCHq0X9cDqPZF4Zv3WFxNiwdXRICom8j7rOlYwkyGjVLJo2jaA==,iv:JyWtXMy4EFIMGAdaqEDgcStArr1Umb2/1JWuyBjfKNI=,tag:LNbiJcz08RJCnymK8smX3w==,type:str]
 sops:
     age:
         - enc: |
@@ -19,7 +22,7 @@ sops:
             +RoIclxJaL8eLIxvyi4ZQf3HD+RBbIds6H0Xdo/YSKAuApyMjqF8Zw==
             -----END AGE ENCRYPTED FILE-----
           recipient: age194qvjfwdnntwx9200e5ygepx0fppwh8034ljnzvzhc9zfxn9vfyq90m0z0
-    lastmodified: "2026-05-19T13:53:46Z"
-    mac: ENC[AES256_GCM,data:97twKrfMthcAKTiyicAABvdrjG/gEdG5fee3u4g1inkA0SDxrVNoWvSNHR5gGh4Pm6WchyP4Iv18eJtYPBWwJhNdZIzFO+OpfSnGcwYCzfFG/mNuzc97884SFtN3H+MkgFmTUXdOprTDXU4pds0bju6o/PSEia5sycA1xDCqkKk=,iv:YkiRUAYp5E5CUqxAQ8SE+mIGQ+86159ZifmtEQm7IXQ=,tag:UWNB3Vt41quRtIZ6vLOeDQ==,type:str]
+    lastmodified: "2026-09-24T22:50:00Z"
+    mac: ENC[AES256_GCM,data:I1QAyiHCXhRMM19j+/pXlq2slWv1Ivq5D4d8K+6YWdgSdNzX/VtCvLur+yGUM/jexK2BP3OhQTXOWqNMnZGLukdSyNVVeLf4Ghz5hyXpq2ijruuM/9lIfIElCFYfVT8IdZoVYlNZgzppfzDXXWUcYSBvPatMi31/c3Cqr56WUJM=,iv:d4QUQAiPUgH2c3njrcQqnH2r25C3isuiIGGXvGDiiQY=,tag:uncMN+uUlCS7ncPBHF0sOw==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.0
