@@ -383,7 +383,7 @@ in
         pyright
         ripgrep
         trionestypePackages.zhuque-fangsong
-        typescript-go
+        typescript
         vscode-json-languageserver
         wl-clipboard
         xclip

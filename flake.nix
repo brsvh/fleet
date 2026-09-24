@@ -39,7 +39,7 @@
     };
 
     crane = {
-      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.23.4";
+      url = "git+https://github.com/ipetkov/crane.git?ref=refs/tags/v0.24.0";
     };
 
     deploy = {
