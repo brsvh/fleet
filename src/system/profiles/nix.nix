@@ -12,7 +12,7 @@ in
     gc = {
       automatic = mkDefault true;
       dates = mkDefault "weekly";
-      options = mkDefault "--delete-older-than 4w";
+      options = mkDefault "--delete-older-than 28d";
       persistent = mkDefault true;
     };
 
