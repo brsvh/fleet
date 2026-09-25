@@ -2527,6 +2527,43 @@
 ;; Reading Mail with Rmail (info "(emacs) Rmail")
 ;;
 
+(use-package mail-utils
+  :custom
+  ;; Recognize localized reply, forwarding, automatic-reply, and
+  ;; out-of-office prefixes when processing message subject fields.
+  (mail-re-regexps
+   `(;; Reply prefixes
+     "RE" "RÉ\\.?" "رد" "回复" "回覆" "SV" "Antw\\.?" "VS"
+     "REF" "AW" "ΑΠ" "ΣΧΕΤ" "השב" "Vá" "R" "RIF" "BLS"
+     "RES" "Odp" "YNT" "ATB"
+     "答[复復覆]" "回[復应應]"
+
+     ;; Forward prefixes
+     "FWD?"
+     "[转轉][发發寄]"
+
+     ;; Automatic replies
+     "Auto"
+     "Auto\\(?:matic\\|mated\\)?[- ]?\\(?:Reply\\|Response\\)"
+     "OO[OF]"
+     ,(concat "自[动動]\\(?:"
+              "[回答][复復覆]\\|回[应應]\\|回信\\|"
+              "[应應]答\\|[响響][应應]"
+              "\\)")
+
+     ;; Out-of-office and vacation replies
+     ,(concat "Out[- ]+of[- ]+Office"
+              "\\(?:[- ]+"
+              "\\(?:Re\\|Reply\\|Response\\|"
+              "Auto\\(?:matic\\|mated\\)?"
+              "[- ]?\\(?:Reply\\|Response\\)\\)"
+              "\\)?")
+     ,(concat "\\(?:外出\\|休假\\)"
+              "\\(?:自[动動]\\)?"
+              "\\(?:[回答][复復覆]\\|回[应應]\\|回信\\|"
+              "[应應]答\\|[响響][应應]\\)")
+     "不在[办辦]公室")))
+
 
 
 ;;
