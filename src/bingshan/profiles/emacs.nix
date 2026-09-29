@@ -671,6 +671,7 @@ in
           elfeed-org
           elfeed-score
           elfeed-webkit
+          elfeed-x
           emacs-gc-stats
           embark
           embark-consult

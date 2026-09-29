@@ -2651,6 +2651,19 @@
   ;; Avoid prefetching articles that have already been read.
   (gnus-async-prefetch-article-p #'gnus-async-unread-p))
 
+(use-package gnus-demon
+  :after (gnus)
+
+  :custom
+  ;; Scan the subscribed groups on the local INN server every five
+  ;; minutes.  Upstream retrieval remains the server's responsibility.
+  (gnus-demon-timestep 60)
+  (gnus-demon-handlers '((gnus-demon-scan-news 5 nil)))
+
+  :hook
+  ;; Start only after `gnus' opens; its shutdown cancels the timers.
+  (gnus-started-hook . gnus-demon-init))
+
 (use-package gnus-group
   :after (gnus)
 
@@ -2901,15 +2914,24 @@
   :init
   ;; Configure existing and future buffers after the native view
   ;; loads.
-  (tessera-gnus-mode 1))
+  (tessera-gnus-mode +1))
 
 (use-package tessera-gnus-summary
   :after (tessera-gnus)
+  :defines (gnus-demon-timers)
 
   :custom
   ;; Retain native extension and cross-group behavior when article
   ;; navigation reaches the boundary of the current Summary buffer.
-  (tessera-gnus-summary-boundary-navigation t))
+  (tessera-gnus-summary-boundary-navigation t)
+
+  ;; Show the next local group scan from the active `gnus-demon' timer.
+  (tessera-gnus-summary-header-line-next-update-function
+   (lambda (_context)
+     (when (boundp 'gnus-demon-timers)
+       (let ((timer (plist-get gnus-demon-timers 'gnus-demon-scan-news)))
+         (when (and (timerp timer) (memq timer timer-list))
+           (timer--time timer)))))))
 
 (use-package window
   :after (gnus-art)
@@ -3553,7 +3575,8 @@
                        (with-current-buffer response
                          (setq-local header-line-format nil)))))))
             (with-current-buffer response
-              (visual-line-mode 1)
+              ;; Wrap long responses at word boundaries for reading.
+              (visual-line-mode +1)
               (setq-local
                header-line-format
                (propertize " Waiting for LLM response..."
@@ -4374,7 +4397,7 @@
   :init
   ;; Configure existing and future buffers after the native view
   ;; loads.
-  (tessera-mu4e-mode 1))
+  (tessera-mu4e-mode +1))
 
 
 
@@ -4724,58 +4747,12 @@
 ;;
 
 (use-package elfeed
-  :after (bs-lib)
   :commands (elfeed)
-  :defines (elfeed-db-directory
-            elfeed-entry-point
-            elfeed-search-filter
-            elfeed-search-mode-map
-            elfeed-search-remain-on-entry
-            elfeed-search-sort-function
-            elfeed-show-entry-switch)
-  :functions (elfeed-db-save
-              elfeed-queue-count-total
-              elfeed-search-entries
-              elfeed-search-show-entry
-              elfeed-tree-update
-              elfeed-untag
-              elfeed-update)
 
   :custom
   ;; Enter through the tag and feed hierarchy instead of opening an
   ;; undifferentiated search immediately.
   (elfeed-entry-point 'elfeed-tree)
-
-  :config
-  ;; Follow Search movement only when an article window already
-  ;; exists; simple navigation never creates that window on its own.
-  (add-hook
-   'elfeed-search-mode-hook
-   (lambda ()
-     (add-hook
-      'post-command-hook
-      (lambda ()
-        (when (and (memq last-command-event '(?n ?p))
-                   (get-buffer-window "*elfeed-entry*"))
-          (call-interactively #'elfeed-search-show-entry)))
-      nil t)))
-
-  ;; After the first complete update, treat the imported backlog as
-  ;; read and record that this one-time migration has finished.
-  (add-hook
-   'elfeed-update-hook
-   (lambda (_url)
-     (let ((complete
-            (bs-path elfeed-db-directory
-                     "initial-update-complete")))
-       (when (and (not (file-exists-p complete))
-                  (zerop (elfeed-queue-count-total)))
-         (let ((unread (elfeed-search-entries "+unread")))
-           (when unread
-             (elfeed-untag unread 'unread)))
-         (elfeed-db-save)
-         (with-temp-file complete)
-         (elfeed-tree-update :force)))))
 
   :bind
   ( :map ctl-c-a-map
@@ -4875,32 +4852,64 @@
   :if (featurep 'xwidget-internal)
   :after (elfeed-show)
   :defines (elfeed-show-mode-map)
-  :functions (elfeed-webkit-enable
-              elfeed-webkit-refresh--webkit
-              elfeed-webkit-refresh--webkit@fit-to-entry-window
-              xwidget-at
-              xwidget-webkit-adjust-size-to-window)
+  :functions (elfeed-webkit-enable)
 
   :config
-  ;; Prefer embedded WebKit rendering when this Emacs has xwidget
-  ;; support; the ordinary SHR renderer remains the fallback
-  ;; otherwise.
+  ;; Open article links in embedded WebKit when xwidgets are
+  ;; available.
   (elfeed-webkit-enable)
-
-  ;; `elfeed-webkit' sizes its widget using the selected Search
-  ;; window.  Refit it to the displayed entry window after rendering
-  ;; instead.
-  (define-advice elfeed-webkit-refresh--webkit
-      (:after () fit-to-entry-window)
-    "Resize the WebKit widget to the displayed Elfeed entry window."
-    (when-let* ((window (get-buffer-window (current-buffer)))
-                (xwidget (xwidget-at (point-min))))
-      (xwidget-webkit-adjust-size-to-window xwidget window)))
 
   :bind
   ( :map elfeed-show-mode-map
-    ;; Toggle an individual reading session between WebKit and `shr'.
+    ;; Switch the session's article renderer between WebKit and `shr'.
     ("%" . elfeed-webkit-toggle))
+
+  :demand t)
+
+(use-package elfeed-x
+  :after (elfeed)
+  :commands (elfeed-x-auto-update-mode)
+
+  :custom
+  ;; Start fifteen-minute updates after entering `elfeed'.
+  (elfeed-x-update-interval 900)
+
+  :config
+  ;; Start the update timer on entry into `elfeed', or now if an
+  ;; Elfeed buffer already exists.
+  (elfeed-x-auto-update-mode +1)
+
+  :demand t)
+
+(use-package elfeed-x-search
+  :after (elfeed-search)
+  :commands (elfeed-x-search-follow-mode)
+
+  :custom
+  ;; Follow both native movement and `tessera-elfeed-search' entry
+  ;; navigation, which replaces the usual \\`n' and \\`p' commands.
+  (elfeed-x-search-follow-commands
+   '(next-line
+     previous-line
+     tessera-elfeed-search--next
+     tessera-elfeed-search--previous))
+
+  :config
+  ;; Follow navigation in an existing article window while keeping
+  ;; focus in Search and marking the displayed entry as read.
+  (elfeed-x-search-follow-mode +1)
+
+  :demand t)
+
+(use-package elfeed-x-webkit
+  :if (featurep 'xwidget-internal)
+  :after (elfeed-webkit)
+  :commands (elfeed-x-webkit-mode)
+
+  :config
+  ;; Fit rendered widgets to the article window while focus stays in
+  ;; Search.
+  (elfeed-x-webkit-mode +1)
 
   :demand t)
 
@@ -4911,7 +4920,17 @@
   :init
   ;; Configure existing and future buffers after the native view
   ;; loads.
-  (tessera-elfeed-mode 1))
+  (tessera-elfeed-mode +1))
+
+(use-package tessera-elfeed-search
+  :after (elfeed-x tessera-elfeed)
+  :functions (elfeed-x-next-update-time)
+
+  :custom
+  ;; Read the schedule through the public `elfeed-x' interface.
+  (tessera-elfeed-search-header-line-next-update-function
+   (lambda (_context)
+     (elfeed-x-next-update-time))))
 
 ;;; init.el ends here
 ;; Local Variables:
