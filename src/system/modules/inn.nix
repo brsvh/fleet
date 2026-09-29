@@ -359,7 +359,8 @@ let
               if not valid_message_id(message_id):
                   return False
               reply = self.command("STAT " + message_id)
-              self.expect(reply, (223, 430))
+              # Historical IDs may be rejected by nnrpd's stricter syntax checks.
+              self.expect(reply, (223, 430, 501))
               return reply.startswith("223 ")
 
           def article(self, number):
@@ -381,7 +382,7 @@ let
                   )
                   self.sock.sendall(wire + b".\r\n")
                   reply = self.readline()
-              self.expect(reply, (235, 435, 436, 437))
+              self.expect(reply, (235, 435, 436, 437, 501))
               return reply
 
 
@@ -898,22 +899,25 @@ let
                           False,
                       )
                       continue
-                  if reader.exists(mid):
-                      state.resolve(endpoint, group, mid)
-                      stats["existing"] += 1
-                      continue
                   try:
+                      if reader.exists(mid):
+                          state.resolve(endpoint, group, mid)
+                          stats["existing"] += 1
+                          continue
                       if endpoint in failed_sources:
                           raise ProtocolError(failed_sources[endpoint])
                       if endpoint not in sources:
-                          sources[endpoint] = stack.enter_context(connect_upstream(upstream))
+                          try:
+                              sources[endpoint] = stack.enter_context(connect_upstream(upstream))
+                          except (OSError, ProtocolError) as error:
+                              failed_sources[endpoint] = str(error)
+                              raise
                       source = sources[endpoint]
                       source.group(group)
                       stats[
                           transfer(upstream, source, reader, feed, state, group, number, mid)
                       ] += 1
                   except (OSError, ProtocolError) as error:
-                      failed_sources[endpoint] = str(error)
                       state.record(
                           endpoint,
                           group,
