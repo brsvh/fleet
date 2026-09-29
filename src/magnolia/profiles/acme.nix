@@ -20,6 +20,12 @@ in
               config.sops.secrets.acme-cloudflare-api-token.path;
           };
 
+          # dae intercepts DNS queries, including queries to authoritative servers.
+          extraLegoFlags = [
+            "--dns.propagation.wait"
+            "60s"
+          ];
+
           group = config.services.nginx.group;
         };
       };
