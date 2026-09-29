@@ -229,6 +229,20 @@
       url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.1.0";
     };
 
+    lem = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/lem-project/lem.git?ref=main";
+    };
+
     llm-agents = {
       inputs = {
         bun2nix = {

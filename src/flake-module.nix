@@ -15,6 +15,7 @@ let
     emacs-proofread
     emacs-tessera
     infix
+    lem
     llm-agents
     nixpkgs
     ;
@@ -131,6 +132,7 @@ in
             emacs-tessera.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
+            lem.overlays.default
             llm-agents.overlays.shared-nixpkgs
           ];
 
@@ -434,6 +436,7 @@ in
             emacs-tessera.overlays.default
             infix.overlays.default
             infix.overlays.emacs-packages
+            lem.overlays.default
             llm-agents.overlays.shared-nixpkgs
           ];
         };

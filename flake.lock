@@ -425,6 +425,30 @@
         "url": "https://github.com/nix-community/lanzaboote.git"
       }
     },
+    "lem": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790274560,
+        "narHash": "sha256-+7YOVvDg1Jqjc8B2MhGgn8cf/dLsq8XCrefBxP7Mwps=",
+        "ref": "main",
+        "rev": "ef6c48eb56575bb3ffe648c30846321b2a5d7e2f",
+        "revCount": 12083,
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/lem-project/lem.git"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "bun2nix": [
@@ -593,6 +617,7 @@
         "import-tree": "import-tree",
         "infix": "infix",
         "lanzaboote": "lanzaboote",
+        "lem": "lem",
         "llm-agents": "llm-agents",
         "mailserver": "mailserver",
         "mailserver-blobs": "mailserver-blobs",
