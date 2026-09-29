@@ -23,6 +23,8 @@
     nginx = {
       defaultListenAddresses = [
         "100.64.0.2"
+        # Match the local FQDN entry in /etc/hosts.
+        "127.0.0.2"
       ];
 
       recommendedProxySettings = true;

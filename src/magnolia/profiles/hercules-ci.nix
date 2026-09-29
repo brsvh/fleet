@@ -91,6 +91,8 @@ in
     services = {
       hercules-ci-agent = {
         after = [
+          "acme-order-renew-${config.networking.fqdn}.service"
+          "nginx.service"
           "sops-install-secrets.service"
           "tailscaled.service"
         ];
@@ -100,6 +102,8 @@ in
         };
 
         wants = [
+          "acme-order-renew-${config.networking.fqdn}.service"
+          "nginx.service"
           "tailscaled.service"
         ];
       };
