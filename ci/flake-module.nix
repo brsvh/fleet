@@ -1,7 +1,13 @@
 {
+  lib,
   self,
   ...
 }:
+let
+  inherit (lib)
+    mapAttrs
+    ;
+in
 {
   flake = {
     herculesCI = {
@@ -18,10 +24,10 @@
                 ;
             };
 
-            nixos = {
-              magnolia =
-                self.nixosConfigurations.magnolia.config.system.build.toplevel;
-            };
+            nixos = mapAttrs (
+              _: configuration:
+              configuration.config.system.build.toplevel
+            ) self.nixosConfigurations;
           };
         };
       };
