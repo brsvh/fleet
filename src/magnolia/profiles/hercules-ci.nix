@@ -57,7 +57,7 @@ in
 
         nixSettings = {
           cores = "8";
-          extra-substituters = "http://magnolia.tail.bingshan.org:5000?priority=30";
+          extra-substituters = "https://magnolia.tail.bingshan.org?priority=30";
           extra-trusted-public-keys = publicKey;
           max-jobs = "2";
         };

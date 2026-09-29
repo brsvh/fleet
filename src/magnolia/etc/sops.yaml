@@ -1,3 +1,5 @@
+acme:
+    cloudflare-api-token: ENC[AES256_GCM,data:Fmy+k65UC+W4UvDdwPWWizWm41auMC1So+lGZFINlz2s6NhU9XtXxzTDLx1QZ0lQlXrtF+Q=,iv:o40n7+fKdk918D1tFOAgKWUllfT3zlN911+CcTWKzJc=,tag:jrXF310ShrYv7/6fUkoiCg==,type:str]
 hercules-ci:
     cluster-join-token: ENC[AES256_GCM,data:IjXl5Xc+TC7YCnp4ByVkUWD+AIAMC3/oRZaGxljfbx6e2KbJ///ir7ROi/zt95nGSqavxNfHH8cpG81WBUlZxgxKM7M5TZN9C5e/dOXGBqWwwH1fxoz75QsKVfoEwmIQ5Kyajk/IhHrZ1gItSmZ7XrwLC0cdKExzfIvB7wb5A+iWVFRbbObPzNlPB2ojoUqup1WaPnIxCocSmdfPX+cs2ugkD7xMeavC88J9twCyod0kbYtzfz7N17fp6iwDCPM3jYwjXRb5AgjiwDiYWgBe8nJ0/XHaUM+LfTHo6toPFk1QAOqgxIF5kXr1PQ==,iv:MMFw/T7dJV7OidX47X3zCF2bjPOciuSX4IZSoyhJb5M=,tag:GD4p3yWWPg3ArKnPZ3E3/A==,type:str]
     store-ssh-key: ENC[AES256_GCM,data:0aj0AMmPU5UpXp9739j+yXHS7XNZBv1/kT14CwgfngV/avlDhglgnwo1i9yvIntqQJXUwdlE6Y2vSRXdQhm5S+P6PYIxmK/+ZeBdL7uKFU9UPHMYC8RlzF1lVAg+eACszLtpvWKWY16BUMyKRTe90GpCsDdFOY5z9mCoWdUcbiUSUlr3cvQISFj/LtH+k07kcD43KkVSIEYdaQsqyEYhk0pqkugAf5maeVcwPGIaWvoTdiVZulIf8+UU0kNZc6QDsPXZDq04qNuRzGILpd5edzlQa+KIKwbR0IhQW6rZNwQyTonsrgV5fD+vs+JMLiEBzdOQzvp9eZMrdp07giuQJsh6qFzEdG+N4JUH0JyroI+MLInZvbVOg5M+FGOW6S9MjuZ4WGI5qe4cE1Dtv2vwuec9reIHhQb4cD6B8A7ONRqfrl5yMFspr8wf3HL1BhM4aBv7il0pbFdN2TVj32Q87AHGBbImCgdrr/sjXvDL1DlUPpZMTxe7CHatL0sQc+cnVKrBqoBVNZncGRRCS+egjtpTlfzcnBn4S8zq,iv:TXfbTP2DO2u1C/saUVMzdyf5eREQMYeJv9Y07bbQvco=,tag:WKoFHXjMBvnuSTUQ3BQiUQ==,type:str]
@@ -16,7 +18,7 @@ sops:
             5CLvRN0hi6QdAEFyty0KP5WS7YwumDWxR7OxZjrTikH2Wkpn4t/UmQ==
             -----END AGE ENCRYPTED FILE-----
           recipient: age10eqf23zmmhrdhlcxtk47as2e582e7kws35478rwu466ygjzgm56sd9c4at
-    lastmodified: "2026-09-29T08:04:24Z"
-    mac: ENC[AES256_GCM,data:T5fxDg0AQNy0lHTdcgKgQ7sHGbM6LNBehMRf93ybVPzPz4UtgbGoEDOH0Ee1BmLAeL6P2JZhrVM7T0jSaEXx9ZgRMbqavsf6Gka6F2S23eeb11E7PjuLSpkOceJRt0y/CFBiXO/QUI5lCUgleNEKiqzPb40YmSHhwLHsvKwH7oM=,iv:cRAfdk6OYoqiWTayql/WDbqClWAu8+QxT+GrI2GXk7M=,tag:eYwAlHKBi0AfT5ctqZjFpw==,type:str]
+    lastmodified: "2026-09-29T08:54:52Z"
+    mac: ENC[AES256_GCM,data:TDKhvKbRjeOWdPxThJ44WW4MPCCUaq4x3c3nEFlz5s6LtSM8pIxKigtP60Eaee/Bg4g8dE/1rU8bstAUokxhTYAdVv6eW1lG4wOxdptUG0c9eNpqsctO1cADvrHURgWY9XG3OkmLN2Y+2PjJjBII0BU2OXtB3HJ0fi4bWLP1NEQ=,iv:31+158dnGIGjWbpZ6B+LvjkylBGiYfQRIWpZOR7IBQ8=,tag:5VVxOAnmciPTFXw3NCI24g==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.3

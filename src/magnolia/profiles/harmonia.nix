@@ -8,29 +8,36 @@
     system.profiles.harmonia
   ];
 
-  networking = {
-    firewall = {
-      interfaces = {
-        tailscale0 = {
-          allowedTCPPorts = [
-            5000
-          ];
-        };
-      };
-    };
-  };
-
   services = {
     harmonia = {
       cache = {
         settings = {
-          bind = "100.64.0.2:5000";
+          bind = "127.0.0.1:5000";
           priority = 30;
         };
 
         signKeyPaths = [
           config.sops.secrets.nix-cache-signing-key.path
         ];
+      };
+    };
+
+    nginx = {
+      virtualHosts = {
+        ${config.networking.fqdn} = {
+          onlySSL = true;
+          useACMEHost = config.networking.fqdn;
+
+          locations = {
+            "/" = {
+              extraConfig = ''
+                proxy_buffering off;
+              '';
+
+              proxyPass = "http://127.0.0.1:5000";
+            };
+          };
+        };
       };
     };
   };
@@ -43,16 +50,6 @@
         restartUnits = [
           "harmonia.service"
         ];
-      };
-    };
-  };
-
-  systemd = {
-    sockets = {
-      harmonia = {
-        socketConfig = {
-          FreeBind = true;
-        };
       };
     };
   };
