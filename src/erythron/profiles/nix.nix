@@ -10,7 +10,7 @@
   nix = {
     settings = {
       substituters = [
-        "http://magnolia.tail.bingshan.org:5000?priority=30"
+        "https://magnolia.tail.bingshan.org?priority=30"
       ];
 
       trusted-public-keys = [
