@@ -94,6 +94,20 @@
       url = "git+https://github.com/brsvh/emacs-bs.git?ref=main";
     };
 
+    emacs-elfmt = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/emacs-elfmt.git?ref=main";
+    };
+
     emacs-jieba-rs = {
       inputs = {
         crane = {

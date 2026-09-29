@@ -176,6 +176,30 @@
         "url": "https://github.com/brsvh/emacs-bs.git"
       }
     },
+    "emacs-elfmt": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790656311,
+        "narHash": "sha256-rOQqrM6p+k3q08Hab9a/kL7vNhdI9jSp1tmzjwZj9Lw=",
+        "ref": "main",
+        "rev": "ed9bb427be1efcd4232bb5f82dc845dd2c2ac029",
+        "revCount": 5,
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-elfmt.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-elfmt.git"
+      }
+    },
     "emacs-jieba-rs": {
       "inputs": {
         "crane": [
@@ -606,6 +630,7 @@
         "devshell": "devshell",
         "disko": "disko",
         "emacs-bs": "emacs-bs",
+        "emacs-elfmt": "emacs-elfmt",
         "emacs-jieba-rs": "emacs-jieba-rs",
         "emacs-overlay": "emacs-overlay",
         "emacs-proofread": "emacs-proofread",

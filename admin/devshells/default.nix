@@ -2,13 +2,17 @@
   inputs,
   lib,
   pkgs,
-  projectRoot,
   system,
   ...
 }:
 let
   inherit (inputs)
+    emacs-elfmt
     plasma-manager
+    ;
+
+  inherit (emacs-elfmt.packages.${system})
+    elfmt
     ;
 
   inherit (lib)
@@ -33,15 +37,6 @@ let
     toml
     yaml
     ;
-
-  elfmt =
-    pkgs.callPackage
-      (projectRoot + /tool/elfmt/package.nix)
-      {
-        inherit
-          projectRoot
-          ;
-      };
 
   formatters = [
     elfmt
