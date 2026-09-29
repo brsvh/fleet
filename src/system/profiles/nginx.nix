@@ -13,14 +13,6 @@ in
     system.profiles.acme
   ];
 
-  networking = {
-    firewall = {
-      allowedTCPPorts = [
-        80
-      ];
-    };
-  };
-
   services = {
     nginx = {
       enable = mkDefault true;
