@@ -67,6 +67,11 @@ in
       package = deploy-rs;
     }
     {
+      category = "[ci]";
+      name = "hci";
+      package = hci;
+    }
+    {
       category = "[tools]";
       help = "Convert Plasma configuration file to Nix";
       package = plasma-manager-pkgs.default;
