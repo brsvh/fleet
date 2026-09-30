@@ -18,11 +18,12 @@ in
       onPush = {
         default = {
           outputs = {
-            checks = {
-              inherit (self.checks.x86_64-linux)
-                test
-                ;
-            };
+            checks = self.checks.x86_64-linux;
+
+            deploy = mapAttrs (
+              _: node:
+              mapAttrs (_: profile: profile.path) node.profiles
+            ) self.deploy.nodes;
 
             nixos = mapAttrs (
               _: configuration:
