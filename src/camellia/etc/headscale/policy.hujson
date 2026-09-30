@@ -1,5 +1,19 @@
 {
+  "hosts": {
+    "azaleoid": "100.64.0.3",
+    "azaleoid-v6": "fd7a:115c:a1e0::3",
+    "erythron": "100.64.0.4",
+    "erythron-v6": "fd7a:115c:a1e0::4",
+    "magnolia": "100.64.0.2",
+    "magnolia-v6": "fd7a:115c:a1e0::2"
+  },
+
+  // Administrators issue one runner tag per preauthkey. Never add tag:managed.
   "tagOwners": {
+    "tag:ci-cache-read": [],
+    "tag:ci-deploy-azaleoid": [],
+    "tag:ci-deploy-erythron": [],
+    "tag:ci-deploy-magnolia": [],
     "tag:managed": []
   },
 
@@ -8,6 +22,31 @@
       "src": ["tag:managed"],
       "dst": ["tag:managed"],
       "ip": ["*"]
+    },
+    {
+      "src": [
+        "tag:ci-cache-read",
+        "tag:ci-deploy-azaleoid",
+        "tag:ci-deploy-erythron",
+        "tag:ci-deploy-magnolia"
+      ],
+      "dst": ["magnolia", "magnolia-v6"],
+      "ip": ["tcp:443"]
+    },
+    {
+      "src": ["tag:ci-deploy-azaleoid"],
+      "dst": ["azaleoid", "azaleoid-v6"],
+      "ip": ["tcp:22"]
+    },
+    {
+      "src": ["tag:ci-deploy-erythron"],
+      "dst": ["erythron", "erythron-v6"],
+      "ip": ["tcp:22"]
+    },
+    {
+      "src": ["tag:ci-deploy-magnolia"],
+      "dst": ["magnolia", "magnolia-v6"],
+      "ip": ["tcp:22"]
     }
   ]
 }
