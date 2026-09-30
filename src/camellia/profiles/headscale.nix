@@ -68,6 +68,10 @@
         metrics_listen_addr = "127.0.0.1:9090";
 
         node = {
+          ephemeral = {
+            inactivity_timeout = "5m";
+          };
+
           expiry = 0;
         };
 
