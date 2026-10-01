@@ -8,6 +8,7 @@
 let
   inherit (lib)
     attrNames
+    elem
     elemAt
     hasAttr
     map
@@ -26,6 +27,7 @@ let
 
   targets = {
     global = {
+      handler = "check/global";
       kind = "global";
       paths = [ "test/" ];
       outputs = removeAttrs self.checks.${system} [
@@ -37,9 +39,11 @@ let
   // mapAttrs' (
     name: host:
     nameValuePair "host-${name}" {
-      kind = "host";
-      deploy = name != "magnolia";
       inherit name;
+
+      deploy = name != "magnolia";
+      handler = "check/host/${name}";
+      kind = "host";
       paths = [
         "src/${name}/"
         "src/system/"
@@ -64,8 +68,10 @@ let
   // mapAttrs' (
     name: home:
     nameValuePair "user-${name}" {
-      kind = "user";
       inherit name;
+
+      handler = "check/user/${name}";
+      kind = "user";
       paths = [
         "src/${name}/"
         "src/home/"
@@ -89,41 +95,72 @@ in
 
     herculesCI =
       {
-        tag ? null,
+        branch ? null,
+        primaryRepo ? { },
+        ref ? null,
         rev ? null,
+        tag ? null,
         ...
       }:
       let
-        request =
+        checkRequest =
           if tag == null then
             null
           else
-            builtins.match "ci/(check|deploy)/([a-z0-9-]+)/([0-9a-f]{40})/([0-9]+)/([0-9]+)" tag;
-        valid =
-          request != null && elemAt request 2 == rev;
-        action = elemAt request 0;
-        target = elemAt request 1;
+            builtins.match "ci/check/(main|develop)/([a-z0-9-]+)/([0-9a-f]{40})/([0-9a-f-]{36})" tag;
+        deployRequest =
+          if tag == null then
+            null
+          else
+            builtins.match "ci/deploy/([a-z0-9-]+)/([0-9a-f]{40})/([0-9]+)/([0-9]+)" tag;
+        checkTarget = elemAt checkRequest 1;
+        deployHost = elemAt deployRequest 0;
+        trustedBranch =
+          elem branch [
+            "main"
+            "develop"
+          ]
+          && ref == "refs/heads/${branch}"
+          && (primaryRepo.owner or null) == "brsvh"
+          && (primaryRepo.name or null) == "fleet";
       in
       {
         ciSystems = [ system ];
-        # Only workflow-selected tags enqueue work. Ordinary pushes still
-        # register the configuration, but do not build the whole fleet.
-        onPush = optionalAttrs valid (
+
+        # Hercules accepts contributions from repository writers. This ref
+        # filter limits our entry points; it is not the authorization boundary.
+        onPush =
           if
-            action == "check" && hasAttr target targets
+            checkRequest != null
+            && elemAt checkRequest 2 == rev
+            && hasAttr checkTarget targets
           then
             {
-              "check-${target}" = {
-                outputs = targets.${target}.outputs;
+              "${targets.${checkTarget}.handler}" = {
+                outputs = targets.${checkTarget}.outputs // {
+                  effects = {
+                    finish = import ./finish.nix {
+                      inherit
+                        inputs
+                        rev
+                        system
+                        tag
+                        ;
+                      branch = elemAt checkRequest 0;
+                      target = targets.${checkTarget};
+                    };
+                  };
+                };
               };
             }
           else if
-            action == "deploy"
-            && target != "magnolia"
-            && hasAttr target hosts
+            deployRequest != null
+            && elemAt deployRequest 1 == rev
+            && deployHost != "magnolia"
+            && hasAttr deployHost hosts
           then
             {
-              "deploy-${target}" = {
+              "deploy/${deployHost}" = {
                 outputs = {
                   effects = {
                     deploy = import ./deploy.nix {
@@ -133,17 +170,32 @@ in
                         self
                         system
                         ;
-                      host = target;
-                      runId = elemAt request 3;
-                      attempt = elemAt request 4;
+                      host = deployHost;
+                      runId = elemAt deployRequest 2;
+                      attempt = elemAt deployRequest 3;
                     };
                   };
                 };
               };
             }
           else
-            { }
-        );
+            optionalAttrs trustedBranch {
+              plan = {
+                outputs = {
+                  effects = {
+                    plan = import ./plan.nix {
+                      inherit
+                        branch
+                        inputs
+                        rev
+                        system
+                        ;
+                      targets = self.ci.targets;
+                    };
+                  };
+                };
+              };
+            };
       };
   };
 }
