@@ -17,6 +17,7 @@ let
     match
     nameValuePair
     optionalAttrs
+    optionals
     pipe
     removeAttrs
     ;
@@ -32,13 +33,24 @@ let
       handler = "check/global";
       kind = "global";
 
-      outputs = removeAttrs self.checks.${system} [
-        "deploy-activate"
-        "deploy-schema"
-      ];
+      outputs =
+        (removeAttrs self.checks.${system} [
+          "deploy-activate"
+          "deploy-schema"
+        ])
+        // {
+          devshell = self.devShells.${system}.default;
+          formatter = self.formatter.${system};
+        };
 
       paths = [
+        ".dir-locals.el"
+        ".gitattributes"
+        ".github/settings.yml"
+        ".gitignore"
         "test/"
+        "tool/devshells/"
+        "tool/flake-module.nix"
       ];
     };
   }
@@ -64,10 +76,16 @@ let
         };
       };
 
+      # The tooling flake module also defines every host's deployment.
       paths = [
         "src/${name}/"
-        "src/system/"
         "src/home/"
+        "src/system/"
+        "tool/flake-module.nix"
+      ]
+      ++ optionals (name != "magnolia") [
+        ".github/workflows/ci.yml"
+        "ci/deploy.nix"
       ]
       ++ pipe host.users [
         attrNames

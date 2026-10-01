@@ -85,20 +85,28 @@ let
 
       for (const path of paths) {
         const matched = Object.entries(targets).filter(([, target]) =>
-          target.paths.some(prefix => path.startsWith(prefix)),
+          target.paths.some(prefix =>
+            prefix.endsWith('/') ? path.startsWith(prefix) : path === prefix,
+          ),
         );
 
         if (matched.length) {
-          for (const [name] of matched) {
+          const names = matched.map(([name]) => name);
+          console.log(`Changed ''${path}: ''${names.join(', ')}`);
+
+          for (const name of names) {
             selected.add(name);
           }
         } else if (
-          path === 'AGENTS.md' ||
-          path.startsWith('.agents/') ||
-          (!path.includes('/') && path.endsWith('.md'))
+          (!path.includes('/') && /\.(md|org)$/i.test(path)) ||
+          /^(README|COPYING|LICENSE)(\.(md|org|rst|txt))?$/i.test(path)
         ) {
+          console.log(`Changed ''${path}: no build checks`);
           continue;
         } else {
+          // Shared flake code and unknown paths must not miss any target.
+          console.log(`Changed ''${path}: all targets (shared or unknown)`);
+
           for (const name of Object.keys(targets)) {
             selected.add(name);
           }
