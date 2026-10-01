@@ -4,41 +4,10 @@
   system,
   ...
 }:
-let
-  inherit (pkgs)
-    writeShellApplication
-    ;
-
-  publish = writeShellApplication {
-    name = "nix-cache-publish";
-
-    runtimeInputs = [
-      config.nix.package
-    ];
-
-    text = ''
-      if [ "$#" -eq 0 ]; then
-        printf 'Usage: nix-cache-publish STORE_PATH_OR_RESULT...\n' >&2
-        exit 2
-      fi
-
-      exec nix copy \
-        --option netrc-file ${config.sops.secrets.nix-cache-upload-netrc.path} \
-        --to 'https://cache.bingshan.org?compression=zstd' \
-        "$@"
-    '';
-  };
-in
 {
   imports = [
     system.profiles.nix
   ];
-
-  environment = {
-    systemPackages = [
-      publish
-    ];
-  };
 
   nix = {
     settings = {
@@ -66,15 +35,6 @@ in
       ];
 
       trusted = true;
-    };
-  };
-
-  sops = {
-    secrets = {
-      nix-cache-upload-netrc = {
-        key = "nix-cache/upload-netrc";
-        owner = "bingshan";
-      };
     };
   };
 
