@@ -6,11 +6,16 @@
   targets,
 }:
 let
+  inherit (inputs.nixpkgs.lib)
+    toJSON
+    ;
+
   pkgs = inputs.nixpkgs.legacyPackages.${system};
+
   effects = inputs.hercules-ci-effects.lib.withPkgs pkgs;
 
   targetMetadata = pkgs.writeText "ci-targets.json" (
-    builtins.toJSON targets
+    toJSON targets
   );
 
   plan = pkgs.writeText "plan.mjs" ''
@@ -152,17 +157,20 @@ let
 in
 effects.mkEffect {
   dontUnpack = true;
-  name = "plan-fleet-ci";
 
-  inputs = [ pkgs.nodejs ];
+  effectScript = ''
+    node ${plan} brsvh/fleet ${branch} ${rev} ${targetMetadata}
+  '';
+
+  inputs = with pkgs; [
+    nodejs
+  ];
+
+  name = "plan-fleet-ci";
 
   secretsMap = {
     git = {
       type = "GitToken";
     };
   };
-
-  effectScript = ''
-    node ${plan} brsvh/fleet ${branch} ${rev} ${targetMetadata}
-  '';
 }

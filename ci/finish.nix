@@ -7,19 +7,29 @@
   target,
 }:
 let
+  inherit (inputs.nixpkgs.lib)
+    toJSON
+    ;
+
   pkgs = inputs.nixpkgs.legacyPackages.${system};
+
   effects = inputs.hercules-ci-effects.lib.withPkgs pkgs;
 
-  request = pkgs.writeText "finish-request.json" (
-    builtins.toJSON {
-      inherit branch rev tag;
-      host =
-        if target.kind == "host" && target.deploy then
-          target.name
-        else
-          null;
-    }
-  );
+  request =
+    pkgs.writeText "finish-request.json"
+      (toJSON {
+        inherit
+          branch
+          rev
+          tag
+          ;
+
+        host =
+          if target.kind == "host" && target.deploy then
+            target.name
+          else
+            null;
+      });
 
   finish = pkgs.writeText "finish.mjs" ''
     import fs from 'node:fs';
@@ -70,14 +80,20 @@ let
 in
 effects.mkEffect {
   dontUnpack = true;
+
+  effectScript = ''
+    node ${finish} ${request}
+  '';
+
+  inputs = with pkgs; [
+    nodejs
+  ];
+
   name = "finish-fleet-check";
-  inputs = [ pkgs.nodejs ];
+
   secretsMap = {
     git = {
       type = "GitToken";
     };
   };
-  effectScript = ''
-    node ${finish} ${request}
-  '';
 }

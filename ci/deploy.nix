@@ -8,6 +8,10 @@
   system,
 }:
 let
+  inherit (inputs.nixpkgs.lib)
+    toJSON
+    ;
+
   pkgs = inputs.nixpkgs.legacyPackages.${system};
 
   effects = inputs.hercules-ci-effects.lib.withPkgs pkgs;
@@ -20,17 +24,28 @@ let
     {
       outputs = _:
         let
-          node = builtins.fromJSON ${builtins.toJSON (builtins.toJSON node)};
+          inherit (builtins)
+            appendContext
+            fromJSON
+            mapAttrs
+            ;
+
+          node = fromJSON ${toJSON (toJSON node)};
         in
         {
           deploy = {
             nodes = {
               ${host} = node // {
-                profiles = builtins.mapAttrs (_: profile: profile // {
-                  path = builtins.appendContext profile.path {
-                    "''${profile.path}" = { path = true; };
-                  };
-                }) node.profiles;
+                profiles = mapAttrs (
+                  _: profile:
+                  profile // {
+                    path = appendContext profile.path {
+                      "''${profile.path}" = {
+                        path = true;
+                      };
+                    };
+                  }
+                ) node.profiles;
               };
             };
           };
@@ -90,25 +105,11 @@ let
 in
 assert host != "magnolia";
 effects.mkEffect {
-  name = "deploy-${host}";
-  dontUnpack = true;
-  requiredSystemFeatures = [ "deploy" ];
-
   NIX_CONFIG = ''
     extra-experimental-features = nix-command flakes
   '';
 
-  inputs = with pkgs; [
-    coreutils
-    nix
-    nodejs
-    openssh
-    inputs.deploy.packages.${system}.default
-  ];
-
-  secretsMap = {
-    ssh = "deploy-ssh";
-  };
+  dontUnpack = true;
 
   effectScript = ''
     (
@@ -143,4 +144,22 @@ effects.mkEffect {
         --auto-rollback true --magic-rollback true
     )
   '';
+
+  inputs = with pkgs; [
+    coreutils
+    inputs.deploy.packages.${system}.default
+    nix
+    nodejs
+    openssh
+  ];
+
+  name = "deploy-${host}";
+
+  requiredSystemFeatures = [
+    "deploy"
+  ];
+
+  secretsMap = {
+    ssh = "deploy-ssh";
+  };
 }

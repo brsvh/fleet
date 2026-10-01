@@ -14,8 +14,10 @@ let
     map
     mapAttrs
     mapAttrs'
+    match
     nameValuePair
     optionalAttrs
+    pipe
     removeAttrs
     ;
 
@@ -29,10 +31,14 @@ let
     global = {
       handler = "check/global";
       kind = "global";
-      paths = [ "test/" ];
+
       outputs = removeAttrs self.checks.${system} [
         "deploy-activate"
         "deploy-schema"
+      ];
+
+      paths = [
+        "test/"
       ];
     };
   }
@@ -44,25 +50,29 @@ let
       deploy = name != "magnolia";
       handler = "check/host/${name}";
       kind = "host";
-      paths = [
-        "src/${name}/"
-        "src/system/"
-        "src/home/"
-      ]
-      ++ map (user: "src/${user}/") (
-        attrNames host.users
-      );
+
       outputs = {
-        system =
-          self.nixosConfigurations.${name}.config.system.build.toplevel;
         deploy =
           self.deploy.nodes.${name}.profiles.system.path;
+
+        system =
+          self.nixosConfigurations.${name}.config.system.build.toplevel;
       }
       // inputs.deploy.lib.${system}.deployChecks {
         nodes = {
           ${name} = self.deploy.nodes.${name};
         };
       };
+
+      paths = [
+        "src/${name}/"
+        "src/system/"
+        "src/home/"
+      ]
+      ++ pipe host.users [
+        attrNames
+        (map (user: "src/${user}/"))
+      ];
     }
   ) hosts
   // mapAttrs' (
@@ -72,24 +82,27 @@ let
 
       handler = "check/user/${name}";
       kind = "user";
+
+      outputs = {
+        home = home.activationPackage;
+      };
+
       paths = [
         "src/${name}/"
         "src/home/"
       ];
-      outputs = {
-        home = home.activationPackage;
-      };
     }
   ) self.homeConfigurations;
 in
 {
   flake = {
     ci = {
-      targets = mapAttrs (
-        _: target: removeAttrs target [ "outputs" ]
-      ) targets;
       builds = mapAttrs (
         _: target: target.outputs
+      ) targets;
+
+      targets = mapAttrs (
+        _: target: removeAttrs target [ "outputs" ]
       ) targets;
     };
 
@@ -107,14 +120,17 @@ in
           if tag == null then
             null
           else
-            builtins.match "ci/check/(main|develop)/([a-z0-9-]+)/([0-9a-f]{40})/([0-9a-f-]{36})" tag;
+            match "ci/check/(main|develop)/([a-z0-9-]+)/([0-9a-f]{40})/([0-9a-f-]{36})" tag;
+
         deployRequest =
           if tag == null then
             null
           else
-            builtins.match "ci/deploy/([a-z0-9-]+)/([0-9a-f]{40})/([0-9]+)/([0-9]+)" tag;
+            match "ci/deploy/([a-z0-9-]+)/([0-9a-f]{40})/([0-9]+)/([0-9]+)" tag;
+
         checkTarget = elemAt checkRequest 1;
         deployHost = elemAt deployRequest 0;
+
         trustedBranch =
           elem branch [
             "main"
@@ -125,7 +141,9 @@ in
           && (primaryRepo.name or null) == "fleet";
       in
       {
-        ciSystems = [ system ];
+        ciSystems = [
+          system
+        ];
 
         # Hercules accepts contributions from repository writers. This ref
         # filter limits our entry points; it is not the authorization boundary.
@@ -146,6 +164,7 @@ in
                         system
                         tag
                         ;
+
                       branch = elemAt checkRequest 0;
                       target = targets.${checkTarget};
                     };
@@ -170,9 +189,10 @@ in
                         self
                         system
                         ;
+
+                      attempt = elemAt deployRequest 3;
                       host = deployHost;
                       runId = elemAt deployRequest 2;
-                      attempt = elemAt deployRequest 3;
                     };
                   };
                 };
@@ -190,6 +210,7 @@ in
                         rev
                         system
                         ;
+
                       targets = self.ci.targets;
                     };
                   };
