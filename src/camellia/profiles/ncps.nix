@@ -46,6 +46,10 @@ in
               proxyPass = "http://127.0.0.1:8501/upload/";
 
               extraConfig = ''
+                if ($request_method !~ ^(GET|HEAD|PUT)$) {
+                  return 405;
+                }
+
                 client_max_body_size 20G;
                 proxy_request_buffering off;
                 proxy_buffering off;
@@ -75,6 +79,7 @@ in
       };
 
       nix-cache-upload-htpasswd = {
+        # The publisher netrc stays encrypted; only nginx needs the verifier.
         key = "nix-cache/upload-htpasswd";
         owner = "nginx";
       };
