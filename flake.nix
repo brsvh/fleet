@@ -197,6 +197,20 @@
       url = "git+https://github.com/numtide/flake-utils.git?ref=main";
     };
 
+    hercules-ci-effects = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/hercules-ci/hercules-ci-effects.git?ref=master";
+    };
+
     home-manager = {
       inputs = {
         nixpkgs = {
