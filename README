@@ -1,0 +1,15 @@
+# README --- fleet README -*- coding: utf-8; mode: org; -*-
+
+#+startup: noindent
+
+* fleet
+
+My NixOS and Home Manager configurations for workstations and servers.
+
+** License
+
+The fleet source code is free software: you can redistribute it and/or
+modify it under the terms of the MIT License.  See [[file:COPYING][COPYING]]
+for the software license text.
+
+# README ends here
