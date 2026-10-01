@@ -94,6 +94,10 @@ effects.mkEffect {
   dontUnpack = true;
   requiredSystemFeatures = [ "deploy" ];
 
+  NIX_CONFIG = ''
+    extra-experimental-features = nix-command flakes
+  '';
+
   inputs = with pkgs; [
     coreutils
     nix
