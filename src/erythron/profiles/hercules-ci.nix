@@ -61,6 +61,9 @@ in
           extra-trusted-public-keys = publicKey;
           max-jobs = "2";
         };
+
+        secretsJsonPath =
+          config.sops.secrets.hercules-ci-effects-secrets.path;
       };
     };
   };
@@ -69,6 +72,15 @@ in
     secrets = {
       hercules-ci-cluster-join-token = {
         key = "hercules-ci/cluster-join-token";
+        owner = "hercules-ci-agent";
+
+        restartUnits = [
+          "hercules-ci-agent.service"
+        ];
+      };
+
+      hercules-ci-effects-secrets = {
+        key = "hercules-ci/effects-secrets";
         owner = "hercules-ci-agent";
 
         restartUnits = [
