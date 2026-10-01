@@ -35,7 +35,7 @@ in
               post-build-hook = "";
             };
 
-            # No Effect credentials are needed for the build-only setup.
+            # Hosts providing Effect credentials override this with a runtime secret.
             secretsJsonPath = mkDefault (
               (pkgs.formats.json { }).generate
                 "hercules-ci-secrets.json"
