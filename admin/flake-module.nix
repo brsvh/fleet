@@ -37,7 +37,7 @@ let
 
   fleet-lib = self.lib;
 
-  dev = collect (projectRoot + /admin) [
+  dev = collect (projectRoot + /tool) [
     camelify
     filterNix
     removeExtension
