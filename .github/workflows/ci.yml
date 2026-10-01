@@ -1,284 +1,67 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  repository_dispatch:
+    types: [fleet-deploy]
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.sha }}
-  # Let an approved deployment finish; a newer main must not interrupt activation.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: deployment-approval-${{ github.event.client_payload.rev }}-${{ github.event.client_payload.hosts[0] }}
+  cancel-in-progress: false
 
 jobs:
-  plan:
+  request:
+    name: Verify deployment request
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      deployments: read
+      statuses: read
     outputs:
-      matrix: ${{ steps.plan.outputs.matrix }}
-      hosts: ${{ steps.plan.outputs.hosts }}
-      has_targets: ${{ steps.plan.outputs.has_targets }}
-      has_hosts: ${{ steps.plan.outputs.has_hosts }}
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: cachix/install-nix-action@v31.11.1
-        with:
-          install_url: https://releases.nixos.org/nix/nix-2.34.8/install
-      - uses: nix-community/cache-nix-action@v7
-        with:
-          primary-key: plan-${{ runner.os }}-${{ hashFiles('flake.lock') }}-${{ github.sha }}
-          restore-prefixes-first-match: plan-${{ runner.os }}-${{ hashFiles('flake.lock') }}-
-      - name: Read CI targets
-        run: nix eval --accept-flake-config --json .#ci.targets > targets.json
-      - uses: actions/github-script@v9
-        id: plan
-        with:
-          script: |
-            const fs = require('node:fs');
-            const {execFileSync} = require('node:child_process');
-
-            const safeName = /^[a-z0-9-]+$/;
-            const safeSha = /^[0-9a-f]{40}$/;
-
-            function pathsBetween(base, head) {
-              if (!safeSha.test(base) || !safeSha.test(head)) throw new Error('Invalid revision');
-              return execFileSync('git', ['diff', '--no-renames', '--name-only', '-z', base, head],
-                {encoding: 'utf8'}).split('\0').filter(Boolean);
-            }
-
-            function affected(targets, paths) {
-              const selected = new Set();
-              for (const path of paths) {
-                const matched = Object.entries(targets).filter(([, target]) =>
-                  target.paths.some(prefix => path.startsWith(prefix)));
-                if (matched.length) {
-                  for (const [name] of matched) selected.add(name);
-                } else if (path === 'AGENTS.md' || path.startsWith('.agents/') ||
-                    (!path.includes('/') && path.endsWith('.md'))) {
-                  continue;
-                } else {
-                  // Inputs, module wiring, CI and unknown source paths can affect every target.
-                  for (const name of Object.keys(targets)) selected.add(name);
-                }
-              }
-              return selected;
-            }
-
-            async function lastDeployment(github, repo, environment) {
-              for await (const {data} of github.paginate.iterator(github.rest.repos.listDeployments,
-                {...repo, environment, per_page: 100})) {
-                for (const deployment of data) {
-                  if (!safeSha.test(deployment.sha)) continue;
-                  const statuses = await github.paginate(github.rest.repos.listDeploymentStatuses,
-                    {...repo, deployment_id: deployment.id, per_page: 100});
-                  if (statuses.some(status => status.state === 'success')) return deployment.sha;
-                }
-              }
-              return null;
-            }
-
-            const targets = JSON.parse(fs.readFileSync('targets.json', 'utf8'));
-            for (const [name, target] of Object.entries(targets)) {
-              if (!safeName.test(name) || (target.name && !safeName.test(target.name))) {
-                throw new Error('Invalid CI target');
-              }
-            }
-            const head = context.sha;
-            const base = context.payload.pull_request?.base.sha || context.payload.before;
-            const selected = !base || /^0+$/.test(base)
-              ? new Set(Object.keys(targets)) : affected(targets, pathsBetween(base, head));
-
-            if (context.eventName === 'push') {
-              // Include changes that were never deployed, even if an earlier approval
-              // was rejected or invalidated by a newer main commit.
-              for (const [name, target] of Object.entries(targets)) {
-                if (target.kind !== 'host' || !target.deploy) continue;
-                const deployed = await lastDeployment(github, context.repo, `deploy-${target.name}`);
-                const pending = !deployed || affected(targets, pathsBetween(deployed, head)).has(name);
-                if (pending) selected.add(name); else selected.delete(name);
-              }
-            }
-            const include = [...selected].sort().map(target => ({target, ...targets[target]}));
-            const hosts = include.filter(target => target.kind === 'host' && target.deploy);
-            core.setOutput('matrix', JSON.stringify({include}));
-            core.setOutput('hosts', JSON.stringify({include: hosts}));
-            core.setOutput('has_targets', include.length > 0);
-            core.setOutput('has_hosts', hosts.length > 0);
-            await core.summary.addHeading('Selected targets')
-              .addRaw(include.map(item => `- ${item.target}`).join('\n') || 'No affected targets.')
-              .addRaw(`\n\nCommit: ${head}\n`).write();
-
-  pull-request:
-    name: Check ${{ matrix.target }}
-    needs: plan
-    if: github.event_name == 'pull_request' && needs.plan.outputs.has_targets == 'true'
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - uses: cachix/install-nix-action@v31.11.1
-        with:
-          install_url: https://releases.nixos.org/nix/nix-2.34.8/install
-          extra_nix_config: |
-            extra-substituters = https://cache.bingshan.org
-            extra-trusted-public-keys = cache.bingshan.org-1:HqcG/vJ7jeSLU48jV4yg8Ot+rUPP2v0vIAAnDEqVSvk=
-      - uses: nix-community/cache-nix-action@v7
-        with:
-          primary-key: pr-${{ runner.os }}-${{ matrix.target }}-${{ hashFiles('flake.lock') }}-${{ github.sha }}
-          restore-prefixes-first-match: pr-${{ runner.os }}-${{ matrix.target }}-${{ hashFiles('flake.lock') }}-
-      - name: Build selected target
-        env:
-          TARGET: ${{ matrix.target }}
-        run: |
-          mapfile -t outputs < <(nix eval --accept-flake-config --json ".#ci.builds.$TARGET" --apply builtins.attrNames | jq -r '.[]')
-          if [ "${#outputs[@]}" -eq 0 ]; then
-            echo "No build outputs for $TARGET" >&2
-            exit 1
-          fi
-          installables=()
-          for output in "${outputs[@]}"; do
-            installables+=(".#ci.builds.$TARGET.$output")
-          done
-          nix build --accept-flake-config --no-link --print-build-logs "${installables[@]}"
-
-  main:
-    name: Build ${{ matrix.target }}
-    needs: plan
-    if: github.event_name == 'push' && needs.plan.outputs.has_targets == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 330
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+      hosts: ${{ steps.request.outputs.hosts }}
+      rev: ${{ steps.request.outputs.rev }}
     steps:
       - uses: actions/github-script@v9
         id: request
-        env:
-          ACTION: check
-          TARGET: ${{ matrix.target }}
-        with:
-          script: &hercules-request |
-            const safeName = /^[a-z0-9-]+$/;
-            const action = process.env.ACTION;
-            const target = process.env.TARGET;
-
-            async function assertMain(github, context) {
-              if (context.eventName !== 'push' || context.ref !== 'refs/heads/main') {
-                throw new Error('Only a main push can request Hercules work');
-              }
-              const {data} = await github.rest.git.getRef({...context.repo, ref: 'heads/main'});
-              if (data.object.sha !== context.sha) throw new Error('Superseded main commit; refusing to proceed');
-            }
-
-            async function assertApproval(github, context, host) {
-              const environment = `deploy-${host}`;
-              const {data: config} = await github.rest.repos.getEnvironment({...context.repo, environment_name: environment});
-              if (!config.protection_rules?.some(rule => rule.type === 'required_reviewers' && rule.reviewers?.length)) {
-                throw new Error(`${environment} must have required reviewers`);
-              }
-              const {data: approvals} = await github.rest.actions.getReviewsForRun({...context.repo, run_id: context.runId});
-              if (!approvals.some(review => review.state === 'approved' &&
-                  review.environments.some(item => item.name === environment))) {
-                throw new Error(`No approval for ${environment}`);
-              }
-            }
-
-            if (!safeName.test(target) || !['check', 'deploy'].includes(action)) throw new Error('Invalid request');
-            await assertMain(github, context);
-            if (action === 'deploy') await assertApproval(github, context, target);
-            const attempt = process.env.GITHUB_RUN_ATTEMPT;
-            if (!/^[0-9]+$/.test(attempt)) throw new Error('Invalid run attempt');
-            const tag = `ci/${action}/${target}/${context.sha}/${context.runId}/${attempt}`;
-            // A Git tag is an immutable request for the original commit, not a new commit.
-            await github.rest.git.createRef({...context.repo, ref: `refs/tags/${tag}`, sha: context.sha});
-            core.setOutput('tag', tag);
-            core.setOutput('handler', `${action}-${target}`);
-            await core.summary.addRaw(`Hercules request: \`${tag}\`\n`).write();
-      - uses: actions/github-script@v9
-        env:
-          REQUEST_TAG: ${{ steps.request.outputs.tag }}
-          HANDLER: ${{ steps.request.outputs.handler }}
-        with:
-          script: &hercules-wait |
-            const tag = process.env.REQUEST_TAG;
-            const handler = process.env.HANDLER;
-
-            async function hercules(path) {
-              const response = await fetch(`https://hercules-ci.com/api/v1/${path}`, {
-                headers: {accept: 'application/json'}, signal: AbortSignal.timeout(30000),
-              });
-              if (!response.ok) throw new Error(`Hercules API returned ${response.status}`);
-              return response.json();
-            }
-
-            const query = new URLSearchParams({ref: `refs/tags/${tag}`, rev: context.sha, limit: '20'});
-            const prefix = `site/github/account/${context.repo.owner}/project/${context.repo.repo}`;
-            const deadline = Date.now() + 5 * 60 * 60 * 1000;
-            let previous = '';
-            while (Date.now() < deadline) {
-              const {items} = await hercules(`${prefix}/jobs?${query}`);
-              const jobs = items.filter(job => job.source.revision === context.sha && job.source.ref === `refs/tags/${tag}`);
-              if (jobs.some(job => job.jobType === 'Config' && (job.jobStatus === 'Failure' || job.isCancelled))) {
-                throw new Error('Hercules could not evaluate the requested configuration');
-              }
-              const job = jobs.find(job => job.jobType === 'OnPush' && job.jobName === handler);
-              if (job) {
-                const status = `${job.index}: ${job.jobPhase} / ${job.jobStatus}`;
-                if (status !== previous) { core.info(status); previous = status; }
-                if (job.jobPhase === 'Done' || job.isCancelled) {
-                  const url = `https://hercules-ci.com/github/${context.repo.owner}/${context.repo.repo}/jobs/${job.index}`;
-                  await core.summary.addLink(handler, url).addEOL().write();
-                  if (job.jobStatus !== 'Success' || job.isCancelled) throw new Error(`Hercules failed: ${url}`);
-                  if (tag.startsWith('ci/check/')) await github.rest.git.deleteRef({...context.repo, ref: `tags/${tag}`});
-                  return;
-                }
-              }
-              await new Promise(resolve => setTimeout(resolve, 30000));
-            }
-            throw new Error('Timed out waiting for Hercules; inspect the remote job before retrying');
-
-  result:
-    name: CI result
-    if: always()
-    needs: [plan, pull-request, main]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/github-script@v9
-        env:
-          RESULTS: ${{ toJSON(needs) }}
         with:
           script: |
-            const needs = JSON.parse(process.env.RESULTS);
-            if (needs.plan.result !== 'success' ||
-                Object.values(needs).some(job => ['failure', 'cancelled'].includes(job.result))) {
-              core.setFailed('A required CI job did not succeed.');
+            const {rev, hosts} = context.payload.client_payload;
+            if (!/^[0-9a-f]{40}$/.test(rev) || rev !== context.sha ||
+                context.ref !== 'refs/heads/main' || !Array.isArray(hosts) ||
+                !hosts.length || hosts.length > 32 || new Set(hosts).size !== hosts.length ||
+                hosts.some(host => !/^[a-z0-9-]+$/.test(host) || host === 'magnolia')) {
+              throw new Error('Invalid deployment request');
             }
+            const {data: main} = await github.rest.git.getRef({...context.repo, ref: 'heads/main'});
+            if (main.object.sha !== rev) throw new Error('Superseded main revision');
 
-  deploy:
-    name: Deploy ${{ matrix.name }}
-    needs: [plan, result]
-    if: github.event_name == 'push' && needs.plan.outputs.has_hosts == 'true'
+            // The finishing Effect dispatches after builds finish. Its commit
+            // status may settle just after the finishing Effect returns.
+            const deadline = Date.now() + 5 * 60 * 1000;
+            while (true) {
+              const statuses = await github.paginate(github.rest.repos.listCommitStatusesForRef,
+                {...context.repo, ref: rev, per_page: 100});
+              const ready = hosts.every(host => statuses.find(status =>
+                status.context === `ci/hercules/onPush/check/host/${host}` &&
+                status.creator?.login === 'hercules-ci[bot]')?.state === 'success');
+              if (ready) break;
+              if (Date.now() >= deadline) throw new Error('Hercules host checks have not succeeded');
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            core.setOutput('hosts', JSON.stringify({include: hosts.map(host => ({host}))}));
+            core.setOutput('rev', rev);
+            await core.summary.addHeading('Deployment approvals')
+              .addRaw(`Commit: ${rev}\n\n${hosts.map(host => `- ${host}`).join('\n')}\n`).write();
+
+  approve:
+    name: Approve / ${{ matrix.host }}
+    needs: request
     runs-on: ubuntu-24.04
-    timeout-minutes: 330
     environment:
-      name: deploy-${{ matrix.name }}
+      name: deploy-${{ matrix.host }}
     concurrency:
-      group: deploy-${{ matrix.name }}
+      group: deploy-${{ matrix.host }}
       cancel-in-progress: false
     permissions:
       contents: write
@@ -286,18 +69,34 @@ jobs:
       deployments: read
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.hosts) }}
+      matrix: ${{ fromJSON(needs.request.outputs.hosts) }}
     steps:
       - uses: actions/github-script@v9
-        id: request
         env:
-          ACTION: deploy
-          TARGET: ${{ matrix.name }}
+          HOST: ${{ matrix.host }}
+          REVISION: ${{ needs.request.outputs.rev }}
         with:
-          script: *hercules-request
-      - uses: actions/github-script@v9
-        env:
-          REQUEST_TAG: ${{ steps.request.outputs.tag }}
-          HANDLER: ${{ steps.request.outputs.handler }}
-        with:
-          script: *hercules-wait
+          script: |
+            const host = process.env.HOST;
+            const rev = process.env.REVISION;
+            const attempt = process.env.GITHUB_RUN_ATTEMPT;
+            if (!/^[a-z0-9-]+$/.test(host) || host === 'magnolia' ||
+                !/^[0-9a-f]{40}$/.test(rev) || !/^[0-9]+$/.test(attempt)) {
+              throw new Error('Invalid deployment approval');
+            }
+            const {data: main} = await github.rest.git.getRef({...context.repo, ref: 'heads/main'});
+            if (main.object.sha !== rev || context.sha !== rev) throw new Error('Superseded main revision');
+            const environment = `deploy-${host}`;
+            const {data: config} = await github.rest.repos.getEnvironment({...context.repo, environment_name: environment});
+            if (!config.protection_rules?.some(rule => rule.type === 'required_reviewers' && rule.reviewers?.length)) {
+              throw new Error(`${environment} must have required reviewers`);
+            }
+            const {data: approvals} = await github.rest.actions.getReviewsForRun({...context.repo, run_id: context.runId});
+            if (!approvals.some(review => review.state === 'approved' &&
+                review.environments.some(item => item.name === environment))) {
+              throw new Error(`No approval for ${environment}`);
+            }
+            const tag = `ci/deploy/${host}/${rev}/${context.runId}/${attempt}`;
+            await github.rest.git.createRef({...context.repo, ref: `refs/tags/${tag}`, sha: rev});
+            await core.summary.addHeading(`Approved ${host}`)
+              .addRaw(`Hercules will execute the deployment Effect for ${rev}.\n\nRequest: \`${tag}\`\n`).write();

@@ -64,9 +64,9 @@ let
       api(`actions/runs/''${runId}/attempts/''${attempt}/jobs?per_page=100`),
     ]);
     if (main.object.sha !== sha || run.head_sha !== sha || run.head_branch !== 'main' ||
-        run.event !== 'push' || run.path !== '.github/workflows/ci.yml' ||
+        run.event !== 'repository_dispatch' || run.path !== '.github/workflows/ci.yml' ||
         run.run_attempt !== Number(attempt) || run.repository.full_name !== repository ||
-        !['in_progress', 'waiting'].includes(run.status)) {
+        !['in_progress', 'waiting', 'completed'].includes(run.status) || run.conclusion === 'cancelled') {
       throw new Error('The approval workflow does not match the current main deployment');
     }
     if (!config.protection_rules?.some(rule => rule.type === 'required_reviewers' && rule.reviewers?.length) ||
@@ -74,8 +74,9 @@ let
           review.environments.some(item => item.name === environment))) {
       throw new Error(`Required approval for ''${environment} is missing`);
     }
-    if (!jobs.jobs.some(job => job.name === `Deploy ''${host}` && job.status === 'in_progress')) {
-      throw new Error('The approved deployment job is no longer running');
+    if (!jobs.jobs.some(job => job.name === `Approve / ''${host}` &&
+        (job.status === 'in_progress' || (job.status === 'completed' && job.conclusion === 'success')))) {
+      throw new Error('The deployment approval job is not active or successful');
     }
     console.log(`Verified approval: ''${repository}@''${sha}, ''${environment}, run ''${runId}/''${attempt}`);
   '';
