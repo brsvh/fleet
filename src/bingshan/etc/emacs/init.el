@@ -435,7 +435,8 @@
 
   :config
   ;; Ignore `embark' buffers when undo/redo window layout.
-  (add-to-list 'winner-boring-buffers "*Embark Collect Completions*" t)
+  (add-to-list 'winner-boring-buffers
+               "*Embark Collect Completions*" t)
   (add-to-list 'winner-boring-buffers "*Embark Collect Live*" t))
 
 
@@ -2672,7 +2673,8 @@
   ;; articles.
   (gnus-permanently-visible-groups ".*")
 
-  ;; Keep groups alphabetical by their displayed, backend-unprefixed names.
+  ;; Keep groups alphabetical by their displayed, backend-unprefixed
+  ;; names.
   (gnus-group-sort-function 'gnus-group-sort-by-real-name)
 
   :hook
@@ -2804,7 +2806,8 @@
   ;; Identify articles saved outside their group with `S'.
   (gnus-saved-mark ?S)
 
-  ;; Mark articles not previously seen by `gnus' with a hollow diamond.
+  ;; Mark articles not previously seen by `gnus' with a hollow
+  ;; diamond.
   (gnus-unseen-mark ?◊)
 
   ;; Identify recently arrived articles with `N'.
@@ -2925,11 +2928,14 @@
   ;; navigation reaches the boundary of the current Summary buffer.
   (tessera-gnus-summary-boundary-navigation t)
 
-  ;; Show the next local group scan from the active `gnus-demon' timer.
+  ;; Show the next local group scan from the active `gnus-demon'
+  ;; timer.
   (tessera-gnus-summary-header-line-next-update-function
    (lambda (_context)
      (when (boundp 'gnus-demon-timers)
-       (let ((timer (plist-get gnus-demon-timers 'gnus-demon-scan-news)))
+       (let ((timer
+              (plist-get gnus-demon-timers
+                         'gnus-demon-scan-news)))
          (when (and (timerp timer) (memq timer timer-list))
            (timer--time timer)))))))
 
@@ -3467,7 +3473,8 @@
                                   '(window-width . 0.5)
                                 '(window-height . 0.35)))
                            alist)))))
-                 (window-parameters . ((no-delete-other-windows . t))))))
+                 (window-parameters
+                  . ((no-delete-other-windows . t))))))
 
 (use-package codex-ide
   :after (codex-ide-session)
@@ -3550,7 +3557,7 @@
   ;; target starts, rather than waiting for its first response chunk.
   (define-advice gptel--handle-wait
       (:around (original-function fsm) display-read-only-response)
-    "Call ORIGINAL-FUNCTION with FSM, then display its response target."
+    "Call ORIGINAL-FUNCTION with FSM, then show its response target."
     (prog1 (funcall original-function fsm)
       (let* ((info (gptel-fsm-info fsm))
              (position (plist-get info :position))
@@ -4030,18 +4037,20 @@
   :custom
   ;; Ignore account-specific automated and non-person addresses.
   (bs-contacts-ignored-email-regexps
-   '(;; Amazon SES envelope sender addresses.
+   `(;; Amazon SES envelope sender addresses.
      "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
 
      ;; Atlassian bounce domains whose pre-organization label contains
      ;; "bounces".
-     "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*bounces[^@.]*\\.atlassian\\.[^@]+\\'"
+     ,(concat "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*"
+              "bounces[^@.]*\\.atlassian\\.[^@]+\\'")
 
      ;; Stripe's dedicated bounce domain.
      "\\`[^@]+@bounce\\.stripe\\.com\\'"
 
      ;; Linux Foundation encoded-recipient envelope addresses.
-     "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+linuxfoundation\\.org\\'"
+     ,(concat "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+"
+              "linuxfoundation\\.org\\'")
 
      ;; Mailing-list rewritten senders, preserving normal list posting
      ;; addresses without an equals sign.
@@ -4830,8 +4839,8 @@
 (use-package elfeed-show
   :custom
   ;; Keep search results above the article, matching the horizontal
-  ;; summary/article layouts used by `gnus' and `mu4e', while retaining
-  ;; focus in the Search buffer for continuous navigation.
+  ;; summary/article layouts used by `gnus' and `mu4e', while
+  ;; retaining focus in the Search buffer for continuous navigation.
   (elfeed-show-entry-switch
    (lambda (buffer)
      (display-buffer
