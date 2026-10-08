@@ -96,11 +96,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789404474,
-        "narHash": "sha256-UXFQ7tFiwn8sPz0EV4CBB2PCf/ZiGIHWn/6MXk81Lxs=",
+        "lastModified": 1791381442,
+        "narHash": "sha256-TQiEqCAQ4bWppfeRGX4O3lwopsgsd2OvcOHTEQRRwEQ=",
         "ref": "master",
-        "rev": "e760371d631165e7d8de5b0dcf148e21ec4c16f0",
-        "revCount": 404,
+        "rev": "45ba3f8c5cb28396fff71671806e2550b464ac86",
+        "revCount": 411,
         "type": "git",
         "url": "https://github.com/serokell/deploy-rs.git"
       },
@@ -216,11 +216,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789615259,
-        "narHash": "sha256-03XHZPmEvs4g7J5OXRtqPMbOpPqdWjVbj8If/4JUaV4=",
+        "lastModified": 1790729683,
+        "narHash": "sha256-mNCqGbm9nWdioBVn8eJPqlVmZadJxXkglcxi4cih0hA=",
         "ref": "main",
-        "rev": "afe020b91bfa198f7cccef954c00e8455399f3ef",
-        "revCount": 86,
+        "rev": "666a31ebec5930e3100d30f8366c62c9537387cc",
+        "revCount": 88,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-jieba-rs.git"
       },
@@ -240,11 +240,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790222974,
-        "narHash": "sha256-LtBAgeKom9pHzNNPZK9qJLRuBZdiYw/9A7RZ4fo0QJs=",
+        "lastModified": 1791436500,
+        "narHash": "sha256-uaDCAeWDiQd4t5nw0vM1x5D1Xr7sLznNgL8192Pwuvc=",
         "ref": "master",
-        "rev": "a9a5c06a23150ed6e88e9470aedd30be3e80756c",
-        "revCount": 20005,
+        "rev": "5bbfa3d72679ea729fa40495a74b9aac4ecef41a",
+        "revCount": 20110,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -288,11 +288,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790669642,
-        "narHash": "sha256-8MFv+fxecHMeqJ7La/ot6cMxYeGXUo93+9y0rmZcKcg=",
+        "lastModified": 1791432136,
+        "narHash": "sha256-03kV2wR6S5wsiV4/1/jYyD83KUbvKHBaq5WuTILRnms=",
         "ref": "main",
-        "rev": "5d6cf01a2d2967dac1f1a733a2a1948e6e5f5908",
-        "revCount": 161,
+        "rev": "bed994dac511fb21f33d83d3e97d76c6a0e9a508",
+        "revCount": 170,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-tessera.git"
       },
@@ -326,11 +326,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788450739,
-        "narHash": "sha256-glZLQlzIn1fXH6PazR2iUmTo7kzzyYSshrWhLS9TqCU=",
+        "lastModified": 1790898470,
+        "narHash": "sha256-zTwuwezD0w3hpga6a6P8emidzAZFyWqlNeRBlpWOOl8=",
         "ref": "main",
-        "rev": "31729ca8cbdb4fa927b34e5f4353e6a83f39e993",
-        "revCount": 494,
+        "rev": "024633cd702b10285db5cb19b40ad48d2399ba60",
+        "revCount": 497,
         "type": "git",
         "url": "https://github.com/hercules-ci/flake-parts.git"
       },
@@ -392,11 +392,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790225410,
-        "narHash": "sha256-BOyZoliWfm/beS4m3FxFKlu5at6npZen1PsWtvzzihk=",
+        "lastModified": 1791306979,
+        "narHash": "sha256-KuLePuhwJM9NLt/gTLHzXaOoSZKGoB3m7NfXjiQ98HY=",
         "ref": "master",
-        "rev": "4900baf1e219645e4a2acba35723852b2091bc20",
-        "revCount": 7313,
+        "rev": "fae6e9e42c3b762ab47635cddcfaf6f52374a61b",
+        "revCount": 7452,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -429,11 +429,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790291508,
-        "narHash": "sha256-BX+iNGVZssv973daokWSY9NgC3ElDmwCDgpduuPNFd0=",
+        "lastModified": 1790896522,
+        "narHash": "sha256-TA4vPDMpnWBgoLiucqFxgCvCVlRVuVvcHQiRKGnuwHY=",
         "ref": "main",
-        "rev": "daa5c171a7568f7ce4cf04d926cd4f958913a469",
-        "revCount": 169,
+        "rev": "79a4870f64a3b122f7a6e63452a97e699f6f5652",
+        "revCount": 181,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
@@ -459,16 +459,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1782141370,
-        "narHash": "sha256-hqijVSEETttmo8Okql9/LG0Ua34hdciKW1a5zzlj8mU=",
-        "ref": "refs/tags/v1.1.0",
-        "rev": "7c9a54a7f87b4539ddbd8bda09a8a5f5f9361aa9",
-        "revCount": 1059,
+        "lastModified": 1790423250,
+        "narHash": "sha256-sr4Kfp6yaXUeyKL6n0Y8/ElcR3momIRC20HFc+LF22s=",
+        "ref": "refs/tags/v1.2.0",
+        "rev": "c1c5edd31802d181c8aa2c71588995d93425d650",
+        "revCount": 1116,
         "type": "git",
         "url": "https://github.com/nix-community/lanzaboote.git"
       },
       "original": {
-        "ref": "refs/tags/v1.1.0",
+        "ref": "refs/tags/v1.2.0",
         "type": "git",
         "url": "https://github.com/nix-community/lanzaboote.git"
       }
@@ -483,11 +483,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790274560,
-        "narHash": "sha256-+7YOVvDg1Jqjc8B2MhGgn8cf/dLsq8XCrefBxP7Mwps=",
+        "lastModified": 1791363814,
+        "narHash": "sha256-J01LIY22C5Alj6frpQ8J6VWcB5ybQ6mfhdoq99NTD7Y=",
         "ref": "main",
-        "rev": "ef6c48eb56575bb3ffe648c30846321b2a5d7e2f",
-        "revCount": 12083,
+        "rev": "877c683846aa7f22e3ca5f64170ee0d60b26f844",
+        "revCount": 12094,
         "type": "git",
         "url": "https://github.com/lem-project/lem.git"
       },
@@ -516,11 +516,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790241846,
-        "narHash": "sha256-rmHQtarWvZxm3/dVuIkUWe0HjWfVGX8+OyaJoHIR8Jo=",
+        "lastModified": 1791438794,
+        "narHash": "sha256-1gkE5PzWLdv4w8hZ2h1iaRS0iWtB9ZaS4fuFvpv30o4=",
         "ref": "main",
-        "rev": "8bec0ce1cbb0a39f8f08dc97a7635af847779f99",
-        "revCount": 19149,
+        "rev": "52f37017a2ba5e1f41358c6247e2b0b7d4cc7f22",
+        "revCount": 20445,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -546,11 +546,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787963050,
-        "narHash": "sha256-yt4H/X9CU2iaLl2NJ/MBycQs7Jl0tbJP5uuDdGWiPGg=",
+        "lastModified": 1791231530,
+        "narHash": "sha256-sj7RiYmHW+d7NjH2TWKozEaYp8nhdGas6/zMKjTCO5k=",
         "ref": "main",
-        "rev": "27b3c74d96351b770ec8216430d5d947290917e9",
-        "revCount": 1076,
+        "rev": "4a06abf89ea5e38a3e0f9bf12f3036095d4a24a2",
+        "revCount": 1080,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -606,11 +606,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1790185690,
-        "narHash": "sha256-xJ+X4hBtOcAFGBOe5nAMyMUeF9foJBmIOu3NjBqBycU=",
+        "lastModified": 1791260994,
+        "narHash": "sha256-Miqqk/ammqnTUxaoCyvtwoPeLbI1ksFyLxi/CazZpWY=",
         "ref": "nixos-unstable",
-        "rev": "4975466d324710c576dc11ad614684e6bd8cad8e",
-        "revCount": 1078696,
+        "rev": "151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4",
+        "revCount": 1086391,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -691,11 +691,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790234952,
-        "narHash": "sha256-tjQa1vDoHJir4lasZTakz/xgmsfB6SRjeQqaIbefFOk=",
+        "lastModified": 1791361643,
+        "narHash": "sha256-HMdfSb1ONHs1RbSkQtCXm+tWEsTikisWWtXDnv0aQ+I=",
         "ref": "master",
-        "rev": "ed34466c59b766481248959a21a6e46cf0c60468",
-        "revCount": 2314,
+        "rev": "8afee9fa8caa877a4feb65adc33e8d72f3747dc9",
+        "revCount": 2328,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -712,11 +712,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790247521,
-        "narHash": "sha256-TNfgoHsqsYYvaJImlWctfRkh4PseTagzegU1Dgdbehw=",
+        "lastModified": 1791103873,
+        "narHash": "sha256-nFxM+pKoZ8LJAEnUXARyCaOAloWgaW9kZQOSjWzKcTE=",
         "ref": "master",
-        "rev": "2bd00bd9bb35fe6d114888c8f1c2e946c541dd8f",
-        "revCount": 1247,
+        "rev": "dcd241ba97088c22569d1573286e1b9daad340c0",
+        "revCount": 1249,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -739,11 +739,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789776288,
-        "narHash": "sha256-egtA2kNImvI/Y2WdrTvQopClja17zfgBQACZhVBt5zc=",
+        "lastModified": 1790756730,
+        "narHash": "sha256-f5Ms6iJDGSA9UggYA2Mt9IiI8BOHft3tRFXOZyvjTFE=",
         "ref": "main",
-        "rev": "763c3480b4885b8fc2db623f61f891fecdfdc99d",
-        "revCount": 251,
+        "rev": "86a90f161fb0bce7ef5e4d18eb39398f9ee558f6",
+        "revCount": 253,
         "type": "git",
         "url": "https://github.com/different-name/steam-config-nix.git"
       },
@@ -776,11 +776,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786901030,
-        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
+        "lastModified": 1791203292,
+        "narHash": "sha256-vuzVwvjeucSnwKwMBpyP8r5IzdrMKCHEdwTrRFwUN7I=",
         "ref": "main",
-        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
-        "revCount": 557,
+        "rev": "03d8ee1bcbc8f9638907bb79edb9673151d0e22b",
+        "revCount": 593,
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
       },
