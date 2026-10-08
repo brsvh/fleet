@@ -34,6 +34,10 @@ in
     hercules-ci-agent = {
       enable = true;
 
+      noIFDRepositories = [
+        "https://github.com/brsvh/chinese-fonts-overlay"
+      ];
+
       settings = {
         binaryCachesPath =
           (pkgs.formats.json { }).generate
