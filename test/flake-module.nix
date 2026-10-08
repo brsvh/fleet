@@ -98,6 +98,15 @@ in
         inherit
           test
           ;
+
+        hercules-ci-worker =
+          import ./hercules-ci-worker.nix
+            {
+              inherit
+                nixpkgs
+                pkgs
+                ;
+            };
       };
 
       packages = {
