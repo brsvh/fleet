@@ -42,7 +42,7 @@ in
         enable = true;
       };
 
-      configurationLimit = 8;
+      configurationLimit = 4;
       enable = true;
 
       measuredBoot = {
