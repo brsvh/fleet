@@ -30,6 +30,9 @@ in
             baseDirectory = mkDefault "/var/lib/hercules-ci-agent";
 
             nixSettings = {
+              # Evaluation must not realize outputs before CI selects them.
+              allow-import-from-derivation = "false";
+
               # CI tasks build locally without changing ordinary clients.
               builders = "";
               post-build-hook = "";
