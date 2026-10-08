@@ -254,7 +254,7 @@
         };
       };
 
-      url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.1.0";
+      url = "git+https://github.com/nix-community/lanzaboote.git?ref=refs/tags/v1.2.0";
     };
 
     lem = {
