@@ -4894,15 +4894,6 @@
   :after (elfeed-search)
   :commands (elfeed-x-search-follow-mode)
 
-  :custom
-  ;; Follow both native movement and `tessera-elfeed-search' entry
-  ;; navigation, which replaces the usual \\`n' and \\`p' commands.
-  (elfeed-x-search-follow-commands
-   '(next-line
-     previous-line
-     tessera-elfeed-search--next
-     tessera-elfeed-search--previous))
-
   :config
   ;; Follow navigation in an existing article window while keeping
   ;; focus in Search and marking the displayed entry as read.
