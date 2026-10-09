@@ -33,6 +33,7 @@ let
 
   finish = pkgs.writeText "finish.mjs" ''
     import fs from 'node:fs';
+    import { setTimeout as delay } from 'node:timers/promises';
 
     const { branch, rev, tag, host } = JSON.parse(
       fs.readFileSync(process.argv[2], 'utf8'),
@@ -52,17 +53,35 @@ let
       herculesApi + '/site/github/account/brsvh/project/fleet';
 
     const api = async (path, method = 'GET', body) => {
-      const response = await fetch(`''${githubApi}/''${path}`, {
-        method,
-        headers: {
-          accept: 'application/vnd.github+json',
-          authorization: `Bearer ''${token}`,
-          'content-type': 'application/json',
-          'user-agent': 'fleet-ci',
-        },
-        body: body === undefined ? undefined : JSON.stringify(body),
-        signal: AbortSignal.timeout(30000),
-      });
+      let response;
+
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          response = await fetch(`''${githubApi}/''${path}`, {
+            method,
+            headers: {
+              accept: 'application/vnd.github+json',
+              authorization: `Bearer ''${token}`,
+              'content-type': 'application/json',
+              'user-agent': 'fleet-ci',
+            },
+            body: body === undefined ? undefined : JSON.stringify(body),
+            signal: AbortSignal.timeout(30000),
+          });
+
+          break;
+        } catch (error) {
+          if (
+            error.cause?.code !== 'UND_ERR_CONNECT_TIMEOUT' ||
+            attempt === 3
+          ) {
+            throw error;
+          }
+
+          console.warn(`Connection timed out; retrying (''${attempt}/2)`);
+          await delay(2000);
+        }
+      }
 
       if (method === 'DELETE' && response.status === 422) {
         return null;

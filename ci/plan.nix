@@ -21,6 +21,7 @@ let
   plan = pkgs.writeText "plan.mjs" ''
     import fs from 'node:fs';
     import { randomUUID } from 'node:crypto';
+    import { setTimeout as delay } from 'node:timers/promises';
 
     const [repository, branch, rev, targetsPath] = process.argv.slice(2);
     const targets = JSON.parse(fs.readFileSync(targetsPath, 'utf8'));
@@ -49,17 +50,35 @@ let
       herculesApi + '/site/github/account/brsvh/project/fleet';
 
     async function api(url, token, method = 'GET', body) {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          accept: 'application/json',
-          ...(token ? { authorization: `Bearer ''${token}` } : {}),
-          'content-type': 'application/json',
-          'user-agent': 'fleet-ci',
-        },
-        body: body === undefined ? undefined : JSON.stringify(body),
-        signal: AbortSignal.timeout(30000),
-      });
+      let response;
+
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          response = await fetch(url, {
+            method,
+            headers: {
+              accept: 'application/json',
+              ...(token ? { authorization: `Bearer ''${token}` } : {}),
+              'content-type': 'application/json',
+              'user-agent': 'fleet-ci',
+            },
+            body: body === undefined ? undefined : JSON.stringify(body),
+            signal: AbortSignal.timeout(30000),
+          });
+
+          break;
+        } catch (error) {
+          if (
+            error.cause?.code !== 'UND_ERR_CONNECT_TIMEOUT' ||
+            attempt === 3
+          ) {
+            throw error;
+          }
+
+          console.warn(`Connection timed out; retrying (''${attempt}/2)`);
+          await delay(2000);
+        }
+      }
 
       if (!response.ok) {
         throw new Error(
