@@ -71,14 +71,26 @@ let
 
           break;
         } catch (error) {
+          const cause = error.cause;
+          // This reset happens before an HTTP request can be sent.
+          const disconnectedBeforeTls =
+            cause?.code === 'ECONNRESET' &&
+            cause.message ===
+              'Client network socket disconnected before secure TLS ' +
+                'connection was established';
+
           if (
-            error.cause?.code !== 'UND_ERR_CONNECT_TIMEOUT' ||
+            (cause?.code !== 'UND_ERR_CONNECT_TIMEOUT' &&
+              !disconnectedBeforeTls) ||
             attempt === 3
           ) {
             throw error;
           }
 
-          console.warn(`Connection timed out; retrying (''${attempt}/2)`);
+          console.warn(
+            `Connection failed (''${cause.code}); ` +
+              `retrying (''${attempt}/2)`,
+          );
           await delay(2000);
         }
       }
