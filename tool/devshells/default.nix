@@ -76,11 +76,6 @@ in
       package = git;
     }
     {
-      category = "[development]";
-      name = "specify";
-      package = spec-kit;
-    }
-    {
       category = "[tools]";
       package = treefmt;
     }
