@@ -1,9 +1,35 @@
 {
   home,
+  lib,
+  osConfig ? null,
   pkgs,
   ...
 }:
 let
+  inherit (lib)
+    head
+    optionalString
+    splitString
+    ;
+
+  xkb =
+    if osConfig != null then
+      osConfig.services.xserver.xkb
+    else
+      {
+        layout = "us";
+        variant = "";
+      };
+
+  layout = head (splitString "," xkb.layout);
+  variant = head (splitString "," xkb.variant);
+
+  keyboardLayout =
+    layout
+    + optionalString (variant != "") "-${variant}";
+
+  keyboardInputMethod = "keyboard-${keyboardLayout}";
+
   toYAML =
     name: attrs:
     (pkgs.formats.yaml { }).generate name attrs;
@@ -107,8 +133,8 @@ in
 
             "Groups/0" = {
               "Name" = "Default";
-              "Default Layout" = "us";
-              "DefaultIM" = "keyboard-us";
+              "Default Layout" = keyboardLayout;
+              "DefaultIM" = keyboardInputMethod;
             };
 
             "Groups/0/Items/0" = {
@@ -117,7 +143,7 @@ in
             };
 
             "Groups/0/Items/1" = {
-              "Name" = "keyboard-us";
+              "Name" = keyboardInputMethod;
               "Layout" = "";
             };
           };
