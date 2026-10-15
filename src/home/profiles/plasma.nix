@@ -2,6 +2,7 @@
   home,
   inputs,
   lib,
+  osConfig ? null,
   pkgs,
   ...
 }:
@@ -11,9 +12,18 @@ let
     ;
 
   inherit (lib)
+    elemAt
+    genList
     getExe
+    length
     mkDefault
+    mkIf
+    splitString
     ;
+
+  xkb = osConfig.services.xserver.xkb;
+  layouts = splitString "," xkb.layout;
+  variants = splitString "," xkb.variant;
 in
 {
   imports = [
@@ -68,6 +78,23 @@ in
   programs = {
     plasma = {
       enable = mkDefault true;
+
+      input = {
+        keyboard = mkIf (osConfig != null) {
+          layouts = genList (index: {
+            layout = elemAt layouts index;
+
+            variant =
+              if index < length variants then
+                elemAt variants index
+              else
+                "";
+          }) (length layouts);
+
+          model = xkb.model;
+          options = splitString "," xkb.options;
+        };
+      };
 
       workspace = {
         colorScheme = mkDefault "BreezeLight";
