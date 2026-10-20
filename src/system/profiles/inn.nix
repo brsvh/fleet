@@ -37,6 +37,7 @@ let
     ];
 
     gmane = [
+      "gmane.emacs.bugs"
       "gmane.emacs.devel"
       "gmane.emacs.help"
       "gmane.lisp.asdf.devel"
@@ -47,11 +48,20 @@ let
       "gmane.comp.kde.devel.general"
       "gmane.comp.hardware.riscv.isa.devel"
       "gmane.comp.hardware.riscv.opensbi.devel"
+      "gmane.linux.kbuild.devel"
       "gmane.linux.ports.riscv"
+      "gmane.comp.gcc.bugs"
       "gmane.comp.gcc.devel"
+      "gmane.comp.gdb.bugs.discuss"
       "gmane.comp.gdb.devel"
       "gmane.comp.gnu.binutils"
       "gmane.comp.lib.glibc.alpha"
+      "gmane.comp.lib.glibc.bugs"
+    ];
+
+    lore = [
+      "dev.linux.lists.regressions"
+      "org.kernel.vger.linux-kselftest"
     ];
 
     olduse = [
