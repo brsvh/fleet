@@ -77,14 +77,21 @@
 
 (setq gnus-parameters
       (append
-       '(("\\`\\(?:comp\\.\\|gmane\\.\\)" (display . 100))
+       '(("\\`\\(?:comp\\|dev\\.linux\\|gmane\\|org\\.kernel\\)\\."
+          (display . 100))
          ("\\`comp\\." (agent-predicate . short)))
+       ;; Use `to-list' so followups retain the article's Reply-To and
+       ;; Cc fields, including Debbugs and Bugzilla reply addresses.
        (mapcar
         (lambda (entry)
           (list (concat "\\`" (regexp-quote (car entry)) "\\'")
                 (cons 'to-list (cdr entry))
                 '(subscribed . t)))
-        '(("gmane.comp.gcc.devel" . "gcc@gcc.gnu.org")
+        '(("dev.linux.lists.regressions"
+           . "regressions@lists.linux.dev")
+          ("gmane.comp.gcc.bugs" . "gcc-bugs@gcc.gnu.org")
+          ("gmane.comp.gcc.devel" . "gcc@gcc.gnu.org")
+          ("gmane.comp.gdb.bugs.discuss" . "gdb-prs@sourceware.org")
           ("gmane.comp.gdb.devel" . "gdb@sourceware.org")
           ("gmane.comp.gnu.binutils" . "binutils@sourceware.org")
           ("gmane.comp.hardware.riscv.isa.devel"
@@ -93,8 +100,12 @@
            . "opensbi@lists.infradead.org")
           ("gmane.comp.kde.devel.general" . "kde-devel@kde.org")
           ("gmane.comp.lib.glibc.alpha" . "libc-alpha@sourceware.org")
+          ("gmane.comp.lib.glibc.bugs" . "glibc-bugs@sourceware.org")
+          ("gmane.emacs.bugs" . "bug-gnu-emacs@gnu.org")
           ("gmane.emacs.devel" . "emacs-devel@gnu.org")
           ("gmane.emacs.help" . "help-gnu-emacs@gnu.org")
+          ("gmane.linux.kbuild.devel"
+           . "linux-kbuild@vger.kernel.org")
           ("gmane.linux.ports.riscv"
            . "linux-riscv@lists.infradead.org")
           ("gmane.lisp.asdf.devel"
@@ -103,7 +114,9 @@
           ("gmane.lisp.guile.user" . "guile-user@gnu.org")
           ("gmane.lisp.scheme.chez" . "chez-scheme@googlegroups.com")
           ("gmane.lisp.scheme.mit-scheme.devel"
-           . "mit-scheme-devel@gnu.org")))))
+           . "mit-scheme-devel@gnu.org")
+          ("org.kernel.vger.linux-kselftest"
+           . "linux-kselftest@vger.kernel.org")))))
 
 ;; Generate Mail-Followup-To using the declared mailing-list
 ;; membership.
@@ -122,6 +135,7 @@
      "alt.callahans")
     ("Emacs"
      "comp.emacs"
+     "gmane.emacs.bugs"
      "gmane.emacs.devel"
      "gmane.emacs.help"
      "net.emacs"
@@ -137,6 +151,10 @@
      "net.games.trivia"
      "net.games.video"
      "rec.games.trivia")
+    ("Kernel"
+     "dev.linux.lists.regressions"
+     "gmane.linux.kbuild.devel"
+     "org.kernel.vger.linux-kselftest")
     ("Languages"
      "alt.comp.lang.rust"
      "comp.lang.c"
@@ -188,10 +206,13 @@
      "net.crypt"
      "comp.security.unix")
     ("Toolchain"
+     "gmane.comp.gcc.bugs"
      "gmane.comp.gcc.devel"
+     "gmane.comp.gdb.bugs.discuss"
      "gmane.comp.gdb.devel"
      "gmane.comp.gnu.binutils"
      "gmane.comp.lib.glibc.alpha"
+     "gmane.comp.lib.glibc.bugs"
      "mod.compilers"
      "mod.std.c")
     ("Unix"
