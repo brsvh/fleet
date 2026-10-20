@@ -46,6 +46,10 @@
           endpoint = "news.gmane.io:119_STARTTLS";
         };
 
+        lore = {
+          endpoint = "nntp.lore.kernel.org:563_TLS";
+        };
+
         olduse = {
           endpoint = "olduse.net:11940";
           normalizeDuplicatePath = true;
