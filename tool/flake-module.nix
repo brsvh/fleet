@@ -145,6 +145,10 @@ in
     {
       apps = {
         camellia-services-health-check = {
+          meta = {
+            description = "Check Camellia service endpoints.";
+          };
+
           type = "app";
           program = "${config.packages.camellia-services-health-check}/bin/camellia-services-health-check";
         };
