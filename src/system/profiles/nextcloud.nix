@@ -37,7 +37,7 @@ in
       enable = mkDefault true;
 
       extraApps = {
-        inherit (pkgs.nextcloud33Packages.apps)
+        inherit (pkgs.nextcloud34Packages.apps)
           calendar
           collectives
           contacts
@@ -56,7 +56,7 @@ in
       };
 
       https = mkDefault true;
-      package = pkgs.nextcloud33;
+      package = pkgs.nextcloud34;
     };
   };
 }
