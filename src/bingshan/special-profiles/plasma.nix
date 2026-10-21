@@ -7,7 +7,12 @@
   ...
 }:
 let
+  inherit (config.xdg)
+    userDirs
+    ;
+
   inherit (lib)
+    concatStringsSep
     elemAt
     ;
 
@@ -57,6 +62,21 @@ in
   programs = {
     plasma = {
       configFile = {
+        baloofilerc = {
+          "Basic Settings" = {
+            "Indexing-Enabled" = true;
+          };
+
+          General = {
+            # Explicit roots include XDG folders below .local/share.
+            folders = concatStringsSep "," [
+              userDirs.desktop
+              userDirs.documents
+              userDirs.download
+            ];
+          };
+        };
+
         kded6rc = {
           "Module-browserintegrationflatpakintegrator" = {
             autoload = false;
