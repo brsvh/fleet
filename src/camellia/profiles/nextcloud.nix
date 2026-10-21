@@ -78,10 +78,6 @@ in
 
     nextcloud = {
       config = {
-        adminpassFile = secrets."chang@bingshan.org".path;
-
-        adminuser = "bingshan";
-
         objectstore = {
           s3 = {
             bucket = store.bucketName;
@@ -774,7 +770,6 @@ in
       "chang@bingshan.org" = {
         restartUnits = [
           "nextcloud-configure.service"
-          "nextcloud-setup.service"
         ];
       };
 
