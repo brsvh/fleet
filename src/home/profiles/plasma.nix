@@ -79,6 +79,15 @@ in
     plasma = {
       enable = mkDefault true;
 
+      configFile = {
+        baloofilerc = {
+          General = {
+            "index hidden folders" = mkDefault false;
+            "only basic indexing" = mkDefault true;
+          };
+        };
+      };
+
       input = {
         keyboard = mkIf (osConfig != null) {
           layouts = genList (index: {
