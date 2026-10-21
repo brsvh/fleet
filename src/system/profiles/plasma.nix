@@ -15,4 +15,18 @@ in
       };
     };
   };
+
+  systemd = {
+    user = {
+      services = {
+        kde-baloo = {
+          overrideStrategy = "asDropin";
+
+          serviceConfig = {
+            IOAccounting = mkDefault true;
+          };
+        };
+      };
+    };
+  };
 }
