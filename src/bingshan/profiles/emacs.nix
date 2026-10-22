@@ -659,6 +659,7 @@ in
           denote-menu
           denote-org
           denote-search
+          denote-sequence
           diff-hl
           diredfl
           doom-modeline
