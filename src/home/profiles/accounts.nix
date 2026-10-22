@@ -57,6 +57,13 @@ in
 
     khal = {
       enable = mkDefault true;
+
+      package = mkDefault (
+        pkgs.khal.overrideAttrs (_: {
+          # The Sphinx hook reads only the first element of a Bash array.
+          sphinxBuilders = "html man";
+        })
+      );
     };
 
     khard = {
