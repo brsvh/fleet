@@ -123,10 +123,6 @@ in
     };
   };
 
-  systems = [
-    "x86_64-linux"
-  ];
-
   perSystem =
     {
       config,
@@ -143,21 +139,6 @@ in
         ;
     in
     {
-      apps = {
-        camellia-services-health-check = {
-          meta = {
-            description = "Check Camellia service endpoints.";
-          };
-
-          type = "app";
-          program = "${config.packages.camellia-services-health-check}/bin/camellia-services-health-check";
-        };
-      };
-
-      checks = mkMerge [
-        (deploy.lib.${system}.deployChecks self.deploy)
-      ];
-
       _module = {
         args = {
           pkgs = import nixpkgs {
@@ -173,6 +154,21 @@ in
         };
       };
 
+      apps = {
+        camellia-services-health-check = {
+          meta = {
+            description = "Check Camellia service endpoints.";
+          };
+
+          type = "app";
+          program = "${config.packages.camellia-services-health-check}/bin/camellia-services-health-check";
+        };
+      };
+
+      checks = mkMerge [
+        (deploy.lib.${system}.deployChecks self.deploy)
+      ];
+
       devshells = mapAttrs (
         _: devshell:
         import devshell {
@@ -186,6 +182,22 @@ in
             ;
         }
       ) dev.devshells;
+
+      formatter =
+        let
+          inherit (config.devshells.default.files.treefmt)
+            file
+            packages
+            ;
+        in
+        writeShellScriptBin "treefmt" ''
+          set -euo pipefail
+          export PATH=${makeBinPath packages}
+          exec ${treefmt}/bin/treefmt \
+            --config-file=${file} \
+            --tree-root-file=flake.nix \
+            "$@"
+        '';
 
       packages = {
         camellia-services-health-check =
@@ -293,21 +305,9 @@ in
             fi
           '';
       };
-
-      formatter =
-        let
-          inherit (config.devshells.default.files.treefmt)
-            file
-            packages
-            ;
-        in
-        writeShellScriptBin "treefmt" ''
-          set -euo pipefail
-          export PATH=${makeBinPath packages}
-          exec ${treefmt}/bin/treefmt \
-            --config-file=${file} \
-            --tree-root-file=flake.nix \
-            "$@"
-        '';
     };
+
+  systems = [
+    "x86_64-linux"
+  ];
 }

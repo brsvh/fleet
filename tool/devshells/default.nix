@@ -21,6 +21,7 @@ let
     getExe
     makeBinPath
     map
+    pipe
     removeAttrs
     ;
 
@@ -97,8 +98,8 @@ in
         };
 
         "*.el" = {
-          indent_style = "space";
           indent_size = "unset";
+          indent_style = "space";
           tab_width = 2;
         };
 
@@ -148,8 +149,6 @@ in
 
         repos = [
           {
-            repo = "local";
-
             hooks = [
               {
                 entry = "treefmt --fail-on-change";
@@ -163,6 +162,8 @@ in
                 ];
               }
             ];
+
+            repo = "local";
           }
         ];
       };
@@ -240,9 +241,10 @@ in
               exec ${getExe prek} -C "$repoRoot" run --stage "${stage}" "$@"
             '';
         in
-        concatStringsSep "\n" (
-          map mkInstall data.default_install_hook_types
-        );
+        pipe data.default_install_hook_types [
+          (map mkInstall)
+          (concatStringsSep "\n")
+        ];
 
       packages = with pkgs; [
         git
