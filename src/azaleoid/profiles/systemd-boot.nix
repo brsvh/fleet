@@ -21,12 +21,6 @@ in
   ];
 
   boot = {
-    initrd = {
-      systemd = {
-        enable = true;
-      };
-    };
-
     lanzaboote = {
       allowUnsigned = false;
 
