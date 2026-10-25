@@ -42,9 +42,6 @@ in
 
           locations = {
             "/" = {
-              # The upload namespace never fetches unselected upstream paths.
-              proxyPass = "http://127.0.0.1:8501/upload/";
-
               extraConfig = ''
                 if ($request_method !~ ^(GET|HEAD|PUT)$) {
                   return 405;
@@ -61,6 +58,9 @@ in
                   auth_basic_user_file ${secrets.nix-cache-upload-htpasswd.path};
                 }
               '';
+
+              # The upload namespace never fetches unselected upstream paths.
+              proxyPass = "http://127.0.0.1:8501/upload/";
             };
           };
         };

@@ -34,7 +34,6 @@
 
           server = {
             automatically_add_embedded_derp_region = true;
-
             enabled = true;
             ipv4 = "95.133.228.83";
             ipv6 = "2a0b:7140:8:1:5054:ff:feef:6795";
@@ -101,12 +100,6 @@
           forceSSL = true;
 
           locations = {
-            "= /generate_204" = {
-              extraConfig = ''
-                return 204;
-              '';
-            };
-
             "/" = {
               extraConfig = ''
                 proxy_buffering off;
@@ -115,6 +108,12 @@
 
               proxyPass = "http://127.0.0.1:8080";
               proxyWebsockets = true;
+            };
+
+            "= /generate_204" = {
+              extraConfig = ''
+                return 204;
+              '';
             };
           };
         };
