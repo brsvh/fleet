@@ -66,7 +66,6 @@ let
       outputs = {
         deploy =
           self.deploy.nodes.${name}.profiles.system.path;
-
         system =
           self.nixosConfigurations.${name}.config.system.build.toplevel;
       }
