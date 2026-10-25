@@ -17,7 +17,9 @@ in
 
   nix = {
     settings = {
-      extra-system-features = [ "deploy" ];
+      extra-system-features = [
+        "deploy"
+      ];
     };
   };
 

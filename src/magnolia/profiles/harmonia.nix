@@ -25,9 +25,6 @@
     nginx = {
       virtualHosts = {
         ${config.networking.fqdn} = {
-          onlySSL = true;
-          useACMEHost = config.networking.fqdn;
-
           locations = {
             "/" = {
               extraConfig = ''
@@ -37,6 +34,9 @@
               proxyPass = "http://127.0.0.1:5000";
             };
           };
+
+          onlySSL = true;
+          useACMEHost = config.networking.fqdn;
         };
       };
     };

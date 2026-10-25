@@ -16,6 +16,16 @@
     };
   };
 
+  sops = {
+    secrets = {
+      "tagss.dae" = {
+        restartUnits = [
+          "dae.service"
+        ];
+      };
+    };
+  };
+
   systemd = {
     services = {
       dae = {
@@ -25,16 +35,6 @@
 
         wants = [
           "network-online.target"
-        ];
-      };
-    };
-  };
-
-  sops = {
-    secrets = {
-      "tagss.dae" = {
-        restartUnits = [
-          "dae.service"
         ];
       };
     };

@@ -48,7 +48,6 @@
         description = "Hercules CI shared store";
         group = "hercules-ci-store";
         isSystemUser = true;
-        shell = pkgs.bashInteractive;
 
         openssh = {
           authorizedKeys = {
@@ -59,6 +58,8 @@
             ];
           };
         };
+
+        shell = pkgs.bashInteractive;
       };
     };
   };
