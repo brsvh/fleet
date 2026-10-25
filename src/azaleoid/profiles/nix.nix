@@ -19,7 +19,6 @@
         sshKey =
           config.sops.secrets.nix-builder-ssh-key.path;
         sshUser = "nix-ssh";
-        system = "x86_64-linux";
 
         supportedFeatures = [
           "benchmark"
@@ -27,6 +26,8 @@
           "kvm"
           "nixos-test"
         ];
+
+        system = "x86_64-linux";
       }
     ];
 
