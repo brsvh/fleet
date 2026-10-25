@@ -31,7 +31,8 @@ let
     ;
 
   inherit (lib)
-    mapAttrsToList
+    attrValues
+    pipe
     removeAttrs
     ;
 
@@ -59,11 +60,15 @@ let
 
   profilesToList =
     profiles:
-    mapAttrsToList (_: v: v) (
-      removeAttrs profiles [
-        "__path"
-      ]
-    );
+    pipe profiles [
+      (
+        attrs:
+        removeAttrs attrs [
+          "__path"
+        ]
+      )
+      attrValues
+    ];
 in
 {
   imports = [
@@ -177,10 +182,37 @@ in
           };
 
           root = {
-            home = config.configurations.home.root;
             inherit (fleet.root)
               user
               ;
+
+            home = config.configurations.home.root;
+          };
+        };
+      };
+
+      camellia = {
+        inherit (fleet.camellia)
+          system
+          ;
+
+        profiles = profilesToList fleet.camellia.profiles;
+
+        users = {
+          ops = {
+            inherit (fleet.ops)
+              user
+              ;
+
+            home = config.configurations.home.ops;
+          };
+
+          root = {
+            inherit (fleet.root)
+              user
+              ;
+
+            home = config.configurations.home.root;
           };
         };
       };
@@ -205,32 +237,6 @@ in
                   fleet.bingshan.special-profiles.gnome
                 ];
             };
-          };
-
-          root = {
-            inherit (fleet.root)
-              user
-              ;
-
-            home = config.configurations.home.root;
-          };
-        };
-      };
-
-      camellia = {
-        inherit (fleet.camellia)
-          system
-          ;
-
-        profiles = profilesToList fleet.camellia.profiles;
-
-        users = {
-          ops = {
-            home = config.configurations.home.ops;
-
-            inherit (fleet.ops)
-              user
-              ;
           };
 
           root = {
@@ -378,7 +384,6 @@ in
 
                               Service = {
                                 ExecStart = getExe mkCert;
-
                                 Type = "oneshot";
                               };
 

@@ -328,12 +328,12 @@
       url = "git+https://github.com/nix-community/nix-unit.git?ref=main";
     };
 
-    nixpkgs = {
-      follows = "nixos";
-    };
-
     nixos = {
       url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-unstable";
+    };
+
+    nixpkgs = {
+      follows = "nixos";
     };
 
     plasma-manager = {
@@ -441,6 +441,7 @@
         filter
         map
         pathExists
+        pipe
         ;
 
       projectRoot = ./.;
@@ -457,9 +458,11 @@
             tree.${subdir} == "directory"
             && pathExists (getFlakeModule subdir);
         in
-        map getFlakeModule (
-          filter hasFlakeModule (attrNames tree)
-        );
+        pipe tree [
+          attrNames
+          (filter hasFlakeModule)
+          (map getFlakeModule)
+        ];
     in
     mkFlake
       {

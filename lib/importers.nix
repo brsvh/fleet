@@ -13,7 +13,7 @@ let
     pipe
     ;
 in
-rec {
+{
   /**
     Read a directory tree and apply transformations to the resulting attribute
     set.
