@@ -14,7 +14,22 @@ let
   inherit (lib)
     concatStringsSep
     elemAt
+    getExe'
+    hm
     ;
+
+  balooExcludeFilters =
+    pkgs.runCommand "baloo-exclude-filters" { }
+      ''
+        export XDG_CONFIG_HOME="$TMPDIR/config"
+        mkdir -p "$XDG_CONFIG_HOME"
+
+        ${getExe' pkgs.kdePackages.baloo "balooctl6"} config list excludeFilters |
+          ${getExe' pkgs.gnused "sed"} -n 's/^    //p' > default-filters
+        test -s default-filters
+        printf '%s\n' build dist out >> default-filters
+        sort -u default-filters | paste -sd, > "$out"
+      '';
 
   first = list: elemAt list 0;
 
@@ -46,6 +61,17 @@ in
   ];
 
   home = {
+    activation = {
+      balooExcludeFilters =
+        hm.dag.entryAfter [ "configure-plasma" ]
+          ''
+            # Merge with this Baloo version's defaults instead of replacing them.
+            run ${getExe' pkgs.kdePackages.kconfig "kwriteconfig6"} \
+              --file baloofilerc --group General --key "exclude filters" \
+              "$(< ${balooExcludeFilters})"
+          '';
+    };
+
     packages =
       (with pkgs; [
         subtitlecomposer
@@ -70,9 +96,15 @@ in
           General = {
             # Explicit roots include XDG folders below .local/share.
             folders = concatStringsSep "," [
+              config.home.homeDirectory
               userDirs.desktop
               userDirs.documents
               userDirs.download
+              userDirs.music
+              userDirs.pictures
+              userDirs.publicShare
+              userDirs.templates
+              userDirs.videos
             ];
           };
         };
