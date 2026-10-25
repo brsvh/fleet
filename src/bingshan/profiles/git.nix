@@ -12,13 +12,16 @@ let
     filter
     getExe
     head
+    pipe
     ;
 
-  email = head (
-    filter (
+  email = pipe config.accounts.email.accounts [
+    attrValues
+    (filter (
       account: account.enable && account.primary
-    ) (attrValues config.accounts.email.accounts)
-  );
+    ))
+    head
+  ];
 
   passdir =
     config.programs.password-store.settings.PASSWORD_STORE_DIR;
@@ -36,13 +39,6 @@ in
         "/.tmp"
       ];
 
-      signing = {
-        inherit (email.gpg)
-          key
-          signByDefault
-          ;
-      };
-
       settings = {
         credential = {
           helper = getExe pkgs.pass-git-helper;
@@ -56,6 +52,13 @@ in
           email = email.address;
           name = email.realName;
         };
+      };
+
+      signing = {
+        inherit (email.gpg)
+          key
+          signByDefault
+          ;
       };
     };
 

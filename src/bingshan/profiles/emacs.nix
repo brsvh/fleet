@@ -16,8 +16,11 @@ let
     findFirst
     head
     mapAttrsToList
+    pipe
     replaceStrings
     sort
+    stringLength
+    substring
     toJSON
     toSentenceCase
     ;
@@ -63,22 +66,22 @@ let
 
     genAddressbooks =
       addressbooks:
-      concatStringsSep "\n" (
-        mapAttrsToList (
+      pipe addressbooks [
+        (mapAttrsToList (
           id: addressbook:
           "(${toJSON id} . ${genAddressbook addressbook})"
-        ) addressbooks
-      );
+        ))
+        (concatStringsSep "\n")
+      ];
 
     genBool = value: if value then "t" else "nil";
 
     genCalendarDirectories =
       calendars:
-      concatStringsSep " " (
-        map (
-          calendar: toJSON calendar.local.path
-        ) calendars
-      );
+      pipe calendars [
+        (map (calendar: toJSON calendar.local.path))
+        (concatStringsSep " ")
+      ];
 
     genDefaultAddressbook =
       addressbook:
@@ -221,14 +224,15 @@ let
       mail: folder:
       let
         path = genMailFolder mail.account folder.role;
-        name = replaceStrings [ "/" ] [ " " ] (
-          builtins.substring 1 (
-            builtins.stringLength path - 1
-          ) path
-        );
+
+        name = pipe path [
+          (substring 1 (stringLength path - 1))
+          (replaceStrings [ "/" ] [ " " ])
+        ];
       in
       {
         inherit (folder) key;
+
         inherit name path;
 
         query = genScopedQuery mail (
@@ -238,14 +242,15 @@ let
 
     genMu4eMaildirs =
       mail:
-      sort (left: right: left.name < right.name) (
-        map (genMu4eMaildir mail) mu4eMaildirRoles
-      );
+      pipe mu4eMaildirRoles [
+        (map (genMu4eMaildir mail))
+        (sort (left: right: left.name < right.name))
+      ];
 
     genMu4eMaildirQueries =
       mail:
-      concatStringsSep "\n" (
-        map (folder: ''
+      pipe (genMu4eMaildirs mail) [
+        (map (folder: ''
           ( :name ${toJSON folder.name}
             :query ${toJSON folder.query}
             :source ${toJSON mail.name}
@@ -253,17 +258,19 @@ let
             :bs-maildir t
             :bs-maildir-key ?${folder.key}
             :maildir ${toJSON folder.path})
-        '') (genMu4eMaildirs mail)
-      );
+        ''))
+        (concatStringsSep "\n")
+      ];
 
     genMu4eMaildirShortcuts =
       mail:
-      concatStringsSep "\n" (
-        map (folder: ''
+      pipe (genMu4eMaildirs mail) [
+        (map (folder: ''
           ( :maildir ${toJSON folder.path}
             :key ?${folder.key})
-        '') (genMu4eMaildirs mail)
-      );
+        ''))
+        (concatStringsSep "\n")
+      ];
 
     genMu4eContext =
       mail:
@@ -291,13 +298,17 @@ let
 
         realName = toJSON account.realName;
 
-        addresses' = concatStringsSep " " (
-          map toJSON mail.addresses
-        );
+        addresses' = pipe mail.addresses [
+          (map toJSON)
+          (concatStringsSep " ")
+        ];
 
-        sharedMaildirAddresses' = concatStringsSep " " (
-          map toJSON sharedMaildirAddresses
-        );
+        sharedMaildirAddresses' =
+          pipe sharedMaildirAddresses
+            [
+              (map toJSON)
+              (concatStringsSep " ")
+            ];
 
         signature = toJSON account.signature.text;
 
@@ -352,7 +363,10 @@ let
 
     genSyncCollections =
       collections:
-      concatStringsSep " " (map toJSON collections);
+      pipe collections [
+        (map toJSON)
+        (concatStringsSep " ")
+      ];
   };
 
 in
@@ -443,9 +457,10 @@ in
             && sharesPrimaryMaildir candidate
           ) enabledMails;
 
-          sharedMaildirAddresses = concatLists (
-            map mailAddresses sharedMails
-          );
+          sharedMaildirAddresses = pipe sharedMails [
+            (map mailAddresses)
+            concatLists
+          ];
 
           prepareMail =
             candidate:
@@ -464,8 +479,8 @@ in
               genMailContext =
                 account: el.genMu4eContext (prepareMail account);
             in
-            concatStringsSep "\n" (
-              map genMailContext (
+            pipe
+              (
                 [ primaryMailEntry ]
                 ++ sharedMails
                 ++ filter (
@@ -474,7 +489,10 @@ in
                   && !sharesPrimaryMaildir candidate
                 ) enabledMails
               )
-            );
+              [
+                (map genMailContext)
+                (concatStringsSep "\n")
+              ];
 
         in
         with el;
@@ -625,9 +643,9 @@ in
           agent-recall
           agent-review
           agent-shell
+          agent-shell-manager
           agent-shell-sidebar
           agent-shell-tramp
-          agent-shell-manager
           anzu
           apheleia
           beframe

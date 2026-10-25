@@ -68,8 +68,8 @@ let
   sessionVariables = {
     GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
-    XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
   };
 in
 {
@@ -80,16 +80,22 @@ in
   ];
 
   gtk = {
-    gtk2.extraConfig = ''
-      gtk-im-module="fcitx"
-    '';
-
-    gtk3.extraConfig = {
-      gtk-im-module = "fcitx";
+    gtk2 = {
+      extraConfig = ''
+        gtk-im-module="fcitx"
+      '';
     };
 
-    gtk4.extraConfig = {
-      gtk-im-module = "fcitx";
+    gtk3 = {
+      extraConfig = {
+        gtk-im-module = "fcitx";
+      };
+    };
+
+    gtk4 = {
+      extraConfig = {
+        gtk-im-module = "fcitx";
+      };
     };
   };
 
@@ -132,19 +138,19 @@ in
             };
 
             "Groups/0" = {
-              "Name" = "Default";
               "Default Layout" = keyboardLayout;
               "DefaultIM" = keyboardInputMethod;
+              "Name" = "Default";
             };
 
             "Groups/0/Items/0" = {
-              "Name" = "rime";
               "Layout" = "";
+              "Name" = "rime";
             };
 
             "Groups/0/Items/1" = {
-              "Name" = keyboardInputMethod;
               "Layout" = "";
+              "Name" = keyboardInputMethod;
             };
           };
         };

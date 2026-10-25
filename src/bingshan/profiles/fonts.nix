@@ -7,10 +7,6 @@
   ...
 }:
 let
-  inherit (builtins)
-    readDir
-    ;
-
   inherit (lib)
     filterAttrs
     getExe'
@@ -18,6 +14,7 @@ let
     mapAttrs'
     mkForce
     nameValuePair
+    readDir
     removeSuffix
     ;
 

@@ -8,7 +8,6 @@
 let
   inherit (lib)
     elemAt
-    toString
     ;
 
   first = list: elemAt list 0;
