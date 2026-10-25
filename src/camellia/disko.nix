@@ -11,13 +11,14 @@
                 bootable = true;
 
                 content = {
-                  type = "filesystem";
-                  format = "ext4";
                   extraArgs = [
                     "-L"
                     "nixos"
                   ];
+
+                  format = "ext4";
                   mountpoint = "/";
+                  type = "filesystem";
                 };
 
                 end = "98585MiB";
@@ -28,11 +29,12 @@
               }
               {
                 content = {
-                  type = "swap";
                   extraArgs = [
                     "-L"
                     "swap"
                   ];
+
+                  type = "swap";
                 };
 
                 end = "100%";

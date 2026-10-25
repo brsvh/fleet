@@ -22,13 +22,6 @@ let
       enableACME = config.security.acme.acceptTerms;
       forceSSL = config.security.acme.acceptTerms;
 
-      root = writeTextDir ".well-known/mta-sts.txt" ''
-        version: STSv1
-        mode: testing
-        mx: ${cfg.fqdn}
-        max_age: 604800
-      '';
-
       locations = {
         "= /.well-known/mta-sts.txt" = {
           extraConfig = ''
@@ -36,6 +29,13 @@ let
           '';
         };
       };
+
+      root = writeTextDir ".well-known/mta-sts.txt" ''
+        version: STSv1
+        mode: testing
+        mx: ${cfg.fqdn}
+        max_age: 604800
+      '';
     };
   };
 
@@ -70,7 +70,6 @@ in
       "cloud@bingshan.org" = {
         passwordFile =
           config.sops.secrets."cloud@bingshan.org".path;
-
         sendOnly = true;
       };
     };

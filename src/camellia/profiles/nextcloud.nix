@@ -61,11 +61,11 @@ in
     };
 
     hosts = {
-      "95.133.228.83" = [
+      "2a0b:7140:8:1:5054:ff:feef:6795" = [
         officeServer
       ];
 
-      "2a0b:7140:8:1:5054:ff:feef:6795" = [
+      "95.133.228.83" = [
         officeServer
       ];
     };
@@ -85,9 +85,7 @@ in
             key = store.keyId;
             port = 3900;
             region = "garage";
-
             secretFile = store.secret;
-
             usePathStyle = true;
             useSsl = false;
             verify_bucket_exists = true;
@@ -122,6 +120,20 @@ in
       };
     };
 
+    nextcloud-whiteboard-server = {
+      enable = true;
+
+      secrets = [
+        secrets."nextcloud/whiteboard-env".path
+      ];
+
+      settings = {
+        CHROME_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
+        NEXTCLOUD_URL = "https://${cfg.hostName}";
+        PORT = "3002";
+      };
+    };
+
     nginx = {
       virtualHosts = {
         "${cfg.hostName}" = {
@@ -148,20 +160,6 @@ in
       };
     };
 
-    nextcloud-whiteboard-server = {
-      enable = true;
-
-      secrets = [
-        secrets."nextcloud/whiteboard-env".path
-      ];
-
-      settings = {
-        CHROME_EXECUTABLE_PATH = "${pkgs.chromium}/bin/chromium";
-        NEXTCLOUD_URL = "https://${cfg.hostName}";
-        PORT = "3002";
-      };
-    };
-
     onlyoffice = {
       enable = true;
       hostname = officeServer;
@@ -169,6 +167,69 @@ in
         secrets."onlyoffice/jwt-secret".path;
       securityNonceFile =
         secrets."onlyoffice/security-nonce".path;
+    };
+  };
+
+  sops = {
+    secrets = {
+      "chang@bingshan.org" = {
+        restartUnits = [
+          "nextcloud-configure.service"
+        ];
+      };
+
+      "cloud@bingshan.org" = {
+        restartUnits = [
+          "phpfpm-nextcloud.service"
+        ];
+      };
+
+      "garage/rpc-secret" = {
+        owner = "garage";
+
+        restartUnits = [
+          "garage.service"
+          "garage-configure.service"
+        ];
+      };
+
+      "nextcloud/s3-secret-key" = {
+        restartUnits = [
+          "garage-configure.service"
+          "nextcloud-setup.service"
+          "phpfpm-nextcloud.service"
+        ];
+      };
+
+      "nextcloud/whiteboard-env" = {
+        restartUnits = [
+          "nextcloud-configure.service"
+          "nextcloud-whiteboard-server.service"
+        ];
+      };
+
+      "onlyoffice/jwt-secret" = {
+        group = "onlyoffice";
+        mode = "0440";
+        owner = "onlyoffice";
+
+        restartUnits = [
+          "nextcloud-configure.service"
+          "onlyoffice-converter.service"
+          "onlyoffice-docservice.service"
+        ];
+      };
+
+      "onlyoffice/security-nonce" = {
+        group = "onlyoffice";
+        mode = "0440";
+        owner = "onlyoffice";
+
+        restartUnits = [
+          "nginx.service"
+          "onlyoffice-docservice.service"
+        ];
+      };
     };
   };
 
@@ -508,16 +569,6 @@ in
         ];
       };
 
-      nextcloud-setup = {
-        after = [
-          "garage-configure.service"
-        ];
-
-        requires = [
-          "garage-configure.service"
-        ];
-      };
-
       nextcloud-configure = {
         after = [
           "nextcloud-setup.service"
@@ -753,67 +804,14 @@ in
           "multi-user.target"
         ];
       };
-    };
-  };
 
-  sops = {
-    secrets = {
-      "garage/rpc-secret" = {
-        owner = "garage";
-
-        restartUnits = [
-          "garage.service"
+      nextcloud-setup = {
+        after = [
           "garage-configure.service"
         ];
-      };
 
-      "chang@bingshan.org" = {
-        restartUnits = [
-          "nextcloud-configure.service"
-        ];
-      };
-
-      "cloud@bingshan.org" = {
-        restartUnits = [
-          "phpfpm-nextcloud.service"
-        ];
-      };
-
-      "nextcloud/s3-secret-key" = {
-        restartUnits = [
+        requires = [
           "garage-configure.service"
-          "nextcloud-setup.service"
-          "phpfpm-nextcloud.service"
-        ];
-      };
-
-      "nextcloud/whiteboard-env" = {
-        restartUnits = [
-          "nextcloud-configure.service"
-          "nextcloud-whiteboard-server.service"
-        ];
-      };
-
-      "onlyoffice/jwt-secret" = {
-        group = "onlyoffice";
-        mode = "0440";
-        owner = "onlyoffice";
-
-        restartUnits = [
-          "nextcloud-configure.service"
-          "onlyoffice-converter.service"
-          "onlyoffice-docservice.service"
-        ];
-      };
-
-      "onlyoffice/security-nonce" = {
-        group = "onlyoffice";
-        mode = "0440";
-        owner = "onlyoffice";
-
-        restartUnits = [
-          "nginx.service"
-          "onlyoffice-docservice.service"
         ];
       };
     };
