@@ -9,7 +9,6 @@ let
   inherit (lib)
     elemAt
     mkForce
-    toString
     ;
 
   first = list: elemAt list 0;

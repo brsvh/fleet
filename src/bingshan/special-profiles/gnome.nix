@@ -32,8 +32,8 @@ in
   dconf = {
     settings = {
       "org/gnome/desktop/interface" = {
-        font-name = "${first fonts.sansSerif} ${toString config.gtk.font.size}";
         document-font-name = "${first fonts.serif} ${toString config.gtk.font.size}";
+        font-name = "${first fonts.sansSerif} ${toString config.gtk.font.size}";
         monospace-font-name = "${first fonts.monospace} ${toString config.gtk.font.size}";
       };
 

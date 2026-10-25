@@ -13,12 +13,6 @@
   accounts =
     let
       bingshan = {
-        mail = rec {
-          host = "mail.bingshan.org";
-          passwordCommand = "pass show ${host}/${userName}";
-          userName = "chang@bingshan.org";
-        };
-
         cloud = rec {
           host = "cloud.bingshan.org";
 
@@ -29,6 +23,12 @@
           ];
 
           userName = "bingshan";
+        };
+
+        mail = rec {
+          host = "mail.bingshan.org";
+          passwordCommand = "pass show ${host}/${userName}";
+          userName = "chang@bingshan.org";
         };
       };
 
