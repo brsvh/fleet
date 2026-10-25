@@ -37,7 +37,7 @@ let
   }) config.accounts.email.accounts;
 
   el = rec {
-    cjkFont = toJSON "Zhuque Fangsong (technical preview)";
+    cjkFont = toJSON "LXGW Neo ZhiSong";
 
     genAddressbook =
       addressbook:
@@ -391,12 +391,12 @@ in
         haskell-language-server
         hunspell
         hunspellDicts.en_US-large
+        lxgwPackages.neo-zhisong
         nerd-fonts.symbols-only
         nixd
         nixfmt
         pyright
         ripgrep
-        trionestypePackages.zhuque-fangsong
         typescript
         vscode-json-languageserver
         wl-clipboard
