@@ -47,6 +47,7 @@ in
 
       measuredBoot = {
         enable = true;
+
         pcrs = [
           0
           4
