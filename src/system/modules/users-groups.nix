@@ -8,7 +8,6 @@ let
     filterAttrs
     genAttrs
     mapAttrsToList
-    mkDefault
     ;
 
   normalUsers = filterAttrs (

@@ -24,6 +24,7 @@ let
   state = cfg.stateDirectory;
   seed = "/var/lib/inn-bootstrap/seed";
   marker = "${state}/.initialized";
+
   path = makeBinPath (
     with pkgs;
     [

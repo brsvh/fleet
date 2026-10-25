@@ -13,7 +13,6 @@ in
       allowBitmaps = mkDefault false;
       allowType1 = mkDefault false;
       cache32Bit = mkDefault false;
-
       enable = mkDefault true;
 
       hinting = {
