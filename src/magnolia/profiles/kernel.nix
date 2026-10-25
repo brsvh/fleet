@@ -4,10 +4,6 @@
 }:
 {
   boot = {
-    initrd = {
-      verbose = false;
-    };
-
     kernelPackages = pkgs.linuxPackages_zen;
 
     kernelParams = [

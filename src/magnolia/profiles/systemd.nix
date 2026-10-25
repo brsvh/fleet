@@ -1,12 +1,7 @@
 {
-  system,
   ...
 }:
 {
-  imports = [
-    system.profiles.systemd
-  ];
-
   systemd = {
     sleep = {
       settings = {
