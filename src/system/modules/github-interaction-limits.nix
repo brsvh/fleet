@@ -51,16 +51,12 @@ in
     systemd = {
       services = {
         github-interaction-limits = {
-          description = "Renew GitHub collaborator-only interactions";
-
           after = [
             "network-online.target"
             "sops-install-secrets.service"
           ];
 
-          wants = [
-            "network-online.target"
-          ];
+          description = "Renew GitHub collaborator-only interactions";
 
           path = with pkgs; [
             coreutils
@@ -138,20 +134,24 @@ in
           };
 
           startLimitIntervalSec = 0;
+
+          wants = [
+            "network-online.target"
+          ];
         };
       };
 
       timers = {
         github-interaction-limits = {
-          wantedBy = [
-            "timers.target"
-          ];
-
           timerConfig = {
             OnCalendar = "monthly";
             Persistent = true;
             RandomizedDelaySec = "15min";
           };
+
+          wantedBy = [
+            "timers.target"
+          ];
         };
       };
     };

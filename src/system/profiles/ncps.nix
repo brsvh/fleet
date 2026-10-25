@@ -20,12 +20,13 @@ in
 
       cache = {
         allowDeleteVerb = mkDefault false;
-        signNarinfo = mkDefault true;
 
         lru = {
           schedule = mkDefault "*/5 * * * *";
           scheduleTimeZone = mkDefault "UTC";
         };
+
+        signNarinfo = mkDefault true;
 
         upstream = {
           publicKeys = [

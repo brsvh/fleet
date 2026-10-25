@@ -40,7 +40,6 @@ in
       ];
 
       fallback = true;
-
       keep-build-log = true;
       keep-derivations = true;
       keep-env-derivations = true;
