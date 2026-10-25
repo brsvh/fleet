@@ -9,7 +9,6 @@ let
     mkEnableOption
     mkIf
     mkPackageOption
-    types
     ;
 
   cfg = config.programs.wemeet;

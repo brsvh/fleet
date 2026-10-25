@@ -16,8 +16,9 @@ let
     mapAttrsToList
     mkOption
     nameValuePair
-    unique
+    pipe
     types
+    unique
     ;
 
   mkDisplayName =
@@ -135,11 +136,12 @@ let
     ) account.emacs.addressbooks
   ) { } contactAccounts;
 
-  defaultAddressbookNames = attrNames (
-    filterAttrs (
+  defaultAddressbookNames = pipe addressbooks [
+    (filterAttrs (
       _: addressbook: addressbook.default
-    ) addressbooks
-  );
+    ))
+    attrNames
+  ];
 
   defaultAddressbook =
     if length defaultAddressbookNames == 1 then
@@ -147,182 +149,194 @@ let
     else
       null;
 
-  syncCollections = unique (
-    mapAttrsToList (
+  syncCollections = pipe addressbooks [
+    (mapAttrsToList (
       _: addressbook: addressbook.syncCollection
-    ) addressbooks
-  );
+    ))
+    unique
+  ];
 
-  invalidAddressbookNames = attrNames (
-    filterAttrs (
+  invalidAddressbookNames = pipe addressbooks [
+    (filterAttrs (
       _: addressbook:
       addressbook.addressbookId == ""
       || addressbook.khardName == ""
       || addressbook.path == ""
       || addressbook.syncCollection == ""
-    ) addressbooks
-  );
+    ))
+    attrNames
+  ];
 
   readOnlyDefaultAddressbookNames = filter (
     name: addressbooks.${name}.readOnly
   ) defaultAddressbookNames;
 
-  missingKhardAccountNames = attrNames (
-    filterAttrs (
+  missingKhardAccountNames = pipe contactAccounts [
+    (filterAttrs (
       _: account:
       account.emacs.addressbooks != { }
       && !account.khard.enable
-    ) contactAccounts
-  );
+    ))
+    attrNames
+  ];
 
-  missingVdirsyncerAccountNames = attrNames (
-    filterAttrs (
-      _: account:
-      account.emacs.addressbooks != { }
-      && !account.vdirsyncer.enable
-    ) contactAccounts
-  );
+  missingVdirsyncerAccountNames =
+    pipe contactAccounts
+      [
+        (filterAttrs (
+          _: account:
+          account.emacs.addressbooks != { }
+          && !account.vdirsyncer.enable
+        ))
+        attrNames
+      ];
 in
 {
   options = {
     accounts = {
       contact = {
         accounts = mkOption {
-          type = types.attrsOf (
-            types.submodule (
-              { name, config, ... }:
-              let
-                accountName = name;
-                account = config;
-              in
-              {
-                options = {
-                  emacs = {
-                    addressbooks = mkOption {
-                      default = { };
+          type =
+            with types;
+            attrsOf (
+              submodule (
+                {
+                  name,
+                  config,
+                  ...
+                }:
+                let
+                  accountName = name;
+                  account = config;
+                in
+                {
+                  options = {
+                    emacs = {
+                      addressbooks = mkOption {
+                        default = { };
 
-                      description = ''
-                        Local vCard addressbooks exposed to Emacs.
-                      '';
+                        description = ''
+                          Local vCard addressbooks exposed to Emacs.
+                        '';
 
-                      type = types.attrsOf (
-                        types.submodule (
-                          { name, ... }:
-                          {
-                            options = {
-                              default = mkOption {
-                                default = false;
+                        type =
+                          with types;
+                          attrsOf (
+                            submodule (
+                              { name, ... }:
+                              {
+                                options = {
+                                  default = mkOption {
+                                    default = false;
 
-                                description = ''
-                                  Whether this addressbook is the default Emacs
-                                  write target.
-                                '';
+                                    description = ''
+                                      Whether this addressbook is the default Emacs
+                                      write target.
+                                    '';
 
-                                type = types.bool;
-                              };
+                                    type = types.bool;
+                                  };
 
-                              khardName = mkOption {
-                                default = name;
+                                  khardName = mkOption {
+                                    default = name;
 
-                                description = ''
-                                  Addressbook name accepted by khard.
-                                '';
+                                    description = ''
+                                      Addressbook name accepted by khard.
+                                    '';
 
-                                type = types.str;
-                              };
+                                    type = types.str;
+                                  };
 
-                              name = mkOption {
-                                default = mkDisplayName accountName name;
+                                  name = mkOption {
+                                    default = mkDisplayName accountName name;
 
-                                description = ''
-                                  Human-readable addressbook name shown in
-                                  Emacs.
-                                '';
+                                    description = ''
+                                      Human-readable addressbook name shown in
+                                      Emacs.
+                                    '';
 
-                                type = types.str;
-                              };
+                                    type = types.str;
+                                  };
 
-                              path = mkOption {
-                                default = "${account.local.path}/${name}";
+                                  path = mkOption {
+                                    default = "${account.local.path}/${name}";
 
-                                description = ''
-                                  Local directory containing this addressbook's
-                                  vCard files.
-                                '';
+                                    description = ''
+                                      Local directory containing this addressbook's
+                                      vCard files.
+                                    '';
 
-                                type = types.str;
-                              };
+                                    type = types.str;
+                                  };
 
-                              readOnly = mkOption {
-                                default = false;
+                                  readOnly = mkOption {
+                                    default = false;
 
-                                description = ''
-                                  Whether Emacs should treat this addressbook
-                                  as read-only.
-                                '';
+                                    description = ''
+                                      Whether Emacs should treat this addressbook
+                                      as read-only.
+                                    '';
 
-                                type = types.bool;
-                              };
+                                    type = types.bool;
+                                  };
 
-                              syncCollection = mkOption {
-                                default = "contacts_${accountName}/${name}";
+                                  syncCollection = mkOption {
+                                    default = "contacts_${accountName}/${name}";
 
-                                description = ''
-                                  Vdirsyncer collection selected when Emacs
-                                  synchronizes contacts.
-                                '';
+                                    description = ''
+                                      Vdirsyncer collection selected when Emacs
+                                      synchronizes contacts.
+                                    '';
 
-                                type = types.str;
-                              };
-                            };
-                          }
-                        )
-                      );
+                                    type = types.str;
+                                  };
+                                };
+                              }
+                            )
+                          );
+                      };
                     };
                   };
-                };
-              }
-            )
-          );
+                }
+              )
+            );
         };
 
         emacs = {
           addressbooks = mkOption {
-            readOnly = true;
-
             description = ''
               Local contact addressbooks exposed to Emacs.
             '';
 
+            readOnly = true;
             type = types.attrsOf emacsAddressbookType;
           };
 
           defaultAddressbook = mkOption {
-            readOnly = true;
-
             description = ''
               Default writable addressbook exposed to Emacs.
             '';
 
+            readOnly = true;
             type = with types; nullOr emacsAddressbookType;
           };
 
           syncCollections = mkOption {
-            readOnly = true;
-
             description = ''
               Vdirsyncer contact collections synchronized by Emacs.
             '';
 
-            type = types.listOf types.str;
+            readOnly = true;
+            type = with types; listOf str;
           };
         };
       };
 
       email = {
         accounts = mkOption {
-          type = types.attrsOf (
-            types.submodule {
+          type =
+            with types;
+            attrsOf (submodule {
               options = {
                 folders = {
                   junk = mkOption {
@@ -336,8 +350,7 @@ in
                   };
                 };
               };
-            }
-          );
+            });
         };
       };
     };

@@ -21,6 +21,16 @@ in
   options = {
     programs = {
       emacs = {
+        earlyInitFile = mkOption {
+          default = null;
+
+          description = ''
+            The user's early init file.
+          '';
+
+          type = with types; nullOr path;
+        };
+
         extraEarlyConfig = mkOption {
           default = "";
 
@@ -30,16 +40,6 @@ in
           '';
 
           type = types.lines;
-        };
-
-        earlyInitFile = mkOption {
-          default = null;
-
-          description = ''
-            The user's early init file.
-          '';
-
-          type = with types; nullOr path;
         };
 
         initFile = mkOption {
