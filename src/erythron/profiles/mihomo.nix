@@ -27,7 +27,6 @@
     mihomo = {
       configFile =
         config.sops.secrets."tagss.yaml".path;
-
       tunMode = false;
     };
   };
