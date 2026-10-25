@@ -53,11 +53,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791855551,
-        "narHash": "sha256-7KcwzJgoC4rvTpiJHdcALxbeggvHDNG57j3K0LsYoVI=",
+        "lastModified": 1792952439,
+        "narHash": "sha256-96w1DBCUqSrxHW4kYy68batwL/1267X3OvEsJxThpkI=",
         "ref": "main",
-        "rev": "89ec4f91c50bbc3515641b91b2fa63538f1df8f5",
-        "revCount": 159,
+        "rev": "4f3f1ed8866fceaadca2a32fca5acd74c527a3fe",
+        "revCount": 180,
         "type": "git",
         "url": "https://github.com/brsvh/chinese-fonts-overlay.git"
       },
@@ -429,11 +429,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792637064,
-        "narHash": "sha256-JqK46f6FtuxRBWEP2jpKpwIQGvO9Og33cXeo8bAocVk=",
+        "lastModified": 1792940150,
+        "narHash": "sha256-86EXcMmLdCoJ26Cy3N97qyRwaEPmOOJ0rhMsSCR4YqY=",
         "ref": "main",
-        "rev": "579700a068dff10b01898c5d6c7994d830769ad1",
-        "revCount": 197,
+        "rev": "1dc436a2aedc86e5e60b33eedf306fce747b7294",
+        "revCount": 199,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
@@ -582,11 +582,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1792502884,
-        "narHash": "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=",
+        "lastModified": 1792773339,
+        "narHash": "sha256-rZLrzrC6i+jnTAlvPZHogKDulY7WWDEv9hJeHieO7Zw=",
         "ref": "nixos-unstable",
-        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
-        "revCount": 1097682,
+        "rev": "3ec636362e1816bc2f0888fa0fa2c69f1bc9e504",
+        "revCount": 1100280,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
