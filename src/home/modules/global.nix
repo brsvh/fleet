@@ -7,11 +7,9 @@
 let
   inherit (lib)
     mkEnableOption
-    mkOption
-    mkPackageOption
     mkIf
     mkMerge
-    types
+    mkPackageOption
     ;
 in
 {

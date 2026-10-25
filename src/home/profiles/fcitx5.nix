@@ -12,7 +12,6 @@ in
   i18n = {
     inputMethod = {
       enable = mkDefault true;
-      type = mkDefault "fcitx5";
 
       fcitx5 = {
         addons = with pkgs; [
@@ -25,12 +24,12 @@ in
           addons = {
             clipboard = {
               globalSection = {
-                "TriggerKey" = "";
-                "PastePrimaryKey" = "";
-                "Number of entries" = 5;
-                "IgnorePasswordFromPasswordManager" = false;
-                "ShowPassword" = false;
                 "ClearPasswordAfter" = 30;
+                "IgnorePasswordFromPasswordManager" = false;
+                "Number of entries" = 5;
+                "PastePrimaryKey" = "";
+                "ShowPassword" = false;
+                "TriggerKey" = "";
               };
             };
 
@@ -42,51 +41,65 @@ in
 
             quickphrase = {
               globalSection = {
-                "TriggerKey" = "";
                 "Choose Modifier" = "None";
-                "Spell" = false;
                 "FallbackSpellLanguage" = "en";
+                "Spell" = false;
+                "TriggerKey" = "";
               };
             };
           };
 
           globalOptions = {
-            "Hotkey" = {
-              "EnumerateWithTriggerKeys" = true;
-              "EnumerateForwardKeys" = null;
-              "EnumerateBackwardKeys" = null;
-              "EnumerateSkipFirst" = false;
-              "ModifierOnlyKeyTimeout" = 250;
+            "Behavior" = {
+              "ActiveByDefault" = false;
+              "AllowInputMethodForPassword" = false;
+              "AutoSavePeriod" = 30;
+              "CompactInputMethodInformation" = true;
+              "CustomXkbOption" = "";
+              "DefaultPageSize" = 8;
+              "DisabledAddons" = "";
+              "EnabledAddons" = "";
+              "OverrideXkbOption" = false;
+              "PreeditEnabledByDefault" = false;
+              "PreloadInputMethod" = true;
+              "ShareInputState" = "No";
+              "ShowFirstInputMethodInformation" = true;
+              "ShowInputMethodInformation" = true;
+              "ShowPreeditForPassword" = false;
+              "resetStateWhenFocusIn" = "No";
+              "showInputMethodInformationWhenFocusIn" = false;
             };
 
-            "Hotkey/TriggerKeys" = {
-              "0" = "Control+Shift+Shift_L";
-              "1" = "Zenkaku_Hankaku";
-              "2" = "Hangul";
+            "Hotkey" = {
+              "EnumerateBackwardKeys" = null;
+              "EnumerateForwardKeys" = null;
+              "EnumerateSkipFirst" = false;
+              "EnumerateWithTriggerKeys" = true;
+              "ModifierOnlyKeyTimeout" = 250;
             };
 
             "Hotkey/ActivateKeys" = {
               "0" = "Hangul_Hanja";
             };
 
-            "Hotkey/DeactivateKeys" = {
-              "0" = "Hangul_Romaja";
-            };
-
             "Hotkey/AltTriggerKeys" = {
               "0" = "Shift_L";
             };
 
-            "Hotkey/EnumerateGroupForwardKeys" = {
-              "0" = "Super+space";
+            "Hotkey/DeactivateKeys" = {
+              "0" = "Hangul_Romaja";
             };
 
             "Hotkey/EnumerateGroupBackwardKeys" = {
               "0" = "Shift+Super+space";
             };
 
-            "Hotkey/PrevPage" = {
-              "0" = "Up";
+            "Hotkey/EnumerateGroupForwardKeys" = {
+              "0" = "Super+space";
+            };
+
+            "Hotkey/NextCandidate" = {
+              "0" = "Tab";
             };
 
             "Hotkey/NextPage" = {
@@ -97,36 +110,24 @@ in
               "0" = "Shift+Tab";
             };
 
-            "Hotkey/NextCandidate" = {
-              "0" = "Tab";
+            "Hotkey/PrevPage" = {
+              "0" = "Up";
             };
 
             "Hotkey/TogglePreedit" = {
               "0" = "Control+Alt+P";
             };
 
-            "Behavior" = {
-              "ActiveByDefault" = false;
-              "resetStateWhenFocusIn" = "No";
-              "ShareInputState" = "No";
-              "PreeditEnabledByDefault" = false;
-              "ShowInputMethodInformation" = true;
-              "showInputMethodInformationWhenFocusIn" = false;
-              "CompactInputMethodInformation" = true;
-              "ShowFirstInputMethodInformation" = true;
-              "DefaultPageSize" = 8;
-              "OverrideXkbOption" = false;
-              "CustomXkbOption" = "";
-              "EnabledAddons" = "";
-              "DisabledAddons" = "";
-              "PreloadInputMethod" = true;
-              "AllowInputMethodForPassword" = false;
-              "ShowPreeditForPassword" = false;
-              "AutoSavePeriod" = 30;
+            "Hotkey/TriggerKeys" = {
+              "0" = "Control+Shift+Shift_L";
+              "1" = "Zenkaku_Hankaku";
+              "2" = "Hangul";
             };
           };
         };
       };
+
+      type = mkDefault "fcitx5";
     };
   };
 }

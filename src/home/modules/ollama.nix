@@ -73,20 +73,6 @@ in
   options = {
     services = {
       ollama = {
-        models = mkOption {
-          default = [ ];
-
-          description = ''
-            Ollama model references to pull for this user.
-          '';
-
-          example = [
-            "qwen3:1.7b"
-          ];
-
-          type = with types; listOf str;
-        };
-
         loader = {
           enable = mkOption {
             default = true;
@@ -109,6 +95,20 @@ in
 
             type = types.ints.positive;
           };
+        };
+
+        models = mkOption {
+          default = [ ];
+
+          description = ''
+            Ollama model references to pull for this user.
+          '';
+
+          example = [
+            "qwen3:1.7b"
+          ];
+
+          type = with types; listOf str;
         };
       };
     };
@@ -173,7 +173,9 @@ in
                     "network.target"
                     "ollama.service"
                   ];
+
                   Description = "Pull Ollama models";
+
                   Wants = [
                     "ollama.service"
                   ];

@@ -36,6 +36,18 @@ in
           type = types.package;
         };
 
+        extraArgs = mkOption {
+          default = [
+            "-o"
+          ];
+
+          description = ''
+            Extra arguments passed to OfflineIMAP by the systemd user service.
+          '';
+
+          type = with types; listOf str;
+        };
+
         frequency = mkOption {
           default = "*:0/5";
 
@@ -55,18 +67,6 @@ in
           '';
 
           type = types.str;
-        };
-
-        extraArgs = mkOption {
-          default = [
-            "-o"
-          ];
-
-          description = ''
-            Extra arguments passed to OfflineIMAP by the systemd user service.
-          '';
-
-          type = with types; listOf str;
         };
       };
     };

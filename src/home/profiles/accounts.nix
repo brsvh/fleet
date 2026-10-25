@@ -43,18 +43,6 @@ in
   };
 
   programs = {
-    offlineimap = {
-      enable = mkDefault true;
-    };
-
-    mu = {
-      enable = mkDefault true;
-    };
-
-    msmtp = {
-      enable = mkDefault true;
-    };
-
     khal = {
       enable = mkDefault true;
 
@@ -67,6 +55,18 @@ in
     };
 
     khard = {
+      enable = mkDefault true;
+    };
+
+    msmtp = {
+      enable = mkDefault true;
+    };
+
+    mu = {
+      enable = mkDefault true;
+    };
+
+    offlineimap = {
       enable = mkDefault true;
     };
 
