@@ -1,5 +1,6 @@
 {
   lib,
+  system,
   ...
 }:
 let
@@ -8,9 +9,14 @@ let
     ;
 in
 {
+  imports = [
+    system.modules.ncps
+  ];
+
   services = {
     ncps = {
       enable = mkDefault true;
+      protectMigrations = mkDefault true;
 
       analytics = {
         reporting = {
