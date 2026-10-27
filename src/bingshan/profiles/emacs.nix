@@ -700,6 +700,7 @@ in
           consult-project-extra
           corfu
           corfu-candidate-overlay
+          debbugs
           denote
           denote-explore
           denote-journal

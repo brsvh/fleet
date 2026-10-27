@@ -3553,6 +3553,43 @@
 
 
 ;;
+;; Debbugs (info "(debbugs-ug) Top")
+;;
+
+(use-package debbugs-browse
+  :hook
+  ;; Open GNU bug links in the tracker from source and mail buffers.
+  ((bug-reference-mode-hook
+    bug-reference-prog-mode-hook
+    gnus-article-mode-hook
+    goto-address-prog-mode-hook
+    mu4e-view-mode-hook)
+   . debbugs-browse-mode))
+
+(use-package debbugs-gnu
+  :after (bs-lib)
+  :commands (debbugs-gnu
+             debbugs-gnu-bugs
+             debbugs-gnu-patches
+             debbugs-gnu-search
+             debbugs-gnu-tagged)
+  :defines (debbugs-gnu-persistency-file)
+
+  :init
+  ;; Keep local bug tags and marks with other persistent session data.
+  (setq debbugs-gnu-persistency-file
+        (bs-path bs-state-directory "debbugs.el")))
+
+(use-package debbugs-org
+  :commands (debbugs-org
+             debbugs-org-bugs
+             debbugs-org-patches
+             debbugs-org-search
+             debbugs-org-tagged))
+
+
+
+;;
 ;; Denote (info "(denote) Top")
 ;;
 
