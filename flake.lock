@@ -200,6 +200,30 @@
         "url": "https://github.com/brsvh/emacs-elfmt.git"
       }
     },
+    "emacs-ghostel-dwim": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793109255,
+        "narHash": "sha256-YwDn2a0UEi4ksq3asi3fi0uvrW5qsmfpY0WIaQN4QC0=",
+        "ref": "main",
+        "rev": "ff7b4a9988adb7e78dd8d7f123af6269e7a6d9e9",
+        "revCount": 26,
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-ghostel-dwim.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/brsvh/emacs-ghostel-dwim.git"
+      }
+    },
     "emacs-jieba-rs": {
       "inputs": {
         "crane": [
@@ -429,11 +453,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793099496,
-        "narHash": "sha256-r9PZfhZkOg53rJo3InJA4ieb2zgMLAdzhJHVVe5FpwM=",
+        "lastModified": 1793109981,
+        "narHash": "sha256-GLcsyu3a1DdRo77aOy7zB2tELQwtU40cQTJ4vxXbIcA=",
         "ref": "main",
-        "rev": "f308a2d2b5462c68645cf5bbeb7d790ae564a6ae",
-        "revCount": 207,
+        "rev": "4a5566b10748d78e52e42d6abb3253beef9f5cd9",
+        "revCount": 208,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
@@ -631,6 +655,7 @@
         "disko": "disko",
         "emacs-bs": "emacs-bs",
         "emacs-elfmt": "emacs-elfmt",
+        "emacs-ghostel-dwim": "emacs-ghostel-dwim",
         "emacs-jieba-rs": "emacs-jieba-rs",
         "emacs-overlay": "emacs-overlay",
         "emacs-proofread": "emacs-proofread",

@@ -108,6 +108,20 @@
       url = "git+https://github.com/brsvh/emacs-elfmt.git?ref=main";
     };
 
+    emacs-ghostel-dwim = {
+      inputs = {
+        flake-parts = {
+          follows = "flake-parts";
+        };
+
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+
+      url = "git+https://github.com/brsvh/emacs-ghostel-dwim.git?ref=main";
+    };
+
     emacs-jieba-rs = {
       inputs = {
         crane = {
