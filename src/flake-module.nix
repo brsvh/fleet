@@ -10,6 +10,7 @@ let
   inherit (inputs)
     chinese-fonts-overlay
     emacs-bs
+    emacs-ghostel-dwim
     emacs-jieba-rs
     emacs-overlay
     emacs-proofread
@@ -130,6 +131,7 @@ in
           overlays = [
             chinese-fonts-overlay.overlays.default
             emacs-bs.overlays.default
+            emacs-ghostel-dwim.overlays.default
             emacs-jieba-rs.overlays.default
             emacs-overlay.overlays.default
             emacs-proofread.overlays.default
@@ -433,6 +435,7 @@ in
           overlays = [
             chinese-fonts-overlay.overlays.default
             emacs-bs.overlays.default
+            emacs-ghostel-dwim.overlays.default
             emacs-jieba-rs.overlays.default
             emacs-overlay.overlays.default
             emacs-proofread.overlays.default
