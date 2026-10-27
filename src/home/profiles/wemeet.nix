@@ -1,6 +1,7 @@
 {
   home,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -16,6 +17,17 @@ in
   programs = {
     wemeet = {
       enable = mkDefault true;
+
+      package = mkDefault (
+        pkgs.wemeet.overrideAttrs (prevAttrs: {
+          postFixup = (prevAttrs.postFixup or "") + ''
+            wrapProgram "$out/bin/wemeet" \
+              --set-default QT_IM_MODULE fcitx
+            wrapProgram "$out/bin/wemeet-xwayland" \
+              --set-default QT_IM_MODULE fcitx
+          '';
+        })
+      );
     };
   };
 
