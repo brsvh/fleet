@@ -311,6 +311,11 @@
   ;; Show `marginalia' of the mini-buffer completions.
   (bs-first-ui-hook . marginalia-mode))
 
+(use-package mb-depth
+  :hook
+  ;; Show the nesting depth when one minibuffer opens another.
+  (bs-first-ui-hook . minibuffer-depth-indicate-mode))
+
 (use-package minibuffer
   :custom
   ;; Use mini-buffer completion as the UI for ‘completion-at-point’.
@@ -710,6 +715,14 @@
 ;;
 ;; Keyboard Macros (info "(emacs) Keyboard Macros")
 ;;
+
+(use-package consult-kmacro
+  :after (kmacro)
+
+  :bind
+  ( :map kmacro-keymap
+    ;; Select and run a recorded macro with \\`C-x C-k m'.
+    ("m" . consult-kmacro)))
 
 
 
@@ -3117,6 +3130,11 @@
 ;; Hyperlinking and Web Navigation Features
 ;; (info "(emacs) Hyperlinking")
 ;;
+
+(use-package goto-addr
+  :hook
+  ;; Make URLs in source comments and strings directly accessible.
+  (prog-mode-hook . goto-address-prog-mode))
 
 
 
