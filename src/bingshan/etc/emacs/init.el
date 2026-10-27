@@ -3293,223 +3293,8 @@
 
 
 ;;
-;; Agents
+;; Language models
 ;;
-
-(use-package agent-recall
-  :custom
-  ;; Show recently changed conversations first when browsing recalled
-  ;; agent sessions.
-  (agent-recall-browse-sort 'modified-desc)
-
-  ;; Use `consult-ripgrep' interface for full-text recall searches.
-  (agent-recall-search-function 'consult-ripgrep)
-
-  ;; Limit recall indexing and search to source checkouts.
-  (agent-recall-search-paths '("~/src")))
-
-(use-package agent-review
-  :bind
-  ( :map ctl-c-x-map
-    ;; Start an agent-assisted review from the custom agent prefix
-    ;; map.
-    ("r" . agent-review)))
-
-(use-package agent-shell
-  :custom
-  ;; Default new agent shells to the Codex OpenAI agent configuration.
-  (agent-shell-preferred-agent-config
-   (agent-shell-openai-make-codex-config))
-
-  ;; Share an adaptive protected side window with Codex IDE, leaving
-  ;; slot zero available for the dedicated `agent-shell' sidebar.
-  (agent-shell-display-action
-   `((display-buffer-reuse-window
-      ,#'(lambda (buffer alist)
-           (let ((wide-p
-                  (and (integerp split-width-threshold)
-                       (>= (frame-width) split-width-threshold))))
-             (display-buffer-in-side-window
-              buffer
-              (append
-               `((preserve-size
-                  . ,(if wide-p '(t . nil) '(nil . t)))
-                 (side . ,(if wide-p 'right 'bottom))
-                 (slot . 1)
-                 ,(if wide-p
-                      '(window-width . 0.5)
-                    '(window-height . 0.35)))
-               alist)))))
-     (window-parameters . ((no-delete-other-windows . t)))))
-
-  ;; Open agent shells directly at the prompt without the package
-  ;; welcome text.
-  (agent-shell-show-welcome-message nil)
-
-  :config
-  ;; Store `agent-shell' cache entries under `bs-cache-directory'
-  ;; while preserving the package helper's component-based path
-  ;; interface.
-  (advice-add 'agent-shell--cache-dir
-              :override
-              #'(lambda (&rest components)
-                  (let* ((base-dir
-                          (bs-path bs-cache-directory "agent-shell/"))
-                         (cache-dir
-                          (apply #'bs-path base-dir components)))
-                    (make-directory cache-dir t)
-                    cache-dir))
-
-              '((name . agent-shell--cache-dir-redirect)))
-
-  :bind
-  ( :map agent-shell-mode-map
-    ;; Interrupt the running agent process from inside its shell
-    ;; buffer.
-    ("C-c C-k" . agent-shell-interrupt)))
-
-(use-package agent-shell-manager
-  :custom
-  ;; Let `display-buffer-alist' choose the regular window placement,
-  ;; matching list buffers such as `ibuffer' instead of forcing a side
-  ;; window.
-  (agent-shell-manager-side nil)
-
-  :config
-  ;; Show the manager in the selected window like `ibuffer'.  The
-  ;; package displays the buffer before enabling
-  ;; `agent-shell-manager-mode', so match the buffer name rather than
-  ;; the major mode.
-  (add-to-list 'display-buffer-alist
-               '("\\*Agent-Shell Buffers\\*"
-                 (display-buffer-same-window)))
-
-  ;; `agent-shell-manager-toggle' dedicates the displayed window.
-  ;; That is appropriate for side windows, but regular same-window
-  ;; display should remain reusable like `ibuffer'.
-  (advice-add 'agent-shell-manager-toggle
-              :around
-              #'(lambda (orig &rest args)
-                  (let* ((buffer
-                          (get-buffer "*Agent-Shell Buffers*"))
-                         (window
-                          (and buffer
-                               (get-buffer-window buffer))))
-                    (if (and (null agent-shell-manager-side)
-                             (window-live-p window))
-                        (progn
-                          (set-window-dedicated-p window nil)
-                          (quit-window nil window))
-                      (prog1 (apply orig args)
-                        (when-let*
-                            ((buffer
-                              (get-buffer "*Agent-Shell Buffers*"))
-                             (window
-                              (get-buffer-window buffer)))
-                          (when (null agent-shell-manager-side)
-                            (set-window-dedicated-p window nil)))))))
-              '((name . agent-shell-manager-buffer-normalize)))
-
-  :bind
-  ( :map ctl-c-x-map
-    ;; Toggle the `agent-shell' manager from the custom agent prefix
-    ;; map.
-    ("C-b" . agent-shell-manager-toggle)))
-
-(use-package agent-shell-sidebar
-  :custom
-  ;; Use the Codex OpenAI agent configuration for sidebar sessions.
-  (agent-shell-sidebar-default-config
-   (agent-shell-openai-make-codex-config))
-
-  :bind
-  ( :map ctl-c-x-map
-    ;; Toggle the persistent agent sidebar from the custom agent
-    ;; prefix map.
-    ("s" . agent-shell-sidebar-toggle)))
-
-(use-package agent-shell-tramp
-  :after (agent-shell)
-  :commands (agent-shell-tramp-mode)
-
-  :config
-  ;; Enable `tramp' integration so agent shells can operate on remote
-  ;; buffers and paths.
-  (agent-shell-tramp-mode +1))
-
-(use-package codex-ide-session
-  :bind
-  ( :map ctl-c-x-map
-    ;; Start Codex IDE from the custom agent prefix map.
-    ("c" . codex-ide)))
-
-(use-package codex-ide
-  :custom
-  ;; Sit and relax, patiently waiting for the app-server thread to be
-  ;; ready.
-  (codex-ide-request-timeout 60)
-
-  :init
-  ;; Share the adaptive protected side window used by regular
-  ;; `agent-shell' sessions, while retaining each conversation buffer
-  ;; for later reuse.
-  (add-to-list 'display-buffer-alist
-               `((derived-mode . codex-ide-session-mode)
-                 (display-buffer-reuse-window
-                  ,#'(lambda (buffer alist)
-                       (let ((wide-p
-                              (and
-                               (integerp split-width-threshold)
-                               (>= (frame-width)
-                                   split-width-threshold))))
-                         (display-buffer-in-side-window
-                          buffer
-                          (append
-                           `((preserve-size
-                              . ,(if wide-p '(t . nil) '(nil . t)))
-                             (side . ,(if wide-p 'right 'bottom))
-                             (slot . 1)
-                             ,(if wide-p
-                                  '(window-width . 0.5)
-                                '(window-height . 0.35)))
-                           alist)))))
-                 (window-parameters
-                  . ((no-delete-other-windows . t))))))
-
-(use-package codex-ide
-  :after (codex-ide-session)
-
-  ;; Load the complete package entrypoint after the session module, so
-  ;; approval and event-loop handlers are ready for the first session.
-  :demand t)
-
-(use-package codex-ide-session-mode
-  :bind
-  ( :map codex-ide-session-mode-map
-    ;; Leave \\`C-c RET' unbound so prompt submission has a single
-    ;; mnemonic binding in Codex sessions.
-    ("C-c RET" . nil)))
-
-(use-package codex-ide-transcript
-  :defines (codex-ide-session-mode-map)
-
-  :bind
-  ( :map codex-ide-session-mode-map
-    ;; Submit Codex prompts with the same key used by `shell-maker'
-    ;; buffers.
-    ("C-c C-c" . codex-ide-submit)))
-
-(use-package codex-ide-transient
-  :bind
-  ( :map ctl-c-x-map
-    ;; Open the Codex IDE menu from the custom agent prefix map.
-    ("C-c" . codex-ide-menu)))
-
-(use-package corfu
-  :hook
-  ;; Enable `corfu' in `codex-ide' sessions so automatic slash command
-  ;; completion uses the popup frontend instead of `*Completions*'.
-  (codex-ide-session-mode-hook . corfu-mode))
 
 (use-package gptel
   :commands (gptel
@@ -3529,9 +3314,8 @@
   ;; Keep backend, model, and request status visible above each chat.
   (gptel-use-header-line t)
 
-  ;; Share an adaptive protected side window with regular
-  ;; `agent-shell' and `codex-ide' sessions, leaving slot zero to
-  ;; agent-shell-sidebar.
+  ;; Display chats in a protected side window that adapts to the frame
+  ;; width.
   (gptel-display-buffer-action
    `((display-buffer-reuse-window
       ,#'(lambda (buffer alist)
@@ -3661,8 +3445,7 @@
     ("RET" . gptel-send)
 
     :map gptel-mode-map
-    ;; Submit prompts with the same mnemonic used by `agent-shell' and
-    ;; `codex-ide'; a prefix argument opens the `gptel' menu.
+    ;; Submit prompts; a prefix argument opens the `gptel' menu.
     ("C-c C-c" . gptel-send)
 
     ;; Keep one unambiguous prompt-submission binding in `gptel'
@@ -3793,24 +3576,6 @@
     ;; Retain access to `org-ctrl-c-ctrl-c' after taking over its
     ;; usual binding for prompt submission.
     ("C-c C-M-c" . org-ctrl-c-ctrl-c)))
-
-(use-package shell-maker
-  :after (agent-shell)
-
-  :bind
-  ( :map agent-shell-mode-map
-    ;; Submit the current `shell-maker' input without leaving insert
-    ;; flow.
-    ("C-c C-c" . shell-maker-submit)))
-
-(use-package simple
-  :after (agent-shell)
-
-  :bind
-  ( :map agent-shell-mode-map
-    ;; Keep \\`RET' as a plain newline inside `agent-shell' buffers;
-    ;; explicit submission remains on \\`C-c C-c'.
-    ("RET" . newline)))
 
 
 
