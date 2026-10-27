@@ -165,6 +165,78 @@ in
       hostname = officeServer;
       jwtSecretFile =
         secrets."onlyoffice/jwt-secret".path;
+
+      package =
+        pkgs.onlyoffice-documentserver.override
+          {
+            # The scanner skips combine's symlinks.
+            extra-fonts = with pkgs.microsoftPackages; [
+              arial
+              bahnschrift
+              calibri
+              cambria
+              cambria-math
+              candara
+              comic-sans-ms
+              consolas
+              constantia
+              corbel
+              courier-new
+              dengxian
+              ebrima
+              fangsong
+              franklin-gothic-medium
+              gabriola
+              gadugi
+              georgia
+              impact
+              ink-free
+              javanese-text
+              kaiti
+              leelawadee-ui
+              lucida-console
+              lucida-sans-unicode
+              malgun-gothic
+              marlett
+              microsoft-himalaya
+              microsoft-jhenghei
+              microsoft-new-tai-lue
+              microsoft-phagspa
+              microsoft-sans-serif
+              microsoft-tai-le
+              microsoft-yahei
+              microsoft-yi-baiti
+              mingliu
+              mongolian-baiti
+              ms-gothic
+              mv-boli
+              myanmar-text
+              nirmala
+              noto-sans-sc
+              noto-serif-sc
+              palatino-linotype
+              sans-serif-collection
+              segoe-icons
+              segoe-print
+              segoe-script
+              segoe-ui
+              segoe-ui-symbols
+              segoe-ui-variable
+              simhei
+              simsun
+              sitka
+              sylfaen
+              symbol
+              tahoma
+              times-new-roman
+              trebuchet-ms
+              verdana
+              webdings
+              wingdings
+              yu-gothic
+            ];
+          };
+
       securityNonceFile =
         secrets."onlyoffice/security-nonce".path;
     };
