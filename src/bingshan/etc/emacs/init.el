@@ -3419,6 +3419,81 @@
 
 
 ;;
+;; AUCTeX (info "(auctex) Top")
+;;
+
+(use-package apheleia-formatters
+  :config
+  ;; Keep formatting explicit and let project settings override the
+  ;; user-level defaults supplied by Home Manager.
+  (setf (alist-get 'tex-fmt apheleia-formatters)
+        '("tex-fmt" "--stdin"))
+  (setf (alist-get 'LaTeX-mode apheleia-mode-alist) 'tex-fmt
+        (alist-get 'docTeX-mode apheleia-mode-alist) 'tex-fmt))
+
+(use-package corfu
+  :hook
+  ;; AUCTeX derives from Text Mode, so enable completion explicitly.
+  (LaTeX-mode-hook . corfu-mode))
+
+(use-package eglot
+  :config
+  ;; Use the same server for LaTeX documents and documented sources.
+  (add-to-list 'eglot-server-programs
+               '(((LaTeX-mode :language-id "latex")
+                  (docTeX-mode :language-id "latex"))
+                 .
+                 ("texlab")))
+
+  :hook
+  (LaTeX-mode-hook . eglot-ensure)
+
+  ;; Keep manual server builds consistent with AUCTeX.  Formatting
+  ;; belongs to `apheleia', and saving does not start a second build.
+  (LaTeX-mode-hook
+   .
+   (lambda ()
+     (setq-local eglot-workspace-configuration
+                 '(:texlab
+                   (:build
+                    (:args ["-xelatex" "-synctex=1"
+                            "-interaction=nonstopmode"
+                            "-file-line-error" "%f"]
+                           :onSave :json-false)
+                    :latexFormatter "none"))))))
+
+(use-package tex
+  :custom
+  ;; Parse local macros and included files for document-aware editing.
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+
+  ;; Use XeTeX for plain TeX and XeLaTeX for LaTeX documents.
+  (TeX-engine 'xetex)
+  (TeX-PDF-mode t)
+
+  ;; PDF Tools synchronizes inside Emacs without an external editor
+  ;; server.  Generate SyncTeX data for both navigation directions.
+  (TeX-source-correlate-method 'synctex)
+  (TeX-source-correlate-start-server nil)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+
+  :hook
+  (TeX-mode-hook . TeX-source-correlate-mode)
+
+  ;; The built-in command keeps PDF detection in sync with XeLaTeX.
+  ;; Plain TeX keeps its own compiler command.
+  (LaTeX-mode-hook . (lambda ()
+                       (setq-local TeX-command-default "LaTeXMk")))
+
+  ;; Refresh an already open PDF after a successful compilation.
+  (TeX-after-compilation-finished-functions
+   .
+   TeX-revert-document-buffer))
+
+
+
+;;
 ;; Autotyping (info "(autotype) Top")
 ;;
 

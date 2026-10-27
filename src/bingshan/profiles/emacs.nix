@@ -379,6 +379,7 @@ in
     bingshan.profiles.git
     bingshan.profiles.global
     bingshan.profiles.grip
+    bingshan.profiles.tex
     home.profiles.emacs
   ];
 
@@ -678,6 +679,7 @@ in
         epkgs: with epkgs; [
           anzu
           apheleia
+          auctex
           beframe
           benchmark-init
           blamer
