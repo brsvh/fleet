@@ -1,4 +1,5 @@
 {
+  config,
   home,
   inputs,
   lib,
@@ -24,6 +25,14 @@ let
   xkb = osConfig.services.xserver.xkb;
   layouts = splitString "," xkb.layout;
   variants = splitString "," xkb.variant;
+
+  inputMethod = config.i18n.inputMethod;
+
+  nativeFcitx5 =
+    config.programs.plasma.enable
+    && inputMethod.enable
+    && inputMethod.type == "fcitx5"
+    && inputMethod.fcitx5.waylandFrontend;
 in
 {
   imports = [
@@ -71,6 +80,11 @@ in
             };
           };
         };
+
+        systemd = {
+          # KWin must pass its input-method socket to Fcitx5.
+          enable = mkIf nativeFcitx5 (mkDefault false);
+        };
       };
     };
   };
@@ -84,6 +98,14 @@ in
           General = {
             "index hidden folders" = mkDefault false;
             "only basic indexing" = mkDefault true;
+          };
+        };
+
+        kwinrc = mkIf nativeFcitx5 {
+          Wayland = {
+            InputMethod =
+              "${inputMethod.package}/share/applications/"
+              + "org.fcitx.Fcitx5.desktop";
           };
         };
       };
@@ -173,6 +195,26 @@ in
           };
         };
       };
+    };
+  };
+
+  xdg = {
+    configFile = {
+      "autostart/org.fcitx.Fcitx5.desktop" =
+        mkIf nativeFcitx5
+          {
+            source =
+              (pkgs.formats.ini { }).generate
+                "fcitx5-autostart.desktop"
+                {
+                  "Desktop Entry" = {
+                    Exec = getExe inputMethod.package;
+                    Name = "Fcitx 5";
+                    NotShowIn = "KDE;";
+                    Type = "Application";
+                  };
+                };
+          };
     };
   };
 }
