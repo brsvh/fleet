@@ -98,15 +98,6 @@ in
         inherit
           test
           ;
-
-        ncps-migrations =
-          pkgs.runCommand "ncps-migrations" { }
-            ''
-              ${pkgs.python3}/bin/python3 \
-                ${./ncps-migrate.py} \
-                ${../src/system/modules/ncps-migrate.py}
-              touch "$out"
-            '';
       };
 
       packages = {
