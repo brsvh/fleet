@@ -381,33 +381,26 @@ in
   ];
 
   home = {
-    packages =
-      (with pkgs; [
-        black
-        clang-tools
-        codesearch
-        curl
-        emacs-lsp-booster
-        haskell-language-server
-        hunspell
-        hunspellDicts.en_US-large
-        lxgwPackages.neo-zhisong
-        nerd-fonts.symbols-only
-        nixd
-        nixfmt
-        pyright
-        ripgrep
-        typescript
-        vscode-json-languageserver
-        wl-clipboard
-        xclip
-      ])
-      ++ (with pkgs.llm-agents; [
-        claude-agent-acp
-        codex
-        codex-acp
-        spec-kit
-      ]);
+    packages = with pkgs; [
+      black
+      clang-tools
+      codesearch
+      curl
+      emacs-lsp-booster
+      haskell-language-server
+      hunspell
+      hunspellDicts.en_US-large
+      lxgwPackages.neo-zhisong
+      nerd-fonts.symbols-only
+      nixd
+      nixfmt
+      pyright
+      ripgrep
+      typescript
+      vscode-json-languageserver
+      wl-clipboard
+      xclip
+    ];
   };
 
   programs = {
@@ -640,12 +633,6 @@ in
 
       extraPackages =
         epkgs: with epkgs; [
-          agent-recall
-          agent-review
-          agent-shell
-          agent-shell-manager
-          agent-shell-sidebar
-          agent-shell-tramp
           anzu
           apheleia
           beframe
@@ -660,7 +647,6 @@ in
           citar-denote
           citar-embark
           citre
-          codex-ide
           consult
           consult-codesearch
           consult-denote
@@ -770,12 +756,6 @@ in
       package = pkgs.emacs-git-pgtk.override {
         withXwidgets = true;
       };
-    };
-
-    git = {
-      ignores = [
-        "/.agent-shell"
-      ];
     };
   };
 
