@@ -92,13 +92,6 @@
   ;; template so the layout stays text-focused and visually quieter.
   (doom-modeline-remove-segment 'bar 'all))
 
-(use-package menu-bar
-  :commands (menu-bar-mode)
-
-  :hook
-  ;; Disable the Menu Bar for all frames once the UI is initialized.
-  (bs-first-ui-hook . (lambda () (menu-bar-mode -1))))
-
 (use-package spacious-padding
   :commands (spacious-padding-mode)
 
@@ -154,13 +147,6 @@
                               :tab-line-width 4
                               :tab-width 4)))
 
-(use-package tool-bar
-  :commands (tool-bar-mode)
-
-  :hook
-  ;; Disable the tool bar for all frames once the UI is initialized.
-  (bs-first-ui-hook . (lambda () (tool-bar-mode -1))))
-
 
 
 ;;
@@ -196,21 +182,6 @@
 ;;
 ;; Basic Editing Commands (info "(emacs) Basic")
 ;;
-
-(use-package consult
-  :bind
-  ( :map goto-map
-    ;; Go to matched file.
-    ("f" . consult-find)
-
-    ;; Go to matched grep search result.
-    ("g" . consult-grep)
-
-    ;; Go to line matches entered string.
-    ("l" . consult-line)
-
-    ;; Go to matched ripgrep search result.
-    ("r" . consult-ripgrep)))
 
 (use-package mwim
   :bind
@@ -457,6 +428,13 @@
 ;; Help (info "(emacs) Help")
 ;;
 
+(use-package consult-info
+  :bind
+  ( :map global-map
+    ;; Query a text and search it in the all info manuals, instead of
+    ;; opening the index.
+    ([remap info] . consult-info)))
+
 (use-package emacs
   :custom
   ;; Use `embark-prefix-help-command' to provide the help prompt of
@@ -629,58 +607,6 @@
   ;; Highlight the current line.
   (prog-mode-hook . hl-line-mode))
 
-(use-package modus-themes
-  :commands (modus-themes-select)
-
-  :custom
-  ;; Disable all other themes when loading a `modus-themes' theme.
-  (modus-themes-disable-other-themes t)
-
-  ;;Use bold for code syntax highlighting and related.
-  (modus-themes-bold-constructs t)
-
-  ;; Use italics for code syntax highlighting and related.
-  (modus-themes-italic-constructs t)
-
-  ;; Themes we used.
-  (modus-themes-to-toggle '(modus-operandi-tinted
-                            modus-vivendi-tinted))
-
-  ;; Use `fixed-pitch' face for `org' tables and code blocks.
-  (modus-themes-mixed-fonts t)
-
-  ;; Set different font sizes for headings of various levels.
-  (modus-themes-headings '((0 . (1.40 ultrabold))
-                           (1 . (1.30 extrabold))
-                           (2 . (1.20 heavy))
-                           (3 . (1.10 bold))
-                           (t . (1.05 semibold))))
-
-  ;; Cross-theme modifications.
-  (modus-themes-common-palette-overrides
-   '(;; Reuse the current-line highlight background for active line
-     ;; numbers so the line number column aligns visually with
-     ;; `hl-line'.
-     (bg-line-number-active bg-hl-line)
-
-     ;; Use the same background for the tab bar and inactive tabs so
-     ;; the strip recedes and individual tabs carry the separation.
-     (bg-tab-bar bg-tab-other)
-
-     ;; Remove mode line border.
-     (border-mode-line-active unspecified)
-     (border-mode-line-inactive unspecified)))
-
-  :hook
-  (bs-first-ui-hook
-   .
-   (lambda ()
-     ;; Enable the first theme we used, if not set, fallback to
-     ;; `modus-operandi-tinted'.
-     (require 'modus-themes)
-     (modus-themes-select (or (car modus-themes-to-toggle)
-                              'modus-operandi-tinted)))))
-
 (use-package tessera
   :custom
   ;; Use `nerd-icons' for entry glyphs.
@@ -727,6 +653,12 @@
   :hook
   ;; Get real-time match counts and context search by `anzu-mode'.
   (bs-first-file-hook . global-anzu-mode))
+
+(use-package consult
+  :bind
+  ( :map goto-map
+    ;; Go to line matches entered string.
+    ("l" . consult-line)))
 
 
 
@@ -796,18 +728,16 @@
 
 (use-package consult
   :bind
+  ( :map goto-map
+    ;; Go to matched file.
+    ("f" . consult-find)))
+
+(use-package consult
+  :bind
   ( :map global-map
     ;; Replace `recentf-open' with the better and preview-able
     ;; `consult-recent-file'.
     ([remap recentf-open] . consult-recent-file)))
-
-(use-package editorconfig
-  :hook
-  ;; Enable `editorconfig-mode' after early startup work completes so
-  ;; files opened during normal editing apply project coding style
-  ;; settings (such as indentation, charset, and end-of-line rules)
-  ;; from `.editorconfig' files.
-  (bs-after-startup-early-hook . editorconfig-mode))
 
 (use-package files
   :after (bs-lib)
@@ -890,6 +820,24 @@
   ;; initialization finishes, so command-line file arguments and early
   ;; file visits can still be checked for pathological long lines.
   (after-init-hook . global-so-long-mode))
+
+(use-package startup
+  :after (bs-lib)
+
+  :custom
+  ;; Emacs maintains auto-save-list files to track existing auto-save
+  ;; backups for crash recovery.  By default these lists live under
+  ;; `user-emacs-directory', but to keep session state centralized and
+  ;; avoid cluttering `user-emacs-directory' directory, we point
+  ;; `auto-save-list-file-prefix' at our data directory’s
+  ;; auto-save-list folder with the prefix saves-, so all recovery
+  ;; metadata is stored alongside other state files.
+  (auto-save-list-file-prefix (concat (bs-path* bs-state-directory
+                                                "auto-save-list/")
+                                      "saves-"))
+
+  :demand t
+  :no-require t)
 
 (use-package switch-window
   :after (treemacs)
@@ -1183,6 +1131,13 @@
   :demand t
   :no-require t)
 
+(use-package menu-bar
+  :commands (menu-bar-mode)
+
+  :hook
+  ;; Disable the Menu Bar for all frames once the UI is initialized.
+  (bs-first-ui-hook . (lambda () (menu-bar-mode -1))))
+
 (use-package scroll-bar
   :commands (scroll-bar-mode)
 
@@ -1200,6 +1155,13 @@
   :hook
   ;; Enable `tab-bar-mode'.
   (bs-first-ui-hook . tab-bar-mode))
+
+(use-package tool-bar
+  :commands (tool-bar-mode)
+
+  :hook
+  ;; Disable the tool bar for all frames once the UI is initialized.
+  (bs-first-ui-hook . (lambda () (tool-bar-mode -1))))
 
 (use-package xt-mouse
   :hook
@@ -1434,56 +1396,6 @@
      ;; Allow file path completion.
      (add-hook 'completion-at-point-functions 'cape-file -10 t))))
 
-(use-package citre
-  :commands (citre-auto-enable-citre-mode)
-
-  :custom
-  ;; Enable our `citre' back-ends.
-  (citre-auto-enable-citre-mode-backends '(global tags))
-
-  ;; Let auto enabling `citre-mode' behavior work for certain modes.
-  (citre-auto-enable-citre-mode-modes '(prog-mode))
-
-  :bind
-  ( :map ctl-c-c-map
-    ;; Jump to the definition at point using the tags database when
-    ;; press \\`C-c c j'.
-    ("j" . citre-jump)
-
-    ;; Peek definitions at point using an ace-style selection
-    ;; interface when press \\`C-c c p', without leaving the current
-    ;; buffer.
-    ("p" . citre-ace-peek)))
-
-(use-package citre-config
-  :demand t)
-
-(use-package citre-ctags
-  :after (citre)
-
-  :custom
-  ;; Always use one location to create a tags file.
-  (citre-default-create-tags-file-location 'global-cache)
-
-  ;; Use ctags options generated by `citre' directly, rather than
-  ;; editing them further.
-  (citre-edit-ctags-options-manually nil)
-
-  :bind
-  ( :map ctl-c-c-map
-    ;; Update the tags file associated with the current buffer or
-    ;; project context when press \\`C-c c u'.
-    ("u" . citre-update-this-tags-file)))
-
-(use-package citre-ui-jump
-  :after (citre)
-
-  :bind
-  ( :map ctl-c-c-map
-    ;; Jump back to the previous location in the `citre' jump stack
-    ;; when press \\`C-c c J'.
-    ("J" . citre-jump-back)))
-
 (use-package consult-eglot-embark
   :after (eglot embark)
 
@@ -1498,13 +1410,6 @@
     ;; Replace `imenu' with `consult-imenu' to provide better go to
     ;; experience.
     ([remap imenu] . consult-imenu)))
-
-(use-package consult-info
-  :bind
-  ( :map global-map
-    ;; Query a text and search it in the all info manuals, instead of
-    ;; opening the index.
-    ([remap info] . consult-info)))
 
 (use-package corfu
   :custom
@@ -2035,6 +1940,15 @@
 ;; Compiling and Testing Programs (info "(emacs) Building")
 ;;
 
+(use-package consult
+  :bind
+  ( :map goto-map
+    ;; Go to matched grep search result.
+    ("g" . consult-grep)
+
+    ;; Go to matched ripgrep search result.
+    ("r" . consult-ripgrep)))
+
 (use-package consult-flymake
   :after (flymake)
 
@@ -2087,6 +2001,56 @@
   ;; Allow to switch to a new project tab when find file in the new
   ;; project.
   ([remap project-find-file] . bs-project-find-file))
+
+(use-package citre
+  :commands (citre-auto-enable-citre-mode)
+
+  :custom
+  ;; Enable our `citre' back-ends.
+  (citre-auto-enable-citre-mode-backends '(global tags))
+
+  ;; Let auto enabling `citre-mode' behavior work for certain modes.
+  (citre-auto-enable-citre-mode-modes '(prog-mode))
+
+  :bind
+  ( :map ctl-c-c-map
+    ;; Jump to the definition at point using the tags database when
+    ;; press \\`C-c c j'.
+    ("j" . citre-jump)
+
+    ;; Peek definitions at point using an ace-style selection
+    ;; interface when press \\`C-c c p', without leaving the current
+    ;; buffer.
+    ("p" . citre-ace-peek)))
+
+(use-package citre-config
+  :demand t)
+
+(use-package citre-ctags
+  :after (citre)
+
+  :custom
+  ;; Always use one location to create a tags file.
+  (citre-default-create-tags-file-location 'global-cache)
+
+  ;; Use ctags options generated by `citre' directly, rather than
+  ;; editing them further.
+  (citre-edit-ctags-options-manually nil)
+
+  :bind
+  ( :map ctl-c-c-map
+    ;; Update the tags file associated with the current buffer or
+    ;; project context when press \\`C-c c u'.
+    ("u" . citre-update-this-tags-file)))
+
+(use-package citre-ui-jump
+  :after (citre)
+
+  :bind
+  ( :map ctl-c-c-map
+    ;; Jump back to the previous location in the `citre' jump stack
+    ;; when press \\`C-c c J'.
+    ("J" . citre-jump-back)))
 
 (use-package consult-project-extra
   :after (consult project)
@@ -3141,24 +3105,6 @@
   ;; Persist and restore cursor positions across sessions.
   (bs-first-file-hook . save-place-mode))
 
-(use-package startup
-  :after (bs-lib)
-
-  :custom
-  ;; Emacs maintains auto-save-list files to track existing auto-save
-  ;; backups for crash recovery.  By default these lists live under
-  ;; `user-emacs-directory', but to keep session state centralized and
-  ;; avoid cluttering `user-emacs-directory' directory, we point
-  ;; `auto-save-list-file-prefix' at our data directory’s
-  ;; auto-save-list folder with the prefix saves-, so all recovery
-  ;; metadata is stored alongside other state files.
-  (auto-save-list-file-prefix (concat (bs-path* bs-state-directory
-                                                "auto-save-list/")
-                                      "saves-"))
-
-  :demand t
-  :no-require t)
-
 
 
 ;;
@@ -3258,6 +3204,66 @@
   (emacs-startup-hook . (lambda ()
                           (load custom-file 'noerror 'nomessage))))
 
+(use-package editorconfig
+  :hook
+  ;; Enable `editorconfig-mode' after early startup work completes so
+  ;; files opened during normal editing apply project coding style
+  ;; settings (such as indentation, charset, and end-of-line rules)
+  ;; from `.editorconfig' files.
+  (bs-after-startup-early-hook . editorconfig-mode))
+
+(use-package modus-themes
+  :commands (modus-themes-select)
+
+  :custom
+  ;; Disable all other themes when loading a `modus-themes' theme.
+  (modus-themes-disable-other-themes t)
+
+  ;;Use bold for code syntax highlighting and related.
+  (modus-themes-bold-constructs t)
+
+  ;; Use italics for code syntax highlighting and related.
+  (modus-themes-italic-constructs t)
+
+  ;; Themes we used.
+  (modus-themes-to-toggle '(modus-operandi-tinted
+                            modus-vivendi-tinted))
+
+  ;; Use `fixed-pitch' face for `org' tables and code blocks.
+  (modus-themes-mixed-fonts t)
+
+  ;; Set different font sizes for headings of various levels.
+  (modus-themes-headings '((0 . (1.40 ultrabold))
+                           (1 . (1.30 extrabold))
+                           (2 . (1.20 heavy))
+                           (3 . (1.10 bold))
+                           (t . (1.05 semibold))))
+
+  ;; Cross-theme modifications.
+  (modus-themes-common-palette-overrides
+   '(;; Reuse the current-line highlight background for active line
+     ;; numbers so the line number column aligns visually with
+     ;; `hl-line'.
+     (bg-line-number-active bg-hl-line)
+
+     ;; Use the same background for the tab bar and inactive tabs so
+     ;; the strip recedes and individual tabs carry the separation.
+     (bg-tab-bar bg-tab-other)
+
+     ;; Remove mode line border.
+     (border-mode-line-active unspecified)
+     (border-mode-line-inactive unspecified)))
+
+  :hook
+  (bs-first-ui-hook
+   .
+   (lambda ()
+     ;; Enable the first theme we used, if not set, fallback to
+     ;; `modus-operandi-tinted'.
+     (require 'modus-themes)
+     (modus-themes-select (or (car modus-themes-to-toggle)
+                              'modus-operandi-tinted)))))
+
 (use-package pass
   :commands (pass)
 
@@ -3289,11 +3295,337 @@
 ;; Contributing to Emacs Development (info "(emacs) Contributing")
 ;;
 
+
+
+;;
+;; Autotyping (info "(autotype) Top")
+;;
+
 (use-package copyright
   :custom
   ;; Ensure file headers include correct copyright information.
   copyright-names-regexp
   (format "%s <%s>" user-full-name user-mail-address))
+
+
+
+;;
+;; Contacts
+;;
+
+(use-package bs-contacts
+  :commands (bs-contacts-create
+             bs-contacts-delete
+             bs-contacts-edit
+             bs-contacts-edit-cancel
+             bs-contacts-edit-submit
+             bs-contacts-refresh
+             bs-contacts-select
+             bs-contacts-show
+             bs-contacts-sync)
+
+  :defer t)
+
+(use-package bs-contacts
+  :after (mu4e-compose)
+  :commands (bs-contacts-mu4e-completion-enable)
+  :defines (bs-contacts-ignored-display-name-regexp)
+
+  :custom
+  ;; Ignore account-specific automated and non-person addresses.
+  (bs-contacts-ignored-email-regexps
+   `(;; Amazon SES envelope sender addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
+
+     ;; Atlassian bounce domains whose pre-organization label contains
+     ;; "bounces".
+     ,(concat "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*"
+              "bounces[^@.]*\\.atlassian\\.[^@]+\\'")
+
+     ;; Stripe's dedicated bounce domain.
+     "\\`[^@]+@bounce\\.stripe\\.com\\'"
+
+     ;; Linux Foundation encoded-recipient envelope addresses.
+     ,(concat "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+"
+              "linuxfoundation\\.org\\'")
+
+     ;; Mailing-list rewritten senders, preserving normal list posting
+     ;; addresses without an equals sign.
+     "\\`[^@=]+=.+@lists\\.[^@]+\\'"
+
+     ;; KDE Invent generated incoming addresses.
+     "\\`incoming\\+[^@]+@invent\\.kde\\.org\\'"
+
+     ;; SurveyMonkey outbound platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*outbound\\.surveymonkey\\.com\\'"
+
+     ;; Substack platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*substack\\.com\\'"
+
+     ;; SparkPost delivery platform addresses.
+     "\\`[^@]+@\\(?:[^@.]+\\.\\)*sparkpost\\.com\\'"
+
+     ;; DingTalk generated forwarding addresses.
+     "\\`fw[[:digit:]]+-[[:alnum:]]+@dingtalk\\.com\\'"
+
+     ;; Cloudflare transactional addresses.
+     "\\`em@em[[:digit:]]+\\.cloudflare\\.com\\'"
+
+     ;; Mailing-list notice bounce addresses.
+     "\\`noticebounce\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated notice addresses.
+     "\\`\\(?:notice\\|[^@+]+[._-]notice\\)\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated verification addresses.
+     "\\`[^@+]*verification\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Automated return addresses.
+     "\\`return-to\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Generic role addresses that do not identify a person.
+     "\\`automation\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`bulletin\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`confluence\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`email\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`events\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`hello\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`help\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`info\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`invoice\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`mailer\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`marketing\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`meetings\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`membership\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`payments\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`receipts\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`reports\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`service\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`shop\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`support\\(?:\\+[^@]+\\)?@[^@]+\\'"
+     "\\`webmaster\\(?:\\+[^@]+\\)?@[^@]+\\'"
+
+     ;; Account-specific organization addresses.
+     "\\`nscc-cas@cnic\\.cn\\'"
+     "\\`cstcloud@cnic\\.cn\\'"
+     "\\`dccloud@cnic\\.cn\\'"
+     "\\`it_fapiao@meituan\\.com\\'"
+     "\\`12306@rails\\.com\\.cn\\'"))
+
+  :init
+  ;; Normalize the `mu4e' compose completion candidates so display
+  ;; names stay readable and automated senders are hidden.
+  (bs-contacts-mu4e-completion-enable)
+
+  :config
+  ;; Extend the default automated display names with GitLab after
+  ;; `bs-contacts' has initialized its customization variables.
+  (unless
+      (string-match-p
+       bs-contacts-ignored-display-name-regexp
+       "gitlab")
+    (setq bs-contacts-ignored-display-name-regexp
+          (concat
+           bs-contacts-ignored-display-name-regexp
+           "\\|\\`gitlab\\'"))))
+
+
+
+;;
+;; Denote (info "(denote) Top")
+;;
+
+(use-package consult-denote
+  :bind
+  ( :map ctl-c-n-map
+    ;; Search and select `denote' notes using `consult', providing
+    ;; narrowing, preview, and live filtering over note filenames.
+    ("f" . consult-denote-find)
+
+    ;; Perform full-text search across `denote' notes using `consult'
+    ;; as the front-end, enabling interactive narrowing of grep
+    ;; results.
+    ("g" . consult-denote-grep))
+
+  :hook
+  ;; Enable `consult-denote-mode' early after startup.  This activates
+  ;; integration between `consult' and `denote', ensuring that
+  ;; `consult'-based commands are aware of `denote' notes without
+  ;; requiring manual activation per buffer.
+  (bs-after-startup-late-hook . consult-denote-mode))
+
+(use-package denote
+  :after (bs-lib)
+  :commands (denote-rename-buffer-mode)
+
+  :custom
+  ;; Use the `org' date reader when prompting for dates, enabling
+  ;; calendar navigation and flexible date input.
+  (denote-date-prompt-use-org-read-date t)
+
+  ;; Set the root directory for `denote' notes.  All notes are stored
+  ;; beneath this path.
+  (denote-directory (bs-path* "~/org" "notes"))
+
+  ;; Do not exclude any subdirectories under `denote-directory'.
+  (denote-excluded-directories-regexp nil)
+
+  ;; Infer keywords automatically from note content and context when
+  ;; creating or renaming notes.
+  (denote-infer-keywords t)
+
+  ;; Do not exclude any keywords from the inference process.
+  (denote-keywords-to-not-infer-regexp nil)
+
+  ;; Define the set of known keywords used for completion and
+  ;; validation.
+  (denote-known-keywords '("emacs"))
+
+  ;; Prompt only for title and keywords when creating new notes.
+  (denote-prompts '(title keywords))
+
+  ;; Request confirmation when rewriting front matter or modifying
+  ;; file names during rename operations.
+  (denote-rename-confirmations
+   '(rewrite-front-matter modify-file-name))
+
+  ;; Do not automatically save buffers during `denote' operations.
+  (denote-save-buffers nil)
+
+  ;; Sort keywords alphabetically when writing them to front matter.
+  (denote-sort-keywords t)
+
+  :config
+  ;; Enable automatic buffer renaming to keep buffer names in sync
+  ;; with `denote' file names.
+  (denote-rename-buffer-mode +1)
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Insert links to existing `denote' notes, with interactive
+    ;; selection and completion.
+    ("L" . denote-add-links)
+
+    ;; Rename the current note using its front matter as the source of
+    ;; truth for title and keywords.
+    ("R" . denote-rename-file-using-front-matter)
+
+    ;; Display back-links for the current note, showing which notes
+    ;; reference it.
+    ("b" . denote-backlinks)
+
+    ;; Open a `dired' buffer rooted at the `denote' notes directory.
+    ("d" . denote-dired)
+
+    ;; Insert a link to another `denote' note.
+    ("l" . denote-link)
+
+    ;; Create a new `denote' note.
+    ("n" . denote)
+
+    ;; Insert a link generated from a content-based `denote' query.
+    ("q c" . denote-query-contents-link)
+
+    ;; Insert a link generated from a filename-based `denote' query.
+    ("q f" . denote-query-filenames-link)
+
+    ;; Rename the current `denote' file interactively.
+    ("r" . denote-rename-file)))
+
+(use-package denote
+  :after (dired)
+
+  :custom
+  ;; Define the controlled vocabulary offered during keyword
+  ;; completion, combining note roles with the `emacs' topic.
+  (denote-known-keywords '("decision"
+                           "emacs"
+                           "journal"
+                           "meeting"
+                           "person"
+                           "project"
+                           "reference"))
+
+  :bind
+  ( :map dired-mode-map
+    ;; Rename marked `denote' files using their front matter.
+    ("C-c C-d C-R"
+     .
+     denote-dired-rename-marked-files-using-front-matter)
+
+    ;; Insert links to all marked `denote' notes.
+    ("C-c C-d C-i" . denote-dired-link-marked-notes)
+
+    ;; Rename marked `denote' files by modifying their keyword sets.
+    ("C-c C-d C-k" . denote-dired-rename-marked-files-with-keywords)
+
+    ;; Rename marked `denote' files interactively.
+    ("C-c C-d C-r" . denote-dired-rename-files))
+
+  :hook
+  ;; Enable `denote-dired-mode' in `dired' buffers.  This augments
+  ;; `dired' with `denote'-specific commands and metadata handling.
+  (dired-mode-hook . denote-dired-mode))
+
+(use-package denote-journal
+  :after (denote)
+
+  :custom
+  ;; Reuse one journal entry per calendar day instead of creating a
+  ;; separate entry on every invocation.
+  (denote-journal-interval 'daily)
+
+  ;; Mark every journal entry with `journal' so it can be identified
+  ;; and retrieved independently of ordinary `denote' notes.
+  (denote-journal-keyword "journal")
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Visit today's journal entry or create it when absent; a prefix
+    ;; argument selects another date.
+    ("j" . denote-journal-new-or-existing-entry)))
+
+
+
+;;
+;; EasyPG Assistant (info "(epa) Top")
+;;
+
+(use-package epa-file
+  :custom
+  ;; Set the default recipient(s) for file encryption.  When saving an
+  ;; encrypted file without specifying recipients explicitly, these
+  ;; keys will be used by default.
+  (epa-file-select-keys 'silent))
+
+(use-package epa-file
+  :after (epa)
+  :commands (epa-file-enable)
+
+  :config
+  ;; Silencing all messages during `epa-file-enable' executing.
+  (advice-add 'epa-file-enable :around 'bs-silence-message)
+
+  ;; Enable `epa-file' so that Emacs can automatically recognize and
+  ;; transparently handle *.gpg files.  When opening an encrypted
+  ;; file, it is automatically decrypted; when saving, it is
+  ;; automatically encrypted again.
+  (epa-file-enable))
+
+(use-package epa-hook
+  :custom
+  ;; Set the default recipient(s) for file encryption.  When saving an
+  ;; encrypted file without specifying recipients explicitly,
+  ;; `user-mail-address' key will be used by default.
+  (epa-file-encrypt-to `(,user-mail-address)))
+
+(use-package epg-config
+  :custom
+  ;; Configure `epg-config' to use loop-back pinentry mode, so that
+  ;; Emacs handles passphrase prompts internally instead of spawning
+  ;; an external pinentry program.  This allows password input
+  ;; directly in the mini-buffer.
+  (epg-pinentry-mode 'loopback))
 
 
 
@@ -3581,326 +3913,6 @@
     ;; Retain access to `org-ctrl-c-ctrl-c' after taking over its
     ;; usual binding for prompt submission.
     ("C-c C-M-c" . org-ctrl-c-ctrl-c)))
-
-
-
-;;
-;; Denote (info "(denote) Top")
-;;
-
-(use-package consult-denote
-  :bind
-  ( :map ctl-c-n-map
-    ;; Search and select `denote' notes using `consult', providing
-    ;; narrowing, preview, and live filtering over note filenames.
-    ("f" . consult-denote-find)
-
-    ;; Perform full-text search across `denote' notes using `consult'
-    ;; as the front-end, enabling interactive narrowing of grep
-    ;; results.
-    ("g" . consult-denote-grep))
-
-  :hook
-  ;; Enable `consult-denote-mode' early after startup.  This activates
-  ;; integration between `consult' and `denote', ensuring that
-  ;; `consult'-based commands are aware of `denote' notes without
-  ;; requiring manual activation per buffer.
-  (bs-after-startup-late-hook . consult-denote-mode))
-
-(use-package denote
-  :after (bs-lib)
-  :commands (denote-rename-buffer-mode)
-
-  :custom
-  ;; Use the `org' date reader when prompting for dates, enabling
-  ;; calendar navigation and flexible date input.
-  (denote-date-prompt-use-org-read-date t)
-
-  ;; Set the root directory for `denote' notes.  All notes are stored
-  ;; beneath this path.
-  (denote-directory (bs-path* "~/org" "notes"))
-
-  ;; Do not exclude any subdirectories under `denote-directory'.
-  (denote-excluded-directories-regexp nil)
-
-  ;; Infer keywords automatically from note content and context when
-  ;; creating or renaming notes.
-  (denote-infer-keywords t)
-
-  ;; Do not exclude any keywords from the inference process.
-  (denote-keywords-to-not-infer-regexp nil)
-
-  ;; Define the set of known keywords used for completion and
-  ;; validation.
-  (denote-known-keywords '("emacs"))
-
-  ;; Prompt only for title and keywords when creating new notes.
-  (denote-prompts '(title keywords))
-
-  ;; Request confirmation when rewriting front matter or modifying
-  ;; file names during rename operations.
-  (denote-rename-confirmations
-   '(rewrite-front-matter modify-file-name))
-
-  ;; Do not automatically save buffers during `denote' operations.
-  (denote-save-buffers nil)
-
-  ;; Sort keywords alphabetically when writing them to front matter.
-  (denote-sort-keywords t)
-
-  :config
-  ;; Enable automatic buffer renaming to keep buffer names in sync
-  ;; with `denote' file names.
-  (denote-rename-buffer-mode +1)
-
-  :bind
-  ( :map ctl-c-n-map
-    ;; Insert links to existing `denote' notes, with interactive
-    ;; selection and completion.
-    ("L" . denote-add-links)
-
-    ;; Rename the current note using its front matter as the source of
-    ;; truth for title and keywords.
-    ("R" . denote-rename-file-using-front-matter)
-
-    ;; Display back-links for the current note, showing which notes
-    ;; reference it.
-    ("b" . denote-backlinks)
-
-    ;; Open a `dired' buffer rooted at the `denote' notes directory.
-    ("d" . denote-dired)
-
-    ;; Insert a link to another `denote' note.
-    ("l" . denote-link)
-
-    ;; Create a new `denote' note.
-    ("n" . denote)
-
-    ;; Insert a link generated from a content-based `denote' query.
-    ("q c" . denote-query-contents-link)
-
-    ;; Insert a link generated from a filename-based `denote' query.
-    ("q f" . denote-query-filenames-link)
-
-    ;; Rename the current `denote' file interactively.
-    ("r" . denote-rename-file)))
-
-(use-package denote
-  :after (dired)
-
-  :custom
-  ;; Define the controlled vocabulary offered during keyword
-  ;; completion, combining note roles with the `emacs' topic.
-  (denote-known-keywords '("decision"
-                           "emacs"
-                           "journal"
-                           "meeting"
-                           "person"
-                           "project"
-                           "reference"))
-
-  :bind
-  ( :map dired-mode-map
-    ;; Rename marked `denote' files using their front matter.
-    ("C-c C-d C-R"
-     .
-     denote-dired-rename-marked-files-using-front-matter)
-
-    ;; Insert links to all marked `denote' notes.
-    ("C-c C-d C-i" . denote-dired-link-marked-notes)
-
-    ;; Rename marked `denote' files by modifying their keyword sets.
-    ("C-c C-d C-k" . denote-dired-rename-marked-files-with-keywords)
-
-    ;; Rename marked `denote' files interactively.
-    ("C-c C-d C-r" . denote-dired-rename-files))
-
-  :hook
-  ;; Enable `denote-dired-mode' in `dired' buffers.  This augments
-  ;; `dired' with `denote'-specific commands and metadata handling.
-  (dired-mode-hook . denote-dired-mode))
-
-(use-package denote-journal
-  :after (denote)
-
-  :custom
-  ;; Reuse one journal entry per calendar day instead of creating a
-  ;; separate entry on every invocation.
-  (denote-journal-interval 'daily)
-
-  ;; Mark every journal entry with `journal' so it can be identified
-  ;; and retrieved independently of ordinary `denote' notes.
-  (denote-journal-keyword "journal")
-
-  :bind
-  ( :map ctl-c-n-map
-    ;; Visit today's journal entry or create it when absent; a prefix
-    ;; argument selects another date.
-    ("j" . denote-journal-new-or-existing-entry)))
-
-
-
-;;
-;; EasyPG Assistant (info "(epa) Top")
-;;
-
-(use-package epa-file
-  :custom
-  ;; Set the default recipient(s) for file encryption.  When saving an
-  ;; encrypted file without specifying recipients explicitly, these
-  ;; keys will be used by default.
-  (epa-file-select-keys 'silent))
-
-(use-package epa-file
-  :after (epa)
-  :commands (epa-file-enable)
-
-  :config
-  ;; Silencing all messages during `epa-file-enable' executing.
-  (advice-add 'epa-file-enable :around 'bs-silence-message)
-
-  ;; Enable `epa-file' so that Emacs can automatically recognize and
-  ;; transparently handle *.gpg files.  When opening an encrypted
-  ;; file, it is automatically decrypted; when saving, it is
-  ;; automatically encrypted again.
-  (epa-file-enable))
-
-(use-package epa-hook
-  :custom
-  ;; Set the default recipient(s) for file encryption.  When saving an
-  ;; encrypted file without specifying recipients explicitly,
-  ;; `user-mail-address' key will be used by default.
-  (epa-file-encrypt-to `(,user-mail-address)))
-
-(use-package epg-config
-  :custom
-  ;; Configure `epg-config' to use loop-back pinentry mode, so that
-  ;; Emacs handles passphrase prompts internally instead of spawning
-  ;; an external pinentry program.  This allows password input
-  ;; directly in the mini-buffer.
-  (epg-pinentry-mode 'loopback))
-
-
-
-;;
-;; Contacts
-;;
-
-(use-package bs-contacts
-  :commands (bs-contacts-create
-             bs-contacts-delete
-             bs-contacts-edit
-             bs-contacts-edit-cancel
-             bs-contacts-edit-submit
-             bs-contacts-refresh
-             bs-contacts-select
-             bs-contacts-show
-             bs-contacts-sync)
-
-  :defer t)
-
-(use-package bs-contacts
-  :after (mu4e-compose)
-  :commands (bs-contacts-mu4e-completion-enable)
-  :defines (bs-contacts-ignored-display-name-regexp)
-
-  :custom
-  ;; Ignore account-specific automated and non-person addresses.
-  (bs-contacts-ignored-email-regexps
-   `(;; Amazon SES envelope sender addresses.
-     "\\`[^@]+@\\(?:[^@.]+\\.\\)*amazonses\\.com\\'"
-
-     ;; Atlassian bounce domains whose pre-organization label contains
-     ;; "bounces".
-     ,(concat "\\`[^@]+@\\(?:[^@.]+\\.\\)*[^@.]*"
-              "bounces[^@.]*\\.atlassian\\.[^@]+\\'")
-
-     ;; Stripe's dedicated bounce domain.
-     "\\`[^@]+@bounce\\.stripe\\.com\\'"
-
-     ;; Linux Foundation encoded-recipient envelope addresses.
-     ,(concat "\\`[[:alnum:]]+-[^@=]+=.+@\\(?:[^@.]+\\.\\)+"
-              "linuxfoundation\\.org\\'")
-
-     ;; Mailing-list rewritten senders, preserving normal list posting
-     ;; addresses without an equals sign.
-     "\\`[^@=]+=.+@lists\\.[^@]+\\'"
-
-     ;; KDE Invent generated incoming addresses.
-     "\\`incoming\\+[^@]+@invent\\.kde\\.org\\'"
-
-     ;; SurveyMonkey outbound platform addresses.
-     "\\`[^@]+@\\(?:[^@.]+\\.\\)*outbound\\.surveymonkey\\.com\\'"
-
-     ;; Substack platform addresses.
-     "\\`[^@]+@\\(?:[^@.]+\\.\\)*substack\\.com\\'"
-
-     ;; SparkPost delivery platform addresses.
-     "\\`[^@]+@\\(?:[^@.]+\\.\\)*sparkpost\\.com\\'"
-
-     ;; DingTalk generated forwarding addresses.
-     "\\`fw[[:digit:]]+-[[:alnum:]]+@dingtalk\\.com\\'"
-
-     ;; Cloudflare transactional addresses.
-     "\\`em@em[[:digit:]]+\\.cloudflare\\.com\\'"
-
-     ;; Mailing-list notice bounce addresses.
-     "\\`noticebounce\\(?:\\+[^@]+\\)?@[^@]+\\'"
-
-     ;; Automated notice addresses.
-     "\\`\\(?:notice\\|[^@+]+[._-]notice\\)\\(?:\\+[^@]+\\)?@[^@]+\\'"
-
-     ;; Automated verification addresses.
-     "\\`[^@+]*verification\\(?:\\+[^@]+\\)?@[^@]+\\'"
-
-     ;; Automated return addresses.
-     "\\`return-to\\(?:\\+[^@]+\\)?@[^@]+\\'"
-
-     ;; Generic role addresses that do not identify a person.
-     "\\`automation\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`bulletin\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`confluence\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`email\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`events\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`hello\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`help\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`info\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`invoice\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`mailer\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`marketing\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`meetings\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`membership\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`payments\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`receipts\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`reports\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`service\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`shop\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`support\\(?:\\+[^@]+\\)?@[^@]+\\'"
-     "\\`webmaster\\(?:\\+[^@]+\\)?@[^@]+\\'"
-
-     ;; Account-specific organization addresses.
-     "\\`nscc-cas@cnic\\.cn\\'"
-     "\\`cstcloud@cnic\\.cn\\'"
-     "\\`dccloud@cnic\\.cn\\'"
-     "\\`it_fapiao@meituan\\.com\\'"
-     "\\`12306@rails\\.com\\.cn\\'"))
-
-  :init
-  ;; Normalize the `mu4e' compose completion candidates so display
-  ;; names stay readable and automated senders are hidden.
-  (bs-contacts-mu4e-completion-enable)
-
-  :config
-  ;; Extend the default automated display names with GitLab after
-  ;; `bs-contacts' has initialized its customization variables.
-  (unless
-      (string-match-p
-       bs-contacts-ignored-display-name-regexp
-       "gitlab")
-    (setq bs-contacts-ignored-display-name-regexp
-          (concat
-           bs-contacts-ignored-display-name-regexp
-           "\\|\\`gitlab\\'"))))
 
 
 
@@ -4472,6 +4484,28 @@
 
 
 ;;
+;; Transient (info "(transient) Top")
+;;
+
+(use-package transient
+  :after (bs-lib)
+
+  :custom
+  ;; Centralizing the storage of `transient' data files to a directory
+  ;; under `bs-state-directory'.
+  (transient-history-file (bs-path bs-state-directory
+                                   "transient"
+                                   "history.el"))
+  (transient-levels-file  (bs-path bs-state-directory
+                                   "transient"
+                                   "levels.el"))
+  (transient-values-file  (bs-path bs-state-directory
+                                   "transient"
+                                   "values.el")))
+
+
+
+;;
 ;; Transparent Remote (file) Access (info "(tramp) Top")
 ;;
 
@@ -4496,28 +4530,6 @@
   ;; Save the connection history we created with `tramp'.
   (tramp-persistency-file-name (bs-path* bs-state-directory
                                          "tramp/connections.el")))
-
-
-
-;;
-;; Transient (info "(transient) Top")
-;;
-
-(use-package transient
-  :after (bs-lib)
-
-  :custom
-  ;; Centralizing the storage of `transient' data files to a directory
-  ;; under `bs-state-directory'.
-  (transient-history-file (bs-path bs-state-directory
-                                   "transient"
-                                   "history.el"))
-  (transient-levels-file  (bs-path bs-state-directory
-                                   "transient"
-                                   "levels.el"))
-  (transient-values-file  (bs-path bs-state-directory
-                                   "transient"
-                                   "values.el")))
 
 
 
