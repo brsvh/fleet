@@ -1201,6 +1201,11 @@
   ;; Enable `tab-bar-mode'.
   (bs-first-ui-hook . tab-bar-mode))
 
+(use-package xt-mouse
+  :hook
+  ;; Receive mouse clicks and wheel events in terminal frames.
+  (after-init-hook . xterm-mouse-mode))
+
 
 
 ;;
