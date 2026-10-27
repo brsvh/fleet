@@ -2962,6 +2962,35 @@
 ;; Document Viewing (info "(emacs) Document View")
 ;;
 
+(use-package pdf-tools
+  :hook
+  ;; Enable search, links, outlines and annotations when a PDF opens.
+  ;; Nix provides the server, so no runtime installer is needed.
+  (pdf-view-mode-hook . pdf-tools-enable-minor-modes))
+
+(use-package pdf-view
+  :functions (doc-view-mode)
+
+  :config
+  ;; Choose the viewer at visit time for mixed GUI/terminal sessions.
+  ;; Load the supporting modes only when graphical viewing is used.
+  (advice-add 'pdf-view-mode :around
+              (lambda (mode &rest arguments)
+                (if (and (display-graphic-p)
+                         (image-type-available-p 'png))
+                    (progn
+                      (require 'pdf-tools)
+                      (apply mode arguments))
+                  (doc-view-mode)))
+              '((name . bs-pdf-frame)))
+
+  :mode
+  ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+
+  :magic
+  ;; Recognize PDF contents even when the file has no PDF extension.
+  ("%PDF" . pdf-view-mode))
+
 
 
 ;;

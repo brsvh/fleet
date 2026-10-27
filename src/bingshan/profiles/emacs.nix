@@ -392,12 +392,14 @@ in
       haskell-language-server
       hunspell
       hunspellDicts.en_US-large
+      imagemagick
       lxgw-wenkai
       lxgwPackages.neo-zhisong
       lxgwPackages.zhenkai
       nerd-fonts.symbols-only
       nixd
       nixfmt
+      poppler-utils
       pyright
       ripgrep
       typescript
@@ -766,6 +768,7 @@ in
           org-super-agenda
           paredit
           pass
+          pdf-tools
           plz
           proofread
           proofread-popup
