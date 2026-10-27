@@ -494,6 +494,17 @@ in
         in
         with el;
         ''
+          (eval-when-compile
+            (require 'use-package))
+
+          (eval-and-compile
+            ;; default.el is compiled separately from the user init files.
+            (setq use-package-always-defer t
+                  use-package-expand-minimally t
+                  use-package-compute-statistics nil
+                  use-package-ensure-function #'ignore
+                  use-package-hook-name-suffix nil))
+
           (use-package bs-contacts
             :custom
             (bs-contacts-addressbooks '(${genAddressbooks contactAddressbooks}))
