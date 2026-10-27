@@ -1,4 +1,5 @@
 {
+  config,
   home,
   lib,
   osConfig ? null,
@@ -8,6 +9,7 @@
 let
   inherit (lib)
     head
+    optionalAttrs
     optionalString
     splitString
     ;
@@ -65,11 +67,20 @@ let
         };
       };
 
+  nativeFcitx5 =
+    (config.programs.plasma.enable or false)
+    && config.i18n.inputMethod.fcitx5.waylandFrontend;
+
   sessionVariables = {
+    XMODIFIERS = "@im=fcitx";
+  }
+  // optionalAttrs nativeFcitx5 {
+    QT_IM_MODULES = "wayland;fcitx;ibus";
+  }
+  // optionalAttrs (!nativeFcitx5) {
     GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     SDL_IM_MODULE = "fcitx";
-    XMODIFIERS = "@im=fcitx";
   };
 in
 {
@@ -99,12 +110,6 @@ in
     };
   };
 
-  home = {
-    inherit
-      sessionVariables
-      ;
-  };
-
   i18n = {
     inputMethod = {
       fcitx5 = {
@@ -122,6 +127,10 @@ in
             ];
           })
         ];
+
+        sessionVariables = sessionVariables // {
+          GLFW_IM_MODULE = "ibus";
+        };
 
         settings = {
           addons = {
