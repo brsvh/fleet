@@ -3142,6 +3142,80 @@
 ;; Games and Other Amusements (info "(emacs) Amusements")
 ;;
 
+(use-package emacs
+  :defines (gamegrid-timer zone-timer)
+
+  :init
+  ;; Block built-in games and amusements while retaining text tools
+  ;; such as `morse', `decipher' and `handwrite'.
+  (let* ((libraries
+          '("5x5" "animate" "blackbox" "bubbles" "cookie1"
+            "dissociate" "doctor" "dunnet" "fortune" "gamegrid"
+            "gametree" "gomoku" "hanoi" "life" "mpuz" "pong"
+            "snake" "solitaire" "spook" "studly" "tetris" "zone"))
+         (pattern
+          (concat "\\(?:\\`\\|/\\)" (regexp-opt libraries)
+                  "\\(?:\\.el\\(?:c\\|\\.gz\\)?\\)?\\'"))
+         (block-command
+          (lambda (&rest _arguments)
+            (interactive)
+            (user-error "Games are disabled by this configuration")))
+         (block-loaded-commands
+          (lambda ()
+            (dolist (entry load-history)
+              (when (and (stringp (car entry))
+                         (string-match-p pattern (car entry)))
+                (dolist (definition (cdr entry))
+                  (when (and (consp definition)
+                             (eq (car definition) 'defun)
+                             (commandp (cdr definition)))
+                    (advice-add (cdr definition) :override
+                                block-command
+                                '((name . bs-disable-games))))))))))
+    ;; Block autoloaded entry points without loading their libraries.
+    ;; The interactive override also avoids argument prompts.
+    (mapatoms
+     (lambda (symbol)
+       (let ((definition (symbol-function symbol)))
+         (when (and (autoloadp definition)
+                    (nth 3 definition)
+                    (string-match-p pattern (nth 1 definition)))
+           (advice-add symbol :override block-command
+                       '((name . bs-disable-games)))))))
+
+    ;; Cover commands already loaded and those defined by later loads.
+    ;; Named advice is replaced rather than stacked on configuration
+    ;; reloads.
+    (dolist (library libraries)
+      (eval-after-load library block-loaded-commands))
+    (funcall block-loaded-commands)
+
+    ;; This amusement lives in `misc', alongside useful editing tools.
+    (advice-add 'butterfly :override block-command
+                '((name . bs-disable-games))))
+
+  ;; Stop an idle animation or an existing grid game when reloading
+  ;; this configuration, without starting any game libraries.
+  (when (and (boundp 'zone-timer) (timerp zone-timer))
+    (cancel-timer zone-timer)
+    (setq zone-timer nil))
+
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (and (boundp 'gamegrid-timer)
+                 (timerp gamegrid-timer))
+        (cancel-timer gamegrid-timer)
+        (setq gamegrid-timer nil))))
+
+  :demand t
+  :no-require t)
+
+(use-package menu-bar
+  :config
+  ;; Remove the Games submenu even if the menu bar is enabled later.
+  (keymap-unset menu-bar-tools-menu "<games>" t)
+  (keymap-unset menu-bar-tools-menu "<separator-games>" t))
+
 
 
 ;;
