@@ -312,11 +312,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791432136,
-        "narHash": "sha256-03kV2wR6S5wsiV4/1/jYyD83KUbvKHBaq5WuTILRnms=",
+        "lastModified": 1793123872,
+        "narHash": "sha256-oLeGLf+uAzKs5SINzjIJGMMBtF37m9lvFgOhC3jB/Nw=",
         "ref": "main",
-        "rev": "bed994dac511fb21f33d83d3e97d76c6a0e9a508",
-        "revCount": 170,
+        "rev": "7d0cd2a1e2cbe8c2c8839148691d508069178e9f",
+        "revCount": 171,
         "type": "git",
         "url": "https://github.com/brsvh/emacs-tessera.git"
       },
@@ -453,11 +453,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793109981,
-        "narHash": "sha256-GLcsyu3a1DdRo77aOy7zB2tELQwtU40cQTJ4vxXbIcA=",
+        "lastModified": 1793112348,
+        "narHash": "sha256-VovnB7q0RnQ0+JEtN/Hgo8JsvtQz+mMCZP8lRiUK21Y=",
         "ref": "main",
-        "rev": "4a5566b10748d78e52e42d6abb3253beef9f5cd9",
-        "revCount": 208,
+        "rev": "e87b46dc3bdb9ad0bea5a81c40722f35c5fc3d4f",
+        "revCount": 209,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
