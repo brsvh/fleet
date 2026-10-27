@@ -37,7 +37,9 @@ let
   }) config.accounts.email.accounts;
 
   el = rec {
+    cjkBoldItalicFont = toJSON "LXGW ZhenKai GB";
     cjkFont = toJSON "LXGW Neo ZhiSong";
+    cjkItalicFont = toJSON "LXGW WenKai";
 
     genAddressbook =
       addressbook:
@@ -390,7 +392,9 @@ in
       haskell-language-server
       hunspell
       hunspellDicts.en_US-large
+      lxgw-wenkai
       lxgwPackages.neo-zhisong
+      lxgwPackages.zhenkai
       nerd-fonts.symbols-only
       nixd
       nixfmt
@@ -512,21 +516,47 @@ in
             :demand t
             :no-require t)
 
-          (use-package emacs
-            :when (display-graphic-p)
-
-            :config
-            (set-fontset-font t 'cjk-misc (font-spec :family ${cjkFont}))
-            (set-fontset-font t 'han (font-spec :family ${cjkFont}))
-
-            :demand t
-            :no-require t)
-
           (use-package epa-hook
             :config
             (add-to-list 'epa-file-encrypt-to "${primaryMail.account.gpg.key}")
 
             :defer t)
+
+          (use-package fontset
+            :config
+            (dolist (script '(han cjk-misc))
+              (set-fontset-font t script
+                                (font-spec :family ${cjkFont})))
+
+            ;; Use distinct upright Chinese typefaces for emphasis while leaving
+            ;; the Latin weight and slant to their faces.
+            (dolist (entry '(("fontset-bsitalic" . ${cjkItalicFont})
+                             ("fontset-bsbolditalic" . ${cjkBoldItalicFont})))
+              (let ((fontset
+                     (or (query-fontset (car entry))
+                         (create-fontset-from-fontset-spec
+                          (concat "-*-*-*-*-*-*-*-*-*-*-*-*-" (car entry))))))
+                (dolist (script '(han cjk-misc))
+                  (set-fontset-font fontset script
+                                    (font-spec :family (cdr entry)
+                                               :weight 'normal
+                                               :slant 'normal)))))
+
+            :hook
+            ;; Restore the fontsets after theme changes and for new GUI frames.
+            ((after-make-frame-functions
+              bs-first-ui-hook
+              modus-themes-after-load-theme-hook)
+             .
+             (lambda (&optional frame)
+               (dolist (frame (if frame (list frame) (frame-list)))
+                 (when (display-graphic-p frame)
+                   (set-face-attribute 'italic frame
+                                       :fontset "fontset-bsitalic")
+                   (set-face-attribute 'bold-italic frame
+                                       :fontset "fontset-bsbolditalic")))))
+
+            :demand t)
 
           (use-package info
             :custom
