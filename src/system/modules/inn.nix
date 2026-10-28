@@ -1082,8 +1082,8 @@ let
           seed = json.loads((root / "seed.json").read_text())
           if seed["primary"] != config["primaryHost"] or seed["role"] != "primary":
               raise ValueError("bootstrap image belongs to a different primary")
-          if seed["groups"] != sorted(config["groups"]):
-              raise ValueError("bootstrap group configuration differs from this replica")
+          if not set(seed["groups"]).issubset(config["groups"]):
+              raise ValueError("bootstrap contains groups not configured on this replica")
           if not complete:
               # Conservatively use apparent size and preserve 2 GiB for the system.
               free = os.statvfs(root).f_bavail * os.statvfs(root).f_frsize
@@ -1926,6 +1926,26 @@ let
     fi
   '';
 
+  postStart = writeShellScript "inn-post-start" ''
+    set -euo pipefail
+
+    # Type=simple starts this before innd has opened its control socket.
+    until ${cfg.package}/bin/ctlinnd -s -t 1 mode >/dev/null; do
+      ${coreutils}/bin/sleep 1
+    done
+
+    # Add declared groups to existing archives without resetting article numbers.
+    while IFS= read -r group; do
+      if ! ${gawk}/bin/awk -v group="$group" \
+        '$1 == group { found = 1; exit } END { exit !found }' \
+        ${escapeShellArg "${databaseDirectory}/active"}; then
+        ${cfg.package}/bin/ctlinnd -t 10 newgroup "$group" y
+      fi
+    done < ${backfillGroups}
+
+    exec ${archiveTool}/bin/inn-archive ready
+  '';
+
 in
 {
   options = {
@@ -2355,7 +2375,7 @@ in
             serviceConfig = {
               Environment = innEnvironment;
               ExecStart = "${cfg.package}/bin/innd -d -4 ${cfg.bindAddress} -P ${toString cfg.port}";
-              ExecStartPost = "${archiveTool}/bin/inn-archive ready";
+              ExecStartPost = "${postStart}";
               ExecStartPre = "${preStart}";
               ExecStop = "${cfg.package}/bin/ctlinnd -t 60 shutdown systemd-stop";
               Group = cfg.group;
