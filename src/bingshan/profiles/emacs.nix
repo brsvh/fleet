@@ -14,6 +14,7 @@ let
     concatStringsSep
     filter
     findFirst
+    getExe
     head
     mapAttrsToList
     pipe
@@ -516,6 +517,12 @@ in
 
             :defer t)
 
+          (use-package bs-htmlize
+            :custom
+            (bs-htmlize-browser "${getExe pkgs.google-chrome}")
+
+            :defer t)
+
           (use-package bs-khal
             :custom
             (bs-khal-calendar-directories '(${genCalendarDirectories enabledCalendars}))
@@ -776,6 +783,7 @@ in
           proofread
           proofread-popup
           rainbow-delimiters
+          recursion-indicator
           sly
           sly-asdf
           sly-macrostep
