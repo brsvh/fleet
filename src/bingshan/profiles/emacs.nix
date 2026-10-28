@@ -720,7 +720,6 @@ in
           diff-hl
           diredfl
           doom-modeline
-          editorconfig
           eglot
           eglot-booster
           eldoc-box
