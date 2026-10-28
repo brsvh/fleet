@@ -2957,6 +2957,23 @@
 ;; Document Viewing (info "(emacs) Document View")
 ;;
 
+(use-package pdf-cache
+  :functions (image-mode-window-get)
+
+  :config
+  ;; The idle timer can run while the first page is still loading.
+  ;; Wait for a page number and use the timer's buffer explicitly.
+  (advice-add 'pdf-cache--prefetch-start :around
+              (lambda (start buffer)
+                (when (and (buffer-live-p buffer)
+                           (eq buffer (window-buffer)))
+                  (with-current-buffer buffer
+                    (when (and (derived-mode-p 'pdf-view-mode)
+                               (integerp
+                                (image-mode-window-get 'page)))
+                      (funcall start buffer)))))
+              '((name . bs-pdf-prefetch-ready))))
+
 (use-package pdf-tools
   :hook
   ;; Enable search, links, outlines and annotations when a PDF opens.
