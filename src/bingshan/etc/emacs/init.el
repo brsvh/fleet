@@ -311,11 +311,6 @@
   ;; Show `marginalia' of the mini-buffer completions.
   (bs-first-ui-hook . marginalia-mode))
 
-(use-package mb-depth
-  :hook
-  ;; Show the nesting depth when one minibuffer opens another.
-  (bs-first-ui-hook . minibuffer-depth-indicate-mode))
-
 (use-package minibuffer
   :custom
   ;; Use mini-buffer completion as the UI for ‘completion-at-point’.
@@ -3105,17 +3100,45 @@
 ;; Printing Hard Copies (info "(emacs) Printing")
 ;;
 
+(use-package bs-htmlize
+  :bind
+  ( :map ctl-c-f-map
+    ;; Print the active region or buffer to a paginated PDF.
+    ("p" . bs-htmlize-print-pdf)))
+
 
 
 ;;
 ;; Sorting Text (info "(emacs) Sorting")
 ;;
 
+(use-package bs-sort
+  :after (embark)
+  :defines (embark-sort-map)
+
+  :bind
+  ( :map embark-sort-map
+    ;; Keep the built-in sort actions and add per-operation options.
+    ("o" . bs-sort-menu)
+    ("v" . bs-sort-lines-natural)))
+
 
 
 ;;
 ;; Editing Pictures (info "(emacs) Picture Mode")
 ;;
+
+(use-package artist
+  :commands (artist-mode))
+
+(use-package bs-picture
+  :hook
+  ;; Both Picture and Artist use these entry and exit hooks.
+  (picture-mode-hook . bs-picture-setup)
+  (picture-mode-exit-hook . bs-picture-restore))
+
+(use-package picture
+  :commands (picture-mode))
 
 
 
@@ -3152,6 +3175,26 @@
 ;;
 ;; Recursive Editing Levels (info "(emacs) Recursive Edit")
 ;;
+
+(use-package mb-depth
+  :after (recursion-indicator)
+
+  :config
+  ;; The mode line now distinguishes prompts from recursive edits.
+  (minibuffer-depth-indicate-mode -1)
+
+  :demand t)
+
+(use-package recursion-indicator
+  :config
+  ;; Keep the built-in recursive exit and abort commands unchanged.
+  (keymap-unset recursion-indicator-map
+                "<remap> <abort-recursive-edit>")
+  (keymap-unset recursion-indicator-map
+                "<remap> <exit-recursive-edit>")
+
+  :hook
+  (bs-first-ui-hook . recursion-indicator-mode))
 
 
 
@@ -3415,6 +3458,47 @@
 ;;
 ;; Contributing to Emacs Development (info "(emacs) Contributing")
 ;;
+
+(use-package emacsbug
+  :commands (submit-emacs-patch))
+
+(use-package git-commit
+  :functions (magit-toplevel)
+
+  :config
+  ;; Run after ordinary setup and only for a project named emacs
+  ;; containing GNU Emacs sources, regardless of its Git remotes.
+  (add-hook
+   'git-commit-setup-hook
+   (lambda ()
+     (when-let* ((root (magit-toplevel))
+                 (project (project-current nil root)))
+       (when (and (equal (project-name project) "emacs")
+                  (file-equal-p root (project-root project))
+                  (seq-every-p
+                   (lambda (file)
+                     (file-regular-p (expand-file-name file root)))
+                   '("src/emacs.c" "src/lisp.h" "lisp/version.el"))
+                  (let ((configure
+                         (expand-file-name "configure.ac" root)))
+                    (and (file-readable-p configure)
+                         (with-temp-buffer
+                           (insert-file-contents configure)
+                           (goto-char (point-min))
+                           (search-forward
+                            "AC_INIT([GNU Emacs]," nil t)))))
+         (setq-local git-commit-summary-max-length 50
+                     fill-column 63)
+         ;; Rebuild highlighting with the buffer-local subject limit.
+         (font-lock-remove-keywords nil git-commit-font-lock-keywords)
+         (font-lock-add-keywords nil git-commit-font-lock-keywords)
+         (font-lock-flush)
+         (use-local-map (copy-keymap (current-local-map)))
+         (keymap-local-set "C-c C-l" #'magit-generate-changelog))))
+   90))
+
+(use-package magit-extras
+  :commands (magit-generate-changelog))
 
 
 
