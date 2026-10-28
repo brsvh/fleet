@@ -405,6 +405,7 @@ in
       pyright
       ripgrep
       typescript
+      unzip
       vscode-json-languageserver
       wl-clipboard
       xclip
@@ -767,12 +768,15 @@ in
           nerd-icons-ibuffer
           nix-mode
           nix-ts-mode
+          nov
+          olivetti
           orderless
           org-appear
           org-contrib
           org-gtd
           org-modern
           org-modern-indent
+          org-noter
           org-ql
           org-super-agenda
           paredit
@@ -783,6 +787,7 @@ in
           proofread-popup
           rainbow-delimiters
           recursion-indicator
+          saveplace-pdf-view
           sly
           sly-asdf
           sly-macrostep
