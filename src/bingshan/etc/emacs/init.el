@@ -2983,21 +2983,21 @@
   (nov-mode-hook . olivetti-mode))
 
 (use-package pdf-cache
-  :functions (image-mode-window-get)
+  :functions (image-mode-window-get
+              pdf-cache--prefetch-start@pdf-prefetch-ready)
 
   :config
   ;; The idle timer can run while the first page is still loading.
   ;; Wait for a page number and use the timer's buffer explicitly.
-  (advice-add 'pdf-cache--prefetch-start :around
-              (lambda (start buffer)
-                (when (and (buffer-live-p buffer)
-                           (eq buffer (window-buffer)))
-                  (with-current-buffer buffer
-                    (when (and (derived-mode-p 'pdf-view-mode)
-                               (integerp
-                                (image-mode-window-get 'page)))
-                      (funcall start buffer)))))
-              '((name . bs-pdf-prefetch-ready))))
+  (define-advice pdf-cache--prefetch-start
+      (:around (start buffer) pdf-prefetch-ready)
+    "Call START for BUFFER only when its displayed PDF page is ready."
+    (when (and (buffer-live-p buffer)
+               (eq buffer (window-buffer)))
+      (with-current-buffer buffer
+        (when (and (derived-mode-p 'pdf-view-mode)
+                   (integerp (image-mode-window-get 'page)))
+          (funcall start buffer))))))
 
 (use-package pdf-tools
   :hook
@@ -3008,7 +3008,8 @@
 (use-package pdf-view
   :functions (doc-view-mode
               pdf-view-dark-minor-mode
-              pdf-view-midnight-minor-mode)
+              pdf-view-midnight-minor-mode
+              pdf-view-mode@pdf-frame)
 
   :custom
   ;; Fit newly opened documents to the available window width.
@@ -3017,15 +3018,15 @@
   :config
   ;; Choose the viewer at visit time for mixed GUI/terminal sessions.
   ;; Load the supporting modes only when graphical viewing is used.
-  (advice-add 'pdf-view-mode :around
-              (lambda (mode &rest arguments)
-                (if (and (display-graphic-p)
-                         (image-type-available-p 'png))
-                    (progn
-                      (require 'pdf-tools)
-                      (apply mode arguments))
-                  (doc-view-mode)))
-              '((name . bs-pdf-frame)))
+  (define-advice pdf-view-mode
+      (:around (mode &rest arguments) pdf-frame)
+    "Call MODE with ARGUMENTS in graphical frames, or use Doc View."
+    (if (and (display-graphic-p)
+             (image-type-available-p 'png))
+        (progn
+          (require 'pdf-tools)
+          (apply mode arguments))
+      (doc-view-mode)))
 
   :mode
   ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
@@ -3291,6 +3292,13 @@
   :defines (gamegrid-timer zone-timer)
 
   :init
+  ;; This amusement lives in `misc', alongside useful editing tools.
+  (define-advice butterfly
+      (:override (&rest _arguments) disable-games)
+    "Refuse to run games and amusements."
+    (interactive)
+    (user-error "Games are disabled by this configuration"))
+
   ;; Block built-in games and amusements while retaining text tools
   ;; such as `morse', `decipher' and `handwrite'.
   (let* ((libraries
@@ -3301,10 +3309,6 @@
          (pattern
           (concat "\\(?:\\`\\|/\\)" (regexp-opt libraries)
                   "\\(?:\\.el\\(?:c\\|\\.gz\\)?\\)?\\'"))
-         (block-command
-          (lambda (&rest _arguments)
-            (interactive)
-            (user-error "Games are disabled by this configuration")))
          (block-loaded-commands
           (lambda ()
             (dolist (entry load-history)
@@ -3315,8 +3319,8 @@
                              (eq (car definition) 'defun)
                              (commandp (cdr definition)))
                     (advice-add (cdr definition) :override
-                                block-command
-                                '((name . bs-disable-games))))))))))
+                                #'butterfly@disable-games
+                                '((name . disable-games))))))))))
     ;; Block autoloaded entry points without loading their libraries.
     ;; The interactive override also avoids argument prompts.
     (mapatoms
@@ -3325,19 +3329,15 @@
          (when (and (autoloadp definition)
                     (nth 3 definition)
                     (string-match-p pattern (nth 1 definition)))
-           (advice-add symbol :override block-command
-                       '((name . bs-disable-games)))))))
+           (advice-add symbol :override #'butterfly@disable-games
+                       '((name . disable-games)))))))
 
     ;; Cover commands already loaded and those defined by later loads.
     ;; Named advice is replaced rather than stacked on configuration
     ;; reloads.
     (dolist (library libraries)
       (eval-after-load library block-loaded-commands))
-    (funcall block-loaded-commands)
-
-    ;; This amusement lives in `misc', alongside useful editing tools.
-    (advice-add 'butterfly :override block-command
-                '((name . bs-disable-games))))
+    (funcall block-loaded-commands))
 
   ;; Stop an idle animation or an existing grid game when reloading
   ;; this configuration, without starting any game libraries.
