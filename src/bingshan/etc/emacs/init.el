@@ -4869,6 +4869,34 @@
   ;; improves readability without altering underlying `org' syntax.
   (org-mode-hook . org-modern-indent-mode))
 
+(use-package org-noter
+  :after (bs-ext)
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Start a reading session from a document or an Org heading.
+    ("o" . org-noter))
+
+  ;; Load optional backends only when starting a reading session.
+  :no-require t)
+
+(use-package org-noter-core
+  :custom
+  ;; Keep reading sessions in the current frame.
+  (org-noter-always-create-frame nil)
+
+  ;; Record the last document location in the Org notes.
+  (org-noter-auto-save-last-location t)
+
+  ;; Preserve the frame when a reading session ends.
+  (org-noter-kill-frame-at-session-end nil)
+
+  ;; Display the document and its notes side by side.
+  (org-noter-notes-window-location 'horizontal-split)
+
+  ;; Use the configured readers, including the terminal PDF fallback.
+  (org-noter-supported-modes '(doc-view-mode nov-mode pdf-view-mode)))
+
 
 
 ;;
