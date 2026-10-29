@@ -2981,7 +2981,13 @@
   (pdf-view-mode-hook . pdf-tools-enable-minor-modes))
 
 (use-package pdf-view
-  :functions (doc-view-mode)
+  :functions (doc-view-mode
+              pdf-view-dark-minor-mode
+              pdf-view-midnight-minor-mode)
+
+  :custom
+  ;; Fit newly opened documents to the available window width.
+  (pdf-view-display-size 'fit-width)
 
   :config
   ;; Choose the viewer at visit time for mixed GUI/terminal sessions.
@@ -3001,7 +3007,25 @@
 
   :magic
   ;; Recognize PDF contents even when the file has no PDF extension.
-  ("%PDF" . pdf-view-mode))
+  ("%PDF" . pdf-view-mode)
+
+  :hook
+  ;; Follow the theme's brightness when opening PDFs or changing
+  ;; themes.  Midnight mode preserves the hues of colored figures.
+  ((pdf-tools-enabled-hook
+    enable-theme-functions
+    disable-theme-functions)
+   .
+   (lambda (&rest _)
+     (let ((argument (if (eq (frame-parameter nil 'background-mode)
+                             'dark)
+                         1
+                       -1)))
+       (dolist (buffer (buffer-list))
+         (with-current-buffer buffer
+           (when (derived-mode-p 'pdf-view-mode)
+             (pdf-view-dark-minor-mode argument)
+             (pdf-view-midnight-minor-mode argument))))))))
 
 
 
@@ -3186,6 +3210,13 @@
   :hook
   ;; Persist and restore cursor positions across sessions.
   (bs-first-file-hook . save-place-mode))
+
+(use-package saveplace-pdf-view
+  :after (saveplace)
+
+  ;; Extend the existing place file with PDF pages and scroll
+  ;; positions.
+  :demand t)
 
 
 
