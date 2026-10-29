@@ -4770,7 +4770,12 @@
 
   :preface
   ;; Set the shared root before deferred packages derive their paths.
-  (setq org-directory (bs-path* "~/org"))
+  (setq org-directory (bs-path "~/org/"))
+
+  :init
+  ;; Create the shared root at runtime, avoiding filesystem changes
+  ;; during byte compilation.
+  (bs-path* org-directory)
 
   :config
   ;; Show the Block Structure dispatcher in a dedicated bottom side
