@@ -2991,13 +2991,19 @@
   ;; Center the reading body within an 80-column width.
   (olivetti-body-width 80)
 
-  :custom-face
-  ;; Blend the fringes into the text background in either theme.
-  (olivetti-fringe ((t (:background unspecified :inherit default))))
-
   :hook
   ;; Enable margins and soft wrapping when reading EPUB documents.
-  (nov-mode-hook . olivetti-mode))
+  (nov-mode-hook . olivetti-mode)
+
+  ;; Match the text background when `olivetti' starts and after each
+  ;; `modus-themes' theme change, without changing other fringes.
+  ((olivetti-mode-hook modus-themes-after-load-theme-hook)
+   .
+   (lambda ()
+     (when (featurep 'olivetti)
+       (set-face-attribute 'olivetti-fringe nil
+                           :background
+                           (face-background 'default nil t))))))
 
 (use-package pdf-cache
   :functions (image-mode-window-get
