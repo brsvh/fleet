@@ -1355,13 +1355,26 @@
 ;; Org Text
 ;;
 
+(use-package olivetti
+  :commands (olivetti-mode)
+  :defines (org-directory)
+
+  :hook
+  ;; Center prose notes with soft wrapping and the EPUB line spacing.
+  ;; Keep task files and project documentation in their usual layout.
+  (org-mode-hook
+   .
+   (lambda ()
+     (when (and buffer-file-name
+                (file-in-directory-p
+                 buffer-file-name (bs-path* org-directory "notes")))
+       (setq-local line-spacing 0.2)
+       (olivetti-mode +1)))))
+
 (use-package simple
   :hook
-  ;; Enable `auto-fill-mode' in `org-mode' buffers.
-  (org-mode-hook . auto-fill-mode)
-
   ;; Set the fill column to 80 characters locally for `org-mode'
-  ;; buffers.
+  ;; buffers.  Hard wrapping is inherited from `text-mode-hook'.
   (org-mode-hook . (lambda ()
                      (setq-local fill-column 80))))
 
@@ -2978,8 +2991,12 @@
   ;; Center the reading body within an 80-column width.
   (olivetti-body-width 80)
 
+  :custom-face
+  ;; Blend the fringes into the text background in either theme.
+  (olivetti-fringe ((t (:background unspecified :inherit default))))
+
   :hook
-  ;; Enable margins and soft wrapping only in EPUB reading buffers.
+  ;; Enable margins and soft wrapping when reading EPUB documents.
   (nov-mode-hook . olivetti-mode))
 
 (use-package pdf-cache
