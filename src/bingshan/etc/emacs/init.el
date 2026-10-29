@@ -2957,6 +2957,31 @@
 ;; Document Viewing (info "(emacs) Document View")
 ;;
 
+(use-package nov
+  :after (bs-lib)
+
+  :custom
+  ;; Keep EPUB reading positions with the other persistent state.
+  (nov-save-place-file (bs-path bs-state-directory "nov-places"))
+
+  ;; Leave paragraphs intact so window resizing uses soft wrapping.
+  (nov-text-width t)
+
+  :mode
+  ("\\.[eE][pP][uU][bB]\\'" . nov-mode)
+  :hook
+  ;; Add breathing room without changing the existing font choices.
+  (nov-mode-hook . (lambda () (setq-local line-spacing 0.2))))
+
+(use-package olivetti
+  :custom
+  ;; Center the reading body within an 80-column width.
+  (olivetti-body-width 80)
+
+  :hook
+  ;; Enable margins and soft wrapping only in EPUB reading buffers.
+  (nov-mode-hook . olivetti-mode))
+
 (use-package pdf-cache
   :functions (image-mode-window-get)
 
