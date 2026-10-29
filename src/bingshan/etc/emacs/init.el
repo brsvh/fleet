@@ -3675,9 +3675,7 @@
              bs-contacts-refresh
              bs-contacts-select
              bs-contacts-show
-             bs-contacts-sync)
-
-  :defer t)
+             bs-contacts-sync))
 
 (use-package bs-contacts
   :after (mu4e-compose)
