@@ -3845,6 +3845,10 @@
 (use-package denote
   :after (bs-lib)
   :commands (denote-rename-buffer-mode)
+  :functions (denote-retrieve-front-matter-title-value
+              denote-title-prompt
+              org-set-regexps-and-options
+              outline-next-heading)
 
   :custom
   ;; Use the `org' date reader when prompting for dates, enabling
@@ -3867,7 +3871,14 @@
 
   ;; Define the set of known keywords used for completion and
   ;; validation.
-  (denote-known-keywords '("emacs"))
+  (denote-known-keywords '("book"
+                           "decision"
+                           "emacs"
+                           "journal"
+                           "meeting"
+                           "person"
+                           "project"
+                           "reference"))
 
   ;; Prompt only for title and keywords when creating new notes.
   (denote-prompts '(title keywords))
@@ -3883,6 +3894,23 @@
   ;; Sort keywords alphabetically when writing them to front matter.
   (denote-sort-keywords t)
 
+  ;; Keep book metadata and reading notes under one document heading.
+  (denote-templates
+   (list
+    (cons 'book
+          (lambda ()
+            ;; Read file tags after `denote' inserts the front matter.
+            (org-set-regexps-and-options t)
+            (concat
+             "* " (denote-retrieve-front-matter-title-value
+                   buffer-file-name 'org)
+             "\n:PROPERTIES:\n"
+             ":AUTHOR:\n"
+             ":YEAR:\n"
+             ":READING_STATUS: planned\n"
+             ":READING_STATUS_ALL: planned reading finished paused\n"
+             ":END:\n\n** Summary\n\n** Notes\n\n** Questions\n")))))
+
   :config
   ;; Enable automatic buffer renaming to keep buffer names in sync
   ;; with `denote' file names.
@@ -3890,6 +3918,15 @@
 
   :bind
   ( :map ctl-c-n-map
+    ;; Create an Org book note; `org-noter' associates its document.
+    ("B" . (lambda ()
+             (interactive)
+             (require 'denote)
+             (denote (denote-title-prompt)
+                     '("book") 'org nil nil 'book)
+             (goto-char (point-min))
+             (outline-next-heading)))
+
     ;; Insert links to existing `denote' notes, with interactive
     ;; selection and completion.
     ("L" . denote-add-links)
@@ -3922,17 +3959,6 @@
 
 (use-package denote
   :after (dired)
-
-  :custom
-  ;; Define the controlled vocabulary offered during keyword
-  ;; completion, combining note roles with the `emacs' topic.
-  (denote-known-keywords '("decision"
-                           "emacs"
-                           "journal"
-                           "meeting"
-                           "person"
-                           "project"
-                           "reference"))
 
   :bind
   ( :map dired-mode-map
@@ -4896,6 +4922,29 @@
 
   ;; Use the configured readers, including the terminal PDF fallback.
   (org-noter-supported-modes '(doc-view-mode nov-mode pdf-view-mode)))
+
+(use-package org-ql-view
+  :functions (denote-directory-files)
+
+  :config
+  ;; Keep reading states separate from the GTD task workflow.
+  (dolist (status '("planned" "reading" "finished" "paused"))
+    (let ((name (concat "Books: " (capitalize status))))
+      (setf (alist-get name org-ql-views nil nil #'equal)
+            (list
+             :buffers-files
+             (lambda ()
+               (require 'denote)
+               (denote-directory-files "\\.org\\'" nil t nil t))
+             :query `(and (tags "book")
+                          (property "READING_STATUS" ,status
+                                    :inherit nil))
+             :title name))))
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Select a reading list and refresh it with \\`g'.
+    ("v" . org-ql-view)))
 
 
 
