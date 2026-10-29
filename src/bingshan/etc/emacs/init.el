@@ -3663,6 +3663,69 @@
 
 
 ;;
+;; Citar
+;;
+
+(use-package citar
+  :after (bs-lib)
+
+  :custom
+  ;; Bibliography entries refer to documents through their file field.
+  (citar-bibliography (list (bs-path org-directory "library.bib")))
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Open or create a Denote note for a bibliography entry.
+    ("N" . citar-open-notes)
+
+    :map ctl-c-r-map
+    ;; Insert a citation using the current document's syntax.
+    ("c" . citar-insert-citation)
+
+    ;; Browse entries and open their documents, links, or notes.
+    ("o" . citar-open)))
+
+(use-package citar-denote
+  :after (citar)
+  :commands (citar-denote-mode)
+
+  :custom
+  ;; Keep bibliographic notes in Org within the existing Denote root.
+  (citar-denote-file-type 'org)
+  (citar-denote-keyword "reference")
+
+  ;; Let `org-noter' manage the document and notes layout on request.
+  (citar-denote-open-attachment nil)
+
+  :config
+  (citar-denote-mode +1)
+
+  :demand t)
+
+(use-package citar-denote
+  :functions (citar-denote-add-reference)
+
+  :bind
+  ( :map ctl-c-n-map
+    ;; Associate an existing book note with a bibliography entry.
+    ("k" . (lambda ()
+             (interactive)
+             (require 'citar)
+             (call-interactively #'citar-denote-add-reference)))))
+
+(use-package citar-embark
+  :after (citar embark)
+  :commands (citar-embark-mode)
+
+  :config
+  ;; Offer citation actions through the existing Embark bindings.
+  (citar-embark-mode +1)
+
+  :demand t)
+
+
+
+;;
 ;; Contacts
 ;;
 
@@ -3857,7 +3920,7 @@
 
   ;; Set the root directory for `denote' notes.  All notes are stored
   ;; beneath this path.
-  (denote-directory (bs-path* "~/org" "notes"))
+  (denote-directory (bs-path* org-directory "notes"))
 
   ;; Do not exclude any subdirectories under `denote-directory'.
   (denote-excluded-directories-regexp nil)
@@ -4610,6 +4673,19 @@
 ;; Org (info "(org) Top")
 ;;
 
+(use-package oc
+  :after (bs-lib)
+
+  :custom
+  ;; Share the bibliography with `citar' for native Org citations.
+  (org-cite-global-bibliography
+   (list (bs-path org-directory "library.bib")))
+
+  ;; Use `citar' to insert, follow, and display citation references.
+  (org-cite-activate-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-insert-processor 'citar))
+
 (use-package ol
   :custom
   ;; Display links using their description text instead of their raw
@@ -4621,9 +4697,6 @@
   :commands (org-set-tags-command)
 
   :custom
-  ;; Directory beneath `org' files.
-  (org-directory (bs-path* "~/org"))
-
   ;; Restrict agenda discovery to the GTD subtree so agenda commands
   ;; operate on the curated task set instead of every `org' file under
   ;; `org-directory'.
@@ -4677,6 +4750,10 @@
   (org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)"
                                  "|"
                                  "DONE(d)" "CNCL(c)" "FAIL(f)")))
+
+  :preface
+  ;; Set the shared root before deferred packages derive their paths.
+  (setq org-directory (bs-path* "~/org"))
 
   :config
   ;; Show the Block Structure dispatcher in a dedicated bottom side
@@ -5036,7 +5113,7 @@
   :custom
   ;; Maintain subscriptions and inherited tags in a dedicated `org'
   ;; file outside `org-agenda-files'.
-  (rmh-elfeed-org-files '("~/org/feeds.org"))
+  (rmh-elfeed-org-files (list (bs-path org-directory "feeds.org")))
 
   :config
   (elfeed-org)
