@@ -1,0 +1,37 @@
+name: Retry CI
+run-name: Retry Hercules source fetch / ${{ github.event.sha }}
+
+on: status
+
+permissions:
+  contents: read
+
+jobs:
+  retry:
+    if: >-
+      github.repository == 'brsvh/fleet' &&
+      github.ref == 'refs/heads/main' &&
+      github.event.context == 'ci/hercules/evaluation' &&
+      (github.event.state == 'failure' || github.event.state == 'error')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: ci-retry
+    concurrency:
+      group: ci-retry-${{ github.event.sha }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # A status event runs the workflow from the default branch.
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+          sparse-checkout: ci
+      - uses: actions/github-script@v9
+        env:
+          HERCULES_CI_API_TOKEN: ${{ secrets.HERCULES_CI_API_TOKEN }}
+        with:
+          script: |
+            const { default: run } = await import(
+              `${process.env.GITHUB_WORKSPACE}/ci/retry.mjs`
+            );
+            await run({ github, context, core });
