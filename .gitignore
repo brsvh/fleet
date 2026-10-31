@@ -2,6 +2,7 @@
 
 # devshells
 /.editorconfig
+/biome.json
 /lefthook.yml
 /prek.toml
 /treefmt.toml
