@@ -64,6 +64,13 @@ in
       systemd = {
         services = {
           hercules-ci-agent = {
+            environment = {
+              # Avoid HTTP/2 stream resets during GitHub source fetches.
+              GIT_CONFIG_COUNT = "1";
+              GIT_CONFIG_KEY_0 = "http.https://github.com/.version";
+              GIT_CONFIG_VALUE_0 = "HTTP/1.1";
+            };
+
             serviceConfig = {
               UMask = "0077";
             };
