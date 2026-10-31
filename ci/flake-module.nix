@@ -7,18 +7,12 @@
 }:
 let
   inherit (lib)
-    attrNames
     elem
-    elemAt
-    hasAttr
-    map
+    filterAttrs
     mapAttrs
     mapAttrs'
-    match
     nameValuePair
     optionalAttrs
-    optionals
-    pipe
     removeAttrs
     ;
 
@@ -42,20 +36,10 @@ let
           devshell = self.devShells.${system}.default;
           formatter = self.formatter.${system};
         };
-
-      paths = [
-        ".dir-locals.el"
-        ".gitattributes"
-        ".github/settings.yml"
-        ".gitignore"
-        "test/"
-        "tool/devshells/"
-        "tool/flake-module.nix"
-      ];
     };
   }
   // mapAttrs' (
-    name: host:
+    name: _:
     nameValuePair "host-${name}" {
       inherit name;
 
@@ -74,22 +58,6 @@ let
           ${name} = self.deploy.nodes.${name};
         };
       };
-
-      # The tooling flake module also defines every host's deployment.
-      paths = [
-        "src/${name}/"
-        "src/home/"
-        "src/system/"
-        "tool/flake-module.nix"
-      ]
-      ++ optionals (name != "magnolia") [
-        ".github/workflows/ci.yml"
-        "ci/deploy.nix"
-      ]
-      ++ pipe host.users [
-        attrNames
-        (map (user: "src/${user}/"))
-      ];
     }
   ) hosts
   // mapAttrs' (
@@ -103,11 +71,6 @@ let
       outputs = {
         home = home.activationPackage;
       };
-
-      paths = [
-        "src/${name}/"
-        "src/home/"
-      ];
     }
   ) self.homeConfigurations;
 in
@@ -129,25 +92,9 @@ in
         primaryRepo ? { },
         ref ? null,
         rev ? null,
-        tag ? null,
         ...
       }:
       let
-        checkRequest =
-          if tag == null then
-            null
-          else
-            match "ci/check/(main|develop)/([a-z0-9-]+)/([0-9a-f]{40})/([0-9a-f-]{36})" tag;
-
-        deployRequest =
-          if tag == null then
-            null
-          else
-            match "ci/deploy/([a-z0-9-]+)/([0-9a-f]{40})/([0-9]+)/([0-9]+)" tag;
-
-        checkTarget = elemAt checkRequest 1;
-        deployHost = elemAt deployRequest 0;
-
         trustedBranch =
           elem branch [
             "main"
@@ -162,78 +109,50 @@ in
           system
         ];
 
-        # Hercules accepts contributions from repository writers. This ref
-        # filter limits our entry points; it is not the authorization boundary.
-        onPush =
-          if
-            checkRequest != null
-            && elemAt checkRequest 2 == rev
-            && hasAttr checkTarget targets
-          then
-            {
-              "${targets.${checkTarget}.handler}" = {
-                outputs = targets.${checkTarget}.outputs // {
-                  effects = {
-                    finish = import ./finish.nix {
-                      inherit
-                        inputs
-                        rev
-                        system
-                        tag
-                        ;
-
-                      branch = elemAt checkRequest 0;
-                      target = targets.${checkTarget};
-                    };
-                  };
-                };
-              };
-            }
-          else if
-            deployRequest != null
-            && elemAt deployRequest 1 == rev
-            && deployHost != "magnolia"
-            && hasAttr deployHost hosts
-          then
-            {
-              "deploy/${deployHost}" = {
-                outputs = {
-                  effects = {
-                    deploy = import ./deploy.nix {
-                      inherit
-                        inputs
-                        rev
-                        self
-                        system
-                        ;
-
-                      attempt = elemAt deployRequest 3;
-                      host = deployHost;
-                      runId = elemAt deployRequest 2;
-                    };
-                  };
-                };
-              };
-            }
-          else
-            optionalAttrs trustedBranch {
-              plan = {
-                outputs = {
-                  effects = {
-                    plan = import ./plan.nix {
-                      inherit
-                        branch
-                        inputs
-                        rev
-                        system
-                        ;
-
-                      targets = self.ci.targets;
-                    };
-                  };
-                };
-              };
+        onPush = optionalAttrs trustedBranch (
+          {
+            # Preserve the required status without a polling Effect.
+            plan = {
+              outputs = self.ci.builds;
             };
+          }
+          // mapAttrs' (
+            _: target:
+            nameValuePair target.handler {
+              outputs = target.outputs;
+            }
+          ) targets
+          // optionalAttrs (branch == "main") (
+            mapAttrs'
+              (
+                _: target:
+                nameValuePair "release/${target.name}" {
+                  outputs = {
+                    # Request approval only after the complete graph builds.
+                    checks = self.ci.builds;
+
+                    effects = {
+                      release = import ./release.nix {
+                        inherit
+                          inputs
+                          rev
+                          self
+                          system
+                          ;
+
+                        host = target.name;
+                      };
+                    };
+                  };
+                }
+              )
+              (
+                filterAttrs (
+                  _: target: target.kind == "host" && target.deploy
+                ) targets
+              )
+          )
+        );
       };
   };
 }

@@ -1,4 +1,7 @@
 name: CI
+run-name: >-
+  Deploy ${{ github.event.client_payload.host }}
+  ${{ github.event.client_payload.requestId }}
 
 on:
   repository_dispatch:
@@ -8,95 +11,87 @@ permissions:
   contents: read
 
 concurrency:
-  group: deployment-approval-${{ github.event.client_payload.rev }}-${{ github.event.client_payload.hosts[0] }}
+  group: deployment-${{ github.event.client_payload.requestId }}
   cancel-in-progress: false
 
 jobs:
   request:
     name: Verify deployment request
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      statuses: read
     outputs:
-      hosts: ${{ steps.request.outputs.hosts }}
-      rev: ${{ steps.request.outputs.rev }}
+      host: ${{ steps.request.outputs.host }}
+      project: ${{ steps.request.outputs.project }}
+      source-job: ${{ steps.request.outputs.source-job }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ci
       - uses: actions/github-script@v9
         id: request
+        env:
+          REQUEST: ${{ toJSON(github.event.client_payload) }}
         with:
           script: |
-            const {rev, hosts} = context.payload.client_payload;
-            if (!/^[0-9a-f]{40}$/.test(rev) || rev !== context.sha ||
-                context.ref !== 'refs/heads/main' || !Array.isArray(hosts) ||
-                !hosts.length || hosts.length > 32 || new Set(hosts).size !== hosts.length ||
-                hosts.some(host => !/^[a-z0-9-]+$/.test(host) || host === 'magnolia')) {
-              throw new Error('Invalid deployment request');
-            }
-            const {data: main} = await github.rest.git.getRef({...context.repo, ref: 'heads/main'});
-            if (main.object.sha !== rev) throw new Error('Superseded main revision');
-
-            // The finishing Effect dispatches after builds finish. Its commit
-            // status may settle just after the finishing Effect returns.
-            const deadline = Date.now() + 5 * 60 * 1000;
-            while (true) {
-              const statuses = await github.paginate(github.rest.repos.listCommitStatusesForRef,
-                {...context.repo, ref: rev, per_page: 100});
-              const ready = hosts.every(host => statuses.find(status =>
-                status.context === `ci/hercules/onPush/check/host/${host}` &&
-                status.creator?.login === 'hercules-ci[bot]')?.state === 'success');
-              if (ready) break;
-              if (Date.now() >= deadline) throw new Error('Hercules host checks have not succeeded');
-              await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-            core.setOutput('hosts', JSON.stringify({include: hosts.map(host => ({host}))}));
-            core.setOutput('rev', rev);
-            await core.summary.addHeading('Deployment approvals')
-              .addRaw(`Commit: ${rev}\n\n${hosts.map(host => `- ${host}`).join('\n')}\n`).write();
+            const { default: run } = await import(
+              `${process.env.GITHUB_WORKSPACE}/ci/request.mjs`
+            );
+            await run({ github, context, core });
 
   approve:
-    name: Approve / ${{ matrix.host }}
+    name: Approve / ${{ needs.request.outputs.host }}
     needs: request
     runs-on: ubuntu-24.04
     environment:
-      name: deploy-${{ matrix.host }}
+      name: deploy-${{ needs.request.outputs.host }}
     concurrency:
-      group: deploy-${{ matrix.host }}
+      group: deploy-${{ needs.request.outputs.host }}
       cancel-in-progress: false
     permissions:
-      contents: write
+      contents: read
       actions: read
       deployments: read
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.request.outputs.hosts) }}
+    outputs:
+      job: ${{ steps.approve.outputs.job }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ci
       - uses: actions/github-script@v9
+        id: approve
         env:
-          HOST: ${{ matrix.host }}
-          REVISION: ${{ needs.request.outputs.rev }}
+          HERCULES_CI_API_TOKEN: ${{ secrets.HERCULES_CI_API_TOKEN }}
+          PROJECT: ${{ needs.request.outputs.project }}
+          REQUEST: ${{ toJSON(github.event.client_payload) }}
+          SOURCE_JOB: ${{ needs.request.outputs.source-job }}
         with:
           script: |
-            const host = process.env.HOST;
-            const rev = process.env.REVISION;
-            const attempt = process.env.GITHUB_RUN_ATTEMPT;
-            if (!/^[a-z0-9-]+$/.test(host) || host === 'magnolia' ||
-                !/^[0-9a-f]{40}$/.test(rev) || !/^[0-9]+$/.test(attempt)) {
-              throw new Error('Invalid deployment approval');
-            }
-            const {data: main} = await github.rest.git.getRef({...context.repo, ref: 'heads/main'});
-            if (main.object.sha !== rev || context.sha !== rev) throw new Error('Superseded main revision');
-            const environment = `deploy-${host}`;
-            const {data: config} = await github.rest.repos.getEnvironment({...context.repo, environment_name: environment});
-            if (!config.protection_rules?.some(rule => rule.type === 'required_reviewers' && rule.reviewers?.length)) {
-              throw new Error(`${environment} must have required reviewers`);
-            }
-            const {data: approvals} = await github.rest.actions.getReviewsForRun({...context.repo, run_id: context.runId});
-            if (!approvals.some(review => review.state === 'approved' &&
-                review.environments.some(item => item.name === environment))) {
-              throw new Error(`No approval for ${environment}`);
-            }
-            const tag = `ci/deploy/${host}/${rev}/${context.runId}/${attempt}`;
-            await github.rest.git.createRef({...context.repo, ref: `refs/tags/${tag}`, sha: rev});
-            await core.summary.addHeading(`Approved ${host}`)
-              .addRaw(`Hercules will execute the deployment Effect for ${rev}.\n\nRequest: \`${tag}\`\n`).write();
+            const { default: run } = await import(
+              `${process.env.GITHUB_WORKSPACE}/ci/approve.mjs`
+            );
+            await run({ github, context, core });
+
+  observe:
+    name: Deployment result / ${{ needs.request.outputs.host }}
+    needs: [request, approve]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ci
+      - uses: actions/github-script@v9
+        env:
+          JOB: ${{ needs.approve.outputs.job }}
+          SOURCE_JOB: ${{ needs.request.outputs.source-job }}
+        with:
+          script: |
+            const { default: run } = await import(
+              `${process.env.GITHUB_WORKSPACE}/ci/observe.mjs`
+            );
+            await run({ github, context, core });
