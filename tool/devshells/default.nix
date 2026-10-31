@@ -35,6 +35,7 @@ let
     ;
 
   inherit (pkgs.formats)
+    json
     toml
     yaml
     ;
@@ -42,6 +43,7 @@ let
   formatters = [
     elfmt
     mdformatWithPlugins
+    pkgs.biome
     pkgs.nixfmt
   ];
 
@@ -55,7 +57,7 @@ let
   plasma-manager-pkgs =
     plasma-manager.packages.${system};
 in
-{
+rec {
   commands = with pkgs; [
     {
       category = "[deployment]";
@@ -83,6 +85,48 @@ in
   ];
 
   files = {
+    biome = rec {
+      data = {
+        "$schema" =
+          "https://biomejs.dev/schemas/${pkgs.biome.version}/schema.json";
+
+        assist = {
+          enabled = false;
+        };
+
+        formatter = {
+          indentStyle = "space";
+          indentWidth = 2;
+          lineEnding = "lf";
+          lineWidth = 80;
+        };
+
+        javascript = {
+          formatter = {
+            arrowParentheses = "always";
+            expand = "always";
+            operatorLinebreak = "before";
+            quoteStyle = "single";
+            semicolons = "always";
+            trailingCommas = "all";
+          };
+        };
+
+        linter = {
+          enabled = false;
+        };
+      };
+
+      generator =
+        data: (json { }).generate (baseNameOf path) data;
+
+      packages = with pkgs; [
+        biome
+      ];
+
+      path = "biome.json";
+    };
+
     editorconfig = rec {
       data = {
         root = true;
@@ -100,6 +144,13 @@ in
         "*.el" = {
           indent_size = "unset";
           indent_style = "space";
+          tab_width = 2;
+        };
+
+        "*.{js,mjs,cjs}" = {
+          indent_size = 2;
+          indent_style = "space";
+          max_line_length = 80;
           tab_width = 2;
         };
 
@@ -354,6 +405,22 @@ in
     treefmt = rec {
       data = {
         formatter = {
+          biome = {
+            command = "biome";
+
+            includes = [
+              "*.cjs"
+              "*.js"
+              "*.mjs"
+            ];
+
+            options = [
+              "format"
+              "--write"
+              "--config-path=${files.biome.generator files.biome.data}"
+            ];
+          };
+
           emacs-lisp = {
             command = "elfmt";
 
@@ -394,6 +461,10 @@ in
           };
         };
       };
+
+      deps = [
+        "biome"
+      ];
 
       generator =
         data: (toml { }).generate (baseNameOf path) data;
