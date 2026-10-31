@@ -779,6 +779,7 @@ in
           org-noter
           org-ql
           org-super-agenda
+          org-table-widget
           paredit
           pass
           pdf-tools
