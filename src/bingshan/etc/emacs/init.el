@@ -4971,6 +4971,11 @@
   (org-id-locations-file (bs-path org-directory ".id-locations")))
 
 (use-package org-modern
+  :custom
+  ;; Let `org-table-widget' handle tables while retaining the other
+  ;; `org-modern' decorations.
+  (org-modern-table nil)
+
   :hook
   ;; Activate `org-modern-mode' when entering `org-mode'.  This
   ;; adjusts the visual presentation of headings, lists, blocks, and
@@ -5041,6 +5046,33 @@
   ( :map ctl-c-n-map
     ;; Select a reading list and refresh it with \\`g'.
     ("v" . org-ql-view)))
+
+(use-package org-table-widget
+  :functions (modus-themes-get-color-value
+              modus-themes-get-current-theme)
+
+  :custom
+  ;; Keep scrolling smooth without replacing the window header line.
+  (org-table-widget-sticky-header nil)
+
+  :config
+  (let ((set-table-faces
+         (lambda ()
+           (when (and (featurep 'modus-themes)
+                      (modus-themes-get-current-theme))
+             (set-face-attribute
+              'org-table-widget-zebra nil
+              :background
+              (modus-themes-get-color-value 'bg-dim t))))))
+    ;; Use the current `modus-themes' palette for alternating rows,
+    ;; both on first load and after switching themes.
+    (funcall set-table-faces)
+    (add-hook 'modus-themes-after-load-theme-hook set-table-faces))
+
+  :hook
+  ;; Preview tables in `org' buffers.  Press \\`e' on a table to edit
+  ;; its source, then leave the table to restore the preview.
+  (org-mode-hook . org-table-widget-mode))
 
 
 
