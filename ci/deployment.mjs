@@ -1,7 +1,8 @@
+import { deployHandler } from './hercules.mjs';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
-import { requestJson } from './http.mjs';
+import { requestJson, requestRejected } from './http.mjs';
 
 const candidate = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const command = process.argv[3];
@@ -24,11 +25,11 @@ const jobApi =
 const approvalName = `fleet-approval-${host}.json`;
 const deployedName = `fleet-deployed-${host}.json`;
 const requestName = `fleet-request-${host}.json`;
-const runName = `Deploy ${host} ${requestId}`;
+const runName = `Deploy ${host}`;
 const uuid = /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
 
 if (!gitToken || !hciToken || !uuid.test(projectId)) {
-  throw new Error('Missing release credentials or project identity');
+  throw new Error('Missing deployment credentials or project identity');
 }
 
 const github = (path, options) =>
@@ -132,6 +133,8 @@ async function saveDeployment(observed, approval, origin) {
 async function verifyApproval(approval) {
   if (
     !sameRequest(approval)
+    || !sameRequest(requested)
+    || requested.runId !== approval.runId
     || !uuid.test(approval.sourceJobId)
     || !/^\d+$/.test(String(approval.runId))
     || !Number.isSafeInteger(approval.attempt)
@@ -139,7 +142,7 @@ async function verifyApproval(approval) {
     || approval.systemPath !== candidate.systemPath
     || approval.deployPath !== candidate.deployPath
   ) {
-    throw new Error('Invalid release approval record');
+    throw new Error('Invalid deployment approval record');
   }
 
   const runPath = `actions/runs/${approval.runId}`;
@@ -157,7 +160,7 @@ async function verifyApproval(approval) {
     run.head_sha !== revision
     || run.head_branch !== 'main'
     || run.event !== 'repository_dispatch'
-    || run.path !== '.github/workflows/ci.yml'
+    || run.path !== '.github/workflows/deploy.yml'
     || run.display_title !== runName
     || run.run_attempt !== approval.attempt
     || latest.run_attempt !== approval.attempt
@@ -168,20 +171,20 @@ async function verifyApproval(approval) {
     ].includes(run.status)
     || run.conclusion === 'cancelled'
   ) {
-    throw new Error('Approval workflow does not match this release');
+    throw new Error('Approval workflow does not match this deployment');
   }
 
   if (
     source.projectId !== projectId
     || source.jobType !== 'OnPush'
-    || source.jobName !== `release/${host}`
+    || source.jobName !== deployHandler(host)
     || source.isCancelled
     || source.source.ref !== 'refs/heads/main'
     || source.source.revision !== revision
     || source.jobPhase !== 'Done'
     || source.jobStatus !== 'Success'
   ) {
-    throw new Error('Approval does not refer to a successful release job');
+    throw new Error('Approval does not refer to a successful deployment job');
   }
 
   if (
@@ -202,7 +205,9 @@ async function verifyApproval(approval) {
   for (let page = 1; ; page += 1) {
     const path = `${runPath}/attempts/${approval.attempt}/jobs`;
     const result = await github(`${path}?per_page=100&page=${page}`);
-    approvalJob = result.jobs.find((job) => job.name === `Approve / ${host}`);
+    approvalJob = result.jobs.find(
+      (job) => job.name === `Approve deployment to ${host}`,
+    );
 
     if (approvalJob || result.jobs.length < 100) {
       break;
@@ -216,14 +221,14 @@ async function verifyApproval(approval) {
       || approvalJob.conclusion === 'success'
     )
   ) {
-    throw new Error('The protected approval job did not authorize release');
+    throw new Error('The protected approval job did not authorize deployment');
   }
 
   const query = new URLSearchParams({
     ref: 'refs/heads/main',
     rev: revision,
     handler: 'OnPush',
-    name: 'plan',
+    name: 'checkAll',
     success: 'true',
     limit: '100',
   });
@@ -232,7 +237,7 @@ async function verifyApproval(approval) {
   if (
     !items.some(
       (job) =>
-        job.jobName === 'plan'
+        job.jobName === 'checkAll'
         && job.source.revision === revision
         && job.source.ref === 'refs/heads/main'
         && job.jobStatus === 'Success'
@@ -247,6 +252,23 @@ async function verifyApproval(approval) {
 }
 
 async function existingWorkflow() {
+  if (sameRequest(requested) && Number.isSafeInteger(requested.runId)) {
+    const run = await github(`actions/runs/${requested.runId}`);
+
+    if (
+      run.head_sha !== revision
+      || run.event !== 'repository_dispatch'
+      || run.path !== '.github/workflows/deploy.yml'
+      || run.display_title !== runName
+    ) {
+      throw new Error('The recorded workflow does not match this request');
+    }
+
+    return run;
+  }
+
+  const matches = [];
+
   for (let page = 1; ; page += 1) {
     const query = new URLSearchParams({
       event: 'repository_dispatch',
@@ -254,19 +276,37 @@ async function existingWorkflow() {
       per_page: '100',
       page: String(page),
     });
-    const result = await github(`actions/workflows/ci.yml/runs?${query}`);
-    const run = result.workflow_runs.find(
-      (item) => item.display_title === runName && item.head_sha === revision,
+    const result = await github(`actions/workflows/deploy.yml/runs?${query}`);
+    matches.push(
+      ...result.workflow_runs.filter(
+        (run) =>
+          run.display_title === runName
+          && run.head_sha === revision
+          && run.event === 'repository_dispatch'
+          && run.path === '.github/workflows/deploy.yml',
+      ),
     );
 
-    if (run || result.workflow_runs.length < 100) {
-      return run;
+    if (result.workflow_runs.length < 100) {
+      break;
     }
   }
+
+  if (matches.length > 1) {
+    throw new Error('Multiple deployment workflows; inspect them manually');
+  }
+
+  return matches[0];
 }
 
 async function requestApproval(previous) {
-  if (!(await existingWorkflow())) {
+  let run = await existingWorkflow();
+  let dispatchError;
+
+  if (
+    !run
+    && (!sameRequest(requested) || requested.dispatchStatus === 'rejected')
+  ) {
     let summary = 'No previous verified deployment is recorded.';
 
     if (previous) {
@@ -300,10 +340,16 @@ async function requestApproval(previous) {
     }
 
     await currentMain();
+    // Persist uncertainty before POST, including across Effect reruns.
+    await putState(requestName, {
+      ...candidate,
+      dispatchStatus: 'pending',
+    });
 
     try {
       await github('dispatches', {
         method: 'POST',
+        noContent: true,
         body: {
           event_type: 'fleet-deploy',
           client_payload: {
@@ -313,22 +359,45 @@ async function requestApproval(previous) {
         },
       });
     } catch (error) {
-      let found;
-
-      for (let attempt = 0; attempt < 4 && !found; attempt += 1) {
-        await delay(2000 * (attempt + 1));
-        found = await existingWorkflow();
-      }
-
-      if (!found) {
+      if (requestRejected(error)) {
+        await putState(requestName, {
+          ...candidate,
+          dispatchStatus: 'rejected',
+        });
         throw error;
       }
+
+      dispatchError = error;
+      // Dispatch may have succeeded even when its response was lost.
+      console.error(`Deployment dispatch response was not received: ${error}`);
     }
   }
 
-  await putState(requestName, candidate);
+  for (let attempt = 0; attempt < 12 && !run; attempt += 1) {
+    await delay(5000);
+    run = await existingWorkflow();
+  }
 
-  console.log(`Requested approval for ${host} at ${revision}`);
+  if (!run) {
+    throw new Error(
+      'Could not confirm the deployment workflow; '
+        + 'inspect GitHub before retry',
+      {
+        cause: dispatchError,
+      },
+    );
+  }
+
+  if (!sameRequest(requested) || requested.runId !== run.id) {
+    await putState(requestName, {
+      ...(sameRequest(requested) ? requested : {}),
+      ...candidate,
+      dispatchStatus: 'confirmed',
+      runId: run.id,
+    });
+  }
+
+  console.log(`Approval workflow: ${run.html_url}; status: ${run.status}`);
 }
 
 await currentMain();
@@ -343,28 +412,49 @@ if (sameRequest(approval)) {
   await verifyApproval(approval);
 
   const before = inspect();
-  const failedBefore =
-    sameRequest(requested) && Array.isArray(requested.failedServicesBefore)
-      ? requested.failedServicesBefore
-      : before.failedServices;
+  const failedBefore = Array.isArray(requested.failedServicesBefore)
+    ? requested.failedServicesBefore
+    : before.failedServices;
 
   await putState(requestName, {
     ...candidate,
+    runId: approval.runId,
     failedServicesBefore: failedBefore,
   });
 
   if (!matchesSystem(before)) {
     await currentMain();
 
-    execFileSync(
-      command,
-      [
-        'activate',
-      ],
-      {
-        stdio: 'inherit',
-      },
-    );
+    try {
+      execFileSync(
+        command,
+        [
+          'activate',
+        ],
+        {
+          stdio: 'inherit',
+        },
+      );
+    } catch (error) {
+      console.error(`Activation failed on ${host}; collecting remote state.`);
+
+      try {
+        execFileSync(
+          command,
+          [
+            'diagnose',
+          ],
+          {
+            stdio: 'inherit',
+            timeout: 45000,
+          },
+        );
+      } catch {
+        console.error('Remote diagnostics are unavailable.');
+      }
+
+      throw error;
+    }
   }
 
   const after = inspect();
@@ -389,20 +479,21 @@ if (sameRequest(approval)) {
   && previous.fingerprint === fingerprint
 ) {
   console.log(`No deployment change for ${host}`);
-} else if (sameRequest(requested)) {
-  console.log('Approval is pending; resume the GitHub workflow first');
+} else if (sameRequest(requested) && requested.dispatchStatus !== 'rejected') {
+  await requestApproval(previous);
 } else {
   let observed;
 
-  if (!previous) {
-    try {
-      observed = inspect();
-    } catch {
-      console.log('Existing deployment could not be inspected.');
-    }
+  try {
+    observed = inspect();
+  } catch (error) {
+    console.error(
+      `SSH preflight failed on ${host}; no approval request was created.`,
+    );
+    throw error;
   }
 
-  if (observed && matchesSystem(observed)) {
+  if (!previous && matchesSystem(observed)) {
     await saveDeployment(observed, null, 'observed');
     console.log(`Initialized ${host} from its running system`);
   } else {
