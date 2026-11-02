@@ -1,5 +1,9 @@
 import { setTimeout as delay } from 'node:timers/promises';
 
+export function requestRejected(error) {
+  return error.status >= 400 && error.status < 500 && error.status !== 408;
+}
+
 export async function requestJson(url, options = {}) {
   const {
     token,
@@ -78,9 +82,11 @@ export async function requestJson(url, options = {}) {
         504,
       ].includes(response.status)
     ) {
-      throw new Error(
+      const error = new Error(
         `${method} ${new URL(url).pathname}: HTTP ${response.status}`,
       );
+      error.status = response.status;
+      throw error;
     }
 
     await delay(retryDelay(attempt));

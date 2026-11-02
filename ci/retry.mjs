@@ -1,5 +1,7 @@
 import { setTimeout as delay } from 'node:timers/promises';
+import { stripVTControlCharacters } from 'node:util';
 import { requestJson } from './http.mjs';
+import { jobFamily, jobHistory, rerunJob, sameTask } from './hercules.mjs';
 
 export default async function ({ github, context, core }) {
   const { payload } = context;
@@ -12,7 +14,8 @@ export default async function ({ github, context, core }) {
     || context.ref !== 'refs/heads/main'
     || context.repo.owner !== 'brsvh'
     || context.repo.repo !== 'fleet'
-    || payload.context !== 'ci/hercules/evaluation'
+    || typeof payload.context !== 'string'
+    || !payload.context.startsWith('ci/hercules/')
     || ![
       'failure',
       'error',
@@ -32,40 +35,20 @@ export default async function ({ github, context, core }) {
   }
 
   const herculesApi = 'https://hercules-ci.com/api/v1';
-  const projectApi = '/site/github/account/brsvh/project/fleet';
   const interval = 60000;
   const limit = 5;
 
-  const api = (path, method = 'GET') =>
+  const api = (path, options) =>
     requestJson(`${herculesApi}${path}`, {
       token,
-      method,
+      ...options,
       attempts: 3,
       retryDelay: () => interval,
     });
 
-  async function history() {
-    const query = new URLSearchParams({
-      rev: revision,
-      limit: '100',
-    });
-    const jobs = [];
+  const history = () => jobHistory(api, revision);
 
-    for (let page = 0; page < 10; page += 1) {
-      const { items } = await api(`${projectApi}/jobs?${query}`);
-      jobs.push(...items);
-
-      if (items.length < 100) {
-        return jobs;
-      }
-
-      query.set('offsetIndex', String(items.at(-1).index));
-    }
-
-    throw new Error('Too many jobs to establish a safe retry budget');
-  }
-
-  function configuration(job) {
+  function eligible(job) {
     return (
       job?.ownerName === 'brsvh'
       && job.repoName === 'fleet'
@@ -75,17 +58,21 @@ export default async function ({ github, context, core }) {
         'refs/heads/main',
         'refs/heads/develop',
       ].includes(job.source.ref)
-      && [
+      && (([
         'Config',
         'Legacy',
       ].includes(job.jobType)
-      && job.jobName === null
+        && job.jobName === null)
+        || (job.jobType === 'OnPush'
+          && /^(check|deploy)[A-Z][A-Za-z0-9]*$/.test(job.jobName)
+          && (!job.jobName.startsWith('deploy')
+            || job.source.ref === 'refs/heads/main')))
     );
   }
 
   function failed(job) {
     return (
-      configuration(job)
+      eligible(job)
       && !job.isCancelled
       && job.jobPhase === 'Done'
       && job.jobStatus === 'Failure'
@@ -103,7 +90,7 @@ export default async function ({ github, context, core }) {
   const source = jobs.find((job) => job.index === index);
 
   if (!failed(source)) {
-    await skip('The job is not a failed repository configuration fetch.');
+    await skip('The job is not a failed repository evaluation.');
     return;
   }
 
@@ -117,48 +104,41 @@ export default async function ({ github, context, core }) {
   }
 
   function budget(history) {
-    const family = history.filter(
-      (job) =>
-        configuration(job)
-        && job.projectId === source.projectId
-        && job.source.ref === source.source.ref,
-    );
-    const byId = new Map(
-      family.map((job) => [
-        job.id,
-        job,
-      ]),
-    );
-    const visited = new Set();
-    let root = source;
+    const { root, jobs: family } = jobFamily(source, history);
 
-    while (root.rerunOf) {
-      if (visited.has(root.id) || !byId.has(root.rerunOf)) {
-        throw new Error('Incomplete or invalid Hercules rerun history');
-      }
-
-      visited.add(root.id);
-      root = byId.get(root.rerunOf);
-    }
-
-    const descendants = new Set([
-      root.id,
-    ]);
-
-    for (const job of family.toSorted((a, b) => a.index - b.index)) {
-      if (descendants.has(job.rerunOf)) {
-        descendants.add(job.id);
-      }
-    }
-
-    // A newer configuration job also covers manual retries of this revision.
-    if (family.some((job) => job.index > source.index)) {
+    if (
+      history.some(
+        (job) =>
+          sameTask(job, source)
+          && (job.index > source.index
+            || (!job.isCancelled && job.jobPhase !== 'Done')),
+      )
+    ) {
       return null;
+    }
+
+    // Once deployment preparation has evaluated, a rerun may consume approval.
+    // Leave those retries to the approved deployment workflow or its operator.
+    if (source.jobName === null || source.jobName.startsWith('deploy')) {
+      if (
+        history.some(
+          (job) =>
+            job.projectId === source.projectId
+            && job.source.ref === source.source.ref
+            && job.source.revision === revision
+            && job.jobType === 'OnPush'
+            && /^deploy[A-Z]/.test(job.jobName)
+            && job.evaluationStatus === 'Success'
+            && (source.jobName === null || job.jobName === source.jobName),
+        )
+      ) {
+        return null;
+      }
     }
 
     return {
       root,
-      attempts: descendants.size - 1,
+      attempts: family.length - 1,
     };
   }
 
@@ -170,7 +150,9 @@ export default async function ({ github, context, core }) {
   let remaining = budget(jobs);
 
   if (!remaining || remaining.attempts >= limit) {
-    await skip('A newer job exists or the five-retry budget is exhausted.');
+    await skip(
+      'Retry blocked by task history, deployment stage or five-retry limit.',
+    );
     return;
   }
 
@@ -178,11 +160,11 @@ export default async function ({ github, context, core }) {
   const attributes = evaluation.attributes;
   const message = attributes?.[0]?.value?.Error?.errorMessage;
 
-  const clean = (text) => text.replace(/\x1b\[[0-9;]*m/g, '');
-
   const input =
     typeof message === 'string'
-      ? clean(message).match(/while fetching the input '([^']+)'/)?.[1]
+      ? stripVTControlCharacters(message).match(
+          /while fetching the input '([^']+)'/,
+        )?.[1]
       : null;
   const repository = 'git+https://github.com/brsvh/fleet.git';
   const url = input?.startsWith(`${repository}?`) ? new URL(input) : null;
@@ -193,7 +175,9 @@ export default async function ({ github, context, core }) {
     || !url
     || url.searchParams.get('rev') !== revision
     || url.searchParams.get('ref') !== source.source.ref
-    || !clean(message).includes('Failed to fetch git repository')
+    || !stripVTControlCharacters(message).includes(
+      'Failed to fetch git repository',
+    )
     || Object.keys(evaluation.derivations).length !== 0
     || evaluation.evaluationDependencies.length !== 0
     || evaluation.ifdAttributes.length !== 0
@@ -216,12 +200,16 @@ export default async function ({ github, context, core }) {
     throw new Error('The evaluation log is incomplete');
   }
 
-  const text = clean(log.lines.map((line) => line.t).join('\n'));
+  const text = stripVTControlCharacters(
+    log.lines.map((line) => line.t).join('\n'),
+  );
   const permanent = [
     /authentication failed|permission denied|access denied/i,
     /could not read (?:username|password)|repository .*not found/i,
     /requested URL returned error: (?:400|401|403|404|410)\b/i,
-    /SSL certificate problem|certificate verification failed/i,
+    /curl (?:51|60)\b|SSL (?:certificate problem|peer certificate)/i,
+    /certificate (?:verify|verification) failed|certificate has expired/i,
+    /certificate is not yet valid|unable to get local issuer certificate/i,
     /couldn't find remote ref|not our ref|hash mismatch/i,
     /no space left on device|disk quota exceeded/i,
   ];
@@ -248,11 +236,7 @@ export default async function ({ github, context, core }) {
     ],
     [
       'Temporary DNS failure',
-      /could not resolve (?:host|proxy)/i,
-    ],
-    [
-      'Temporary DNS failure',
-      /temporary failure in name resolution/i,
+      /could not resolve (?:host|proxy)|temporary failure in name resolution/i,
     ],
     [
       'Temporary HTTP failure',
@@ -281,30 +265,7 @@ export default async function ({ github, context, core }) {
     return;
   }
 
-  let created;
-
-  try {
-    created = await api(`/jobs/${source.id}/rerun`, 'POST');
-  } catch (error) {
-    // A lost POST response must not cause a second rerun request.
-    for (let attempt = 0; attempt < 3 && !created; attempt += 1) {
-      await delay(interval);
-      created = (await history()).find((job) => job.rerunOf === source.id);
-    }
-
-    if (!created) {
-      throw error;
-    }
-  }
-
-  if (
-    !configuration(created)
-    || created.rerunOf !== source.id
-    || created.projectId !== source.projectId
-    || created.source.ref !== source.source.ref
-  ) {
-    throw new Error('Unexpected Hercules rerun result');
-  }
+  const { job: created } = await rerunJob(api, source, jobs);
 
   await core.summary
     .addHeading(`Source fetch retry ${remaining.attempts + 1}/${limit}`)
