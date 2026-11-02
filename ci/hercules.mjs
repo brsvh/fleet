@@ -2,10 +2,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { requestRejected } from './http.mjs';
 
 export function deployHandler(host) {
-  return (
-    'deploy'
-    + host.replace(/(?:^|-)([a-z0-9])/g, (_, letter) => letter.toUpperCase())
-  );
+  return `deployHost/${host}`;
 }
 
 function kind(job) {

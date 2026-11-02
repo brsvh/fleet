@@ -64,8 +64,14 @@ export default async function ({ github, context, core }) {
       ].includes(job.jobType)
         && job.jobName === null)
         || (job.jobType === 'OnPush'
-          && /^(check|deploy)[A-Z][A-Za-z0-9]*$/.test(job.jobName)
-          && (!job.jobName.startsWith('deploy')
+          && ([
+            'checkAll',
+            'checkGlobal',
+          ].includes(job.jobName)
+            || /^(?:checkHost|checkUser|deployHost)\/[^/\s]+$/.test(
+              job.jobName,
+            ))
+          && (!job.jobName.startsWith('deployHost/')
             || job.source.ref === 'refs/heads/main')))
     );
   }
@@ -119,7 +125,7 @@ export default async function ({ github, context, core }) {
 
     // Once deployment preparation has evaluated, a rerun may consume approval.
     // Leave those retries to the approved deployment workflow or its operator.
-    if (source.jobName === null || source.jobName.startsWith('deploy')) {
+    if (source.jobName === null || source.jobName.startsWith('deployHost/')) {
       if (
         history.some(
           (job) =>
@@ -127,7 +133,7 @@ export default async function ({ github, context, core }) {
             && job.source.ref === source.source.ref
             && job.source.revision === revision
             && job.jobType === 'OnPush'
-            && /^deploy[A-Z]/.test(job.jobName)
+            && job.jobName?.startsWith('deployHost/')
             && job.evaluationStatus === 'Success'
             && (source.jobName === null || job.jobName === source.jobName),
         )
