@@ -79,6 +79,7 @@ effects.mkEffect {
   inputs = with pkgs; [
     coreutils
     deployPackage
+    gnugrep
     hci
     jq
     nix

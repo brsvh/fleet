@@ -425,15 +425,36 @@ if (sameRequest(approval)) {
   if (!matchesSystem(before)) {
     await currentMain();
 
-    execFileSync(
-      command,
-      [
-        'activate',
-      ],
-      {
-        stdio: 'inherit',
-      },
-    );
+    try {
+      execFileSync(
+        command,
+        [
+          'activate',
+        ],
+        {
+          stdio: 'inherit',
+        },
+      );
+    } catch (error) {
+      console.error(`Activation failed on ${host}; collecting remote state.`);
+
+      try {
+        execFileSync(
+          command,
+          [
+            'diagnose',
+          ],
+          {
+            stdio: 'inherit',
+            timeout: 45000,
+          },
+        );
+      } catch {
+        console.error('Remote diagnostics are unavailable.');
+      }
+
+      throw error;
+    }
   }
 
   const after = inspect();
@@ -463,15 +484,16 @@ if (sameRequest(approval)) {
 } else {
   let observed;
 
-  if (!previous) {
-    try {
-      observed = inspect();
-    } catch {
-      console.log('Existing deployment could not be inspected.');
-    }
+  try {
+    observed = inspect();
+  } catch (error) {
+    console.error(
+      `SSH preflight failed on ${host}; no approval request was created.`,
+    );
+    throw error;
   }
 
-  if (observed && matchesSystem(observed)) {
+  if (!previous && matchesSystem(observed)) {
     await saveDeployment(observed, null, 'observed');
     console.log(`Initialized ${host} from its running system`);
   } else {
