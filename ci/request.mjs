@@ -1,3 +1,4 @@
+import { deployHandler } from './hercules.mjs';
 import { createHash } from 'node:crypto';
 import { requestJson } from './http.mjs';
 
@@ -78,14 +79,14 @@ export default async function ({ github, context, core }) {
       query.set('offsetIndex', String(items.at(-1).index));
     }
 
-    source = ready.find((job) => job.jobName === `release/${host}`);
+    source = ready.find((job) => job.jobName === deployHandler(host));
 
-    if (source && ready.some((job) => job.jobName === 'plan')) {
+    if (source && ready.some((job) => job.jobName === 'checkAll')) {
       break;
     }
 
     if (Date.now() >= deadline) {
-      throw new Error('Release preparation has not succeeded');
+      throw new Error('Deployment preparation has not succeeded');
     }
 
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -101,6 +102,7 @@ export default async function ({ github, context, core }) {
       JSON.stringify(
         {
           revision,
+          requestId,
           fingerprint,
           system: candidate.systemPath,
           profile: candidate.deployPath,
