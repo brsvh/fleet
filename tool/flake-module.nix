@@ -94,6 +94,7 @@ in
           };
 
           erythron = {
+            activationTimeout = 600;
             fastConnection = true;
             hostname = "erythron.tail.bingshan.org";
 
