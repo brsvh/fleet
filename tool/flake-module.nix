@@ -66,6 +66,7 @@ in
         in
         {
           azaleoid = {
+            activationTimeout = 600;
             fastConnection = true;
             hostname = "azaleoid.tail.bingshan.org";
 
