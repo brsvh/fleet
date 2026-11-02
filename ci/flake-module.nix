@@ -45,7 +45,7 @@ let
       inherit name;
 
       deploy = name != "magnolia";
-      handler = toCamelCase "check-host-${name}";
+      handler = "checkHost/${name}";
       kind = "host";
 
       outputs = {
@@ -66,7 +66,7 @@ let
     nameValuePair (toCamelCase "user-${name}") {
       inherit name;
 
-      handler = toCamelCase "check-user-${name}";
+      handler = "checkUser/${name}";
       kind = "user";
 
       outputs = {
@@ -126,27 +126,25 @@ in
             mapAttrs'
               (
                 _: target:
-                nameValuePair
-                  (toCamelCase "deploy-${target.name}")
-                  {
-                    outputs = {
-                      # Request approval only after the complete graph builds.
-                      checks = self.ci.builds;
+                nameValuePair "deployHost/${target.name}" {
+                  outputs = {
+                    # Request approval only after the complete graph builds.
+                    checks = self.ci.builds;
 
-                      effects = {
-                        deployHost = import ./deployment.nix {
-                          inherit
-                            inputs
-                            rev
-                            self
-                            system
-                            ;
+                    effects = {
+                      deployHost = import ./deployment.nix {
+                        inherit
+                          inputs
+                          rev
+                          self
+                          system
+                          ;
 
-                          host = target.name;
-                        };
+                        host = target.name;
                       };
                     };
-                  }
+                  };
+                }
               )
               (
                 filterAttrs (
