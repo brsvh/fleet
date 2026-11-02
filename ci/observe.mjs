@@ -10,20 +10,20 @@ export default async function ({ core }) {
     });
 
     if (job.rerunOf !== process.env.SOURCE_JOB || job.isCancelled) {
-      throw new Error('The approved Hercules release was cancelled');
+      throw new Error('The approved Hercules deployment was cancelled');
     }
 
     if (job.jobPhase === 'Done') {
       if (job.jobStatus !== 'Success' || job.effectsStatus !== 'Success') {
-        throw new Error(`Hercules release failed: job ${job.index}`);
+        throw new Error(`Hercules deployment failed: job ${job.index}`);
       }
 
-      core.info(`Hercules release completed: job ${job.index}`);
+      core.info(`Hercules deployment completed: job ${job.index}`);
       return;
     }
 
     await new Promise((resolve) => setTimeout(resolve, 15000));
   }
 
-  throw new Error('Timed out observing the Hercules release');
+  throw new Error('Timed out observing the Hercules deployment');
 }

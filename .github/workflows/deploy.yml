@@ -1,4 +1,4 @@
-name: CI
+name: Deploy
 run-name: >-
   Deploy ${{ github.event.client_payload.host }}
   ${{ github.event.client_payload.requestId }}
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   request:
-    name: Verify deployment request
+    name: Validate deployment request
     runs-on: ubuntu-24.04
     outputs:
       host: ${{ steps.request.outputs.host }}
@@ -40,7 +40,7 @@ jobs:
             await run({ github, context, core });
 
   approve:
-    name: Approve / ${{ needs.request.outputs.host }}
+    name: Approve deployment to ${{ needs.request.outputs.host }}
     needs: request
     runs-on: ubuntu-24.04
     environment:
@@ -75,7 +75,7 @@ jobs:
             await run({ github, context, core });
 
   observe:
-    name: Deployment result / ${{ needs.request.outputs.host }}
+    name: Wait for deployment to ${{ needs.request.outputs.host }}
     needs: [request, approve]
     runs-on: ubuntu-24.04
     timeout-minutes: 180

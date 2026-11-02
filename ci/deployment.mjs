@@ -1,3 +1,4 @@
+import { deployHandler } from './hercules.mjs';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -28,7 +29,7 @@ const runName = `Deploy ${host} ${requestId}`;
 const uuid = /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
 
 if (!gitToken || !hciToken || !uuid.test(projectId)) {
-  throw new Error('Missing release credentials or project identity');
+  throw new Error('Missing deployment credentials or project identity');
 }
 
 const github = (path, options) =>
@@ -139,7 +140,7 @@ async function verifyApproval(approval) {
     || approval.systemPath !== candidate.systemPath
     || approval.deployPath !== candidate.deployPath
   ) {
-    throw new Error('Invalid release approval record');
+    throw new Error('Invalid deployment approval record');
   }
 
   const runPath = `actions/runs/${approval.runId}`;
@@ -157,7 +158,7 @@ async function verifyApproval(approval) {
     run.head_sha !== revision
     || run.head_branch !== 'main'
     || run.event !== 'repository_dispatch'
-    || run.path !== '.github/workflows/ci.yml'
+    || run.path !== '.github/workflows/deploy.yml'
     || run.display_title !== runName
     || run.run_attempt !== approval.attempt
     || latest.run_attempt !== approval.attempt
@@ -168,20 +169,20 @@ async function verifyApproval(approval) {
     ].includes(run.status)
     || run.conclusion === 'cancelled'
   ) {
-    throw new Error('Approval workflow does not match this release');
+    throw new Error('Approval workflow does not match this deployment');
   }
 
   if (
     source.projectId !== projectId
     || source.jobType !== 'OnPush'
-    || source.jobName !== `release/${host}`
+    || source.jobName !== deployHandler(host)
     || source.isCancelled
     || source.source.ref !== 'refs/heads/main'
     || source.source.revision !== revision
     || source.jobPhase !== 'Done'
     || source.jobStatus !== 'Success'
   ) {
-    throw new Error('Approval does not refer to a successful release job');
+    throw new Error('Approval does not refer to a successful deployment job');
   }
 
   if (
@@ -202,7 +203,9 @@ async function verifyApproval(approval) {
   for (let page = 1; ; page += 1) {
     const path = `${runPath}/attempts/${approval.attempt}/jobs`;
     const result = await github(`${path}?per_page=100&page=${page}`);
-    approvalJob = result.jobs.find((job) => job.name === `Approve / ${host}`);
+    approvalJob = result.jobs.find(
+      (job) => job.name === `Approve deployment to ${host}`,
+    );
 
     if (approvalJob || result.jobs.length < 100) {
       break;
@@ -216,14 +219,14 @@ async function verifyApproval(approval) {
       || approvalJob.conclusion === 'success'
     )
   ) {
-    throw new Error('The protected approval job did not authorize release');
+    throw new Error('The protected approval job did not authorize deployment');
   }
 
   const query = new URLSearchParams({
     ref: 'refs/heads/main',
     rev: revision,
     handler: 'OnPush',
-    name: 'plan',
+    name: 'checkAll',
     success: 'true',
     limit: '100',
   });
@@ -232,7 +235,7 @@ async function verifyApproval(approval) {
   if (
     !items.some(
       (job) =>
-        job.jobName === 'plan'
+        job.jobName === 'checkAll'
         && job.source.revision === revision
         && job.source.ref === 'refs/heads/main'
         && job.jobStatus === 'Success'
@@ -254,7 +257,7 @@ async function existingWorkflow() {
       per_page: '100',
       page: String(page),
     });
-    const result = await github(`actions/workflows/ci.yml/runs?${query}`);
+    const result = await github(`actions/workflows/deploy.yml/runs?${query}`);
     const run = result.workflow_runs.find(
       (item) => item.display_title === runName && item.head_sha === revision,
     );

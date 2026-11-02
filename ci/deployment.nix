@@ -9,6 +9,7 @@ let
   inherit (inputs.nixpkgs.lib)
     fileset
     hashString
+    toCamelCase
     toJSON
     ;
 
@@ -31,8 +32,9 @@ let
     root = ./.;
 
     fileset = fileset.unions [
+      ./deployment.mjs
+      ./hercules.mjs
       ./http.mjs
-      ./release.mjs
     ];
   };
 
@@ -49,7 +51,7 @@ let
   });
 
   request =
-    pkgs.writeText "release-request.json"
+    pkgs.writeText "deployment-request.json"
       (toJSON {
         inherit
           deployPath
@@ -68,9 +70,10 @@ effects.mkEffect {
     extra-experimental-features = nix-command flakes
   '';
 
+  # Keep sharing the lock with deployment jobs from older revisions.
   effectScript = ''
     hci lock run --name fleet-release-${host} -- \
-      node ${scripts}/release.mjs ${request} ${deployment}
+      node ${scripts}/deployment.mjs ${request} ${deployment}
   '';
 
   inputs = with pkgs; [
@@ -83,7 +86,7 @@ effects.mkEffect {
     openssh
   ];
 
-  name = "release-${host}";
+  name = toCamelCase "deploy-${host}";
 
   requiredSystemFeatures = [
     "deploy"

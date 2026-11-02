@@ -1,4 +1,4 @@
-name: Retry CI
+name: Retry source fetch
 run-name: Retry Hercules source fetch / ${{ github.event.sha }}
 
 on: status

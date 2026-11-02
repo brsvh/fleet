@@ -14,6 +14,7 @@ let
     nameValuePair
     optionalAttrs
     removeAttrs
+    toCamelCase
     ;
 
   system = "x86_64-linux";
@@ -24,7 +25,7 @@ let
 
   targets = {
     global = {
-      handler = "check/global";
+      handler = "checkGlobal";
       kind = "global";
 
       outputs =
@@ -40,11 +41,11 @@ let
   }
   // mapAttrs' (
     name: _:
-    nameValuePair "host-${name}" {
+    nameValuePair (toCamelCase "host-${name}") {
       inherit name;
 
       deploy = name != "magnolia";
-      handler = "check/host/${name}";
+      handler = toCamelCase "check-host-${name}";
       kind = "host";
 
       outputs = {
@@ -62,10 +63,10 @@ let
   ) hosts
   // mapAttrs' (
     name: home:
-    nameValuePair "user-${name}" {
+    nameValuePair (toCamelCase "user-${name}") {
       inherit name;
 
-      handler = "check/user/${name}";
+      handler = toCamelCase "check-user-${name}";
       kind = "user";
 
       outputs = {
@@ -111,40 +112,41 @@ in
 
         onPush = optionalAttrs trustedBranch (
           {
-            # Preserve the required status without a polling Effect.
-            plan = {
+            checkAll = {
               outputs = self.ci.builds;
             };
           }
           // mapAttrs' (
             _: target:
             nameValuePair target.handler {
-              outputs = target.outputs;
+              inherit (target) outputs;
             }
           ) targets
           // optionalAttrs (branch == "main") (
             mapAttrs'
               (
                 _: target:
-                nameValuePair "release/${target.name}" {
-                  outputs = {
-                    # Request approval only after the complete graph builds.
-                    checks = self.ci.builds;
+                nameValuePair
+                  (toCamelCase "deploy-${target.name}")
+                  {
+                    outputs = {
+                      # Request approval only after the complete graph builds.
+                      checks = self.ci.builds;
 
-                    effects = {
-                      release = import ./release.nix {
-                        inherit
-                          inputs
-                          rev
-                          self
-                          system
-                          ;
+                      effects = {
+                        deployHost = import ./deployment.nix {
+                          inherit
+                            inputs
+                            rev
+                            self
+                            system
+                            ;
 
-                        host = target.name;
+                          host = target.name;
+                        };
                       };
                     };
-                  };
-                }
+                  }
               )
               (
                 filterAttrs (

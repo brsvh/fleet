@@ -1,3 +1,4 @@
+import { deployHandler } from './hercules.mjs';
 import { requestJson } from './http.mjs';
 
 export default async function ({ github, context, core }) {
@@ -59,7 +60,7 @@ export default async function ({ github, context, core }) {
     source.projectId !== projectId
     || source.ownerName !== 'brsvh'
     || source.repoName !== 'fleet'
-    || source.jobName !== `release/${host}`
+    || source.jobName !== deployHandler(host)
     || source.source.ref !== 'refs/heads/main'
     || source.source.revision !== revision
     || source.isCancelled
@@ -105,7 +106,7 @@ export default async function ({ github, context, core }) {
     ref: 'refs/heads/main',
     rev: revision,
     handler: 'OnPush',
-    name: `release/${host}`,
+    name: deployHandler(host),
     limit: '100',
   });
   const jobsPath = `${projectApi}/jobs?${query}`;
