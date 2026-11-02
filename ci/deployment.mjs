@@ -2,7 +2,7 @@ import { deployHandler } from './hercules.mjs';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
-import { requestJson } from './http.mjs';
+import { requestJson, requestRejected } from './http.mjs';
 
 const candidate = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const command = process.argv[3];
@@ -25,7 +25,7 @@ const jobApi =
 const approvalName = `fleet-approval-${host}.json`;
 const deployedName = `fleet-deployed-${host}.json`;
 const requestName = `fleet-request-${host}.json`;
-const runName = `Deploy ${host} ${requestId}`;
+const runName = `Deploy ${host}`;
 const uuid = /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
 
 if (!gitToken || !hciToken || !uuid.test(projectId)) {
@@ -133,6 +133,8 @@ async function saveDeployment(observed, approval, origin) {
 async function verifyApproval(approval) {
   if (
     !sameRequest(approval)
+    || !sameRequest(requested)
+    || requested.runId !== approval.runId
     || !uuid.test(approval.sourceJobId)
     || !/^\d+$/.test(String(approval.runId))
     || !Number.isSafeInteger(approval.attempt)
@@ -250,6 +252,23 @@ async function verifyApproval(approval) {
 }
 
 async function existingWorkflow() {
+  if (sameRequest(requested) && Number.isSafeInteger(requested.runId)) {
+    const run = await github(`actions/runs/${requested.runId}`);
+
+    if (
+      run.head_sha !== revision
+      || run.event !== 'repository_dispatch'
+      || run.path !== '.github/workflows/deploy.yml'
+      || run.display_title !== runName
+    ) {
+      throw new Error('The recorded workflow does not match this request');
+    }
+
+    return run;
+  }
+
+  const matches = [];
+
   for (let page = 1; ; page += 1) {
     const query = new URLSearchParams({
       event: 'repository_dispatch',
@@ -258,18 +277,36 @@ async function existingWorkflow() {
       page: String(page),
     });
     const result = await github(`actions/workflows/deploy.yml/runs?${query}`);
-    const run = result.workflow_runs.find(
-      (item) => item.display_title === runName && item.head_sha === revision,
+    matches.push(
+      ...result.workflow_runs.filter(
+        (run) =>
+          run.display_title === runName
+          && run.head_sha === revision
+          && run.event === 'repository_dispatch'
+          && run.path === '.github/workflows/deploy.yml',
+      ),
     );
 
-    if (run || result.workflow_runs.length < 100) {
-      return run;
+    if (result.workflow_runs.length < 100) {
+      break;
     }
   }
+
+  if (matches.length > 1) {
+    throw new Error('Multiple deployment workflows; inspect them manually');
+  }
+
+  return matches[0];
 }
 
 async function requestApproval(previous) {
-  if (!(await existingWorkflow())) {
+  let run = await existingWorkflow();
+  let dispatchError;
+
+  if (
+    !run
+    && (!sameRequest(requested) || requested.dispatchStatus === 'rejected')
+  ) {
     let summary = 'No previous verified deployment is recorded.';
 
     if (previous) {
@@ -303,10 +340,16 @@ async function requestApproval(previous) {
     }
 
     await currentMain();
+    // Persist uncertainty before POST, including across Effect reruns.
+    await putState(requestName, {
+      ...candidate,
+      dispatchStatus: 'pending',
+    });
 
     try {
       await github('dispatches', {
         method: 'POST',
+        noContent: true,
         body: {
           event_type: 'fleet-deploy',
           client_payload: {
@@ -316,22 +359,45 @@ async function requestApproval(previous) {
         },
       });
     } catch (error) {
-      let found;
-
-      for (let attempt = 0; attempt < 4 && !found; attempt += 1) {
-        await delay(2000 * (attempt + 1));
-        found = await existingWorkflow();
-      }
-
-      if (!found) {
+      if (requestRejected(error)) {
+        await putState(requestName, {
+          ...candidate,
+          dispatchStatus: 'rejected',
+        });
         throw error;
       }
+
+      dispatchError = error;
+      // Dispatch may have succeeded even when its response was lost.
+      console.error(`Deployment dispatch response was not received: ${error}`);
     }
   }
 
-  await putState(requestName, candidate);
+  for (let attempt = 0; attempt < 12 && !run; attempt += 1) {
+    await delay(5000);
+    run = await existingWorkflow();
+  }
 
-  console.log(`Requested approval for ${host} at ${revision}`);
+  if (!run) {
+    throw new Error(
+      'Could not confirm the deployment workflow; '
+        + 'inspect GitHub before retry',
+      {
+        cause: dispatchError,
+      },
+    );
+  }
+
+  if (!sameRequest(requested) || requested.runId !== run.id) {
+    await putState(requestName, {
+      ...(sameRequest(requested) ? requested : {}),
+      ...candidate,
+      dispatchStatus: 'confirmed',
+      runId: run.id,
+    });
+  }
+
+  console.log(`Approval workflow: ${run.html_url}; status: ${run.status}`);
 }
 
 await currentMain();
@@ -346,13 +412,13 @@ if (sameRequest(approval)) {
   await verifyApproval(approval);
 
   const before = inspect();
-  const failedBefore =
-    sameRequest(requested) && Array.isArray(requested.failedServicesBefore)
-      ? requested.failedServicesBefore
-      : before.failedServices;
+  const failedBefore = Array.isArray(requested.failedServicesBefore)
+    ? requested.failedServicesBefore
+    : before.failedServices;
 
   await putState(requestName, {
     ...candidate,
+    runId: approval.runId,
     failedServicesBefore: failedBefore,
   });
 
@@ -392,8 +458,8 @@ if (sameRequest(approval)) {
   && previous.fingerprint === fingerprint
 ) {
   console.log(`No deployment change for ${host}`);
-} else if (sameRequest(requested)) {
-  console.log('Approval is pending; resume the GitHub workflow first');
+} else if (sameRequest(requested) && requested.dispatchStatus !== 'rejected') {
+  await requestApproval(previous);
 } else {
   let observed;
 

@@ -1,7 +1,5 @@
 name: Deploy
-run-name: >-
-  Deploy ${{ github.event.client_payload.host }}
-  ${{ github.event.client_payload.requestId }}
+run-name: Deploy ${{ github.event.client_payload.host }}
 
 on:
   repository_dispatch:
@@ -54,6 +52,7 @@ jobs:
       deployments: read
     outputs:
       job: ${{ steps.approve.outputs.job }}
+      root-job: ${{ steps.approve.outputs.root-job }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -88,7 +87,9 @@ jobs:
       - uses: actions/github-script@v9
         env:
           JOB: ${{ needs.approve.outputs.job }}
-          SOURCE_JOB: ${{ needs.request.outputs.source-job }}
+          ROOT_JOB: ${{ needs.approve.outputs.root-job }}
+          PROJECT: ${{ needs.request.outputs.project }}
+          REQUEST: ${{ toJSON(github.event.client_payload) }}
         with:
           script: |
             const { default: run } = await import(
