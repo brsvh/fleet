@@ -8,13 +8,16 @@
 }:
 let
   inherit (lib)
-    filterAttrs
+    filesystem
+    filter
     getExe'
     hasSuffix
-    mapAttrs'
+    listToAttrs
+    map
     mkForce
     nameValuePair
-    readDir
+    pipe
+    removePrefix
     removeSuffix
     ;
 
@@ -234,24 +237,30 @@ in
   sops = {
     secrets =
       let
-        directory = bingshan.etc.fonts.mbtype.__path;
-
-        files = filterAttrs (
-          name: type:
-          type == "regular" && hasSuffix ".otf.sops" name
-        ) (readDir directory);
+        directory = bingshan.etc.fonts.MBType.__path;
       in
-      mapAttrs' (
-        name: _:
-        let
-          filename = removeSuffix ".sops" name;
-        in
-        nameValuePair "fonts/${filename}" {
-          format = "binary";
-          path = "${config.xdg.dataHome}/fonts/mbtype/${filename}";
-          sopsFile = directory + "/${name}";
-        }
-      ) files;
+      pipe directory [
+        filesystem.listFilesRecursive
+        (filter (
+          file: hasSuffix ".otf.sops" (toString file)
+        ))
+        (map (
+          file:
+          let
+            filename = pipe (toString file) [
+              (removePrefix "${toString directory}/")
+              (removeSuffix ".sops")
+            ];
+          in
+          nameValuePair "fonts/MBType/${filename}" {
+            format = "binary";
+            path = "${config.xdg.dataHome}/fonts/MBType/${filename}";
+            # Keep spaces in filenames below a directory store path.
+            sopsFile = "${directory}/${filename}.sops";
+          }
+        ))
+        listToAttrs
+      ];
   };
 
   systemd = {
@@ -260,7 +269,7 @@ in
         sops-nix = {
           Service = {
             ExecStartPost = ''
-              ${getExe' fontconfig "fc-cache"} -f ${config.xdg.dataHome}/fonts/mbtype
+              ${getExe' fontconfig "fc-cache"} -f ${config.xdg.dataHome}/fonts/MBType
             '';
           };
         };
