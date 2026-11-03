@@ -14,7 +14,6 @@ let
     nameValuePair
     optionalAttrs
     removeAttrs
-    toCamelCase
     ;
 
   system = "x86_64-linux";
@@ -39,41 +38,35 @@ let
         };
     };
   }
-  // mapAttrs' (
-    name: _:
-    nameValuePair (toCamelCase "host-${name}") {
-      inherit name;
+  // mapAttrs (name: _: {
+    inherit name;
 
-      deploy = name != "magnolia";
-      handler = "checkHost/${name}";
-      kind = "host";
+    deploy = name != "magnolia";
+    handler = "checkHost/${name}";
+    kind = "host";
 
-      outputs = {
-        deploy =
-          self.deploy.nodes.${name}.profiles.system.path;
-        system =
-          self.nixosConfigurations.${name}.config.system.build.toplevel;
-      }
-      // inputs.deploy.lib.${system}.deployChecks {
-        nodes = {
-          ${name} = self.deploy.nodes.${name};
-        };
-      };
+    outputs = {
+      deploy =
+        self.deploy.nodes.${name}.profiles.system.path;
+      system =
+        self.nixosConfigurations.${name}.config.system.build.toplevel;
     }
-  ) hosts
-  // mapAttrs' (
-    name: home:
-    nameValuePair (toCamelCase "user-${name}") {
-      inherit name;
-
-      handler = "checkUser/${name}";
-      kind = "user";
-
-      outputs = {
-        home = home.activationPackage;
+    // inputs.deploy.lib.${system}.deployChecks {
+      nodes = {
+        ${name} = self.deploy.nodes.${name};
       };
-    }
-  ) self.homeConfigurations;
+    };
+  }) hosts
+  // mapAttrs (name: home: {
+    inherit name;
+
+    handler = "checkUser/${name}";
+    kind = "user";
+
+    outputs = {
+      home = home.activationPackage;
+    };
+  }) self.homeConfigurations;
 in
 {
   flake = {
