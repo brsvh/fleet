@@ -60,16 +60,16 @@ in
     gnome-shell = {
       extensions = with pkgs.gnomeExtensions; [
         {
+          id = "add-username-toppanel@brendaw.com";
+          package = add-username-to-top-panel;
+        }
+        {
           id = "appindicatorsupport@rgcjonas.gmail.com";
           package = appindicator;
         }
         {
           id = "kimpanel@kde.org";
           package = kimpanel;
-        }
-        {
-          id = "user-id-in-top-panel@fthx";
-          package = user-id-in-top-panel;
         }
         {
           id = "user-theme@gnome-shell-extensions.gcampax.github.com";
