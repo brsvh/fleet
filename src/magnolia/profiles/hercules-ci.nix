@@ -84,12 +84,7 @@ in
               and = [
                 { isOwner = "brsvh"; }
                 { isRepo = "chinese-fonts-overlay"; }
-                {
-                  or = [
-                    { isBranch = "main"; }
-                    "isTag"
-                  ];
-                }
+                { isBranch = "main"; }
               ];
             };
 
