@@ -1,10 +1,17 @@
 {
   config,
+  lib,
   pkgs,
   system,
   ...
 }:
 let
+  inherit (lib)
+    mkForce
+    ;
+
+  siteDirectory = "${config.services.hercules-ci-agent.settings.baseDirectory}/chinese-fonts-overlay-site";
+
   publicKey = "magnolia.tail.bingshan.org-1:VDtUX3qdn2o0sknJSDf0abndR7RwqnyNU4V4GKKJZpQ=";
 
   sshKey =
@@ -18,6 +25,7 @@ in
   nix = {
     settings = {
       extra-system-features = [
+        "chinese-fonts-overlay-site"
         "deploy"
       ];
     };
@@ -42,6 +50,13 @@ in
     hercules-ci-agent = {
       enable = true;
 
+      # Agent 0.10.10 cannot decode compound mount conditions from TOML tables.
+      tomlFile = mkForce (
+        (pkgs.formats.json { }).generate
+          "hercules-ci-agent.json"
+          config.services.hercules-ci-agent.settings
+      );
+
       settings = {
         binaryCachesPath =
           (pkgs.formats.json { }).generate
@@ -62,6 +77,26 @@ in
         clusterJoinTokenPath =
           config.sops.secrets.hercules-ci-cluster-join-token.path;
         concurrentTasks = 2;
+
+        effectMountables = {
+          chinese-fonts-overlay-site = {
+            condition = {
+              and = [
+                { isOwner = "brsvh"; }
+                { isRepo = "chinese-fonts-overlay"; }
+                {
+                  or = [
+                    { isBranch = "main"; }
+                    "isTag"
+                  ];
+                }
+              ];
+            };
+
+            readOnly = false;
+            source = siteDirectory;
+          };
+        };
 
         nixSettings = {
           cores = "8";
@@ -108,6 +143,12 @@ in
   };
 
   systemd = {
+    tmpfiles = {
+      rules = [
+        "d ${siteDirectory} 0700 hercules-ci-agent hercules-ci-agent -"
+      ];
+    };
+
     services = {
       hercules-ci-agent = {
         after = [
