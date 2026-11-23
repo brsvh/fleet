@@ -78,6 +78,12 @@ in
 
   configurations = {
     home = {
+      archive = {
+        inherit (fleet.archive)
+          home
+          ;
+      };
+
       bingshan = {
         inherit (fleet.bingshan)
           home
@@ -201,6 +207,14 @@ in
         profiles = profilesToList fleet.camellia.profiles;
 
         users = {
+          archive = {
+            inherit (fleet.archive)
+              user
+              ;
+
+            home = config.configurations.home.archive;
+          };
+
           ops = {
             inherit (fleet.ops)
               user
