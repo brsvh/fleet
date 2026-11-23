@@ -9,8 +9,18 @@
 
   services = {
     openssh = {
+      extraConfig = ''
+        Match User archive
+          ChrootDirectory /srv/archive
+          DisableForwarding yes
+          ForceCommand internal-sftp -d /public -u 0022 -P symlink,hardlink
+          PermitTTY no
+        Match all
+      '';
+
       settings = {
         AllowUsers = [
+          "archive"
           "ops"
           "root"
         ];
