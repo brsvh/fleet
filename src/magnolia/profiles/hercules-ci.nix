@@ -10,7 +10,7 @@ let
     mkForce
     ;
 
-  siteDirectory = "${config.services.hercules-ci-agent.settings.baseDirectory}/chinese-fonts-overlay-site";
+  pagesDirectory = "${config.services.hercules-ci-agent.settings.baseDirectory}/chinese-fonts-overlay-pages";
 
   publicKey = "magnolia.tail.bingshan.org-1:VDtUX3qdn2o0sknJSDf0abndR7RwqnyNU4V4GKKJZpQ=";
 
@@ -25,7 +25,7 @@ in
   nix = {
     settings = {
       extra-system-features = [
-        "chinese-fonts-overlay-site"
+        "chinese-fonts-overlay-pages"
         "deploy"
       ];
     };
@@ -79,7 +79,7 @@ in
         concurrentTasks = 2;
 
         effectMountables = {
-          chinese-fonts-overlay-site = {
+          chinese-fonts-overlay-pages = {
             condition = {
               and = [
                 { isOwner = "brsvh"; }
@@ -89,7 +89,7 @@ in
             };
 
             readOnly = false;
-            source = siteDirectory;
+            source = pagesDirectory;
           };
         };
 
@@ -140,7 +140,7 @@ in
   systemd = {
     tmpfiles = {
       rules = [
-        "d ${siteDirectory} 0700 hercules-ci-agent hercules-ci-agent -"
+        "d ${pagesDirectory} 0700 hercules-ci-agent hercules-ci-agent -"
       ];
     };
 
