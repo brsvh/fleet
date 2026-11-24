@@ -10,6 +10,8 @@ let
     secrets
     ;
 
+  pagesBucket = "chinese-fonts-overlay-pages";
+  webfontsBucket = "chinese-fonts-overlay-webfonts";
   siteBucket = "chinese-fonts-overlay-site";
 in
 {
@@ -29,6 +31,14 @@ in
 
       provision = {
         buckets = {
+          ${pagesBucket} = {
+            keys = {
+              pages-reader = false;
+              pages-writer = true;
+            };
+            maximumSize = 2147483648;
+          };
+
           ${siteBucket} = {
             keys = {
               site-reader = false;
@@ -36,6 +46,14 @@ in
             };
 
             maximumSize = 2147483648;
+          };
+
+          ${webfontsBucket} = {
+            keys = {
+              webfonts-reader = false;
+              webfonts-writer = true;
+            };
+            maximumSize = 536870912;
           };
 
           nextcloud = {
@@ -55,6 +73,16 @@ in
               secrets."nextcloud/s3-secret-key".path;
           };
 
+          pages-reader = {
+            id = "GK31e4112f2e0d1388165df6f3";
+            secretFile = secrets."garage/pages-reader".path;
+          };
+
+          pages-writer = {
+            id = "GKe25af8c7d4e8d1115e0ea42e";
+            secretFile = secrets."garage/pages-writer".path;
+          };
+
           site-reader = {
             id = "GK193986f86cce1b74eaf6a849";
             secretFile = secrets."garage/site-reader".path;
@@ -64,6 +92,18 @@ in
             id = "GK034518f6cbd60752ae8314fb";
             secretFile = secrets."garage/site-writer".path;
           };
+          webfonts-reader = {
+            id = "GKeb46e862f6527c06f15e2c84";
+            secretFile =
+              secrets."garage/webfonts-reader".path;
+          };
+
+          webfonts-writer = {
+            id = "GK25386caffcf8f3e51f8505cf";
+            secretFile =
+              secrets."garage/webfonts-writer".path;
+          };
+
         };
 
         rpcSecretFile = secrets."garage/rpc-secret".path;
@@ -74,6 +114,18 @@ in
 
   sops = {
     secrets = {
+      "garage/pages-reader" = {
+        restartUnits = [
+          "garage-configure.service"
+        ];
+      };
+
+      "garage/pages-writer" = {
+        restartUnits = [
+          "garage-configure.service"
+        ];
+      };
+
       "garage/rpc-secret" = {
         owner = "garage";
 
@@ -94,6 +146,18 @@ in
           "garage-configure.service"
         ];
       };
+      "garage/webfonts-reader" = {
+        restartUnits = [
+          "garage-configure.service"
+        ];
+      };
+
+      "garage/webfonts-writer" = {
+        restartUnits = [
+          "garage-configure.service"
+        ];
+      };
+
     };
   };
 
@@ -115,9 +179,11 @@ in
         ];
 
         script = ''
-          ${config.services.garage.package}/bin/garage \
-            --rpc-secret-file "$CREDENTIALS_DIRECTORY/rpc-secret" \
-            bucket cleanup-incomplete-uploads --older-than 1d ${siteBucket}
+          for bucket in ${pagesBucket} ${siteBucket} ${webfontsBucket}; do
+            ${config.services.garage.package}/bin/garage \
+              --rpc-secret-file "$CREDENTIALS_DIRECTORY/rpc-secret" \
+              bucket cleanup-incomplete-uploads --older-than 1d "$bucket"
+          done
         '';
 
         serviceConfig = {
