@@ -12,7 +12,6 @@ let
 
   pagesBucket = "chinese-fonts-overlay-pages";
   webfontsBucket = "chinese-fonts-overlay-webfonts";
-  siteBucket = "chinese-fonts-overlay-site";
 in
 {
   imports = [
@@ -36,14 +35,6 @@ in
               pages-reader = false;
               pages-writer = true;
             };
-            maximumSize = 2147483648;
-          };
-
-          ${siteBucket} = {
-            keys = {
-              site-reader = false;
-              site-writer = true;
-            };
 
             maximumSize = 2147483648;
           };
@@ -53,6 +44,7 @@ in
               webfonts-reader = false;
               webfonts-writer = true;
             };
+
             maximumSize = 536870912;
           };
 
@@ -83,15 +75,6 @@ in
             secretFile = secrets."garage/pages-writer".path;
           };
 
-          site-reader = {
-            id = "GK193986f86cce1b74eaf6a849";
-            secretFile = secrets."garage/site-reader".path;
-          };
-
-          site-writer = {
-            id = "GK034518f6cbd60752ae8314fb";
-            secretFile = secrets."garage/site-writer".path;
-          };
           webfonts-reader = {
             id = "GKeb46e862f6527c06f15e2c84";
             secretFile =
@@ -103,7 +86,6 @@ in
             secretFile =
               secrets."garage/webfonts-writer".path;
           };
-
         };
 
         rpcSecretFile = secrets."garage/rpc-secret".path;
@@ -135,17 +117,6 @@ in
         ];
       };
 
-      "garage/site-reader" = {
-        restartUnits = [
-          "garage-configure.service"
-        ];
-      };
-
-      "garage/site-writer" = {
-        restartUnits = [
-          "garage-configure.service"
-        ];
-      };
       "garage/webfonts-reader" = {
         restartUnits = [
           "garage-configure.service"
@@ -157,7 +128,6 @@ in
           "garage-configure.service"
         ];
       };
-
     };
   };
 
@@ -179,7 +149,7 @@ in
         ];
 
         script = ''
-          for bucket in ${pagesBucket} ${siteBucket} ${webfontsBucket}; do
+          for bucket in ${pagesBucket} ${webfontsBucket}; do
             ${config.services.garage.package}/bin/garage \
               --rpc-secret-file "$CREDENTIALS_DIRECTORY/rpc-secret" \
               bucket cleanup-incomplete-uploads --older-than 1d "$bucket"

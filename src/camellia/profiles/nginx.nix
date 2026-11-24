@@ -47,7 +47,7 @@ in
               return = "404";
             };
 
-            "~ ^/chinese-fonts-overlay-(?:pages|site|webfonts)(?:/|$)" =
+            "~ ^/chinese-fonts-overlay-(?:pages|webfonts)(?:/|$)" =
               {
                 extraConfig = ''
                   client_max_body_size 1000m;
