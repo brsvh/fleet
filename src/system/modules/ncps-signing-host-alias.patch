@@ -1,0 +1,96 @@
+--- a/pkg/server/server.go
++++ b/pkg/server/server.go
+@@ -10,6 +10,7 @@
+ 	"io"
+ 	"net/http"
+ 	"runtime/debug"
++	"slices"
+ 	"strconv"
+ 	"strings"
+ 	"time"
+@@ -17,6 +18,7 @@
+ 	"github.com/andybalholm/brotli"
+ 	"github.com/go-chi/chi/v5"
+ 	"github.com/go-chi/chi/v5/middleware"
++	"github.com/nix-community/go-nix/pkg/narinfo/signature"
+ 	"github.com/prometheus/client_golang/prometheus/promhttp"
+ 	"github.com/riandyrn/otelchi"
+ 	"github.com/rs/zerolog"
+@@ -337,16 +339,40 @@
+ 	})
+ }
+ 
++// Set by the distribution when both public hostnames serve the same cache.
++var signingHostAlias string
++
++func (s *Server) aliasKeyName(name string) string {
++	version, ok := strings.CutPrefix(name, s.cache.GetHostname()+"-")
++	if !ok || version == "" || signingHostAlias == "" || signingHostAlias == s.cache.GetHostname() {
++		return ""
++	}
++
++	return signingHostAlias + "-" + version
++}
++
++func (s *Server) publicIdentity(r *http.Request) (string, signature.PublicKey) {
++	key := s.cache.PublicKey()
++	host, _, _ := strings.Cut(r.Host, ":")
++	if alias := s.aliasKeyName(key.Name); alias != "" && strings.EqualFold(host, signingHostAlias) {
++		key.Name = alias
++		return signingHostAlias, key
++	}
++
++	return s.cache.GetHostname(), key
++}
++
+ func (s *Server) getIndex(w http.ResponseWriter, r *http.Request) {
+ 	w.Header().Add(contentType, contentTypeJSON)
+ 	w.WriteHeader(http.StatusOK)
+ 
++	host, key := s.publicIdentity(r)
+ 	body := struct {
+ 		Hostname  string `json:"hostname"`
+ 		Publickey string `json:"publicKey"`
+ 	}{
+-		Hostname:  s.cache.GetHostname(),
+-		Publickey: s.cache.PublicKey().String(),
++		Hostname:  host,
++		Publickey: key.String(),
+ 	}
+ 
+ 	if err := json.NewEncoder(w).Encode(body); err != nil {
+@@ -386,7 +412,8 @@
+ 	)
+ 	defer span.End()
+ 
+-	if _, err := w.Write([]byte(s.cache.PublicKey().String())); err != nil {
++	_, key := s.publicIdentity(r)
++	if _, err := w.Write([]byte(key.String())); err != nil {
+ 		http.Error(w, err.Error(), http.StatusInternalServerError)
+ 
+ 		zerolog.Ctx(r.Context()).
+@@ -489,6 +516,24 @@
+ 			}
+ 
+ 			narInfoCopy.URL = normalizedURL.String()
++		}
++
++		// The signed fingerprint is independent of the key name. Alias only
++		// a signature verified with our own key, including for older uploads.
++		key := s.cache.PublicKey()
++		if alias := s.aliasKeyName(key.Name); alias != "" {
++			fingerprint := narInfoCopy.Fingerprint()
++			for _, sig := range narInfo.Signatures {
++				if key.Verify(fingerprint, sig) {
++					sigs := slices.Clone(narInfo.Signatures)
++					sigs = slices.DeleteFunc(sigs, func(existing signature.Signature) bool {
++						return existing.Name == alias
++					})
++					sig.Name = alias
++					narInfoCopy.Signatures = append(sigs, sig)
++					break
++				}
++			}
+ 		}
+ 
+ 		narInfoBytes := []byte(narInfoCopy.String())

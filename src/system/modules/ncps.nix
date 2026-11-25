@@ -12,7 +12,9 @@ let
     mkEnableOption
     mkForce
     mkIf
+    mkOption
     removePrefix
+    types
     ;
 
   cfg = config.services.ncps;
@@ -153,6 +155,36 @@ in
     services = {
       ncps = {
         protectMigrations = mkEnableOption "ncps SQLite migration preflight and backups";
+
+        signingHostAlias = mkOption {
+          default = null;
+
+          description = ''
+            Additional hostname under which to advertise the cache signing
+            key. Serve both signature names with the same key version.
+          '';
+
+          type =
+            with types;
+            nullOr (strMatching "[a-z0-9.-]+");
+        };
+
+        package = mkOption {
+          apply =
+            package:
+            if cfg.signingHostAlias == null then
+              package
+            else
+              package.overrideAttrs (prev: {
+                patches = (prev.patches or [ ]) ++ [
+                  ./ncps-signing-host-alias.patch
+                ];
+
+                ldflags = (prev.ldflags or [ ]) ++ [
+                  "-X github.com/kalbasit/ncps/pkg/server.signingHostAlias=${cfg.signingHostAlias}"
+                ];
+              });
+        };
       };
     };
   };
