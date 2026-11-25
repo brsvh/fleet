@@ -24,6 +24,8 @@ in
 
   services = {
     ncps = {
+      signingHostAlias = "cache.brsvh.org";
+
       cache = {
         allowPutVerb = true;
         hostName = "cache.bingshan.org";
@@ -39,6 +41,10 @@ in
         "cache.bingshan.org" = {
           enableACME = true;
           forceSSL = true;
+
+          serverAliases = [
+            config.services.ncps.signingHostAlias
+          ];
 
           locations = {
             "/" = {
