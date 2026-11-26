@@ -86,6 +86,30 @@ let
         (concatStringsSep " ")
       ];
 
+    genContactQuery =
+      addresses:
+      "("
+      + concatMapStringsSep " OR " (
+        address:
+        "(from:${address} OR to:${address} OR cc:${address} OR bcc:${address})"
+      ) addresses
+      + ")";
+
+    genContextQuery =
+      mail:
+      let
+        root = ''maildir:"/${mail.account.maildir.path}/"'';
+      in
+      if mail.account.primary then
+        if mail.sharedMaildirAddresses == [ ] then
+          root
+        else
+          "(${root}) AND NOT (${genContactQuery mail.sharedMaildirAddresses})"
+      else if mail.sharesPrimaryMaildir then
+        "(${root}) AND (${genContactQuery mail.addresses})"
+      else
+        root;
+
     genDefaultAddressbook =
       addressbook:
       if addressbook == null then
@@ -115,34 +139,6 @@ let
     genMaildirQuery =
       account: role:
       ''maildir:"${genMailFolder account role}"'';
-
-    genContactQuery =
-      addresses:
-      "("
-      + concatMapStringsSep " OR " (
-        address:
-        "(from:${address} OR to:${address} OR cc:${address} OR bcc:${address})"
-      ) addresses
-      + ")";
-
-    genContextQuery =
-      mail:
-      let
-        root = ''maildir:"/${mail.account.maildir.path}/"'';
-      in
-      if mail.account.primary then
-        if mail.sharedMaildirAddresses == [ ] then
-          root
-        else
-          "(${root}) AND NOT (${genContactQuery mail.sharedMaildirAddresses})"
-      else if mail.sharesPrimaryMaildir then
-        "(${root}) AND (${genContactQuery mail.addresses})"
-      else
-        root;
-
-    genScopedQuery =
-      mail: query:
-      "(${genContextQuery mail}) AND (${query})";
 
     genMu4eBookmark = mail: name: query: key: ''
       ( :name ${toJSON name}
@@ -200,81 +196,6 @@ let
         (genMu4eMaildirQueries mail)
       ];
 
-    mu4eMaildirRoles = [
-      {
-        key = "d";
-        role = "drafts";
-      }
-      {
-        key = "i";
-        role = "inbox";
-      }
-      {
-        key = "j";
-        role = "junk";
-      }
-      {
-        key = "s";
-        role = "sent";
-      }
-      {
-        key = "t";
-        role = "trash";
-      }
-    ];
-
-    genMu4eMaildir =
-      mail: folder:
-      let
-        path = genMailFolder mail.account folder.role;
-
-        name = pipe path [
-          (substring 1 (stringLength path - 1))
-          (replaceStrings [ "/" ] [ " " ])
-        ];
-      in
-      {
-        inherit (folder) key;
-
-        inherit name path;
-
-        query = genScopedQuery mail (
-          genMaildirQuery mail.account folder.role
-        );
-      };
-
-    genMu4eMaildirs =
-      mail:
-      pipe mu4eMaildirRoles [
-        (map (genMu4eMaildir mail))
-        (sort (left: right: left.name < right.name))
-      ];
-
-    genMu4eMaildirQueries =
-      mail:
-      pipe (genMu4eMaildirs mail) [
-        (map (folder: ''
-          ( :name ${toJSON folder.name}
-            :query ${toJSON folder.query}
-            :source ${toJSON mail.name}
-            :bs-hidden t
-            :bs-maildir t
-            :bs-maildir-key ?${folder.key}
-            :maildir ${toJSON folder.path})
-        ''))
-        (concatStringsSep "\n")
-      ];
-
-    genMu4eMaildirShortcuts =
-      mail:
-      pipe (genMu4eMaildirs mail) [
-        (map (folder: ''
-          ( :maildir ${toJSON folder.path}
-            :key ?${folder.key})
-        ''))
-        (concatStringsSep "\n")
-      ];
-
     genMu4eContext =
       mail:
       let
@@ -315,7 +236,7 @@ let
 
         signature = toJSON account.signature.text;
 
-        signkey = toJSON account.gpg.key;
+        signingKey = toJSON account.gpg.key;
       in
       ''
         (make-mu4e-context
@@ -355,7 +276,7 @@ let
            (mail-source-directory . ${maildirAbsPath})
            (message-directory . ${maildirAbsPath})
            (message-signature . ${signature})
-           (mml-secure-openpgp-signers . (${signkey}))
+           (mml-secure-openpgp-signers . (${signingKey}))
            (mu4e-sent-folder . ${genMailFolder' "sent"})
            (mu4e-drafts-folder . ${genMailFolder' "drafts"})
            (mu4e-trash-folder . ${genMailFolder' "trash"})
@@ -364,14 +285,92 @@ let
            (smime-certificate-directory . ${certdirAbsPath})))
       '';
 
+    genMu4eMaildir =
+      mail: folder:
+      let
+        path = genMailFolder mail.account folder.role;
+
+        name = pipe path [
+          (substring 1 (stringLength path - 1))
+          (replaceStrings [ "/" ] [ " " ])
+        ];
+      in
+      {
+        inherit (folder) key;
+
+        inherit name path;
+
+        query = genScopedQuery mail (
+          genMaildirQuery mail.account folder.role
+        );
+      };
+
+    genMu4eMaildirQueries =
+      mail:
+      pipe (genMu4eMaildirs mail) [
+        (map (folder: ''
+          ( :name ${toJSON folder.name}
+            :query ${toJSON folder.query}
+            :source ${toJSON mail.name}
+            :bs-hidden t
+            :bs-maildir t
+            :bs-maildir-key ?${folder.key}
+            :maildir ${toJSON folder.path})
+        ''))
+        (concatStringsSep "\n")
+      ];
+
+    genMu4eMaildirShortcuts =
+      mail:
+      pipe (genMu4eMaildirs mail) [
+        (map (folder: ''
+          ( :maildir ${toJSON folder.path}
+            :key ?${folder.key})
+        ''))
+        (concatStringsSep "\n")
+      ];
+
+    genMu4eMaildirs =
+      mail:
+      pipe mu4eMaildirRoles [
+        (map (genMu4eMaildir mail))
+        (sort (left: right: left.name < right.name))
+      ];
+
+    genScopedQuery =
+      mail: query:
+      "(${genContextQuery mail}) AND (${query})";
+
     genSyncCollections =
       collections:
       pipe collections [
         (map toJSON)
         (concatStringsSep " ")
       ];
-  };
 
+    mu4eMaildirRoles = [
+      {
+        key = "d";
+        role = "drafts";
+      }
+      {
+        key = "i";
+        role = "inbox";
+      }
+      {
+        key = "j";
+        role = "junk";
+      }
+      {
+        key = "s";
+        role = "sent";
+      }
+      {
+        key = "t";
+        role = "trash";
+      }
+    ];
+  };
 in
 {
   imports = [
