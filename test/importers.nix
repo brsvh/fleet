@@ -32,12 +32,10 @@ in
 
         expected = {
           __path = leftDir;
-
-          "left-only" = leftDir + /left-only.nix;
+          left-only = leftDir + /left-only.nix;
 
           nested = {
             __path = leftDir + /nested;
-
             left = leftDir + /nested/left.nix;
             shared = leftDir + /nested/shared.nix;
           };
@@ -61,7 +59,7 @@ in
             ];
 
         expected = {
-          "left-only" = leftDir + /left-only.nix;
+          left-only = leftDir + /left-only.nix;
 
           nested = {
             left = leftDir + /nested/left.nix;
@@ -69,7 +67,7 @@ in
             shared = rightDir + /nested/shared.nix;
           };
 
-          "right-only" = rightDir + /right-only.nix;
+          right-only = rightDir + /right-only.nix;
           shared = rightDir + /shared.nix;
         };
       };
