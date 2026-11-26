@@ -26,6 +26,7 @@ const approvalName = `fleet-approval-${host}.json`;
 const deployedName = `fleet-deployed-${host}.json`;
 const requestName = `fleet-request-${host}.json`;
 const runName = `Deploy ${host}`;
+const storePath = /^\/nix\/store\/[a-z0-9]{32}-[^/\s]+$/;
 const uuid = /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
 
 if (!gitToken || !hciToken || !uuid.test(projectId)) {
@@ -237,7 +238,10 @@ async function verifyApproval(approval) {
   if (
     !items.some(
       (job) =>
-        job.jobName === 'checkAll'
+        job.projectId === projectId
+        && job.ownerName === 'brsvh'
+        && job.repoName === 'fleet'
+        && job.jobName === 'checkAll'
         && job.source.revision === revision
         && job.source.ref === 'refs/heads/main'
         && job.jobStatus === 'Success'
@@ -313,29 +317,39 @@ async function requestApproval(previous) {
       summary =
         `System: ${previous.systemPath}\n` + `     -> ${candidate.systemPath}`;
 
-      try {
-        const diff = execFileSync(
-          'nix',
-          [
-            'store',
-            'diff-closures',
-            previous.systemPath,
-            candidate.systemPath,
-          ],
-          {
-            encoding: 'utf8',
-            timeout: 30000,
-            stdio: [
-              'ignore',
-              'pipe',
-              'pipe',
+      if (
+        typeof previous.systemPath === 'string'
+        && typeof candidate.systemPath === 'string'
+        && storePath.test(previous.systemPath)
+        && storePath.test(candidate.systemPath)
+      ) {
+        try {
+          const diff = execFileSync(
+            'nix',
+            [
+              'store',
+              'diff-closures',
+              '--',
+              previous.systemPath,
+              candidate.systemPath,
             ],
-          },
-        );
+            {
+              encoding: 'utf8',
+              timeout: 30000,
+              stdio: [
+                'ignore',
+                'pipe',
+                'pipe',
+              ],
+            },
+          );
 
-        summary += `\n\n${diff}`;
-      } catch {
-        summary += '\nClosure details are unavailable; see the paths above.';
+          summary += `\n\n${diff}`;
+        } catch {
+          summary += '\nClosure details are unavailable; see the paths above.';
+        }
+      } else {
+        summary += '\nClosure details are unavailable; invalid system path.';
       }
     }
 

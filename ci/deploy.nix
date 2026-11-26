@@ -9,38 +9,45 @@ let
     toJSON
     ;
 
-  deployment = pkgs.writeTextDir "flake.nix" ''
-    {
-      outputs = _:
-        let
-          inherit (builtins)
-            appendContext
-            fromJSON
-            mapAttrs
-            ;
+  deployment =
+    pkgs.runCommand "deploy-flake-${host}" { }
+      ''
+        mkdir -p "$out"
+        cp ${pkgs.writeText "node.json" (toJSON node)} "$out/node.json"
+        cp ${pkgs.writeText "flake.nix" ''
+          {
+            outputs = _:
+              let
+                inherit (builtins)
+                  appendContext
+                  fromJSON
+                  mapAttrs
+                  readFile
+                  ;
 
-          node = fromJSON ${toJSON (toJSON node)};
-        in
-        {
-          deploy = {
-            nodes = {
-              ${host} = node // {
-                profiles = mapAttrs (
-                  _: profile:
-                  profile // {
-                    path = appendContext profile.path {
-                      "''${profile.path}" = {
-                        path = true;
-                      };
+                node = fromJSON (readFile ./node.json);
+              in
+              {
+                deploy = {
+                  nodes = {
+                    ${toJSON host} = node // {
+                      profiles = mapAttrs (
+                        _: profile:
+                        profile // {
+                          path = appendContext profile.path {
+                            "''${profile.path}" = {
+                              path = true;
+                            };
+                          };
+                        }
+                      ) node.profiles;
                     };
-                  }
-                ) node.profiles;
+                  };
+                };
               };
-            };
-          };
-        };
-    }
-  '';
+          }
+        ''} "$out/flake.nix"
+      '';
 
   knownHosts = pkgs.writeText "deploy-known-hosts" ''
     azaleoid.tail.bingshan.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICG6HIBl+a6c5Iw9kpB+vscaAhs4fz0OffcRlB/10l7m
@@ -64,7 +71,7 @@ pkgs.writeShellScript "deploy-${host}" ''
     -o ServerAliveInterval=15
     -o ServerAliveCountMax=4
     -o StrictHostKeyChecking=yes
-    -o UserKnownHostsFile=${knownHosts}
+    -o UserKnownHostsFile=${escapeShellArg knownHosts}
   )
   destination=${escapeShellArg "${node.sshUser}@${node.hostname}"}
   export NIX_SSHOPTS="''${ssh_options[*]}"
@@ -83,7 +90,8 @@ pkgs.writeShellScript "deploy-${host}" ''
       fi
 
       cat "$credentials/error" >&2
-      echo "SSH check for ${host} failed ($attempt/5)." >&2
+      printf 'SSH check for %s failed (%s/5).\n' \
+        ${escapeShellArg host} "$attempt" >&2
 
       if grep -Eqi \
         'permission denied|authentication failed|host key|bad configuration|invalid' \
@@ -135,7 +143,7 @@ pkgs.writeShellScript "deploy-${host}" ''
       printf '%s\n' "''${output#*$'\n'}"
       ;;
     activate)
-      deploy ${deployment}#${host} --skip-checks \
+      deploy ${escapeShellArg "${deployment}#${host}"} --skip-checks \
         --ssh-opts "$NIX_SSHOPTS" \
         --auto-rollback true --magic-rollback true
       ;;

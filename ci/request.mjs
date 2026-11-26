@@ -5,6 +5,27 @@ import { requestJson } from './http.mjs';
 export default async function ({ github, context, core }) {
   const candidate = JSON.parse(process.env.REQUEST);
   const { host, revision, fingerprint, requestId } = candidate;
+  const storePath = /^\/nix\/store\/[a-z0-9]{32}-[^/\s]+$/;
+
+  if (
+    candidate.schemaVersion !== 1
+    || typeof host !== 'string'
+    || typeof revision !== 'string'
+    || typeof fingerprint !== 'string'
+    || typeof requestId !== 'string'
+    || typeof candidate.systemPath !== 'string'
+    || typeof candidate.deployPath !== 'string'
+    || !/^[a-z0-9-]+$/.test(host)
+    || !/^[0-9a-f]{40}$/.test(revision)
+    || !/^[0-9a-f]{64}$/.test(fingerprint)
+    || !storePath.test(candidate.systemPath)
+    || !storePath.test(candidate.deployPath)
+    || context.ref !== 'refs/heads/main'
+    || context.sha !== revision
+  ) {
+    throw new Error('Invalid deployment request');
+  }
+
   const digest = createHash('sha256')
     .update(
       [
@@ -15,19 +36,7 @@ export default async function ({ github, context, core }) {
     )
     .digest('hex');
 
-  const storePath = /^\/nix\/store\/[a-z0-9]{32}-[^/\s]+$/;
-
-  if (
-    candidate.schemaVersion !== 1
-    || !/^[a-z0-9-]+$/.test(host)
-    || !/^[0-9a-f]{40}$/.test(revision)
-    || !/^[0-9a-f]{64}$/.test(fingerprint)
-    || requestId !== digest
-    || !storePath.test(candidate.systemPath)
-    || !storePath.test(candidate.deployPath)
-    || context.ref !== 'refs/heads/main'
-    || context.sha !== revision
-  ) {
+  if (requestId !== digest) {
     throw new Error('Invalid deployment request');
   }
 
@@ -55,8 +64,9 @@ export default async function ({ github, context, core }) {
       limit: '100',
     });
     const ready = [];
+    let complete = false;
 
-    while (true) {
+    for (let page = 0; page < 50; page += 1) {
       const { items } = await requestJson(`${projectApi}/jobs?${query}`);
 
       ready.push(
@@ -73,10 +83,15 @@ export default async function ({ github, context, core }) {
       );
 
       if (items.length < 100) {
+        complete = true;
         break;
       }
 
       query.set('offsetIndex', String(items.at(-1).index));
+    }
+
+    if (!complete) {
+      throw new Error('Too many jobs while checking deployment preparation');
     }
 
     source = ready.find((job) => job.jobName === deployHandler(host));
