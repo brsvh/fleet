@@ -1,4 +1,4 @@
-import { deployHandler } from './hercules.mjs';
+import { deployHandler, fleetProjectPath, herculesApi } from './hercules.mjs';
 import { createHash } from 'node:crypto';
 import { requestJson } from './http.mjs';
 
@@ -49,8 +49,7 @@ export default async function ({ github, context, core }) {
     throw new Error('Superseded main revision');
   }
 
-  const herculesApi = 'https://hercules-ci.com/api/v1';
-  const projectApi = herculesApi + '/site/github/account/brsvh/project/fleet';
+  const projectApi = `${herculesApi}${fleetProjectPath}`;
 
   const deadline = Date.now() + 5 * 60 * 1000;
   let source;

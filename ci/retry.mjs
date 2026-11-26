@@ -1,12 +1,18 @@
 import { setTimeout as delay } from 'node:timers/promises';
 import { stripVTControlCharacters } from 'node:util';
 import { requestJson } from './http.mjs';
-import { jobFamily, jobHistory, rerunJob, sameTask } from './hercules.mjs';
+import {
+  herculesApi,
+  herculesJobUrlBase,
+  jobFamily,
+  jobHistory,
+  rerunJob,
+  sameTask,
+} from './hercules.mjs';
 
 export default async function ({ github, context, core }) {
   const { payload } = context;
   const revision = payload.sha;
-  const jobBase = 'https://hercules-ci.com/github/brsvh/fleet/jobs/';
   const target = payload.target_url;
 
   if (
@@ -22,8 +28,8 @@ export default async function ({ github, context, core }) {
     ].includes(payload.state)
     || !/^[0-9a-f]{40}$/.test(revision)
     || typeof target !== 'string'
-    || !target.startsWith(jobBase)
-    || !/^[1-9][0-9]*$/.test(target.slice(jobBase.length))
+    || !target.startsWith(herculesJobUrlBase)
+    || !/^[1-9][0-9]*$/.test(target.slice(herculesJobUrlBase.length))
   ) {
     throw new Error('Invalid Hercules evaluation status');
   }
@@ -34,7 +40,6 @@ export default async function ({ github, context, core }) {
     throw new Error('Configure HERCULES_CI_API_TOKEN in ci-retry');
   }
 
-  const herculesApi = 'https://hercules-ci.com/api/v1';
   const interval = 60000;
   const limit = 5;
 
