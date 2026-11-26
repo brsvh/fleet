@@ -14,6 +14,7 @@ let
 
   inherit (lib)
     elemAt
+    filter
     genList
     getExe
     length
@@ -123,7 +124,10 @@ in
           }) (length layouts);
 
           model = xkb.model;
-          options = splitString "," xkb.options;
+
+          options = filter (option: option != "") (
+            splitString "," xkb.options
+          );
         };
       };
 
