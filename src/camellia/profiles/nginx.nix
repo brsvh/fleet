@@ -50,6 +50,9 @@ in
             "~ ^/chinese-fonts-overlay-(?:pages|webfonts)(?:/|$)" =
               {
                 extraConfig = ''
+                  if ($request_uri !~ "^/chinese-fonts-overlay-(?:pages|webfonts)(?:/|\?|$)") {
+                    return 404;
+                  }
                   client_max_body_size 1000m;
                   client_body_timeout 300s;
                   proxy_pass http://127.0.0.1:3900;
