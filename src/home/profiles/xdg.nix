@@ -25,14 +25,14 @@ in
     };
 
     userDirs = {
-      enable = mkDefault true;
       createDirectories = mkDefault true;
       desktop = "${dataHome}/Desktop";
       documents = "${dataHome}/Documents";
       download = "${dataHome}/Downloads";
+      enable = mkDefault true;
       music = "${dataHome}/Music";
       pictures = "${dataHome}/Pictures";
-      projects = "${config.home.homeDirectory}";
+      projects = config.home.homeDirectory;
       publicShare = "${dataHome}/Public";
       setSessionVariables = mkDefault true;
       templates = "${dataHome}/Templates";

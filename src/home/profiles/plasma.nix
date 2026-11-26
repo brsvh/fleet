@@ -92,8 +92,6 @@ in
 
   programs = {
     plasma = {
-      enable = mkDefault true;
-
       configFile = {
         baloofilerc = {
           General = {
@@ -110,6 +108,8 @@ in
           };
         };
       };
+
+      enable = mkDefault true;
 
       input = {
         keyboard = mkIf (osConfig != null) {
