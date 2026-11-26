@@ -9,6 +9,7 @@ let
     mkEnableOption
     mkIf
     mkPackageOption
+    optional
     ;
 
   cfg = config.programs.wemeet;
@@ -21,16 +22,17 @@ in
 
         package = mkPackageOption pkgs "wemeet" {
           default = "wemeet";
+          nullable = true;
         };
       };
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     home = {
-      packages = mkIf (cfg.package != null) [
-        cfg.package
-      ];
+      packages = optional (
+        cfg.package != null
+      ) cfg.package;
     };
   };
 }

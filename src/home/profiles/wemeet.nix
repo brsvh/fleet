@@ -42,7 +42,7 @@ in
     };
   };
 
-  xdg = {
+  xdg = mkIf config.programs.wemeet.enable {
     desktopEntries = {
       wemeetapp = {
         categories = [
