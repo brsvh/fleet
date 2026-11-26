@@ -50,9 +50,6 @@
       calendar = {
         accounts = {
           bingshan = {
-            primary = true;
-            primaryCollection = "personal";
-
             khal = {
               enable = true;
               type = "discover";
@@ -61,6 +58,9 @@
             local = {
               path = "${config.accounts.calendar.basePath}/${bingshan.cloud.host}";
             };
+
+            primary = true;
+            primaryCollection = "personal";
 
             remote = {
               inherit (bingshan.cloud)
@@ -73,12 +73,12 @@
             };
 
             vdirsyncer = {
-              enable = true;
-
               collections = [
                 "from a"
                 "from b"
               ];
+
+              enable = true;
             };
           };
 
@@ -181,12 +181,12 @@
             };
 
             vdirsyncer = {
-              enable = true;
-
               collections = [
                 "from a"
                 "from b"
               ];
+
+              enable = true;
             };
           };
         };

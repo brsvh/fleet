@@ -178,8 +178,6 @@ in
 
       plugins = [
         {
-          plugin = pkgs.tmuxPlugins.tmux-thumbs;
-
           extraConfig = ''
             set -g @thumbs-key Space
             set -g @thumbs-unique 1
@@ -188,6 +186,8 @@ in
             set -g @thumbs-upcase-command 'tmux set-buffer -w -- "{}" && tmux paste-buffer'
             set -g @thumbs-multi-command 'tmux set-buffer -w -- "{}" && tmux paste-buffer'
           '';
+
+          plugin = pkgs.tmuxPlugins.tmux-thumbs;
         }
       ];
 

@@ -183,13 +183,13 @@ in
               };
             }
             {
-              name = "org.kde.plasma.digitalclock";
-
               config = {
                 Appearance = {
                   fontWeight = 400;
                 };
               };
+
+              name = "org.kde.plasma.digitalclock";
             }
             "org.kde.plasma.showdesktop"
           ];
