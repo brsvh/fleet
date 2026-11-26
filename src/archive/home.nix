@@ -1,4 +1,6 @@
-{ ... }:
+{
+  ...
+}:
 {
   home = {
     homeDirectory = "/var/lib/archive";
