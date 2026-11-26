@@ -12,6 +12,7 @@ let
 in
 {
   imports = [
+    system.modules.gnome
     system.profiles.dconf
     system.profiles.qt
     system.profiles.wayland
