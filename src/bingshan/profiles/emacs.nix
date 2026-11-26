@@ -331,9 +331,9 @@ let
                           (string-prefix-p ${maildir} maildir)
                           (not
                            (mu4e-message-contact-field-matches
-                   	 msg
-                   	 '( :from :to :cc :bcc)
-                   	 (mapcar #'regexp-quote '(${sharedMaildirAddresses'}))))))
+                            msg
+                            '( :from :to :cc :bcc)
+                            (mapcar #'regexp-quote '(${sharedMaildirAddresses'}))))))
                  ''
                else if !sharesPrimaryMaildir then
                  ''
@@ -520,7 +520,7 @@ in
 
           (use-package bs-htmlize
             :custom
-            (bs-htmlize-browser "${getExe pkgs.google-chrome}")
+            (bs-htmlize-browser ${toJSON (getExe pkgs.google-chrome)})
 
             :defer t)
 
@@ -533,14 +533,14 @@ in
 
           (use-package emacs
             :custom
-            (user-full-name "${primaryMail.account.realName}")
+            (user-full-name ${toJSON primaryMail.account.realName})
 
             :demand t
             :no-require t)
 
           (use-package epa-hook
             :config
-            (add-to-list 'epa-file-encrypt-to "${primaryMail.account.gpg.key}")
+            (add-to-list 'epa-file-encrypt-to ${toJSON primaryMail.account.gpg.key})
 
             :defer t)
 
@@ -582,21 +582,21 @@ in
 
           (use-package info
             :custom
-            (Info-additional-directory-list '("${pkgs.mu.mu4e}/share/info"))
+            (Info-additional-directory-list '(${toJSON "${pkgs.mu.mu4e}/share/info"}))
 
             :defer t)
 
           (use-package mail-source
             :custom
-            (mail-source-directory "${primaryMaildir}")
+            (mail-source-directory ${toJSON primaryMaildir})
 
             :defer t)
 
           (use-package message
             :custom
-            (message-directory "${primaryMaildir}")
+            (message-directory ${toJSON primaryMaildir})
             (message-sendmail-envelope-from 'header)
-            (message-signature "${primaryMail.account.signature.text}")
+            (message-signature ${toJSON primaryMail.account.signature.text})
 
             :defer t)
 
@@ -623,9 +623,9 @@ in
 
           (use-package mu4e-folders
             :custom
-            (mu4e-sent-folder "${genMailFolder primaryMail.account "sent"}")
-            (mu4e-drafts-folder "${genMailFolder primaryMail.account "drafts"}")
-            (mu4e-trash-folder "${genMailFolder primaryMail.account "trash"}")
+            (mu4e-sent-folder ${toJSON (genMailFolder primaryMail.account "sent")})
+            (mu4e-drafts-folder ${toJSON (genMailFolder primaryMail.account "drafts")})
+            (mu4e-trash-folder ${toJSON (genMailFolder primaryMail.account "trash")})
             (mu4e-maildir-shortcuts '(${genMu4eMaildirShortcuts primaryMail}))
 
             :defer t)
@@ -653,13 +653,13 @@ in
 
           (use-package smime
             :custom
-            (smime-certificate-directory "${primaryMaildir}/certs/")
+            (smime-certificate-directory ${toJSON "${primaryMaildir}/certs/"})
 
             :defer t)
 
           (use-package smtpmail
             :custom
-            (smtpmail-queue-dir "${maildirBase}/queued-mail/")
+            (smtpmail-queue-dir ${toJSON "${maildirBase}/queued-mail/"})
 
             :defer t)
 
@@ -668,11 +668,10 @@ in
             :no-require t
 
             :custom
-            (user-mail-address "${primaryMail.account.address}"))
+            (user-mail-address ${toJSON primaryMail.account.address}))
         '';
 
       extraEarlyConfig =
-        with el;
         let
           font = head config.fonts.fontconfig.defaultFonts.monospace;
 
