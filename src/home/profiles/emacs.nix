@@ -63,6 +63,9 @@ in
       enable = true;
 
       extraConfig = ''
+        (eval-when-compile
+          (require 'use-package))
+
         (use-package emacs
           :demand t
           :no-require t
