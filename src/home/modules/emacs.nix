@@ -15,6 +15,7 @@ let
 
   inherit (pkgs)
     runCommandLocal
+    writeText
     ;
 in
 {
@@ -91,7 +92,15 @@ in
             extraPackages = epkgs: [
               (epkgs.trivialBuild {
                 pname = "early-default";
-                src = pkgs.writeText "early-default.el" cfg.extraEarlyConfig;
+
+                src = writeText "early-default.el" ''
+                  ;;; early-default.el --- Early Default Config -*- lexical-binding: t; -*-
+
+                  ${cfg.extraEarlyConfig}
+
+                  ;;; early-default.el ends here
+                '';
+
                 version = "0.1.0";
               })
             ];
