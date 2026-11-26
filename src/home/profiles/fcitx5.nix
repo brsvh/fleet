@@ -25,7 +25,7 @@ in
             clipboard = {
               globalSection = {
                 "ClearPasswordAfter" = 30;
-                "IgnorePasswordFromPasswordManager" = false;
+                "IgnorePasswordFromPasswordManager" = true;
                 "Number of entries" = 5;
                 "PastePrimaryKey" = "";
                 "ShowPassword" = false;
