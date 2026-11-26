@@ -7,7 +7,16 @@
   imports = [
     system.modules.users-groups
     system.profiles.fish
+    system.profiles.sops
   ];
+
+  sops = {
+    secrets = {
+      "users/ops/hashed-password" = {
+        neededForUsers = true;
+      };
+    };
+  };
 
   users = {
     users = {
@@ -19,6 +28,8 @@
           "wheel"
         ];
 
+        hashedPasswordFile =
+          config.sops.secrets."users/ops/hashed-password".path;
         isNormalUser = true;
 
         openssh = {
