@@ -10,8 +10,8 @@ let
 in
 {
   imports = [
-    erythron.disko
     disko.nixosModules.disko
+    erythron.disko
   ];
 
   hardware = {
