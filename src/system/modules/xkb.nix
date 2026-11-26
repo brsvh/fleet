@@ -93,7 +93,7 @@ in
       {
         programs = {
           dconf = {
-            profiles = genAttrs [ "user" "gnome" ] (_: {
+            profiles = genAttrs [ "gnome" "user" ] (_: {
               databases = [
                 {
                   settings = {

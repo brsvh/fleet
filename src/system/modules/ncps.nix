@@ -154,21 +154,6 @@ in
   options = {
     services = {
       ncps = {
-        protectMigrations = mkEnableOption "ncps SQLite migration preflight and backups";
-
-        signingHostAlias = mkOption {
-          default = null;
-
-          description = ''
-            Additional hostname under which to advertise the cache signing
-            key. Serve both signature names with the same key version.
-          '';
-
-          type =
-            with types;
-            nullOr (strMatching "[a-z0-9.-]+");
-        };
-
         package = mkOption {
           apply =
             package:
@@ -184,6 +169,21 @@ in
                   "-X github.com/kalbasit/ncps/pkg/server.signingHostAlias=${cfg.signingHostAlias}"
                 ];
               });
+        };
+
+        protectMigrations = mkEnableOption "ncps SQLite migration preflight and backups";
+
+        signingHostAlias = mkOption {
+          default = null;
+
+          description = ''
+            Additional hostname under which to advertise the cache signing
+            key. Serve both signature names with the same key version.
+          '';
+
+          type =
+            with types;
+            nullOr (strMatching "[a-z0-9.-]+");
         };
       };
     };
