@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   lib,
   ...
@@ -15,7 +16,7 @@ let
     ;
 
   normalUsers = filterAttrs (
-    _: v: v.enable && v.isNormalUser
+    _: value: value.enable && value.isNormalUser
   ) config.users.users;
 
   normalUsersList = mapAttrsToList (
