@@ -54,7 +54,7 @@ let
     ]
   );
 
-  plasma-manager-pkgs =
+  plasmaManagerPackages =
     plasma-manager.packages.${system};
 in
 rec {
@@ -72,7 +72,7 @@ rec {
     {
       category = "[tools]";
       help = "Convert Plasma configuration file to Nix";
-      package = plasma-manager-pkgs.default;
+      package = plasmaManagerPackages.default;
     }
     {
       category = "[tools]";
