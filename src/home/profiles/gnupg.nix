@@ -19,8 +19,8 @@ in
 
   services = {
     gpg-agent = {
-      defaultCacheTtl = 28800;
-      defaultCacheTtlSsh = 28800;
+      defaultCacheTtl = mkDefault 28800;
+      defaultCacheTtlSsh = mkDefault 28800;
       enable = mkDefault true;
       enableExtraSocket = mkDefault true;
       enableSshSupport = mkDefault true;
