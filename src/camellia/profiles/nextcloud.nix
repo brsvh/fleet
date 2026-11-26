@@ -35,8 +35,8 @@ let
 in
 {
   imports = [
-    camellia.profiles.sops
     camellia.profiles.garage
+    camellia.profiles.sops
     system.profiles.nextcloud
   ];
 
@@ -119,7 +119,7 @@ in
 
     nginx = {
       virtualHosts = {
-        "${cfg.hostName}" = {
+        ${cfg.hostName} = {
           enableACME = true;
           forceSSL = true;
 
