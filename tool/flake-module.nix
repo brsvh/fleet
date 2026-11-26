@@ -56,7 +56,7 @@ in
 
           camellia = self.nixosConfigurations.camellia;
 
-          deploy-lib =
+          deployLib =
             deploy.lib.${camellia.config.nixpkgs.hostPlatform.system};
 
           erythron = self.nixosConfigurations.erythron;
@@ -71,7 +71,7 @@ in
 
             profiles = {
               system = {
-                path = deploy-lib.activate.nixos azaleoid;
+                path = deployLib.activate.nixos azaleoid;
                 user = "root";
               };
             };
@@ -84,7 +84,7 @@ in
 
             profiles = {
               system = {
-                path = deploy-lib.activate.nixos camellia;
+                path = deployLib.activate.nixos camellia;
                 user = "root";
               };
             };
@@ -99,7 +99,7 @@ in
 
             profiles = {
               system = {
-                path = deploy-lib.activate.nixos erythron;
+                path = deployLib.activate.nixos erythron;
                 user = "root";
               };
             };
@@ -113,7 +113,7 @@ in
 
             profiles = {
               system = {
-                path = deploy-lib.activate.nixos magnolia;
+                path = deployLib.activate.nixos magnolia;
                 user = "root";
               };
             };
@@ -135,8 +135,8 @@ in
     let
       inherit (pkgs)
         curl
-        writeShellScriptBin
         treefmt
+        writeShellScriptBin
         ;
     in
     {
@@ -161,8 +161,8 @@ in
             description = "Check Camellia service endpoints.";
           };
 
-          type = "app";
           program = "${config.packages.camellia-services-health-check}/bin/camellia-services-health-check";
+          type = "app";
         };
       };
 
@@ -205,22 +205,22 @@ in
           let
             camellia = self.nixosConfigurations.camellia;
 
-            camellia-config = camellia.config;
+            camelliaConfig = camellia.config;
 
-            nginx-hosts = attrNames camellia-config.services.nginx.virtualHosts;
+            nginxHosts = attrNames camelliaConfig.services.nginx.virtualHosts;
 
             requireNginxHost =
               host:
-              if elem host nginx-hosts then
+              if elem host nginxHosts then
                 host
               else
                 throw "camellia health check host `${host}` is not configured as an nginx virtual host";
 
             serviceHealthChecks =
               let
-                nextcloudHost = requireNginxHost camellia-config.services.nextcloud.hostName;
+                nextcloudHost = requireNginxHost camelliaConfig.services.nextcloud.hostName;
 
-                onlyofficeHost = requireNginxHost camellia-config.services.onlyoffice.hostname;
+                onlyofficeHost = requireNginxHost camelliaConfig.services.onlyoffice.hostname;
 
                 mtaStsChecks = map (
                   domain:
@@ -231,7 +231,7 @@ in
                     name = "mta-sts:${domain}";
                     url = "https://${host}/.well-known/mta-sts.txt";
                   }
-                ) camellia-config.mailserver.domains;
+                ) camelliaConfig.mailserver.domains;
               in
               [
                 {
