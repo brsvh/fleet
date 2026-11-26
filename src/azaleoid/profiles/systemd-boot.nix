@@ -24,14 +24,6 @@ in
     lanzaboote = {
       allowUnsigned = false;
 
-      autoEnrollKeys = {
-        allowBrickingMyMachine = true;
-        autoReboot = false;
-        enable = true;
-        includeChecksumsFromTPM = false;
-        includeMicrosoftKeys = false;
-      };
-
       autoGenerateKeys = {
         enable = true;
       };
