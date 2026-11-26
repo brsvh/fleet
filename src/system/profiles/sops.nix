@@ -20,6 +20,7 @@ in
   sops = {
     age = {
       keyFile = mkDefault "/var/lib/sops/age/keys.txt";
+      sshKeyPaths = mkDefault [ ];
     };
   };
 }
