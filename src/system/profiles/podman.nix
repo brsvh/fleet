@@ -10,13 +10,13 @@ in
 {
   virtualisation = {
     podman = {
-      enable = mkDefault true;
-
       defaultNetwork = {
         settings = {
           dns_enabled = true;
         };
       };
+
+      enable = mkDefault true;
     };
   };
 }

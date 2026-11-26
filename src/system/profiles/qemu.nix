@@ -1,7 +1,7 @@
 {
   lib,
-  system,
   pkgs,
+  system,
   ...
 }:
 let
