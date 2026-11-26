@@ -47,16 +47,6 @@ in
       offlineimap = {
         enable = mkEnableOption "OfflineIMAP synchronization";
 
-        package = mkOption {
-          default = config.programs.offlineimap.package;
-
-          description = ''
-            OfflineIMAP package used by the systemd user service.
-          '';
-
-          type = types.package;
-        };
-
         extraArgs = mkOption {
           default = [
             "-o"
@@ -78,6 +68,16 @@ in
           '';
 
           type = types.str;
+        };
+
+        package = mkOption {
+          default = config.programs.offlineimap.package;
+
+          description = ''
+            OfflineIMAP package used by the systemd user service.
+          '';
+
+          type = types.package;
         };
 
         ui = mkOption {
