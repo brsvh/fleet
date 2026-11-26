@@ -11,7 +11,7 @@ let
     ;
 
   normalUsers = filterAttrs (
-    _: v: v.enable && v.isNormalUser
+    _: value: value.enable && value.isNormalUser
   ) config.users.users;
 
   normalUsersList = mapAttrsToList (
@@ -27,7 +27,7 @@ in
 
   users = {
     groups = {
-      network-manager = {
+      networkmanager = {
         members = normalUsersList;
       };
     };
