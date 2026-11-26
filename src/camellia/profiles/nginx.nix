@@ -25,7 +25,6 @@ in
         "archive.bingshan.org" = {
           enableACME = true;
           forceSSL = true;
-          root = archivePublicRoot;
 
           locations = {
             "/" = {
@@ -36,6 +35,8 @@ in
               '';
             };
           };
+
+          root = archivePublicRoot;
         };
 
         "s3.bingshan.org" = {

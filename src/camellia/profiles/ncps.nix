@@ -24,8 +24,6 @@ in
 
   services = {
     ncps = {
-      signingHostAlias = "cache.brsvh.org";
-
       cache = {
         allowPutVerb = true;
         hostName = "cache.bingshan.org";
@@ -34,6 +32,8 @@ in
           secrets.nix-cache-signing-key.path;
         tempPath = "/var/lib/ncps/tmp";
       };
+
+      signingHostAlias = "cache.brsvh.org";
     };
 
     nginx = {
@@ -41,10 +41,6 @@ in
         "cache.bingshan.org" = {
           enableACME = true;
           forceSSL = true;
-
-          serverAliases = [
-            config.services.ncps.signingHostAlias
-          ];
 
           locations = {
             "/" = {
@@ -69,6 +65,10 @@ in
               proxyPass = "http://127.0.0.1:8501/upload/";
             };
           };
+
+          serverAliases = [
+            config.services.ncps.signingHostAlias
+          ];
         };
       };
     };

@@ -45,8 +45,8 @@ let
 in
 {
   imports = [
-    camellia.profiles.sops
     camellia.profiles.networking
+    camellia.profiles.sops
     system.profiles.mailserver
   ];
 
