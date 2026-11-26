@@ -23,8 +23,20 @@ let
     head
   ];
 
-  passdir =
+  iniFormat = pkgs.formats.ini { };
+
+  passwordStoreDir =
     config.programs.password-store.settings.PASSWORD_STORE_DIR;
+
+  mappingEntry = target: username: {
+    inherit
+      target
+      username
+      ;
+
+    password_store_dir = passwordStoreDir;
+    username_extractor = "static";
+  };
 in
 {
   imports = [
@@ -70,25 +82,18 @@ in
   xdg = {
     configFile = {
       "pass-git-helper/git-pass-mapping.ini" = {
-        text = ''
-          [codeberg.org]
-          target = codeberg.org/bingshan
-          password_store_dir = ${passdir}
-          username_extractor = static
-          username = bingshan
+        source =
+          iniFormat.generate "git-pass-mapping.ini"
+            {
+              "codeberg.org" =
+                mappingEntry "codeberg.org/bingshan" "bingshan";
 
-          [github.com/brsvh/*]
-          target = github.com/brsvh
-          password_store_dir = ${passdir}
-          username_extractor = static
-          username = brsvh
+              "github.com/YuanshengClaw/*" =
+                mappingEntry "github.com/YuanshengClaw" "brsvh";
 
-          [github.com/YuanshengClaw/*]
-          target = github.com/YuanshengClaw
-          password_store_dir = ${passdir}
-          username_extractor = static
-          username = brsvh
-        '';
+              "github.com/brsvh/*" =
+                mappingEntry "github.com/brsvh" "brsvh";
+            };
       };
     };
   };
