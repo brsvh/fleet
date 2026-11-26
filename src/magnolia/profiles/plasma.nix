@@ -20,9 +20,13 @@
 
   networking = {
     firewall = {
-      allowedTCPPorts = [
-        3389
-      ];
+      interfaces = {
+        tailscale0 = {
+          allowedTCPPorts = [
+            3389
+          ];
+        };
+      };
     };
   };
 }
