@@ -8,9 +8,11 @@ let
   inherit (lib)
     mkEnableOption
     mkIf
-    mkMerge
     mkPackageOption
+    optional
     ;
+
+  cfg = config.programs.global;
 in
 {
   options = {
@@ -31,41 +33,23 @@ in
     };
   };
 
-  config =
-    let
-      cfg = config.programs.global;
+  config = mkIf cfg.enable {
+    home = {
+      packages =
+        optional (cfg.ctags != null) cfg.ctags
+        ++ optional (cfg.package != null) cfg.package
+        ++ (with pkgs; [
+          python3
+          python3Packages.pygments
+        ]);
 
-      isXDG = config.xdg.enable;
-
-      notXDG = !isXDG;
-
-      cond = xdg: cfg.enable && xdg;
-    in
-    mkMerge [
-      {
-        home = {
-          packages = with pkgs; [
-            cfg.ctags
-            cfg.package
-            python3
-            python3Packages.pygments
-          ];
-        };
-      }
-      (mkIf (cond isXDG) {
-        home = {
-          sessionVariables = {
-            GTAGSOBJDIRPREFIX =
-              config.xdg.cacheHome + "/gtags";
-          };
-        };
-      })
-      (mkIf (cond notXDG) {
-        home = {
-          sessionVariables = {
-            GTAGSOBJDIRPREFIX = "~/.cache/gtags/";
-          };
-        };
-      })
-    ];
+      sessionVariables = {
+        GTAGSOBJDIRPREFIX =
+          if config.xdg.enable then
+            "${config.xdg.cacheHome}/gtags"
+          else
+            "${config.home.homeDirectory}/.cache/gtags";
+      };
+    };
+  };
 }
