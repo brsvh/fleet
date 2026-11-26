@@ -25,8 +25,8 @@ let
     ;
 
   inherit (fleet-lib.transformers)
-    filterNix
     excludeTopLevelDirs
+    filterNix
     removeExtension
     removeInternalPath
     ;
