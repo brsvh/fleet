@@ -35,6 +35,9 @@ in
         serviceConfig = {
           DynamicUser = false;
           Group = "garage";
+          PrivateTmp = true;
+          ProtectSystem = "strict";
+          UMask = "0077";
           User = "garage";
         };
       };
