@@ -20,7 +20,6 @@ let
   store = {
     bucketName = "nextcloud";
     keyId = "GK74f5107bc2ede82b9f049e23";
-    keyName = "nextcloud";
     secret = secrets."nextcloud/s3-secret-key".path;
   };
 
