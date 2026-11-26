@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    system.modules.users-groups
     system.profiles.fish
     system.profiles.sops
   ];
