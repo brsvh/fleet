@@ -15,6 +15,21 @@ export default async function ({ github, context, core }) {
   const sourceId = process.env.SOURCE_JOB;
   const projectId = process.env.PROJECT;
   const attempt = Number(process.env.GITHUB_RUN_ATTEMPT);
+  const uuid = /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
+
+  if (
+    typeof host !== 'string'
+    || typeof revision !== 'string'
+    || typeof sourceId !== 'string'
+    || typeof projectId !== 'string'
+    || !/^[a-z0-9-]+$/.test(host)
+    || !/^[0-9a-f]{40}$/.test(revision)
+    || !uuid.test(sourceId)
+    || !uuid.test(projectId)
+  ) {
+    throw new Error('Invalid deployment approval parameters');
+  }
+
   const environment = `deploy-${host}`;
 
   if (!token) {
