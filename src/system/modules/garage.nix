@@ -13,6 +13,7 @@ let
     mkIf
     mkOption
     optionalString
+    toJSON
     types
     ;
 
@@ -37,6 +38,15 @@ let
         }
       '') bucket.keys
     )}
+    revoke_undeclared_permissions ${
+      escapeShellArg (
+        toJSON (
+          mapAttrsToList (
+            key: _: keys.${key}.id
+          ) bucket.keys
+        )
+      )
+    }
   '') cfg.buckets;
 in
 {
@@ -395,6 +405,34 @@ in
               ' | garage_json AllowBucketKey - > /dev/null
             }
 
+            revoke_undeclared_permissions() {
+              local declared_ids="$1"
+              local bucket_id access_key_id undeclared_keys
+
+              bucket_id="$(jq -r '.id' "$bucket_info_file")"
+              undeclared_keys="$(
+                jq -r --argjson declared "$declared_ids" '
+                  .keys[]?
+                  | select(
+                      (.permissions.read or .permissions.write or .permissions.owner)
+                      and (($declared | index(.accessKeyId)) == null)
+                    )
+                  | .accessKeyId
+                ' "$bucket_info_file"
+              )"
+
+              while IFS= read -r access_key_id; do
+                if test -z "$access_key_id"; then
+                  continue
+                fi
+
+                jq -n --arg bucketId "$bucket_id" --arg accessKeyId "$access_key_id" '
+                  {bucketId: $bucketId, accessKeyId: $accessKeyId,
+                   permissions: {read: true, write: true, owner: true}}
+                ' | garage_json DenyBucketKey - > /dev/null
+              done <<< "$undeclared_keys"
+            }
+
             ensure_layout
             ${concatStringsSep "\n" keyCommands}
             ${concatStringsSep "\n" bucketCommands}
@@ -410,9 +448,14 @@ in
               name: key: "key-${name}:${key.secretFile}"
             ) keys;
 
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+            ProtectHome = true;
+            ProtectSystem = "strict";
             StateDirectory = "garage-configure";
             StateDirectoryMode = "0700";
             Type = "oneshot";
+            UMask = "0077";
             User = "garage";
           };
 
