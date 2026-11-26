@@ -18,6 +18,11 @@ nix-cache:
 onlyoffice:
     jwt-secret: ENC[AES256_GCM,data:VRm+zffIXCpkEQiqVDzwA84H4t6fqDv8tmvbl8+E5O8OSQHoKwrBggOG7HDldsmH7NAhMXqrGl7RmFvccCvWKw==,iv:AA6XkXn/sq/fqx5Ln4jxUwBKppZ6tsRqm7s8OA2VKfE=,tag:KDQlhFkrt5BqOPhxQyZKZA==,type:str]
     security-nonce: ENC[AES256_GCM,data:4rIX+2eSwj3nb/P7I6VYUHlZyULJQdNkqFKpnouV1MJJqueMc8IsivgtKmrz5YdKPedjN+Gq4yDvDW2d1wb5riL7CKER9VK62Krqxpfh/G0OEg7uBQpNz4jw0EM=,iv:peazVlxql5RdkGB5zb0RnF/z/DM57q5Tvs2Kx7/pUmU=,tag:CI728MGA4Zod7SyV7IPeSQ==,type:str]
+users:
+    ops:
+        hashed-password: ENC[AES256_GCM,data:F+SXif+mCnvcpT+lI9UozsEdmTt969OkFxHj+uLgZGDP4XQ9mAJ4nZM8jThfUj7xGkK/k2nH4JNp9ChnaumoQP0DFs258ACWZA==,iv:y0JWhR6nBxSqtKgmBiJT7WWvVlX756hp5HaxJdn9eNg=,tag:27ZmlFXPFiA5oMtL8mW6ZQ==,type:str]
+    root:
+        hashed-password: ENC[AES256_GCM,data:qZdb2LjBDfN6QhTHxzIGscjYrE/seipIZA+OZekLV6aW3WZpK9TyZyIdz5TOBX43Nz7MIskS6Zvj0dTWiFvYjpO32OWGqqTIOg==,iv:p7JipCeLvyVAfbnmxJB0rXHs/4avSdR9x2wEADIYS0Q=,tag:BDHm9dIIVZIonR1ts6mBtA==,type:str]
 sops:
     age:
         - enc: |
@@ -29,7 +34,7 @@ sops:
             +RoIclxJaL8eLIxvyi4ZQf3HD+RBbIds6H0Xdo/YSKAuApyMjqF8Zw==
             -----END AGE ENCRYPTED FILE-----
           recipient: age194qvjfwdnntwx9200e5ygepx0fppwh8034ljnzvzhc9zfxn9vfyq90m0z0
-    lastmodified: "2026-11-24T05:14:23Z"
-    mac: ENC[AES256_GCM,data:S9Nd8pkHcWcL7+qx7pxLDwvnk0Snigs8LndYnnkR5wGLMLzfRw/HbTOrm3hhPMyquCfwZUwKyTbbFqPduqHziqvTxHJ6J/vHT3QCBbVoGzmnnWDXCVmIP4e01zO3547EYwlvNVDG+wYT9zdMY/Jc9spLaThejj9e/mYDj9xHvgU=,iv:D8mW2Nn6heJw7qvH4eFhvt7qo55EMF6lLWITqBrapGg=,tag:KTdvssVLrj1fKX+Bu682qA==,type:str]
+    lastmodified: "2026-11-26T10:15:06Z"
+    mac: ENC[AES256_GCM,data:N2ccFYpBKdVb8kVoQOKnBnaobfqIlru6pcmHs1AvNl/OCoAGuSE3GgSXyQ2ATEIT/g9TZiG4V5VNFBdcHWZAaf335v106PCqyvwyScdY9kzdZrwDw4YH0iNfy2RvCRZQ6gJeWedKFLkCMR6qcwRbXxMu0q1L007hZpBNcB819e8=,iv:EujvX3y07n+zK7E9ZniVASutOzarUE9+zGRZhYmKS9w=,tag:PmBAHEB8/Ar4uclOkKZjLw==,type:str]
     unencrypted_suffix: _unencrypted
     version: 3.13.3
