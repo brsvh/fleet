@@ -16,7 +16,7 @@ in
 {
   imports = [
     camellia.profiles.sops
-    system.modules.garage-provision
+    system.modules.garage
     system.profiles.garage
   ];
 
