@@ -8,6 +8,11 @@
               efi = {
                 content = {
                   format = "vfat";
+
+                  mountOptions = [
+                    "umask=0077"
+                  ];
+
                   mountpoint = "/efi";
                   type = "filesystem";
                 };
