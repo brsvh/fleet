@@ -16,6 +16,9 @@ in
   services = {
     nginx = {
       enable = mkDefault true;
+      recommendedOptimisation = mkDefault true;
+      recommendedProxySettings = mkDefault true;
+      recommendedTlsSettings = mkDefault true;
     };
   };
 }
