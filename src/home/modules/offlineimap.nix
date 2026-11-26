@@ -5,16 +5,37 @@
 }:
 let
   inherit (lib)
-    concatStringsSep
+    concatMapStringsSep
     mkEnableOption
     mkIf
     mkOption
+    replaceStrings
     types
     ;
 
   cfg = config.services.offlineimap;
 
+  escapeSystemdArg =
+    argument:
+    "\"${
+      replaceStrings
+        [
+          "\\"
+          "\""
+          "%"
+          "\n"
+        ]
+        [
+          "\\\\"
+          "\\\""
+          "%%"
+          "\\n"
+        ]
+        argument
+    }\"";
+
   offlineimapArgs = [
+    "${cfg.package}/bin/offlineimap"
     "-u"
     cfg.ui
   ]
@@ -79,8 +100,8 @@ in
           offlineimap = {
             Service = {
               ExecStart =
-                "${cfg.package}/bin/offlineimap "
-                + concatStringsSep " " offlineimapArgs;
+                concatMapStringsSep " " escapeSystemdArg
+                  offlineimapArgs;
               Type = "oneshot";
             };
 
