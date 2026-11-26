@@ -31,7 +31,7 @@ in
           type =
             with types;
             nonEmptyListOf (
-              strMatching "[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+              strMatching "[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?/([A-Za-z0-9_-][A-Za-z0-9_.-]*|\\.[A-Za-z0-9_-][A-Za-z0-9_.-]*|\\.\\.[A-Za-z0-9_.-]+)"
             );
         };
 
