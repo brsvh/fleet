@@ -1322,13 +1322,11 @@
                t))
 
 (use-package grip-mode
+  :commands (grip-mode)
+
   :custom
   ;; Prefer an embedded WebKit preview when Emacs supports xwidgets.
-  (grip-preview-in-webkit t)
-
-  :hook
-  ;; Start a GitHub-style preview for `markdown-ts-mode' buffers.
-  (markdown-ts-mode-hook . grip-mode))
+  (grip-preview-in-webkit t))
 
 (use-package simple
   :hook
@@ -3635,9 +3633,10 @@
 
 (use-package tex
   :custom
-  ;; Parse local macros and included files for document-aware editing.
-  (TeX-auto-save t)
-  (TeX-parse-self t)
+  ;; Avoid loading or saving per-directory `auto/*.el' style files so
+  ;; untrusted TeX directories cannot execute Lisp on open.
+  (TeX-auto-save nil)
+  (TeX-parse-self nil)
 
   ;; Use XeTeX for plain TeX and XeLaTeX for LaTeX documents.
   (TeX-engine 'xetex)
@@ -4316,10 +4315,10 @@
   :defines (gptel--openai-oauth-token-file)
 
   :config
-  ;; Keep the refresh token with other persistent Emacs state instead
-  ;; of placing it below `user-emacs-directory'.
+  ;; Keep the refresh token encrypted with other persistent Emacs
+  ;; state instead of placing it below `user-emacs-directory'.
   (setq gptel--openai-oauth-token-file
-        (bs-path bs-state-directory "gptel/openai-oauth-token"))
+        (bs-path bs-state-directory "gptel/openai-oauth-token.gpg"))
 
   :demand t)
 
@@ -5236,19 +5235,11 @@
   :if (featurep 'xwidget-internal)
   :after (elfeed-show)
   :defines (elfeed-show-mode-map)
-  :functions (elfeed-webkit-enable)
-
-  :config
-  ;; Open article links in embedded WebKit when xwidgets are
-  ;; available.
-  (elfeed-webkit-enable)
 
   :bind
   ( :map elfeed-show-mode-map
     ;; Switch the session's article renderer between WebKit and `shr'.
-    ("%" . elfeed-webkit-toggle))
-
-  :demand t)
+    ("%" . elfeed-webkit-toggle)))
 
 (use-package elfeed-x
   :after (elfeed)
