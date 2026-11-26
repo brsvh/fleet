@@ -179,11 +179,14 @@ in
   */
   liftDefault =
     mapAttrsRecursiveCond'
-      (v: !(isAttrs v && v ? default))
+      (value: !(isAttrs value && value ? default))
       (
-        path: v:
+        path: value:
         nameValuePair (stemOf (last path)) (
-          if isAttrs v && v ? default then v.default else v
+          if isAttrs value && value ? default then
+            value.default
+          else
+            value
         )
       );
 
