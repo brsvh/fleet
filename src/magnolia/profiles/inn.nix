@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    magnolia.profiles.sops
     system.profiles.inn
   ];
 
@@ -13,8 +14,8 @@
     inn = {
       credentials = {
         eternal-september =
-          config.sops.secrets.inn-eternal-september.path;
-        solani = config.sops.secrets.inn-solani.path;
+          config.sops.secrets."inn/eternal-september".path;
+        solani = config.sops.secrets."inn/solani".path;
       };
 
       peers = {
@@ -67,15 +68,8 @@
 
   sops = {
     secrets = {
-      inn-eternal-september = {
-        key = "eternal-september";
-        sopsFile = magnolia.etc."inn.sops";
-      };
-
-      inn-solani = {
-        key = "solani";
-        sopsFile = magnolia.etc."inn.sops";
-      };
+      "inn/eternal-september" = { };
+      "inn/solani" = { };
     };
   };
 }
