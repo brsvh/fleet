@@ -10,7 +10,8 @@ in
 {
   programs = {
     gamescope = {
-      enable = mkDefault true;
+      # Override NixOS steam.nix's mkDefault false when gamescopeSession is off.
+      enable = true;
       enableWsi = mkDefault true;
     };
   };
