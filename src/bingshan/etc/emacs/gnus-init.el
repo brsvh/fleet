@@ -296,9 +296,10 @@ TOPIC is a list of the topic name followed by its group names."
             (gnus-group-set-subscription
              group gnus-level-default-unsubscribed t))))
       (unless gnus-topic-topology
-        (setq gnus-topic-topology '(("Gnus" visible nil nil))))
+        (setq gnus-topic-topology
+              (list (list "Gnus" 'visible nil nil))))
       (unless (assoc "Gnus" gnus-topic-alist)
-        (push '("Gnus") gnus-topic-alist))
+        (push (list "Gnus") gnus-topic-alist))
       (dolist (entry gnus-topic-alist)
         (setcdr entry
                 (cl-remove-if
