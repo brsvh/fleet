@@ -15,9 +15,6 @@ in
 
   services = {
     ncps = {
-      enable = mkDefault true;
-      protectMigrations = mkDefault true;
-
       analytics = {
         reporting = {
           enable = mkDefault false;
@@ -44,6 +41,9 @@ in
           ];
         };
       };
+
+      enable = mkDefault true;
+      protectMigrations = mkDefault true;
 
       server = {
         addr = mkDefault "127.0.0.1:8501";

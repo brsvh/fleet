@@ -84,14 +84,14 @@ in
         bind '"\e[D": backward-char'
 
         function hstrnotiocsti {
-            {
-        READLINE_LINE="$(
-            {
-        </dev/tty "${hstr}/bin/hstr" "''${READLINE_LINE}"
-            } 2>&1 1>&3 3>&-
-        )"
-            } 3>&1
-            READLINE_POINT=''${#READLINE_LINE}
+          {
+            READLINE_LINE="$(
+              {
+                </dev/tty "${hstr}/bin/hstr" "''${READLINE_LINE}"
+              } 2>&1 1>&3 3>&-
+            )"
+          } 3>&1
+          READLINE_POINT=''${#READLINE_LINE}
         }
 
         # Bind hstr to <ctrl-r>.

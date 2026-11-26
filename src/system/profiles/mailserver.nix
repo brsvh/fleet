@@ -34,7 +34,7 @@ in
   services = {
     nginx = {
       virtualHosts = {
-        "${cfg.fqdn}" = {
+        ${cfg.fqdn} = {
           enableACME = mkDefault true;
         };
       };

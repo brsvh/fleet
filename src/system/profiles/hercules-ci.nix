@@ -12,7 +12,6 @@ let
     ;
 
   cfg = config.services.hercules-ci-agent;
-
 in
 {
   config = mkMerge [
