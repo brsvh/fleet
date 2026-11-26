@@ -33,7 +33,7 @@ in
   programs = {
     steam = {
       dedicatedServer = {
-        openFirewall = mkDefault true;
+        openFirewall = mkDefault false;
       };
 
       enable = mkDefault true;
@@ -43,7 +43,7 @@ in
       ];
 
       remotePlay = {
-        openFirewall = mkDefault true;
+        openFirewall = mkDefault false;
       };
     };
   };
