@@ -121,7 +121,7 @@
 ;; Generate Mail-Followup-To using the declared mailing-list
 ;; membership.
 (setq message-subscribed-address-functions
-      '(gnus-find-subscribed-addresses))
+      (list #'gnus-find-subscribed-addresses))
 
 (defconst gnus-init-topics
   '(("Architecture"

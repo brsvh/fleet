@@ -26,6 +26,8 @@
 (require 'bs-ext)
 (require 'bs-hooks)
 (require 'bs-lib)
+(require 'seq)
+(require 'subr-x)
 
 (eval-when-compile
   (require 'cl-lib)
@@ -205,7 +207,7 @@
   ;; Display the current Column number.
   (bs-first-buffer-hook . column-number-mode)
 
-  ;; Display the current Line number.b
+  ;; Display the current Line number.
   (bs-first-buffer-hook . line-number-mode))
 
 
@@ -314,7 +316,7 @@
 (use-package minibuffer
   :custom
   ;; Use mini-buffer completion as the UI for ‘completion-at-point’.
-  (completion-in-region-function 'consult-completion-in-region)
+  (completion-in-region-function #'consult-completion-in-region)
 
   ;; Setup our preferred completion styles:
   ;;
@@ -338,7 +340,8 @@
 (use-package orderless
   :custom
   ;; Allow escape with the black-splash.
-  (orderless-component-separator 'orderless-escapable-split-on-space))
+  (orderless-component-separator
+   #'orderless-escapable-split-on-space))
 
 (use-package savehist
   :after (bs-lib)
@@ -420,7 +423,7 @@
   :custom
   ;; Only show available commands in current mode.
   (read-extended-command-predicate
-   'command-completion-default-include-p))
+   #'command-completion-default-include-p))
 
 
 
@@ -439,7 +442,7 @@
   :custom
   ;; Use `embark-prefix-help-command' to provide the help prompt of
   ;; prefix commands.
-  (prefix-help-command 'embark-prefix-help-command))
+  (prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark
   :commands (embark-prefix-help-command))
@@ -675,19 +678,19 @@
   ;; avoiding false-positive spelling flags within mixed-language
   ;; text.
   (add-hook 'jinx-mode-hook
-            #'(lambda ()
-                (defvar jinx--syntax-table)
-                (let ((st jinx--syntax-table))
-                  (modify-syntax-entry '(#x4E00 . #x9FFF) "_" st)
-                  (modify-syntax-entry '(#x3400 . #x4DBF) "_" st)
-                  (modify-syntax-entry '(#x20000 . #x2A6DF) "_" st)
-                  (modify-syntax-entry '(#x2A700 . #x2B73F) "_" st)
-                  (modify-syntax-entry '(#x2B740 . #x2B81F) "_" st)
-                  (modify-syntax-entry '(#x2B820 . #x2CEAF) "_" st)
-                  (modify-syntax-entry '(#x2CEB0 . #x2EBEF) "_" st)
-                  (modify-syntax-entry '(#x30000 . #x3134F) "_" st)
-                  (modify-syntax-entry '(#x31350 . #x323AF) "_" st)
-                  (modify-syntax-entry '(#x2EBF0 . #x2EE5F) "_" st))))
+            (lambda ()
+              (defvar jinx--syntax-table)
+              (let ((st jinx--syntax-table))
+                (modify-syntax-entry '(#x4E00 . #x9FFF) "_" st)
+                (modify-syntax-entry '(#x3400 . #x4DBF) "_" st)
+                (modify-syntax-entry '(#x20000 . #x2A6DF) "_" st)
+                (modify-syntax-entry '(#x2A700 . #x2B73F) "_" st)
+                (modify-syntax-entry '(#x2B740 . #x2B81F) "_" st)
+                (modify-syntax-entry '(#x2B820 . #x2CEAF) "_" st)
+                (modify-syntax-entry '(#x2CEB0 . #x2EBEF) "_" st)
+                (modify-syntax-entry '(#x30000 . #x3134F) "_" st)
+                (modify-syntax-entry '(#x31350 . #x323AF) "_" st)
+                (modify-syntax-entry '(#x2EBF0 . #x2EE5F) "_" st))))
 
   :hook
   ;; Establish global spell checking as part of the normal editing
@@ -791,11 +794,12 @@
    .
    (lambda ()
      ;; Always delete trailing when programming.
-     (add-hook 'before-save-hook 'bs/delete-trailing-whitespace nil t)
+     (add-hook 'before-save-hook
+               #'bs/delete-trailing-whitespace nil t)
 
      ;; Do untabify when `indent-tabs-mode' is nil
      (unless indent-tabs-mode
-       (add-hook 'before-save-hook 'bs/untabify nil t)))))
+       (add-hook 'before-save-hook #'bs/untabify nil t)))))
 
 (use-package recentf
   :after (bs-lib)
@@ -806,8 +810,8 @@
 
   :config
   ;; Silencing all messages during `recentf' loading and cleanup.
-  (advice-add 'recentf-load-list :around 'bs-silence-message)
-  (advice-add 'recentf-cleanup   :around 'bs-silence-message)
+  (advice-add 'recentf-load-list :around #'bs-silence-message)
+  (advice-add 'recentf-cleanup   :around #'bs-silence-message)
 
   :hook
   ;; Enable `recentf-mode' to provide the list of recent files.
@@ -1115,7 +1119,7 @@
   ;; Favor buffer selection that is scoped to the current context, so
   ;; switching buffers operates on what is relevant to the active
   ;; workspace or project instead of the entire global buffer set.
-  (consult-buffer-list-function 'consult--frame-buffer-list)
+  (consult-buffer-list-function #'consult--frame-buffer-list)
 
   :bind
   ( :map global-map
@@ -1248,7 +1252,7 @@
    (lambda ()
      ;; Offer defined abbreviations through
      ;; `completion-at-point-functions'.
-     (add-hook 'completion-at-point-functions 'cape-abbrev 10 t))))
+     (add-hook 'completion-at-point-functions #'cape-abbrev 10 t))))
 
 (use-package emacs
   :custom
@@ -1409,14 +1413,14 @@
    (lambda ()
      ;; Offer explicitly defined abbreviations before loosely matched
      ;; words from the current buffer.
-     (add-hook 'completion-at-point-functions 'cape-abbrev 10 t)
+     (add-hook 'completion-at-point-functions #'cape-abbrev 10 t)
 
      ;; Make symbols that already exist in the current buffer
      ;; immediately reusable during editing.
-     (add-hook 'completion-at-point-functions 'cape-dabbrev 20 t)
+     (add-hook 'completion-at-point-functions #'cape-dabbrev 20 t)
 
      ;; Allow file path completion.
-     (add-hook 'completion-at-point-functions 'cape-file -10 t))))
+     (add-hook 'completion-at-point-functions #'cape-file -10 t))))
 
 (use-package consult-eglot-embark
   :after (eglot embark)
@@ -1500,12 +1504,13 @@
 
 (use-package eglot
   :after (cape)
+  :functions (cape-wrap-nonexclusive)
 
   :config
   ;; Allow language-server completions to coexist with other
   ;; completion sources instead of monopolizing the candidate space.
   (advice-add 'eglot-completion-at-point
-              :around 'cape-wrap-nonexclusive))
+              :around #'cape-wrap-nonexclusive))
 
 (use-package eglot-booster
   :hook
@@ -1660,7 +1665,7 @@
 
   :init
   ;; Load `sly' contrib packages before running `sly'.
-  (advice-add 'sly :before 'sly-setup)
+  (advice-add 'sly :before #'sly-setup)
 
   :config
   ;; Register the `sly' contrib packages we want to use.
@@ -1982,6 +1987,8 @@
   (prog-mode-hook . flymake-mode))
 
 (use-package flymake-popon
+  :functions (flymake-eldoc-function)
+
   :hook
   ;; Enable `flymake-popon-mode' whenever `flymake-mode' is active.
   ;; Diagnostic messages are displayed in a child frame (posframe)
@@ -1996,7 +2003,7 @@
    .
    (lambda ()
      (remove-hook 'eldoc-documentation-functions
-                  'flymake-eldoc-function
+                  #'flymake-eldoc-function
                   t))))
 
 (use-package startup
@@ -2091,7 +2098,7 @@
   :config
   ;; Synchronize `diff-hl' after the `magit' auto-revert pass, so file
   ;; buffers observe the refreshed Git state.
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t))
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh t))
 
 (use-package diff-hl-flydiff
   :hook
@@ -2559,16 +2566,6 @@
 ;; Email and Usenet News with Gnus (info "(emacs) Gnus")
 ;;
 
-(use-package auth-source-pass
-  :after (gnus)
-  :commands (auth-source-pass-enable)
-
-  :init
-  ;; Activate the password-store backend as soon as `gnus' loads, so
-  ;; the first interactive `gnus' command can resolve NNTP
-  ;; credentials.
-  (auth-source-pass-enable))
-
 (use-package gnus
   :after (bs-lib)
   :commands (gnus)
@@ -2663,7 +2660,7 @@
 
   ;; Keep groups alphabetical by their displayed, backend-unprefixed
   ;; names.
-  (gnus-group-sort-function 'gnus-group-sort-by-real-name)
+  (gnus-group-sort-function #'gnus-group-sort-by-real-name)
 
   :hook
   ;; Use a concise mode-line name for `gnus-group' buffers.
@@ -2909,7 +2906,8 @@
 
 (use-package tessera-gnus-summary
   :after (tessera-gnus)
-  :defines (gnus-demon-timers)
+  :defines (gnus-demon-timers timer-list)
+  :functions (timer--time)
 
   :custom
   ;; Retain native extension and cross-group behavior when article
@@ -3082,13 +3080,14 @@
 
 (use-package comint
   :after (cape)
+  :functions (cape-wrap-nonexclusive)
 
   :config
   ;; Favor iterative exploration at REPL prompts by keeping completion
   ;; open to past input and local context, rather than forcing a
   ;; single, authoritative completion source.
   (advice-add 'comint-completion-at-point
-              :around 'cape-wrap-nonexclusive))
+              :around #'cape-wrap-nonexclusive))
 
 (use-package corfu
   :hook
@@ -3097,6 +3096,8 @@
   (comint-mode-hook . corfu-mode))
 
 (use-package ghostel
+  :defines (server-name server-socket-dir)
+
   :config
   ;; Add a display buffer rule to make `ghostel' buffers shown in a
   ;; side window at the bottom of the frame.
@@ -3108,8 +3109,8 @@
                  (window-height . 0.35)))
 
   :hook
-  ;; Export environment variables so that programs launched from Let
-  ;; `ghostel' uses Emacs as its editor.
+  ;; Export environment variables so that programs launched from
+  ;; `ghostel' use Emacs as their editor.
   (ghostel-pre-spawn-hook
    .
    (lambda ()
@@ -3390,22 +3391,6 @@
 
 (use-package package
   :custom
-  ;; `package-user-dir' is where Emacs downloads and installs
-  ;; packages, default is the elpa subdirectory under
-  ;; `user-emacs-directory'.  We override it to live under our data
-  ;; directory, name-spaced by `emacs-version', so that each Emacs
-  ;; version keeps its own isolated set of packages.
-  (package-user-dir (bs-path bs-data-directory emacs-version))
-
-  ;; Ensure verification data is also version-specific.
-  (package-gnupghome-dir (bs-path package-user-dir "gnupg/"))
-
-  ;; Emacs writes optimized autoloads into `package-quickstart-file',
-  ;; we want that autoload file to live alongside our installed
-  ;; packages.
-  (package-quickstart-file (bs-path package-user-dir "autoloads.el"))
-  (package-quickstart t)
-
   ;; Keep the built-in package manager available as an optional
   ;; supplement to packages managed declaratively by Nix.
   (package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -3477,7 +3462,7 @@
   ;; Disable all other themes when loading a `modus-themes' theme.
   (modus-themes-disable-other-themes t)
 
-  ;;Use bold for code syntax highlighting and related.
+  ;; Use bold for code syntax highlighting and related.
   (modus-themes-bold-constructs t)
 
   ;; Use italics for code syntax highlighting and related.
@@ -3557,7 +3542,12 @@
   :commands (submit-emacs-patch))
 
 (use-package git-commit
-  :functions (magit-toplevel)
+  :defines (git-commit-font-lock-keywords
+            git-commit-summary-max-length)
+  :functions (magit-toplevel
+              project-current
+              project-name
+              project-root)
 
   :config
   ;; Run after ordinary setup and only for a project named emacs
@@ -4106,7 +4096,7 @@
 
   :config
   ;; Silencing all messages during `epa-file-enable' executing.
-  (advice-add 'epa-file-enable :around 'bs-silence-message)
+  (advice-add 'epa-file-enable :around #'bs-silence-message)
 
   ;; Enable `epa-file' so that Emacs can automatically recognize and
   ;; transparently handle *.gpg files.  When opening an encrypted
@@ -4159,21 +4149,21 @@
   ;; width.
   (gptel-display-buffer-action
    `((display-buffer-reuse-window
-      ,#'(lambda (buffer alist)
-           (let ((wide-p
-                  (and (integerp split-width-threshold)
-                       (>= (frame-width) split-width-threshold))))
-             (display-buffer-in-side-window
-              buffer
-              (append
-               `((preserve-size
-                  . ,(if wide-p '(t . nil) '(nil . t)))
-                 (side . ,(if wide-p 'right 'bottom))
-                 (slot . 1)
-                 ,(if wide-p
-                      '(window-width . 0.5)
-                    '(window-height . 0.35)))
-               alist)))))
+      ,(lambda (buffer alist)
+         (let ((wide-p
+                (and (integerp split-width-threshold)
+                     (>= (frame-width) split-width-threshold))))
+           (display-buffer-in-side-window
+            buffer
+            (append
+             `((preserve-size
+                . ,(if wide-p '(t . nil) '(nil . t)))
+               (side . ,(if wide-p 'right 'bottom))
+               (slot . 1)
+               ,(if wide-p
+                    '(window-width . 0.5)
+                  '(window-height . 0.35)))
+             alist)))))
      (body-function . select-window)
      (window-parameters . ((no-delete-other-windows . t)))))
 
@@ -4430,7 +4420,7 @@
   :custom
   ;; Use the async `mu4e'-backed search by default so selected
   ;; candidates keep the normal `mu4e' header and message actions.
-  (consult-mu-default-command 'consult-mu-async)
+  (consult-mu-default-command #'consult-mu-async)
 
   ;; Keep enough matches available for broad mailbox searches without
   ;; making the minibuffer completion table unbounded.
@@ -4455,7 +4445,7 @@
   ;; Open the selected message in the regular `mu4e' view buffer
   ;; instead of using reply, forward, or a custom action as the
   ;; default.
-  (consult-mu-action 'consult-mu--view-action)
+  (consult-mu-action #'consult-mu--view-action)
 
   :bind
   ( :map goto-map
@@ -4593,7 +4583,7 @@
 
   ;; Use the standard completion entry point so the active minibuffer
   ;; completion UI handles the `mu4e' option prompts.
-  (mu4e-completing-read-function 'completing-read))
+  (mu4e-completing-read-function #'completing-read))
 
 (use-package mu4e-main
   :config
@@ -4836,6 +4826,8 @@
                      (org-edna-mode +1))))
 
 (use-package org-gtd
+  :defines (org-gtd-update-ack)
+
   :preface
   ;; Acknowledge the required `org-gtd' 4.x upgrade steps up front so
   ;; the package does not emit its one-time migration warning on load.
@@ -5140,7 +5132,7 @@
   :custom
   ;; Enter through the tag and feed hierarchy instead of opening an
   ;; undifferentiated search immediately.
-  (elfeed-entry-point 'elfeed-tree)
+  (elfeed-entry-point #'elfeed-tree)
 
   :bind
   ( :map ctl-c-a-map
@@ -5177,7 +5169,7 @@
 
 (use-package elfeed-score
   :after (elfeed)
-  :defines (elfeed-score-map)
+  :defines (elfeed-score-map elfeed-search-mode-map)
   :functions (elfeed-score-enable)
 
   :config

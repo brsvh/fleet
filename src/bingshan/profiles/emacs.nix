@@ -646,7 +646,7 @@ in
             :custom
             (mail-envelope-from 'header)
             (mail-specify-envelope-from t)
-            (send-mail-function 'sendmail-send-it)
+            (send-mail-function #'sendmail-send-it)
             (sendmail-program "msmtp")
 
             :defer t)
