@@ -18,24 +18,20 @@ in
       testCamelifiesNamesAndKeepsPathMetadata = {
         expr = camelify {
           __path = "/src/root";
-
           "feature-module.nix" = "root";
 
-          "nested-dir" = {
+          nested-dir = {
             __path = "/src/root/nested-dir";
-
             "child-module.nix" = "child";
           };
         };
 
         expected = {
           __path = "/src/root";
-
           featureModule = "root";
 
           nestedDir = {
             __path = "/src/root/nested-dir";
-
             childModule = "child";
           };
         };
@@ -73,7 +69,6 @@ in
       testKeepsNixFilesAndPathMetadata = {
         expr = filterNix {
           __path = "/src/root";
-
           "module.nix" = "/src/root/module.nix";
           "note.txt" = "/src/root/note.txt";
 
@@ -85,7 +80,6 @@ in
 
         expected = {
           __path = "/src/root";
-
           "module.nix" = "/src/root/module.nix";
 
           nested = {
@@ -128,7 +122,6 @@ in
       testRemovesExtensionsAndKeepsPathMetadata = {
         expr = removeExtension {
           __path = "/src/root";
-
           ".env" = "env";
           "module.nix" = "root";
 
@@ -139,7 +132,6 @@ in
 
         expected = {
           __path = "/src/root";
-
           ".env" = "env";
           module = "root";
 
@@ -157,7 +149,6 @@ in
 
           module = {
             __path = "/src/root/module";
-
             file = "module.nix";
           };
         };

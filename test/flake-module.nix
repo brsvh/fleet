@@ -18,6 +18,7 @@ in
     }:
     let
       inherit (pkgs)
+        runCommand
         writeShellApplication
         writeText
         ;
@@ -43,7 +44,7 @@ in
         }).__tests
       '';
 
-      run-test = writeShellApplication {
+      runTest = writeShellApplication {
         name = "run-test";
 
         runtimeInputs = with pkgs; [
@@ -75,11 +76,11 @@ in
         '';
       };
 
-      test = pkgs.runCommand "test" { } ''
-        ${run-test}/bin/run-test
+      test = runCommand "test" { } ''
+        ${runTest}/bin/run-test
 
         mkdir -p "$out/bin"
-        ln -s ${run-test}/bin/run-test "$out/bin/test"
+        ln -s ${runTest}/bin/run-test "$out/bin/test"
       '';
     in
     {
@@ -89,8 +90,8 @@ in
             description = "Run the nix-unit test suite.";
           };
 
-          type = "app";
           program = "${config.packages.test}/bin/test";
+          type = "app";
         };
       };
 
