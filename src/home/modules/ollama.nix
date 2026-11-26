@@ -15,10 +15,30 @@ let
     mkIf
     mkMerge
     mkOption
+    replaceStrings
     types
     ;
 
   cfg = config.services.ollama;
+
+  escapeSystemdEnvironment =
+    entry:
+    "\"${
+      replaceStrings
+        [
+          "\\"
+          "\""
+          "%"
+          "\n"
+        ]
+        [
+          "\\\\"
+          "\\\""
+          "%%"
+          "\\n"
+        ]
+        entry
+    }\"";
 
   package =
     if cfg.acceleration == null then
@@ -162,8 +182,10 @@ in
 
                 Service = {
                   Environment = mapAttrsToList (
-                    name: value: "${name}=${value}"
+                    name: value:
+                    escapeSystemdEnvironment "${name}=${value}"
                   ) cfg.environmentVariables;
+
                   ExecStart = "${loader}";
                   Type = "oneshot";
                 };
