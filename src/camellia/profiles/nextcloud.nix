@@ -24,6 +24,8 @@ let
     secret = secrets."nextcloud/s3-secret-key".path;
   };
 
+  chmodBin = "${coreutils}/bin/chmod";
+
   jqBin = "${jq}/bin/jq";
 
   occBin = "${cfg.occ}/bin/nextcloud-occ";
@@ -294,6 +296,12 @@ in
 
           trap 'printf "nextcloud-configure failed at line %s\n" "$LINENO" >&2' ERR
 
+          ${chmodBin} 0700 "$STATE_DIRECTORY"
+
+          if test -f "$STATE_DIRECTORY/bingshan-password.sha256"; then
+            ${chmodBin} 0600 "$STATE_DIRECTORY/bingshan-password.sha256"
+          fi
+
           password_hash() {
             local credential="$1"
             local hash
@@ -448,41 +456,55 @@ in
             > /dev/null \
             2>&1 || true
 
-          source "$CREDENTIALS_DIRECTORY/whiteboard-env"
+          ${jqBin} \
+            --null-input \
+            --rawfile onlyoffice_jwt "$CREDENTIALS_DIRECTORY/onlyoffice-jwt-secret" \
+            --rawfile whiteboard_env "$CREDENTIALS_DIRECTORY/whiteboard-env" \
+            --arg collab_backend_url "https://${cfg.hostName}/whiteboard" \
+            --arg document_server_url "https://${officeServer}/" \
+            --arg storage_url "https://${cfg.hostName}/" \
+            '
+              def parse_env($text; $key):
+                [
+                  $text
+                  | split("\n")[]
+                  | sub("\r$"; "")
+                  | capture("^\\s*(?:export\\s+)?" + $key + "=(?<value>.*)$")
+                  | .value
+                  | if (startswith("\"") and endswith("\""))
+                      or (startswith("\u0027") and endswith("\u0027"))
+                    then .[1:-1]
+                    else .
+                    end
+                ]
+                | (last // "") as $value
+                | if ($value | length) == 0 then
+                    error("missing " + $key)
+                  else
+                    $value
+                  end;
 
-          ${occBin} \
-            config:app:set whiteboard collabBackendUrl \
-            --value="https://${cfg.hostName}/whiteboard" \
-            > /dev/null
-
-          ${occBin} \
-            config:app:set whiteboard jwt_secret_key \
-            --value="$JWT_SECRET_KEY" \
-            > /dev/null
-
-          onlyoffice_jwt_secret="$(
-            cat "$CREDENTIALS_DIRECTORY/onlyoffice-jwt-secret"
-          )"
-
-          ${occBin} \
-            config:app:set onlyoffice DocumentServerUrl \
-            --value="https://${officeServer}/" \
-            > /dev/null
-
-          ${occBin} \
-            config:app:set onlyoffice StorageUrl \
-            --value="https://${cfg.hostName}/" \
-            > /dev/null
-
-          ${occBin} \
-            config:app:set onlyoffice jwt_secret \
-            --value="$onlyoffice_jwt_secret" \
-            > /dev/null
-
-          ${occBin} \
-            config:app:set onlyoffice jwt_header \
-            --value="Authorization" \
-            > /dev/null
+              ($onlyoffice_jwt | sub("[\r\n]+$"; "")) as $onlyoffice_secret
+              | if ($onlyoffice_secret | length) == 0 then
+                  error("empty onlyoffice-jwt-secret")
+                else
+                  {
+                    apps: {
+                      onlyoffice: {
+                        DocumentServerUrl: $document_server_url,
+                        StorageUrl: $storage_url,
+                        jwt_header: "Authorization",
+                        jwt_secret: $onlyoffice_secret
+                      },
+                      whiteboard: {
+                        collabBackendUrl: $collab_backend_url,
+                        jwt_secret_key: parse_env($whiteboard_env; "JWT_SECRET_KEY")
+                      }
+                    }
+                  }
+                end
+            ' \
+            | ${occBin} config:import > /dev/null
         '';
 
         serviceConfig = {
@@ -492,14 +514,8 @@ in
             "chang-password:${
               secrets."chang@bingshan.org".path
             }"
-            "mail_smtppassword:${
-              secrets."cloud@bingshan.org".path
-            }"
             "onlyoffice-jwt-secret:${
               secrets."onlyoffice/jwt-secret".path
-            }"
-            "s3_secret:${
-              secrets."nextcloud/s3-secret-key".path
             }"
             "whiteboard-env:${
               secrets."nextcloud/whiteboard-env".path
@@ -507,7 +523,9 @@ in
           ];
 
           StateDirectory = "nextcloud-configure";
+          StateDirectoryMode = "0700";
           Type = "oneshot";
+          UMask = "0077";
           User = "nextcloud";
         };
 
