@@ -37,7 +37,7 @@ in
               if config.xdg.enable then
                 "${config.xdg.configHome}/grip"
               else
-                "~/.grip";
+                "${config.home.homeDirectory}/.grip";
           };
     };
   };
