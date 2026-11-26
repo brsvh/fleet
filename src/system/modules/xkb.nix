@@ -6,6 +6,7 @@
 let
   inherit (lib)
     elemAt
+    filter
     genAttrs
     genList
     length
@@ -101,7 +102,9 @@ in
                         sources
                         ;
 
-                      xkb-options = splitString "," xkb.options;
+                      xkb-options = filter (option: option != "") (
+                        splitString "," xkb.options
+                      );
                     };
                   };
                 }
