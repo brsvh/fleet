@@ -246,6 +246,9 @@ let
 
 
       class NNTP:
+          MAX_LINE_BYTES = 1024 * 1024
+          MAX_MULTILINE_BYTES = 64 * 1024 * 1024
+
           def __init__(self, endpoint, username=None, password=None, reader=True):
               self.endpoint = endpoint
               match = re.fullmatch(r"([^:\s]+)(?::([0-9]+))?(?:_(TLS|STARTTLS))?", endpoint)
@@ -297,9 +300,11 @@ let
               self.sock.close()
 
           def readline(self):
-              line = self.stream.readline()
+              line = self.stream.readline(self.MAX_LINE_BYTES + 1)
               if not line:
                   raise ProtocolError(f"NNTP connection closed by {self.endpoint}")
+              if len(line) > self.MAX_LINE_BYTES:
+                  raise ProtocolError(f"NNTP response line too long from {self.endpoint}")
               return line.rstrip(b"\r\n").decode("utf-8", "replace")
 
           def command(self, value):
@@ -310,18 +315,32 @@ let
 
           @staticmethod
           def expect(reply, codes):
-              if int(reply[:3]) not in codes:
+              if (
+                  len(reply) < 3
+                  or not reply[:3].isdigit()
+                  or int(reply[:3]) not in codes
+              ):
                   raise ProtocolError(reply)
               return reply
 
           def multiline(self):
+              total = 0
+              at_crlf = True
               while True:
-                  line = self.stream.readline()
+                  line = self.stream.readline(self.MAX_LINE_BYTES + 1)
                   if not line:
                       raise ProtocolError(f"incomplete NNTP multiline response from {self.endpoint}")
-                  if line == b".\r\n":
+                  if len(line) > self.MAX_LINE_BYTES:
+                      raise ProtocolError(f"NNTP multiline line too long from {self.endpoint}")
+                  if at_crlf and line == b".\r\n":
                       return
-                  yield line[1:] if line.startswith(b"..") else line
+                  if at_crlf and line.startswith(b".."):
+                      line = line[1:]
+                  total += len(line)
+                  if total > self.MAX_MULTILINE_BYTES:
+                      raise ProtocolError(f"NNTP multiline response too large from {self.endpoint}")
+                  at_crlf = line.endswith(b"\r\n")
+                  yield line
 
           def group(self, name):
               fields = self.expect(self.command("GROUP " + name), (211,)).split()
@@ -375,8 +394,9 @@ let
           def offer(self, message_id, article):
               reply = self.command("IHAVE " + message_id)
               if reply.startswith("335 "):
-                  lines = article.split(b"\r\n")
-                  if lines[-1] == b"":
+                  normalized = article.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+                  lines = normalized.split(b"\n")
+                  if lines and lines[-1] == b"":
                       lines.pop()
                   wire = b"".join(
                       (b"." if line.startswith(b".") else b"") + line + b"\r\n"
@@ -446,7 +466,7 @@ let
           return b"\r\n".join(fields) + separator + body
 
 
-      def atomic_write(path, data):
+      def atomic_write(path, data, mode=None):
           path = Path(path)
           descriptor, temporary = tempfile.mkstemp(prefix=path.name + ".", dir=path.parent)
           try:
@@ -454,6 +474,8 @@ let
                   stream.write(data)
                   stream.flush()
                   os.fsync(stream.fileno())
+                  if mode is not None:
+                      os.fchmod(stream.fileno(), mode)
               os.replace(temporary, path)
               directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
               try:
@@ -1045,7 +1067,11 @@ let
           for attempt in range(20):
               try:
                   check_server(config["localEndpoint"], config["groups"])
-                  Path("/run/inn/ready").write_text(json.dumps(marker) + "\n")
+                  atomic_write(
+                      "/run/inn/ready",
+                      (json.dumps(marker) + "\n").encode("utf-8"),
+                      mode=0o640,
+                  )
                   return 0
               except (OSError, ProtocolError):
                   if attempt == 19:
@@ -1076,7 +1102,11 @@ let
               "bytes": size,
               "active_sha256": hashlib.sha256((root / "db/active").read_bytes()).hexdigest(),
           })
-          (root / "seed.json").write_text(json.dumps(marker, indent=2) + "\n")
+          atomic_write(
+              root / "seed.json",
+              (json.dumps(marker, indent=2) + "\n").encode("utf-8"),
+              mode=0o640,
+          )
 
 
       def validate_seed(config, directory, complete):
@@ -1120,7 +1150,11 @@ let
           if files != seed["files"] or size != seed["bytes"]:
               raise ValueError("bootstrap file count or size mismatch")
           seed["role"] = "replica"
-          (root / ".initialized").write_text(json.dumps(seed) + "\n")
+          atomic_write(
+              root / ".initialized",
+              (json.dumps(seed) + "\n").encode("utf-8"),
+              mode=0o640,
+          )
 
 
       def replication_status(config, full):
@@ -1538,7 +1572,7 @@ let
                 else
                   cfg.primaryAddress
               }"
-              patterns: "*"
+              patterns: "${concatStringsSep "," groups}"
           }
         ''} $out/incoming.conf
         cp ${writeText "readers.conf" ''
@@ -1841,6 +1875,15 @@ let
         KillSignal = "SIGINT";
         LoadCredential = credentials;
         Nice = 10;
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectHome = true;
+        ProtectSystem = "strict";
+
+        ReadWritePaths = [
+          stateDirectory
+        ];
+
         SuccessExitStatus = successExitStatus;
         TimeoutStartSec = "30m";
         Type = "oneshot";
@@ -1993,6 +2036,7 @@ let
               exit 1
             fi
             stage="$state.initializing"
+            rm -rf "$stage"
             install -d -m 0750 "$stage"
             jq -n --arg primary ${escapeShellArg cfg.primaryHost} \
               --arg id "$(cat /proc/sys/kernel/random/uuid)" \
@@ -2017,9 +2061,10 @@ let
         fi
         runuser -u ${escapeShellArg cfg.user} -- env \
           ${escapeShellArgs innEnvironment} ${preStart}
-        install -d -m 0750 -o ${escapeShellArg cfg.user} -g ${escapeShellArg cfg.group} \
-          /var/lib/inn-bootstrap /var/lib/inn-bootstrap/staging
         snapshot=/var/lib/inn-bootstrap/staging
+        rm -rf "$snapshot" ${bootstrapSeed}
+        install -d -m 0750 -o ${escapeShellArg cfg.user} -g ${escapeShellArg cfg.group} \
+          /var/lib/inn-bootstrap "$snapshot"
         cp -a --reflink=auto "$state/db" "$snapshot/"
         install -d -m 0750 "$snapshot/spool"
         cp -a --reflink=auto "$state/spool/articles" "$state/spool/overview" "$snapshot/spool/"
@@ -2069,7 +2114,7 @@ let
   '';
 
   rsyncConfiguration = writeText "inn-bootstrap-rsyncd.conf" ''
-    address = 0.0.0.0
+    address = ${cfg.primaryAddress}
     port = ${toString cfg.bootstrapPort}
     use chroot = false
     read only = true
@@ -2130,7 +2175,7 @@ in
             Local IPv4 address on which INN listens.
           '';
 
-          type = types.str;
+          type = types.strMatching "[0-9]{1,3}(\\.[0-9]{1,3}){3}";
         };
 
         bootstrapPort = mkOption {
@@ -2275,7 +2320,7 @@ in
                     Replica tailnet IPv4 address allowed to download its seed.
                   '';
 
-                  type = str;
+                  type = strMatching "[0-9]{1,3}(\\.[0-9]{1,3}){3}";
                 };
 
                 host = mkOption {
@@ -2283,7 +2328,7 @@ in
                     Replica FQDN and INN Path identity.
                   '';
 
-                  type = str;
+                  type = strMatching "[A-Za-z0-9.-]+";
                 };
               };
             });
@@ -2304,7 +2349,7 @@ in
             Primary tailnet IPv4 address allowed to feed replicas.
           '';
 
-          type = types.str;
+          type = types.strMatching "[0-9]{1,3}(\\.[0-9]{1,3}){3}";
         };
 
         primaryHost = mkOption {
@@ -2312,7 +2357,7 @@ in
             Fully qualified name of the single authoritative primary.
           '';
 
-          type = types.str;
+          type = types.strMatching "[A-Za-z0-9.-]+";
         };
 
         recent = {
@@ -2483,6 +2528,14 @@ in
           assertion = groups != [ ];
           message = "INN requires at least one configured article group.";
         }
+        {
+          assertion = all (
+            name:
+            builtins.match "[A-Za-z0-9._-]+" name != null
+          ) (attrNames cfg.peers);
+
+          message = "INN peer names must only contain letters, digits, dots, underscores, or hyphens.";
+        }
       ];
 
       environment = {
@@ -2533,6 +2586,15 @@ in
               ExecStartPre = "${preStart}";
               ExecStop = "${cfg.package}/bin/ctlinnd -t 60 shutdown systemd-stop";
               Group = cfg.group;
+              NoNewPrivileges = true;
+              PrivateTmp = true;
+              ProtectHome = true;
+              ProtectSystem = "strict";
+
+              ReadWritePaths = [
+                stateDirectory
+              ];
+
               Restart = "on-failure";
               RestartSec = "5s";
               RuntimeDirectory = "inn";
@@ -2599,6 +2661,7 @@ in
           inn-bootstrap-export = {
             after = [
               "inn.service"
+              "tailscaled.service"
             ];
 
             bindsTo = [
@@ -2629,6 +2692,10 @@ in
 
             wantedBy = [
               "inn.service"
+            ];
+
+            wants = [
+              "tailscaled.service"
             ];
           };
 
