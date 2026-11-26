@@ -10,8 +10,8 @@ let
 in
 {
   imports = [
-    magnolia.disko
     disko.nixosModules.disko
+    magnolia.disko
   ];
 
   hardware = {

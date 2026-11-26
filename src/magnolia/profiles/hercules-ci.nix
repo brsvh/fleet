@@ -50,13 +50,6 @@ in
     hercules-ci-agent = {
       enable = true;
 
-      # Agent 0.10.10 cannot decode compound mount conditions from TOML tables.
-      tomlFile = mkForce (
-        (pkgs.formats.json { }).generate
-          "hercules-ci-agent.json"
-          config.services.hercules-ci-agent.settings
-      );
-
       settings = {
         binaryCachesPath =
           (pkgs.formats.json { }).generate
@@ -103,6 +96,13 @@ in
         secretsJsonPath =
           config.sops.secrets.hercules-ci-effects-secrets.path;
       };
+
+      # Agent 0.10.10 cannot decode compound mount conditions from TOML tables.
+      tomlFile = mkForce (
+        (pkgs.formats.json { }).generate
+          "hercules-ci-agent.json"
+          config.services.hercules-ci-agent.settings
+      );
     };
   };
 
@@ -138,12 +138,6 @@ in
   };
 
   systemd = {
-    tmpfiles = {
-      rules = [
-        "d ${pagesDirectory} 0700 hercules-ci-agent hercules-ci-agent -"
-      ];
-    };
-
     services = {
       hercules-ci-agent = {
         after = [
@@ -163,6 +157,12 @@ in
           "tailscaled.service"
         ];
       };
+    };
+
+    tmpfiles = {
+      rules = [
+        "d ${pagesDirectory} 0700 hercules-ci-agent hercules-ci-agent -"
+      ];
     };
   };
 }
