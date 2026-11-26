@@ -25,6 +25,7 @@ in
 
   hardware = {
     graphics = {
+      # Steam requires 64-bit and 32-bit graphics drivers regardless of host defaults.
       enable = mkForce true;
       enable32Bit = mkForce true;
     };

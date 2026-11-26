@@ -18,7 +18,7 @@ in
       hinting = {
         autohint = mkDefault false;
         enable = mkDefault true;
-        style = "slight";
+        style = mkDefault "slight";
       };
 
       includeUserConf = mkDefault true;
