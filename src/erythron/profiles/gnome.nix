@@ -1,6 +1,6 @@
 {
-  erythron,
   config,
+  erythron,
   lib,
   system,
   ...
@@ -8,14 +8,13 @@
 let
   inherit (lib)
     concatLists
-    concatStringsSep
     filterAttrs
     mapAttrsToList
     pipe
     ;
 
   normalUsers = filterAttrs (
-    _: v: v.enable && v.isNormalUser
+    _: value: value.enable && value.isNormalUser
   ) config.users.users;
 
   userGroup =
@@ -33,47 +32,17 @@ in
     system.profiles.gnome
   ];
 
-  system = {
-    activationScripts = {
-      userMonitorsPermission = {
-        text = pipe normalUsers [
-          (mapAttrsToList (
-            n: v: ''
-              cfg=${v.home}/.config
-
-              if [ -L "$cfg" ]; then
-                :
-              elif [ -d "$cfg" ]; then
-                chown ${v.name}:${userGroup n} "$cfg"
-                chmod 0700 "$cfg"
-              else
-                install -d -m 0700 -o ${v.name} -g ${userGroup n} "$cfg"
-              fi
-
-              rm -rf "$cfg/monitors.xml"
-              ln -s ${erythron.etc.monitors} "$cfg/monitors.xml"
-
-              chown -h ${v.name}:${userGroup n} "$cfg/monitors.xml"
-            ''
-          ))
-          (concatStringsSep "\n")
-        ];
-      };
-    };
-  };
-
   systemd = {
     tmpfiles = {
       rules = pipe normalUsers [
         (mapAttrsToList (
-          n: v: [
-            "d ${v.home}/.config 0700 ${v.name} ${userGroup n} -"
-            "L+ ${v.home}/.config/monitors.xml - - - - ${erythron.etc.monitors}"
+          name: value: [
+            "d ${value.home}/.config 0700 ${value.name} ${userGroup name} -"
+            "L+ ${value.home}/.config/monitors.xml - - - - ${erythron.etc.monitors}"
           ]
         ))
         concatLists
       ];
     };
   };
-
 }
