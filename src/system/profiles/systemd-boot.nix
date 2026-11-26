@@ -17,6 +17,7 @@ in
 
       systemd-boot = {
         configurationLimit = mkDefault 10;
+        editor = mkDefault false;
         enable = mkDefault true;
       };
     };
