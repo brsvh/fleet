@@ -201,8 +201,8 @@ in
             attrsOf (
               submodule (
                 {
-                  name,
                   config,
+                  name,
                   ...
                 }:
                 let
@@ -318,7 +318,7 @@ in
             '';
 
             readOnly = true;
-            type = with types; nullOr emacsAddressbookType;
+            type = types.nullOr emacsAddressbookType;
           };
 
           syncCollections = mkOption {

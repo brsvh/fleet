@@ -62,11 +62,14 @@ in
 
       isXDG = config.xdg.enable;
 
-      notXDG = config.xdg.enable == false;
+      notXDG = !config.xdg.enable;
 
-      cond =
-        v: xdg:
-        cfg.enable && v != null && pathExists v && xdg;
+      hasInitFile =
+        file: xdg:
+        cfg.enable
+        && file != null
+        && pathExists file
+        && xdg;
 
       compileElisp =
         source: file:
@@ -107,7 +110,7 @@ in
           };
         };
       })
-      (mkIf (cond cfg.initFile isXDG) {
+      (mkIf (hasInitFile cfg.initFile isXDG) {
         xdg = {
           configFile = {
             "emacs/init.el" = {
@@ -120,7 +123,7 @@ in
           };
         };
       })
-      (mkIf (cond cfg.earlyInitFile isXDG) {
+      (mkIf (hasInitFile cfg.earlyInitFile isXDG) {
         xdg = {
           configFile = {
             "emacs/early-init.el" = {
@@ -133,7 +136,7 @@ in
           };
         };
       })
-      (mkIf (cond cfg.initFile notXDG) {
+      (mkIf (hasInitFile cfg.initFile notXDG) {
         home = {
           file = {
             ".emacs.d/init.el" = {
@@ -146,7 +149,7 @@ in
           };
         };
       })
-      (mkIf (cond cfg.earlyInitFile notXDG) {
+      (mkIf (hasInitFile cfg.earlyInitFile notXDG) {
         home = {
           file = {
             ".emacs.d/early-init.el" = {
