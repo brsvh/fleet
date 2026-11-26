@@ -29,6 +29,12 @@
           };
         };
 
+        nginx-http-auth = {
+          settings = {
+            port = "http,https";
+          };
+        };
+
         postfix-sasl = {
           settings = {
             port = "465";
