@@ -2467,7 +2467,7 @@ in
             Ordered pullnews upstream definitions and subscribed groups.
           '';
 
-          type = with types; attrsOf upstreamType;
+          type = types.attrsOf upstreamType;
         };
 
         user = mkOption {
