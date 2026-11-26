@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    system.modules.users-groups
     system.profiles.fish
     system.profiles.sops
   ];
@@ -24,6 +23,8 @@
         description = "Bingshan Chang";
 
         extraGroups = [
+          "dialout"
+          "systemd-journal"
           "wheel"
         ];
 
