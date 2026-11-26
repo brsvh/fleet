@@ -104,8 +104,8 @@ in
         set -s extended-keys-format xterm
         set -as terminal-features ',xterm-ghostty:RGB:extkeys:clipboard'
 
-        # Allow applications to copy through the enclosing terminal.
-        set -s set-clipboard on
+        # Let tmux update the terminal clipboard without trusting pane OSC 52.
+        set -s set-clipboard external
         set -ag update-environment ' COLORTERM'
 
         # Start new work in the active pane's directory.
