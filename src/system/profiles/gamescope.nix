@@ -10,7 +10,7 @@ in
 {
   programs = {
     gamescope = {
-      enable = true;
+      enable = mkDefault true;
       enableWsi = mkDefault true;
     };
   };
