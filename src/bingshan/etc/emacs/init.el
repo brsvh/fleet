@@ -1360,6 +1360,18 @@
        (setq-local line-spacing 0.2)
        (olivetti-mode +1)))))
 
+(use-package org
+  :after (bs-lib)
+
+  :preface
+  ;; Set the shared root before deferred packages derive their paths.
+  (setq org-directory (bs-path "~/org/"))
+
+  :init
+  ;; Create the shared root at runtime, avoiding filesystem changes
+  ;; during byte compilation.
+  (bs-path* org-directory))
+
 (use-package simple
   :hook
   ;; Set the fill column to 80 characters locally for `org-mode'
@@ -1586,10 +1598,7 @@
   :hook
   ;; Improve cursor movement by treating Camel-case sub-words as
   ;; separate units.
-  (prog-mode-hook . subword-mode)
-
-  ;; Treat words separated by punctuation too.
-  (prog-mode-hook . superword-mode))
+  (prog-mode-hook . subword-mode))
 
 (use-package whitespace
   :hook
@@ -1993,7 +2002,7 @@
 (use-package startup
   :custom
   ;; Clearing the *scratch* buffer.
-  initial-scratch-message nil
+  (initial-scratch-message nil)
 
   :demand t
   :no-require t)
@@ -3668,10 +3677,13 @@
 ;;
 
 (use-package copyright
-  :custom
+  :defines (copyright-names-regexp)
+
+  :config
   ;; Ensure file headers include correct copyright information.
-  copyright-names-regexp
-  (format "%s <%s>" user-full-name user-mail-address))
+  (setq copyright-names-regexp
+        (regexp-quote
+         (format "%s <%s>" user-full-name user-mail-address))))
 
 
 
@@ -4103,11 +4115,13 @@
   (epa-file-enable))
 
 (use-package epa-hook
-  :custom
-  ;; Set the default recipient(s) for file encryption.  When saving an
-  ;; encrypted file without specifying recipients explicitly,
-  ;; `user-mail-address' key will be used by default.
-  (epa-file-encrypt-to `(,user-mail-address)))
+  :defines (epa-file-encrypt-to)
+
+  :config
+  ;; Fall back to `user-mail-address' when no default recipient key is
+  ;; configured by `default.el'.
+  (unless epa-file-encrypt-to
+    (setq epa-file-encrypt-to (list user-mail-address))))
 
 (use-package epg-config
   :custom
@@ -4763,15 +4777,6 @@
   (org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)"
                                  "|"
                                  "DONE(d)" "CNCL(c)" "FAIL(f)")))
-
-  :preface
-  ;; Set the shared root before deferred packages derive their paths.
-  (setq org-directory (bs-path "~/org/"))
-
-  :init
-  ;; Create the shared root at runtime, avoiding filesystem changes
-  ;; during byte compilation.
-  (bs-path* org-directory)
 
   :config
   ;; Show the Block Structure dispatcher in a dedicated bottom side
