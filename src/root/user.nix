@@ -11,8 +11,6 @@
   users = {
     users = {
       root = {
-        initialHashedPassword = "$y$j9T$SLgyzhjD5N85EYmdCWicI/$3Qei1rSEjsmTwCEKAXwqXsEpcQx4OB5GAuewfp0vz74";
-
         openssh = {
           authorizedKeys = {
             keys = [
