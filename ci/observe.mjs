@@ -1,8 +1,7 @@
 import { requestJson } from './http.mjs';
-import { deployHandler } from './hercules.mjs';
+import { deployHandler, herculesApi } from './hercules.mjs';
 
 export default async function ({ core }) {
-  const herculesApi = 'https://hercules-ci.com/api/v1';
   const deadline = Date.now() + 175 * 60 * 1000;
   const { host, revision } = JSON.parse(process.env.REQUEST);
 

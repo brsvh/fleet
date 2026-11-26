@@ -1,5 +1,6 @@
 import {
   deployHandler,
+  herculesApi,
   jobFamily,
   jobHistory,
   rerunJob,
@@ -65,8 +66,6 @@ export default async function ({ github, context, core }) {
   ) {
     throw new Error('Current main deployment has not been approved');
   }
-
-  const herculesApi = 'https://hercules-ci.com/api/v1';
 
   const api = (path, options) =>
     requestJson(`${herculesApi}${path}`, {

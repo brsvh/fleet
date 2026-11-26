@@ -1,4 +1,4 @@
-import { deployHandler } from './hercules.mjs';
+import { deployHandler, fleetProjectPath, herculesApi } from './hercules.mjs';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -17,10 +17,8 @@ const hciToken = secrets['hercules-ci']?.data.token;
 const projectId = process.env.HERCULES_CI_PROJECT_ID;
 const repository = 'brsvh/fleet';
 const githubApi = `https://api.github.com/repos/${repository}`;
-const herculesApi = 'https://hercules-ci.com/api/v1';
 const stateApi = `${herculesApi}/projects/${projectId}/state`;
-const jobApi =
-  `${herculesApi}/site/github/account/brsvh` + '/project/fleet/jobs';
+const jobApi = `${herculesApi}${fleetProjectPath}/jobs`;
 
 const approvalName = `fleet-approval-${host}.json`;
 const deployedName = `fleet-deployed-${host}.json`;

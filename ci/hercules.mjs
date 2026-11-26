@@ -1,6 +1,11 @@
 import { setTimeout as delay } from 'node:timers/promises';
 import { requestRejected } from './http.mjs';
 
+export const herculesApi = 'https://hercules-ci.com/api/v1';
+export const fleetProjectPath = '/site/github/account/brsvh/project/fleet';
+export const herculesJobUrlBase =
+  'https://hercules-ci.com/github/brsvh/fleet/jobs/';
+
 export function deployHandler(host) {
   return `deployHost/${host}`;
 }
@@ -22,7 +27,6 @@ export function sameTask(job, source) {
 }
 
 export async function jobHistory(api, revision) {
-  const project = '/site/github/account/brsvh/project/fleet';
   const query = new URLSearchParams({
     rev: revision,
     limit: '100',
@@ -30,7 +34,7 @@ export async function jobHistory(api, revision) {
   const jobs = [];
 
   for (let page = 0; page < 10; page += 1) {
-    const { items } = await api(`${project}/jobs?${query}`);
+    const { items } = await api(`${fleetProjectPath}/jobs?${query}`);
     jobs.push(...items);
 
     if (items.length < 100) {
