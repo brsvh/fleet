@@ -59,6 +59,23 @@ let
     removeExtension
   ];
 
+  bingshanUser = {
+    imports = [
+      fleet.bingshan.user
+    ];
+
+    users = {
+      users = {
+        bingshan = {
+          extraGroups = [
+            "kvm"
+            "libvirtd"
+          ];
+        };
+      };
+    };
+  };
+
   profilesToList =
     profiles:
     pipe profiles [
@@ -176,10 +193,6 @@ in
 
         users = {
           bingshan = {
-            inherit (fleet.bingshan)
-              user
-              ;
-
             home = config.configurations.home.bingshan // {
               profiles =
                 config.configurations.home.bingshan.profiles
@@ -187,6 +200,8 @@ in
                   fleet.bingshan.special-profiles.gnome
                 ];
             };
+
+            user = bingshanUser;
           };
 
           root = {
@@ -242,10 +257,6 @@ in
 
         users = {
           bingshan = {
-            inherit (fleet.bingshan)
-              user
-              ;
-
             home = config.configurations.home.bingshan // {
               profiles =
                 config.configurations.home.bingshan.profiles
@@ -253,6 +264,8 @@ in
                   fleet.bingshan.special-profiles.gnome
                 ];
             };
+
+            user = bingshanUser;
           };
 
           root = {
@@ -274,10 +287,6 @@ in
 
         users = {
           bingshan = {
-            inherit (fleet.bingshan)
-              user
-              ;
-
             home = config.configurations.home.bingshan // {
               profiles =
                 config.configurations.home.bingshan.profiles
@@ -426,6 +435,8 @@ in
                   fleet.bingshan.special-profiles.steam
                 ];
             };
+
+            user = bingshanUser;
           };
 
           root = {
