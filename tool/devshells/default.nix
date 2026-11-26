@@ -341,7 +341,7 @@ rec {
                 }
               ];
 
-              path_regex = "^src/azaleoid/etc/sops\.yaml$";
+              path_regex = "^src/azaleoid/etc/sops\\.yaml$";
             }
             {
               key_groups = [
@@ -352,7 +352,7 @@ rec {
                 }
               ];
 
-              path_regex = "^src/bingshan/etc/(sops\.yaml|fonts/.*\.(otf|ttf)\.sops)$";
+              path_regex = "^src/bingshan/etc/(sops\\.yaml|fonts/.*\\.(otf|ttf)\\.sops)$";
             }
             {
               key_groups = [
@@ -363,7 +363,7 @@ rec {
                 }
               ];
 
-              path_regex = "^src/camellia/etc/sops\.yaml$";
+              path_regex = "^src/camellia/etc/sops\\.yaml$";
             }
             {
               key_groups = [
@@ -374,7 +374,7 @@ rec {
                 }
               ];
 
-              path_regex = "^src/erythron/etc/sops\.yaml$";
+              path_regex = "^src/erythron/etc/sops\\.yaml$";
             }
             {
               key_groups = [
@@ -385,7 +385,7 @@ rec {
                 }
               ];
 
-              path_regex = "^src/magnolia/etc/sops\.yaml$";
+              path_regex = "^src/magnolia/etc/sops\\.yaml$";
             }
           ];
         };
