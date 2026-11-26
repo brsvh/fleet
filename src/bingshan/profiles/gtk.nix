@@ -7,11 +7,9 @@
 }:
 let
   inherit (lib)
-    elemAt
+    head
     mkForce
     ;
-
-  first = list: elemAt list 0;
 
   fonts = config.fonts.fontconfig.defaultFonts;
 in
@@ -23,7 +21,7 @@ in
 
   gtk = {
     font = {
-      name = mkForce "${first fonts.sansSerif}";
+      name = mkForce (head fonts.sansSerif);
       package = mkForce null;
     };
   };

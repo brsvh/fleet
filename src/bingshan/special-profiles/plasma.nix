@@ -13,8 +13,8 @@ let
 
   inherit (lib)
     concatStringsSep
-    elemAt
     getExe'
+    head
     hm
     ;
 
@@ -31,20 +31,18 @@ let
         sort -u default-filters | paste -sd, > "$out"
       '';
 
-  first = list: elemAt list 0;
-
   fontFamilies =
     config.fonts.fontconfig.defaultFonts;
 
   fontSize = config.gtk.font.size;
 
   monospace = {
-    family = first fontFamilies.monospace;
+    family = head fontFamilies.monospace;
     pointSize = fontSize;
   };
 
   sansSerif = {
-    family = first fontFamilies.sansSerif;
+    family = head fontFamilies.sansSerif;
     pointSize = fontSize;
   };
 

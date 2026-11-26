@@ -8,15 +8,13 @@
 }:
 let
   inherit (lib)
-    elemAt
+    head
     optional
     ;
 
-  first = list: elemAt list 0;
-
   fonts = config.fonts.fontconfig.defaultFonts;
 
-  monospace = first fonts.monospace;
+  monospace = head fonts.monospace;
 in
 {
   imports = [

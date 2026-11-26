@@ -12,11 +12,9 @@ let
     ;
 
   inherit (lib)
-    elemAt
+    head
     toString
     ;
-
-  first = list: elemAt list 0;
 
   fonts = config.fonts.fontconfig.defaultFonts;
 in
@@ -32,9 +30,9 @@ in
   dconf = {
     settings = {
       "org/gnome/desktop/interface" = {
-        document-font-name = "${first fonts.serif} ${toString config.gtk.font.size}";
-        font-name = "${first fonts.sansSerif} ${toString config.gtk.font.size}";
-        monospace-font-name = "${first fonts.monospace} ${toString config.gtk.font.size}";
+        document-font-name = "${head fonts.serif} ${toString config.gtk.font.size}";
+        font-name = "${head fonts.sansSerif} ${toString config.gtk.font.size}";
+        monospace-font-name = "${head fonts.monospace} ${toString config.gtk.font.size}";
       };
 
       "org/gnome/desktop/session" = {
