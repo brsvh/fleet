@@ -22,8 +22,8 @@ let
     icon = "teamspeak6-client";
 
     mimeTypes = [
-      "x-scheme-handler/ts3server"
       "x-scheme-handler/teamspeak"
+      "x-scheme-handler/ts3server"
     ];
 
     name = "com.teamspeak.teamspeak";

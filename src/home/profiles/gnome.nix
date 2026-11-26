@@ -33,8 +33,11 @@ in
         disable-user-extensions = false;
 
         enabled-extensions = map (
-          ext:
-          if ext ? id then ext.id else ext.extensionUuid
+          extension:
+          if extension ? id then
+            extension.id
+          else
+            extension.extensionUuid
         ) config.programs.gnome-shell.extensions;
       };
 

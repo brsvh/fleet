@@ -15,13 +15,13 @@ let
     else
       "${config.home.homeDirectory}/.npm";
 
-  init-module =
+  initModule =
     if config.home.preferXdgDirectories then
       "${config.xdg.configHome}/npm/config/npm-init.js"
     else
       "${config.home.homeDirectory}/.npm/config/npm-init.js";
 
-  logs-dir =
+  logsDir =
     if config.home.preferXdgDirectories then
       "${config.xdg.stateHome}/npm"
     else
@@ -45,13 +45,13 @@ in
       settings = {
         inherit
           cache
-          init-module
-          logs-dir
           prefix
           ;
 
         color = true;
         init-license = "MIT";
+        init-module = initModule;
+        logs-dir = logsDir;
       };
     };
   };

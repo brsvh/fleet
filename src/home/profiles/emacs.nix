@@ -21,11 +21,11 @@ let
     linkFarm
     ;
 
-  libext =
+  sharedLibraryExtension =
     pkgs.stdenv.targetPlatform.extensions.sharedLibrary;
 
   mkEntry = drv: name: {
-    name = "lib${name}${libext}";
+    name = "lib${name}${sharedLibraryExtension}";
     path = "${drv}/parser";
   };
 
