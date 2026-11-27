@@ -504,17 +504,19 @@ in
         serviceConfig = {
           Group = "nextcloud";
 
-          LoadCredential = [
-            "chang-password:${
-              secrets."chang@bingshan.org".path
-            }"
-            "onlyoffice-jwt-secret:${
-              secrets."onlyoffice/jwt-secret".path
-            }"
-            "whiteboard-env:${
-              secrets."nextcloud/whiteboard-env".path
-            }"
-          ];
+          LoadCredential =
+            config.systemd.services.nextcloud-setup.serviceConfig.LoadCredential
+            ++ [
+              "chang-password:${
+                secrets."chang@bingshan.org".path
+              }"
+              "onlyoffice-jwt-secret:${
+                secrets."onlyoffice/jwt-secret".path
+              }"
+              "whiteboard-env:${
+                secrets."nextcloud/whiteboard-env".path
+              }"
+            ];
 
           StateDirectory = "nextcloud-configure";
           StateDirectoryMode = "0700";
