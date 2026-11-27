@@ -413,11 +413,12 @@ in
               undeclared_keys="$(
                 jq -r --argjson declared "$declared_ids" '
                   .keys[]?
+                  | .accessKeyId as $accessKeyId
                   | select(
                       (.permissions.read or .permissions.write or .permissions.owner)
-                      and (($declared | index(.accessKeyId)) == null)
+                      and (($declared | index($accessKeyId)) == null)
                     )
-                  | .accessKeyId
+                  | $accessKeyId
                 ' "$bucket_info_file"
               )"
 
