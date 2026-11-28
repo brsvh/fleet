@@ -39,6 +39,40 @@ in
           root = archivePublicRoot;
         };
 
+        "assets.bingshan.org" = {
+          enableACME = true;
+          forceSSL = true;
+
+          locations = {
+            "/" = {
+              return = "404";
+            };
+
+            "~ \"^/chinese-fonts-overlay/images/([0-9a-f]{64}\\.webp)$\"" =
+              {
+                extraConfig = ''
+                  set $preview_object $1;
+                  limit_except GET HEAD { deny all; }
+                  if ($request_uri !~ "^/chinese-fonts-overlay/images/[0-9a-f]{64}\.webp(?:\?retry=[0-9]+)?$") {
+                    return 404;
+                  }
+                  proxy_pass http://127.0.0.1:3902/$preview_object;
+                  proxy_http_version 1.1;
+                  proxy_set_header Host chinese-fonts-overlay-previews.web.garage.internal;
+                  proxy_set_header Connection "";
+                  proxy_read_timeout 60s;
+                  add_header Cache-Control "public, max-age=31536000, immutable";
+                  add_header X-Content-Type-Options "nosniff" always;
+                  add_header Cross-Origin-Resource-Policy "cross-origin" always;
+                '';
+              };
+          };
+
+          serverAliases = [
+            "assets.brsvh.org"
+          ];
+        };
+
         "s3.bingshan.org" = {
           enableACME = true;
           forceSSL = true;
@@ -48,10 +82,10 @@ in
               return = "404";
             };
 
-            "~ ^/chinese-fonts-overlay-(?:pages|webfonts)(?:/|$)" =
+            "~ ^/chinese-fonts-overlay-(?:pages|previews|webfonts)(?:/|$)" =
               {
                 extraConfig = ''
-                  if ($request_uri !~ "^/chinese-fonts-overlay-(?:pages|webfonts)(?:/|\?|$)") {
+                  if ($request_uri !~ "^/chinese-fonts-overlay-(?:pages|previews|webfonts)(?:/|\?|$)") {
                     return 404;
                   }
                   client_max_body_size 1000m;
