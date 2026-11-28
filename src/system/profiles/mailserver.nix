@@ -19,12 +19,13 @@ in
 {
   imports = [
     mailserver.nixosModules.default
+    system.profiles.knot-resolver
     system.profiles.nginx
   ];
 
   mailserver = {
     enable = mkDefault true;
-    stateVersion = mkDefault 4;
+    stateVersion = mkDefault 5;
 
     x509 = {
       useACMEHost = cfg.fqdn;
