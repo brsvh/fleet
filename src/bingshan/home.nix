@@ -5,7 +5,7 @@
 {
   home = {
     homeDirectory = "/home/${config.home.username}";
-    stateVersion = "26.05";
+    stateVersion = "26.11";
     username = "bingshan";
   };
 }
