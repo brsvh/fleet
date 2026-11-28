@@ -11,6 +11,7 @@ let
     ;
 
   pagesBucket = "chinese-fonts-overlay-pages";
+  previewsBucket = "chinese-fonts-overlay-previews";
   webfontsBucket = "chinese-fonts-overlay-webfonts";
 in
 {
@@ -37,6 +38,15 @@ in
             };
 
             maximumSize = 2147483648;
+          };
+
+          ${previewsBucket} = {
+            keys = {
+              previews-writer = true;
+            };
+
+            maximumSize = 10737418240;
+            websiteAccess = true;
           };
 
           ${webfontsBucket} = {
@@ -75,6 +85,12 @@ in
             secretFile = secrets."garage/pages-writer".path;
           };
 
+          previews-writer = {
+            id = "GKaa3afd6a425450c529e726e4";
+            secretFile =
+              secrets."garage/previews-writer".path;
+          };
+
           webfonts-reader = {
             id = "GKeb46e862f6527c06f15e2c84";
             secretFile =
@@ -103,6 +119,12 @@ in
       };
 
       "garage/pages-writer" = {
+        restartUnits = [
+          "garage-configure.service"
+        ];
+      };
+
+      "garage/previews-writer" = {
         restartUnits = [
           "garage-configure.service"
         ];
@@ -149,7 +171,7 @@ in
         ];
 
         script = ''
-          for bucket in ${pagesBucket} ${webfontsBucket}; do
+          for bucket in ${pagesBucket} ${previewsBucket} ${webfontsBucket}; do
             ${config.services.garage.package}/bin/garage \
               --rpc-secret-file "$CREDENTIALS_DIRECTORY/rpc-secret" \
               bucket cleanup-incomplete-uploads --older-than 1d "$bucket"
