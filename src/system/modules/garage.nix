@@ -31,6 +31,9 @@ let
       garage_admin bucket set-quotas ${escapeShellArg name} \
         --max-size ${toString bucket.maximumSize} > /dev/null
     ''}
+    set_website_access ${escapeShellArg name} ${
+      if bucket.websiteAccess then "true" else "false"
+    }
     ${concatStringsSep "\n" (
       mapAttrsToList (key: write: ''
         set_permission ${escapeShellArg keys.${key}.id} ${
@@ -83,6 +86,17 @@ in
                     '';
 
                     type = with types; nullOr ints.positive;
+                  };
+
+                  websiteAccess = mkOption {
+                    default = false;
+
+                    description = ''
+                      Whether to expose this bucket read-only through Garage's
+                      website endpoint.
+                    '';
+
+                    type = types.bool;
                   };
                 };
               });
@@ -378,6 +392,31 @@ in
 
               jq -n --arg globalAlias "$name" '{globalAlias: $globalAlias}' | \
                 garage_json CreateBucket - > "$bucket_info_file"
+            }
+
+            set_website_access() {
+              local name="$1" allow="$2"
+
+              if test "$allow" = "true"; then
+                if jq -e '
+                  .websiteAccess == true
+                  and (.websiteConfig.indexDocument // null) == "index.html"
+                  and (.websiteConfig.errorDocument // null) == null
+                ' "$bucket_info_file" > /dev/null; then
+                  return
+                fi
+
+                garage_admin bucket website \
+                  --allow \
+                  --index-document index.html \
+                  "$name" > /dev/null
+              else
+                if jq -e '.websiteAccess == false' "$bucket_info_file" > /dev/null; then
+                  return
+                fi
+
+                garage_admin bucket website --deny "$name" > /dev/null
+              fi
             }
 
             set_permission() {

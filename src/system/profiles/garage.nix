@@ -25,6 +25,12 @@ in
           api_bind_addr = "127.0.0.1:3900";
           s3_region = "garage";
         };
+
+        s3_web = {
+          bind_addr = mkDefault "127.0.0.1:3902";
+          index = mkDefault "index.html";
+          root_domain = mkDefault ".web.garage.internal";
+        };
       };
     };
   };
