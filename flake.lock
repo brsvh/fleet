@@ -53,11 +53,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793847371,
-        "narHash": "sha256-iMFyl4uYdkmxSXdksvxO4MM7Vf5UMbxUjByWn7kI2JY=",
+        "lastModified": 1795866583,
+        "narHash": "sha256-i8kGL2188m6XAcXmVkkooKWvrRGEAcBNVmOpuSX9UrU=",
         "ref": "main",
-        "rev": "a14d554299d1c8a5f4329a215d4d6217d99bf307",
-        "revCount": 199,
+        "rev": "388654a15e1b756679b739be76f65d83d0df2e7c",
+        "revCount": 420,
         "type": "git",
         "url": "https://github.com/brsvh/chinese-fonts-overlay.git"
       },
@@ -138,11 +138,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794328522,
-        "narHash": "sha256-h2BYMW4nTFpIqnMd8gwAPFmJAp/1wWLQ6vT0NfL5qt4=",
+        "lastModified": 1795168368,
+        "narHash": "sha256-D35n2Q2v1KrlF9LS/pFl8Z3EBMJW6qvPw5q4HMbXXLg=",
         "ref": "master",
-        "rev": "1dd30c29c88d99ce295f15e27f93c49bc5fbae07",
-        "revCount": 1417,
+        "rev": "44761d4f745b95e037458a0e57133c5700c8e320",
+        "revCount": 1421,
         "type": "git",
         "url": "https://github.com/nix-community/disko.git"
       },
@@ -264,11 +264,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794779111,
-        "narHash": "sha256-w9Fm4+yEd6SKJ0+y9r6wZS1JEZfOOguZ1pvc1T7uZbM=",
+        "lastModified": 1795850262,
+        "narHash": "sha256-GvQQ+GXuLGWjpDxr9bP4D4QKksLutCa5F1g8JqTNPEQ=",
         "ref": "master",
-        "rev": "f0fb9a6a2b3842a14389d0c14c9ef76b0dcd3f20",
-        "revCount": 20387,
+        "rev": "0a34f1e1afa9308f294859e7f9cf86b0908dce85",
+        "revCount": 20463,
         "type": "git",
         "url": "https://github.com/nix-community/emacs-overlay.git"
       },
@@ -416,11 +416,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794715309,
-        "narHash": "sha256-awkBBs5ctFKgEYjpNGpi3t/VqF589n5EWfdinRb2gNI=",
+        "lastModified": 1795827905,
+        "narHash": "sha256-Udjs2j0EkvK+qGXKHRIQwXWRgzNBIl4oXSUktuOzbmQ=",
         "ref": "master",
-        "rev": "a1293da7dd8e497e08d26173f97e2976b36a31ea",
-        "revCount": 7603,
+        "rev": "5f5abf5eb8de62d954232f3797b5bf4505656b91",
+        "revCount": 7646,
         "type": "git",
         "url": "https://github.com/nix-community/home-manager.git"
       },
@@ -453,11 +453,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794174541,
-        "narHash": "sha256-/UFUYz/MP5BVpPcaGtk32aARSwlv/mQmazyeOzTpbww=",
+        "lastModified": 1795871079,
+        "narHash": "sha256-GyaVO5PpyslKSXWcHLKHXEPNrPcfWWICQ5l8yAXAXbs=",
         "ref": "main",
-        "rev": "0ab8a1a429b538ab3f7195df9444c275ba9334cc",
-        "revCount": 226,
+        "rev": "597276b70f20933656b4bb5d7210b529d99be6ea",
+        "revCount": 235,
         "type": "git",
         "url": "https://github.com/brsvh/infix.git"
       },
@@ -516,11 +516,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794787251,
-        "narHash": "sha256-LHm/x1owamrkGb9am4LofA1jn8yJBQHPxfAUdEDDNfA=",
+        "lastModified": 1795871141,
+        "narHash": "sha256-ZDL6ai4+uT4DCyj5eHF6Ts4Zg0iY97itGWdKtDGGHC4=",
         "ref": "main",
-        "rev": "8adf052a0006d9617a7d6c0fe5a628e1eb48a5dc",
-        "revCount": 24190,
+        "rev": "6dd002022b55cea4c6732c8bb0b20bc4859584d6",
+        "revCount": 25315,
         "type": "git",
         "url": "https://github.com/numtide/llm-agents.nix"
       },
@@ -546,11 +546,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792611588,
-        "narHash": "sha256-K6tvVoF+DSoMpgddGk6Xhern6pcBm3KktHV4c9MWrxM=",
+        "lastModified": 1795612032,
+        "narHash": "sha256-uijMOK/+A7FjJrab7/uU2mE+Eg+3dYkEj9SlN9XGWVc=",
         "ref": "main",
-        "rev": "9004c7d9b0986719a76ca6945a718434508d7b2e",
-        "revCount": 1082,
+        "rev": "3b3a0ca31f0ffb01e711473b3f729f95643c36a7",
+        "revCount": 1108,
         "type": "git",
         "url": "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver.git"
       },
@@ -606,11 +606,11 @@
     },
     "nixos": {
       "locked": {
-        "lastModified": 1794537146,
-        "narHash": "sha256-Wpz/7x/YWnDIBu7yj6ixe8j6fIMsidd9Y+o1PqPF3iM=",
-        "ref": "nixos-unstable",
-        "rev": "d5cc6833999746cffdfe0598f7bc801a57b887a9",
-        "revCount": 1119549,
+        "lastModified": 1795371335,
+        "narHash": "sha256-oa2P5WZer1A4wuhatl92JyHHEjrrOdIyuvTuI5LUi9Q=",
+        "ref": "nixpkgs-unstable",
+        "rev": "619c39f6eac5d1ed6b8f073a9414baf7034b2356",
+        "revCount": 1126808,
         "type": "git",
         "url": "https://github.com/NixOS/nixpkgs.git"
       },
@@ -691,11 +691,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794733384,
-        "narHash": "sha256-VaXNWDU+9dXckN4BlZbrcYTTd9pIscLeiknbhHX4+lk=",
+        "lastModified": 1795860178,
+        "narHash": "sha256-ohgonNy3+RvquNpQVDOiI7lanO246mw1qZ/RaBIXUFE=",
         "ref": "master",
-        "rev": "67f1944c7c99d8dbb57fa3d83043bc0a92cbcc56",
-        "revCount": 2369,
+        "rev": "f88aa8dea8f4136a0897fd7baddb3a07481f29f6",
+        "revCount": 2381,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay.git"
       },
@@ -712,11 +712,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794624949,
-        "narHash": "sha256-3q/hxp/flW1PnV3Dx+H3p8kHGEHJ7251BqVMNsAAB9E=",
+        "lastModified": 1795471345,
+        "narHash": "sha256-2p8/wnENYHU2Z79Ir/rpq+V1sMI9mSD6xGAlvlbVBUY=",
         "ref": "master",
-        "rev": "11e5885d241743ff0193465d533b20e754bc3ce0",
-        "revCount": 1270,
+        "rev": "d5abe5e53200ad48254e8e6bd95e6cef94e66577",
+        "revCount": 1273,
         "type": "git",
         "url": "https://github.com/Mic92/sops-nix.git"
       },
@@ -776,11 +776,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791885023,
-        "narHash": "sha256-C3alQ2MEt0zVrUSho5NUDo3jmhbff72++bfwoqT9Omo=",
+        "lastModified": 1795615686,
+        "narHash": "sha256-/C0FK2Fwq0aWE/GADYyYbAIdQeGfYBbWMin3tfks1NA=",
         "ref": "main",
-        "rev": "0d6d739a833ba9a9c93034862e4a7b061a062a1c",
-        "revCount": 684,
+        "rev": "b7b56d3c8833016c650ca542b1230e6130299741",
+        "revCount": 695,
         "type": "git",
         "url": "https://github.com/numtide/treefmt-nix.git"
       },
